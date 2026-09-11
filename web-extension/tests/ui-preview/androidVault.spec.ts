@@ -10,6 +10,9 @@ test('renders captured native Android vault, authenticator and autofill screens'
   ).toBeVisible()
   await expect(page.locator('body')).not.toHaveClass(/extension-popup/)
   for (const name of [
+    'Master device',
+    'Confirm master transfer',
+    'After master transfer',
     'Unlock settings',
     'Fingerprint unlock',
     'Server response',

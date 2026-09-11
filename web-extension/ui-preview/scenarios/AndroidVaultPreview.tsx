@@ -7,10 +7,31 @@ import totpCameraEntryScreenshot from '../../../docs/screenshots/android-totp-ca
 import totpCameraReviewScreenshot from '../../../docs/screenshots/android-totp-camera-review.png'
 import autofillScreenshot from '../../../docs/screenshots/android-autofill.png'
 import associationScreenshot from '../../../docs/screenshots/android-autofill-association.png'
+import masterDevicesScreenshot from '../../../docs/screenshots/android-devices-master.png'
+import transferMasterScreenshot from '../../../docs/screenshots/android-devices-transfer.png'
+import memberDevicesScreenshot from '../../../docs/screenshots/android-devices-member.png'
 
 // Compose runs in Android, so this scenario displays captures from the actual
 // debug app instead of maintaining a second implementation of its UI in React.
 const screens = [
+  {
+    title: 'Master device',
+    image: masterDevicesScreenshot,
+    description:
+      'The current master is labeled. Only that device offers actions to transfer the role to another connected device.'
+  },
+  {
+    title: 'Confirm master transfer',
+    image: transferMasterScreenshot,
+    description:
+      'Review which device will take over and confirm before relinquishing the master role.'
+  },
+  {
+    title: 'After master transfer',
+    image: memberDevicesScreenshot,
+    description:
+      'The badge moves to the new master and transfer controls disappear from the former master.'
+  },
   {
     title: 'Unlock settings',
     image: unlockSettingsScreenshot,

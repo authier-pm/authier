@@ -97,3 +97,21 @@ after a real camera scan, with the setup key hidden. The checked-in `android-vau
 scenario includes both and renders the refreshed `android-ui-preview.png`.
 No real accounts, production database, deployment, or release publication were
 used. Physical-device camera testing remains separate from emulator validation.
+
+## Master-device management — September 10, 2026
+
+Debug/release builds and lint pass, as do all 53 JVM tests and four native
+`DeviceManagementTest` cases on the API 34 emulator. Coverage includes the
+generated transfer request and server errors, signed-out target filtering,
+confirmation/cancellation, master badge placement, and disabled/hidden controls
+for busy, non-master, unknown-master, stale-role, and signed-out-target states.
+The 14-test mobile API suite passes against PGlite, including a handoff regression
+that rejects non-master requests and rejects the former master using its existing
+session after transfer.
+
+The debug demo exercises the real Compose screen and view model with synthetic
+in-memory transfers. Fresh native captures are `android-devices-master.png`,
+`android-devices-transfer.png`, and `android-devices-member.png`. The checked-in
+Android UI gallery includes all three; its TypeScript check and Playwright render
+pass. Production device transfers use the existing API and recheck server role
+before submitting. No backend deployment or migration is required.

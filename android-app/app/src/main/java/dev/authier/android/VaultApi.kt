@@ -16,6 +16,7 @@ interface VaultApi {
     suspend fun approve(id: Int)
     suspend fun reject(id: Int)
     suspend fun removeDevice(id: String)
+    suspend fun setMasterDevice(id: String)
     suspend fun security(): SecurityInfo
     suspend fun updatePolicy(policy: String): SecurityInfo
     suspend fun updateLockTimeout(seconds: Int)

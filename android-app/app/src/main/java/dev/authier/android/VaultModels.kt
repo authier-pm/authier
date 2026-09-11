@@ -72,7 +72,7 @@ fun requireNativeEditableKind(kind: String) {
     require(isNativeEditableKind(kind)) { "This item is preserved by vault sync. Manage passkeys in the Authier browser extension." }
 }
 
-data class DeviceInfo(val id: String, val name: String, val platform: String, val lastSyncAt: String?, val isCurrent: Boolean)
+data class DeviceInfo(val id: String, val name: String, val platform: String, val lastSyncAt: String?, val isCurrent: Boolean, val logoutAt: String? = null)
 data class ApprovalInfo(val id: Int, val deviceName: String, val ipAddress: String, val createdAt: String)
 data class SecurityInfo(val newDevicePolicy: String = "REQUIRE_ANY_DEVICE_APPROVAL", val recoveryMinutes: Int = 1440, val masterDeviceId: String? = null)
 

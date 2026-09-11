@@ -14,6 +14,7 @@ import dev.authier.android.generated.model.DeviceChallenge
 import dev.authier.android.generated.model.DeviceIdentity
 import dev.authier.android.generated.model.DevicesApproveChallengeRequest
 import dev.authier.android.generated.model.DevicesLogoutRequest
+import dev.authier.android.generated.model.DevicesSetMasterRequest
 import dev.authier.android.generated.model.PendingDeviceApproval
 import dev.authier.android.generated.model.RefreshInput
 import dev.authier.android.generated.model.RegisterInput
@@ -121,7 +122,7 @@ class ApiFacade(serverUrl: String, private var currentDeviceId: String? = null) 
 
     override suspend fun devices() = request {
         device.devicesList(emptyInput).devices.map {
-            DeviceInfo(it.id, it.name, it.platform, it.lastSyncAt, it.id == currentDeviceId)
+            DeviceInfo(it.id, it.name, it.platform, it.lastSyncAt, it.id == currentDeviceId, it.logoutAt)
         }
     }
     override suspend fun approvals() = request {
@@ -130,6 +131,7 @@ class ApiFacade(serverUrl: String, private var currentDeviceId: String? = null) 
     override suspend fun approve(id: Int) { request { device.devicesApproveChallenge(DevicesApproveChallengeRequest(id)) } }
     override suspend fun reject(id: Int) { request { device.devicesRejectChallenge(DevicesApproveChallengeRequest(id)) } }
     override suspend fun removeDevice(id: String) { request { device.devicesRemove(DevicesLogoutRequest(id)) } }
+    override suspend fun setMasterDevice(id: String) { request { device.devicesSetMaster(DevicesSetMasterRequest(id)) } }
     override suspend fun security() = request { settings.securityGet(emptyInput).security.toDomain() }
     override suspend fun updatePolicy(policy: String) = request {
         settings.securityUpdateNewDevicePolicy(SecurityUpdateNewDevicePolicyRequest(

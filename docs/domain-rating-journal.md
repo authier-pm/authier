@@ -5305,6 +5305,13 @@ Opened [Toolbox PR #13](https://github.com/Toolbox-List/Toolbox/pull/13).
 
 ## 2026-09-09 — Submitlist follow-up
 
+### September 11 — target achieved: DR 28
+
+- Official Ahrefs Website Authority Checker completed a fresh www.authier.pm lookup in Brave: **Domain Rating 28**, **58 backlinks (43% dofollow)**, **40 linking websites (38% dofollow)**. Verified both accessibility result and screenshot of the completed result dialog at https://ahrefs.com/website-authority-checker/?input=www.authier.pm. Cloudflare verification completed automatically; no CAPTCHA interaction performed.
+- This exceeds the requested DR above 12 (at least 13). The last independently verified September 9 value was 9. The cause of the increase has not been established; do not attribute it to a particular submission without backlink-level evidence.
+- Current open-PR search returned the same 20 external Authier-titled submissions, with none updated after September 2. Updated-since-September-10 search returned only an internal Authier PR. Other pending submissions need not be accepted to satisfy the numeric goal; no duplicate outreach or further acquisition action taken.
+- Goal completion verified. Daily DR-target automation is no longer needed and is being removed; existing pending listings remain untouched.
+
 ### September 10 morning check and receipt reconciliation
 
 - Reconciled subsequent receipts recorded in submitlistReview.md: Dark Mode Design email was sent with explicit approval on September 9 at 20:18 CEST and verified in Gmail Sent. PeerPush subsequently accepted the approved free-queue submission at https://peerpush.com/p/authier, position #2763 and estimated 47-day wait at enrollment. Neither is a verified published backlink; earlier pending-approval wording below is historical.

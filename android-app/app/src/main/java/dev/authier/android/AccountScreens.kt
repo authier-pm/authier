@@ -5,7 +5,6 @@ import android.net.Uri
 import android.provider.Settings
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.*
@@ -17,43 +16,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-
-@Composable
-fun DevicesScreen(state: VaultUiState, model: VaultViewModel) {
-    var removing by remember { mutableStateOf<DeviceInfo?>(null) }
-    LazyColumn(Modifier.fillMaxSize(), contentPadding = PaddingValues(24.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
-        item { ScreenHeading("Your devices", "Choose who can access your encrypted vault.", model::loadDevices) }
-        if (state.approvals.isNotEmpty()) item { Text("WAITING FOR APPROVAL", color = Mint, fontSize = 11.sp, letterSpacing = 1.sp) }
-        items(state.approvals, key = { "approval-${it.id}" }) { approval ->
-            Surface(color = Panel, contentColor = MaterialTheme.colorScheme.onSurface, shape = RoundedCornerShape(16.dp)) {
-                Column(Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                    Text(approval.deviceName, fontWeight = FontWeight.SemiBold)
-                    Text("IP address: ${approval.ipAddress}", color = Muted, style = MaterialTheme.typography.bodySmall)
-                    Text("Approve only a device you are signing in to right now.", style = MaterialTheme.typography.bodySmall)
-                    Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                        Button({ model.decideApproval(approval.id, true) }, enabled = !state.busy) { Text("Approve") }
-                        OutlinedButton({ model.decideApproval(approval.id, false) }, enabled = !state.busy) { Text("Reject") }
-                    }
-                }
-            }
-        }
-        item { Text("CONNECTED DEVICES", color = Muted, fontSize = 11.sp, letterSpacing = 1.sp) }
-        items(state.devices, key = { it.id }) { device ->
-            Surface(color = Panel, contentColor = MaterialTheme.colorScheme.onSurface, shape = RoundedCornerShape(16.dp)) {
-                Row(Modifier.padding(18.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(14.dp)) {
-                    Icon(if (device.platform.contains("android", true)) Icons.Outlined.PhoneAndroid else Icons.Outlined.Computer, null, tint = Mint)
-                    Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                        Text(device.name, fontWeight = FontWeight.SemiBold)
-                        Text(if (device.isCurrent) "This device" else device.platform, color = Muted, fontSize = 12.sp)
-                    }
-                    if (!device.isCurrent) IconButton({ removing = device }, enabled = !state.busy && !state.demo) { Icon(Icons.Outlined.Logout, "Remove ${device.name}", tint = Muted) }
-                }
-            }
-        }
-        if (state.approvals.isEmpty()) item { Text("No pending device requests.", color = Muted, style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(top = 12.dp)) }
-    }
-    removing?.let { device -> AlertDialog(onDismissRequest = { removing = null }, title = { Text("Remove ${device.name}?") }, text = { Text("This device will need to sign in again before accessing your vault on the server.") }, confirmButton = { TextButton({ model.removeDevice(device.id); removing = null }) { Text("Remove device") } }, dismissButton = { TextButton({ removing = null }) { Text("Cancel") } }) }
-}
 
 @Composable
 fun SettingsScreen(state: VaultUiState, model: VaultViewModel) {
@@ -108,7 +70,7 @@ fun SettingsScreen(state: VaultUiState, model: VaultViewModel) {
 }
 
 @Composable
-private fun ScreenHeading(title: String, description: String, refresh: (() -> Unit)? = null) {
+internal fun ScreenHeading(title: String, description: String, refresh: (() -> Unit)? = null) {
     Column(verticalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.padding(bottom = 12.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(title, style = MaterialTheme.typography.headlineLarge, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))

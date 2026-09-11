@@ -91,6 +91,14 @@ The Android gallery also includes `android-api-error.png`, captured from the deb
 `ApiErrorPreviewActivity` after tapping its error banner. It uses the production
 response dialog with a synthetic HTTP 500 payload and makes no network requests.
 
+The device-management captures are `android-devices-master.png`,
+`android-devices-transfer.png`, and `android-devices-member.png`. Force-stop the
+debug app, launch the demo intent with `--ei tab 1`, capture the master view, tap
+**Make master device** for the confirmation, then **Transfer master role** for
+the non-master view. Demo transfers change only synthetic in-memory state.
+`DeviceManagementTest` checks confirmation/cancellation, badge placement, busy
+controls, and non-master/unknown/stale-role restrictions in production Compose.
+
 The Android gallery includes `android-unlock-settings.png` and
 `android-fingerprint-unlock.png`. Capture the production Compose screens with the
 debug demo intent and `--ei tab 2` (settings) or `--ez locked true` (unlock),

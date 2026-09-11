@@ -23,6 +23,8 @@ const deviceId = crypto.randomUUID()
 const otherUserId = crypto.randomUUID()
 const passkeyUserId = crypto.randomUUID()
 const passkeyDeviceId = crypto.randomUUID()
+const transferUserId = crypto.randomUUID()
+const transferDeviceIds = [crypto.randomUUID(), crypto.randomUUID()]
 const accessToken = sign(
   { userId, deviceId, tokenVersion: 0 },
   process.env.ACCESS_TOKEN_SECRET!
@@ -32,7 +34,7 @@ beforeAll(async () => {
   client = await setupTestDb()
   setDb(testDb)
   await db.insert(schema.user).values(
-    [userId, otherUserId, passkeyUserId].map((id) => ({
+    [userId, otherUserId, passkeyUserId, transferUserId].map((id) => ({
       id,
       email: `${id}@test.com`,
       loginCredentialsLimit: 100,
@@ -62,6 +64,21 @@ beforeAll(async () => {
     ...defaultDeviceSettingSystemValues,
     syncTOTP: false
   })
+  await db.insert(schema.device).values(
+    transferDeviceIds.map((id) => ({
+      id,
+      userId: transferUserId,
+      name: 'Transfer test device',
+      platform: 'android',
+      firstIpAddress: '127.0.0.1',
+      lastIpAddress: '127.0.0.1',
+      ...defaultDeviceSettingSystemValues
+    }))
+  )
+  await db
+    .update(schema.user)
+    .set({ masterDeviceId: transferDeviceIds[0] })
+    .where(eq(schema.user.id, transferUserId))
 })
 
 afterAll(async () => {
@@ -102,6 +119,67 @@ const sync = async (input: VaultApiInputs['mobile']['sync'] = {}) => {
 }
 
 describe('versioned JSON mobile API', () => {
+  it('allows only the current master to transfer the role, including after a handoff', async () => {
+    const [phoneId, browserId] = transferDeviceIds
+    const tokenFor = (id: string) =>
+      sign(
+        { userId: transferUserId, deviceId: id, tokenVersion: 0 },
+        process.env.ACCESS_TOKEN_SECRET!
+      )
+    const phoneToken = tokenFor(phoneId)
+    const browserToken = tokenFor(browserId)
+    const masterId = async () =>
+      (await db.query.user.findFirst({ where: { id: transferUserId } }))
+        ?.masterDeviceId
+
+    const denied = await request(
+      'devices/setMaster',
+      { newMasterDeviceId: browserId },
+      browserToken
+    )
+    expect(denied.status).toBeGreaterThanOrEqual(400)
+    expect(await denied.json()).toMatchObject({
+      message: 'This can be done only from master device'
+    })
+    expect(await masterId()).toBe(phoneId)
+
+    expect(
+      (
+        await request(
+          'devices/setMaster',
+          { newMasterDeviceId: browserId },
+          phoneToken
+        )
+      ).status
+    ).toBe(200)
+    expect(await masterId()).toBe(browserId)
+    const security = await request('security/get', {}, phoneToken)
+    expect(await security.json()).toMatchObject({
+      security: { masterDeviceId: browserId }
+    })
+
+    const formerMaster = await request(
+      'devices/setMaster',
+      { newMasterDeviceId: phoneId },
+      phoneToken
+    )
+    expect(formerMaster.status).toBeGreaterThanOrEqual(400)
+    expect(await formerMaster.json()).toMatchObject({
+      message: 'This can be done only from master device'
+    })
+    expect(await masterId()).toBe(browserId)
+    expect(
+      (
+        await request(
+          'devices/setMaster',
+          { newMasterDeviceId: phoneId },
+          browserToken
+        )
+      ).status
+    ).toBe(200)
+    expect(await masterId()).toBe(phoneId)
+  })
+
   it('syncs versioned passkeys without TOTP and shares the password quota across creates and kind changes', async () => {
     const token = sign(
       { userId: passkeyUserId, deviceId: passkeyDeviceId, tokenVersion: 0 },

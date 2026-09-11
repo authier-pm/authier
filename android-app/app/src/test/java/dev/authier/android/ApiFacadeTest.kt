@@ -56,6 +56,40 @@ class ApiFacadeTest {
         assertEquals("/api/v1/auth/logout", server.takeRequest().path)
     }
 
+    @Test fun `transfers master role through generated authenticated endpoint and reloads its identity`() = runTest {
+        api.accessToken = "master-session"
+        respond("""{"ok":true}""")
+        api.setMasterDevice("next-master")
+        val request = server.takeRequest()
+        assertEquals("/api/v1/devices/setMaster", request.path)
+        assertEquals("Bearer master-session", request.getHeader("Authorization"))
+        assertEquals("""{"newMasterDeviceId":"next-master"}""", request.body.readUtf8())
+
+        respond("""{"security":{"newDevicePolicy":"REQUIRE_MASTER_DEVICE_APPROVAL","deviceRecoveryCooldownMinutes":60,"masterDeviceId":"next-master","vaultLockTimeoutSeconds":300}}""")
+        assertEquals("next-master", api.security().masterDeviceId)
+    }
+
+    @Test fun `preserves signed out status so revoked devices cannot be offered as transfer targets`() = runTest {
+        respond("""{"devices":[{"id":"current-device","name":"Pixel","platform":"android","syncTOTP":true,"vaultLockTimeoutSeconds":300,"createdAt":"2026-09-10T10:00:00Z","lastSyncAt":null,"logoutAt":null,"firstIpAddress":"127.0.0.1","lastIpAddress":"127.0.0.1","lastGeoLocation":""},{"id":"old-browser","name":"Old browser","platform":"browser","syncTOTP":true,"vaultLockTimeoutSeconds":300,"createdAt":"2026-09-10T10:00:00Z","lastSyncAt":null,"logoutAt":"2026-09-10T12:00:00Z","firstIpAddress":"127.0.0.1","lastIpAddress":"127.0.0.1","lastGeoLocation":""}]}""")
+        val devices = api.devices()
+        assertTrue(devices.first().isCurrent)
+        assertNull(devices.first().logoutAt)
+        assertFalse(devices.last().isCurrent)
+        assertEquals("2026-09-10T12:00:00Z", devices.last().logoutAt)
+        val state = VaultUiState(devices = devices, security = SecurityInfo(masterDeviceId = "current-device"))
+        assertTrue(state.isCurrentDeviceMaster)
+        assertFalse(state.canSetMasterDevice(devices.last()))
+    }
+
+    @Test fun `surfaces a rejected master transfer without treating it as success`() = runTest {
+        respond("""{"code":"FORBIDDEN","status":403,"message":"This can be done only from master device"}""", 403)
+        val failure = try { api.setMasterDevice("next-master"); error("Expected API failure") }
+            catch (failure: ApiFailure) { failure }
+        assertEquals(403, failure.status)
+        assertEquals("FORBIDDEN", failure.code)
+        assertEquals("This can be done only from master device", failure.message)
+    }
+
     @Test fun `keeps a mutation id stable when resending and maps deletion records`() = runTest {
         val body = """{"id":"a9e460fa-a93e-4993-b863-97d4353b60e7","encrypted":"ciphertext","kind":"LOGIN_CREDENTIALS","version":3,"createdAt":"2026-09-08T10:00:00.000Z","updatedAt":"2026-09-08T11:00:00.000Z","deletedAt":"2026-09-08T11:00:00.000Z"}"""
         val operation = PendingWrite(operation = "delete", id = "a9e460fa-a93e-4993-b863-97d4353b60e7", expectedVersion = 2)

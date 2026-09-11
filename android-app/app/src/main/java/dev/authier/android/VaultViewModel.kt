@@ -41,7 +41,13 @@ data class VaultUiState(
     val lockTimeoutSeconds: Int = 300,
     val lockGeneration: Int = 0,
     val biometricEnabled: Boolean = false,
-)
+) {
+    val isCurrentDeviceMaster: Boolean
+        get() = devices.any { it.isCurrent && it.id == security.masterDeviceId }
+
+    fun canSetMasterDevice(device: DeviceInfo): Boolean =
+        isCurrentDeviceMaster && !device.isCurrent && device.id != security.masterDeviceId && device.logoutAt == null
+}
 
 class VaultViewModel(application: Application) : AndroidViewModel(application) {
     private val store = VaultStore(application)
@@ -373,6 +379,24 @@ class VaultViewModel(application: Application) : AndroidViewModel(application) {
         authenticated { api -> api.removeDevice(id); state.value = state.value.copy(devices = api.devices()) }
     }
 
+    fun setMasterDevice(id: String) = action {
+        require(state.value.unlocked && state.value.isCurrentDeviceMaster) { "Only the current master device can choose a new master." }
+        val target = requireNotNull(state.value.devices.find { it.id == id && state.value.canSetMasterDevice(it) }) { "Choose another connected device." }
+        if (state.value.demo) {
+            state.value = state.value.copy(security = state.value.security.copy(masterDeviceId = id), notice = "${target.name} is now the master device.")
+            return@action
+        }
+        authenticated { api ->
+            // Recheck server state in case the role changed since this screen loaded.
+            state.value = state.value.copy(security = api.security())
+            require(snapshot.deviceId == state.value.security.masterDeviceId) { "Only the current master device can choose a new master." }
+            api.setMasterDevice(id)
+            // Drop our transfer controls immediately, even if the following refresh fails.
+            state.value = state.value.copy(security = state.value.security.copy(masterDeviceId = id))
+            state.value = state.value.copy(security = api.security(), notice = "${target.name} is now the master device.")
+        }
+    }
+
     fun changePolicy(policy: String) = action {
         authenticated { api -> state.value = state.value.copy(security = api.updatePolicy(policy)) }
     }
@@ -411,6 +435,7 @@ class VaultViewModel(application: Application) : AndroidViewModel(application) {
         val demoSeeds = listOf("JBSWY3DPEHPK3PXP", "KRUGS4ZANFZSAYJA", "MFRGGZDFMZTWQ2LK")
         val codes = listOf("GitHub", "Google", "Cloudflare").mapIndexed { index, label -> VaultItem(SecretRecord("totp-$index", "demo", "TOTP", 1, "2026-09-01T12:00:00Z"), SecretContent(label = label, secret = demoSeeds[index], url = "https://${label.lowercase()}.com")) }
         state.value = VaultUiState(email = "alex@studio.design", unlocked = !locked, remembered = true, demo = true,
+            security = SecurityInfo(masterDeviceId = "demo"),
             lockTimeoutSeconds = 86400, biometricEnabled = locked, items = passwords + codes, lastSyncAt = System.currentTimeMillis(),
             devices = listOf(DeviceInfo("demo", "Pixel · this device", "Android", null, true), DeviceInfo("browser", "Chrome on MacBook", "Browser", null, false)))
     }
