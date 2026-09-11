@@ -72,3 +72,28 @@ No database migration or client vault re-encryption is needed for this fix. Back
 deployment is required for installed clients to benefit. The new APK adds tappable
 response details; the server still masks unexpected internal errors in HTTP responses,
 while recording error types, crypto-limit messages, and stack locations in Worker logs.
+
+## Camera TOTP setup — September 10, 2026
+
+Validated on an Android 14 / API 34 x86_64 emulator with synthetic demo data.
+All 50 JVM tests pass, including QR pixel decoding, RFC 6238 output, provisioning
+metadata/defaults/custom settings, and malformed/unsupported URI rejection.
+Debug and release APK builds and both lint variants pass. The native
+`TotpEditorTest` passes: manual fallback and Android Back preserve the unsaved
+entry, neither saves/dismisses it, and explicit Save returns the unchanged draft.
+UI-preview TypeScript and the Android gallery Playwright scenario pass.
+
+The real camera pipeline was exercised using a synthetic QR image loaded into the
+emulator’s virtual scene (`adb emu virtualscene-image wall <absolute-png-path>`).
+Permission denial displayed recovery options, and manual fallback returned to the
+editor. Granting permission opened the camera. Both a short setup URI and a URI
+with percent-encoded account/issuer metadata scanned successfully. Rescanning
+replaced the draft; explicit Save added exactly one entry, increasing the demo
+TOTP count from three to four, with a locally generated code displayed.
+
+Fresh native captures: `android-totp-camera-entry.png` and
+`android-totp-camera-review.png` in `docs/screenshots/`. The review was captured
+after a real camera scan, with the setup key hidden. The checked-in `android-vault`
+scenario includes both and renders the refreshed `android-ui-preview.png`.
+No real accounts, production database, deployment, or release publication were
+used. Physical-device camera testing remains separate from emulator validation.

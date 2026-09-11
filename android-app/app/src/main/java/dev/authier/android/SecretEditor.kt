@@ -5,6 +5,8 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.QrCodeScanner
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
@@ -18,8 +20,19 @@ fun SecretEditor(initial: SecretContent, initialKind: String, existing: Boolean,
     var content by remember { mutableStateOf(initial) }
     var kind by remember { mutableStateOf(initialKind) }
     var error by remember { mutableStateOf<String?>(null) }
-    Dialog(onDismissRequest = onDismiss, properties = DialogProperties(usePlatformDefaultWidth = false, decorFitsSystemWindows = false)) {
+    var scanning by remember { mutableStateOf(false) }
+    var scanned by remember { mutableStateOf(false) }
+    Dialog(onDismissRequest = { if (scanning) scanning = false else onDismiss() }, properties = DialogProperties(usePlatformDefaultWidth = false, decorFitsSystemWindows = false)) {
         Surface(Modifier.fillMaxSize(), color = Canvas) {
+            if (scanning) {
+                TotpScanner(onCancel = { scanning = false }, onScanned = {
+                    content = content.withTotpProvisioning(it)
+                    error = null
+                    scanned = true
+                    scanning = false
+                })
+                return@Surface
+            }
             Column(Modifier.fillMaxSize().safeDrawingPadding().imePadding().verticalScroll(rememberScrollState()).padding(24.dp), verticalArrangement = Arrangement.spacedBy(18.dp)) {
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                     Text(if (existing) "Edit item" else "Add to your vault", style = MaterialTheme.typography.headlineSmall)
@@ -30,6 +43,14 @@ fun SecretEditor(initial: SecretContent, initialKind: String, existing: Boolean,
                     FilterChip(kind == "TOTP", { kind = "TOTP" }, label = { Text("2FA code") })
                 }
                 Text("Everything you enter is encrypted before leaving this device.", color = Muted, style = MaterialTheme.typography.bodySmall)
+                if (kind == "TOTP") {
+                    OutlinedButton({ scanning = true }, modifier = Modifier.fillMaxWidth().height(52.dp)) {
+                        Icon(Icons.Outlined.QrCodeScanner, null)
+                        Spacer(Modifier.width(10.dp))
+                        Text("Scan QR code")
+                    }
+                    if (scanned) Text("QR code scanned. Review the account and save when ready.", color = Mint, style = MaterialTheme.typography.bodySmall)
+                }
                 OutlinedTextField(content.label, { content = content.copy(label = it) }, label = { Text("Name") }, singleLine = true, modifier = Modifier.fillMaxWidth())
                 OutlinedTextField(content.url.orEmpty(), { content = content.copy(url = it) }, label = { Text("Website") }, singleLine = true, modifier = Modifier.fillMaxWidth(), keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri))
                 if (kind == "LOGIN_CREDENTIALS") {
@@ -40,7 +61,7 @@ fun SecretEditor(initial: SecretContent, initialKind: String, existing: Boolean,
                     Text("Autofill only offers this password in the exact app package you enter. Websites and embedded web pages are not matched.", color = Muted, style = MaterialTheme.typography.bodySmall)
                 } else {
                     PasswordField(content.secret, { content = content.copy(secret = it.replace(" ", "").uppercase()) }, "Setup key (Base32)")
-                    Text("Use the setup key shown by the service when enabling an authenticator app.", color = Muted, style = MaterialTheme.typography.bodySmall)
+                    Text("Scan the service's QR code, or enter its setup key manually.", color = Muted, style = MaterialTheme.typography.bodySmall)
                     Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                         FilterChip(content.digits == 6, { content = content.copy(digits = 6) }, label = { Text("6 digits") })
                         FilterChip(content.digits == 8, { content = content.copy(digits = 8) }, label = { Text("8 digits") })
@@ -49,7 +70,7 @@ fun SecretEditor(initial: SecretContent, initialKind: String, existing: Boolean,
                         FilterChip(content.period == 30, { content = content.copy(period = 30) }, label = { Text("30 seconds") })
                         FilterChip(content.period == 60, { content = content.copy(period = 60) }, label = { Text("60 seconds") })
                     }
-                    Text("SHA1 · compatible with your other Authier apps", color = Muted, style = MaterialTheme.typography.bodySmall)
+                    Text("${content.algorithm} · ${content.digits} digits · every ${content.period} seconds", color = Muted, style = MaterialTheme.typography.bodySmall)
                 }
                 error?.let { Text(it, color = MaterialTheme.colorScheme.error) }
                 Button(onClick = {
