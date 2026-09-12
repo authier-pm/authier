@@ -60,7 +60,10 @@ Unlock once with your master password, then open Settings → Fingerprint unlock
 If no biometric is enrolled, **Register fingerprint in Android** opens system
 settings; return to Authier and enable the feature. Confirm the biometric prompt
 to wrap the vault key with an authentication-per-use Android Keystore key.
-The lock screen and Autofill then offer **Unlock with fingerprint**. Android can
+Opening the app with a locked vault automatically starts fingerprint unlock after
+checking for a valid timed session. Dismiss the prompt or choose **Use master password**
+to enter your password; dismissal stays in effect through screen rotation.
+The lock screen and Autofill also offer **Unlock with fingerprint** to retry. Android can
 also accept another Class 3 biometric. Cancellation, lockout or unavailable hardware
 leave the master-password option available. Changing biometric enrollment invalidates
 the biometric key; unlock with the password and set it up again.
@@ -124,6 +127,15 @@ adb shell am instrument -w -e class dev.authier.android.BiometricUnlockTest \
 Run `adb emu finger touch 1` from another terminal for both the enable and unlock
 prompts. This test uses authentication-per-use Keystore encryption and decryption
 with the production prompt and clears its synthetic vault afterward.
+
+The `openingLockedVaultPromptsAutomaticallyAndDismissalAllowsPassword` case needs
+one fingerprint touch for enrollment and another for the final automatic unlock.
+It checks automatic prompting, dismissal, rotation, password entry, and timed-session
+recovery. It writes `android-fingerprint-password-fallback.png` into the debug app's
+external files directory using only its synthetic test vault. Capture the final
+automatic prompt with `adb emu screenrecord screenshot <directory>` before the
+second fingerprint touch; Android's screenshot API masks the system biometric
+window. Save that emulator capture as `docs/screenshots/android-fingerprint-auto-prompt.png`.
 
 ## Website icons
 

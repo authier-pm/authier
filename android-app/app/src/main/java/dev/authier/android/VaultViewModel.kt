@@ -56,6 +56,7 @@ class VaultViewModel(application: Application) : AndroidViewModel(application) {
     private var masterKey: SecretKey? = null
     private var activeJob: Job? = null
     private var actionGeneration = 0
+    private var automaticBiometricAttempted = false
     private val state = MutableStateFlow(VaultUiState(email = snapshot.email, serverUrl = snapshot.serverUrl,
         remembered = snapshot.authSecretEncrypted.isNotBlank(), pendingWrites = snapshot.outbox.size,
         lastSyncAt = snapshot.lastSyncAt, lockTimeoutSeconds = snapshot.lockTimeoutSeconds))
@@ -81,11 +82,12 @@ class VaultViewModel(application: Application) : AndroidViewModel(application) {
             unlockStore.restore(snapshot) == null) lock()
     }
 
-    fun background() {
+    fun background(changingConfigurations: Boolean = false) {
+        if (!changingConfigurations) automaticBiometricAttempted = false
         if (state.value.lockTimeoutSeconds == 0) lock() else checkExpiry()
     }
 
-    fun resume() {
+    fun resume(activity: FragmentActivity) {
         checkExpiry()
         if (state.value.demo) return
         // Re-read the shared snapshot after autofill and restore without extending its deadline.
@@ -93,7 +95,16 @@ class VaultViewModel(application: Application) : AndroidViewModel(application) {
             snapshot = withContext(Dispatchers.IO) { store.read() }
             state.value = state.value.copy(biometricEnabled = unlockStore.biometricEnabled(snapshot),
                 lockTimeoutSeconds = snapshot.lockTimeoutSeconds)
-            val key = masterKey ?: unlockStore.restore(snapshot) ?: return@action
+            val key = masterKey ?: unlockStore.restore(snapshot)
+            if (key == null) {
+                // Once per foreground visit: dismissal leaves password entry available,
+                // including after activity recreation. A valid timed session skips the prompt.
+                if (state.value.remembered && state.value.biometricEnabled && !automaticBiometricAttempted) {
+                    automaticBiometricAttempted = true
+                    authenticateBiometric(activity)
+                }
+                return@action
+            }
             AuthierCrypto.decrypt(key, snapshot.authSecretEncrypted)
             masterKey = key
             state.value = state.value.copy(unlocked = true)
@@ -117,6 +128,11 @@ class VaultViewModel(application: Application) : AndroidViewModel(application) {
 
     fun unlockBiometric(activity: FragmentActivity) = action {
         snapshot = withContext(Dispatchers.IO) { store.read() }
+        automaticBiometricAttempted = true
+        authenticateBiometric(activity)
+    }
+
+    private suspend fun authenticateBiometric(activity: FragmentActivity) {
         val cipher = unlockStore.prepareBiometric(snapshot, enrolling = false)
         val authenticated = BiometricUnlock.authenticate(activity, cipher, enrolling = false)
         openVault(unlockStore.unlockBiometric(snapshot, authenticated))

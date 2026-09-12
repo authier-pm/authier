@@ -14,6 +14,8 @@ test('renders captured native Android vault, authenticator and autofill screens'
     'Confirm master transfer',
     'After master transfer',
     'Unlock settings',
+    'Automatic fingerprint prompt',
+    'Master password fallback',
     'Fingerprint unlock',
     'Server response',
     'Passwords',
@@ -27,7 +29,10 @@ test('renders captured native Android vault, authenticator and autofill screens'
       name: `Authier Android ${name} screen`
     })
     await expect(screenshot).toBeVisible()
-    await expect(screenshot).toHaveJSProperty('naturalWidth', 1080)
+    await expect(screenshot).toHaveJSProperty(
+      'naturalWidth',
+      name === 'Automatic fingerprint prompt' ? 1280 : 1080
+    )
   }
   await page.screenshot({
     path: '../docs/screenshots/android-ui-preview.png',

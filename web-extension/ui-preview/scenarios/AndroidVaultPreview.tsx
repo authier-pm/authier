@@ -1,5 +1,7 @@
 import unlockSettingsScreenshot from '../../../docs/screenshots/android-unlock-settings.png'
 import fingerprintScreenshot from '../../../docs/screenshots/android-fingerprint-unlock.png'
+import automaticFingerprintScreenshot from '../../../docs/screenshots/android-fingerprint-auto-prompt.png'
+import passwordFallbackScreenshot from '../../../docs/screenshots/android-fingerprint-password-fallback.png'
 import errorScreenshot from '../../../docs/screenshots/android-api-error.png'
 import vaultScreenshot from '../../../docs/screenshots/android-vault.png'
 import totpScreenshot from '../../../docs/screenshots/android-totp.png'
@@ -37,6 +39,18 @@ const screens = [
     image: unlockSettingsScreenshot,
     description:
       'Choose an idle timeout up to one day that survives backgrounding and app restarts, and enable fingerprint unlock.'
+  },
+  {
+    title: 'Automatic fingerprint prompt',
+    image: automaticFingerprintScreenshot,
+    description:
+      'Opening a locked vault starts Android biometric authentication automatically. Choose Use master password or dismiss the prompt to enter your password.'
+  },
+  {
+    title: 'Master password fallback',
+    image: passwordFallbackScreenshot,
+    description:
+      'Dismissing fingerprint authentication leaves the password form ready, without reopening the prompt or showing an error. The fingerprint button remains available to retry.'
   },
   {
     title: 'Fingerprint unlock',

@@ -105,6 +105,15 @@ debug demo intent and `--ei tab 2` (settings) or `--ez locked true` (unlock),
 force-stopping the debug app before each launch. These scenarios cover a one-day
 idle timeout that survives app restarts and the biometric unlock alternative.
 
+The gallery also includes `android-fingerprint-auto-prompt.png` and
+`android-fingerprint-password-fallback.png`, captured by the opt-in Android
+`BiometricUnlockTest.openingLockedVaultPromptsAutomaticallyAndDismissalAllowsPassword`
+test. These show the real system prompt opening automatically and the production
+password form after dismissal, using an encrypted synthetic vault. Capture the
+prompt through the emulator console (see `android-app/README.md`), pull the fallback
+from the debug app's external files directory into `docs/screenshots/`, and run
+`pnpm playwright:ui-preview androidVault.spec.ts` to refresh the gallery.
+
 The `android-blog` scenario embeds the production native Android launch article.
 Run the `Android launch article` test in `playwrightAndroidUpdates.config.ts` to
 verify desktop/mobile layout, screenshot assets and download links, and capture

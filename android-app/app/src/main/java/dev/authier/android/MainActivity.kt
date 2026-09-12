@@ -28,8 +28,8 @@ class MainActivity : FragmentActivity() {
         setContent { AuthierTheme { AuthierApp(model, intent.getIntExtra("tab", 0).takeIf { BuildConfig.DEBUG && intent.getBooleanExtra("demo", false) } ?: 0) } }
     }
 
-    override fun onResume() { super.onResume(); model.resume() }
-    override fun onStop() { model.background(); super.onStop() }
+    override fun onResume() { super.onResume(); model.resume(this) }
+    override fun onStop() { model.background(isChangingConfigurations); super.onStop() }
     override fun dispatchTouchEvent(event: MotionEvent): Boolean { if (event.actionMasked == MotionEvent.ACTION_DOWN) model.touch(); return super.dispatchTouchEvent(event) }
     override fun onWindowFocusChanged(hasFocus: Boolean) {
         super.onWindowFocusChanged(hasFocus)

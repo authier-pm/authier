@@ -41,6 +41,12 @@ object BiometricUnlock {
             }
             override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
                 activity.lifecycle.removeObserver(observer)
+                if (errorCode == BiometricPrompt.ERROR_NEGATIVE_BUTTON ||
+                    errorCode == BiometricPrompt.ERROR_USER_CANCELED ||
+                    errorCode == BiometricPrompt.ERROR_CANCELED) {
+                    continuation.cancel(CancellationException("Biometric unlock dismissed"))
+                    return
+                }
                 if (continuation.isActive) continuation.resumeWithException(IllegalStateException("$errString You can use your master password."))
             }
         })
