@@ -37,7 +37,10 @@ class AutofillUnlockActivity : FragmentActivity() {
     private var unlocked by mutableStateOf(false)
     private var error by mutableStateOf<String?>(null)
     private lateinit var requestedPackage: String
-    private lateinit var passwordId: AutofillId
+    private var passwordId: AutofillId? = null
+    private var generationIds = emptyList<AutofillId>()
+    private lateinit var destination: AutofillDestination
+    private var destinationVerified = false
     private var usernameId: AutofillId? = null
     private var masterKey: SecretKey? = null
     private var unlockedSnapshot: VaultSnapshot? = null
@@ -50,19 +53,32 @@ class AutofillUnlockActivity : FragmentActivity() {
         val target = intent.getStringExtra(EXTRA_PACKAGE)
         @Suppress("DEPRECATION")
         val passwordTarget = intent.getParcelableExtra<AutofillId>(EXTRA_PASSWORD_ID)
-        if (target == null || NativeAutofillTarget.packageFromAssociation(target) != target || passwordTarget == null) {
+        @Suppress("DEPRECATION")
+        val generatedTargets = intent.getParcelableArrayListExtra<AutofillId>(EXTRA_GENERATION_IDS).orEmpty()
+        val origin = intent.getStringExtra(EXTRA_ORIGIN)
+        val create = intent.getBooleanExtra(EXTRA_CREATE, false)
+        if (target == null || NativeAutofillTarget.packageFromAssociation(target) != target ||
+            (origin != null && httpsOrigin(origin) != origin) ||
+            (create && generatedTargets.isEmpty()) || (!create && passwordTarget == null)) {
             finish()
             return
         }
         requestedPackage = target
         passwordId = passwordTarget
+        generationIds = generatedTargets
+        destination = AutofillDestination(target, origin)
         @Suppress("DEPRECATION")
         val usernameTarget = intent.getParcelableExtra<AutofillId>(EXTRA_USERNAME_ID)
         usernameId = usernameTarget
         setContent {
             AuthierTheme {
                 AutofillUnlockScreen(requestedPackage, choices, unlocked, busy, error, { unlock(password = it) }, ::fill, ::finish,
-                    if (biometricEnabled) { { unlock(biometric = true) } } else null)
+                    if (biometricEnabled) { { unlock(biometric = true) } } else null,
+                    webOrigin = destination.webOrigin,
+                    canCreate = generationIds.isNotEmpty() && (create || passwordId in generationIds),
+                    initiallyCreating = create,
+                    initialUsername = intent.getStringExtra(EXTRA_USERNAME).orEmpty(),
+                    onCreate = ::createAndFill)
             }
         }
         unlock()
@@ -96,6 +112,10 @@ class AutofillUnlockActivity : FragmentActivity() {
         error = null
         activeJob = lifecycleScope.launch {
             try {
+                if (!destinationVerified) {
+                    destinationVerified = withContext(Dispatchers.IO) { WebAutofillTrust(this@AutofillUnlockActivity).verify(destination) }
+                    require(destinationVerified) { "This app could not be verified for ${destination.label}. Open the website in your default browser and try again." }
+                }
                 val snapshot = withContext(Dispatchers.IO) { VaultStore(this@AutofillUnlockActivity).read() }
                 require(snapshot.authSecretEncrypted.isNotBlank()) { "Open Authier and sign in before using autofill." }
                 biometricEnabled = unlockStore.biometricEnabled(snapshot)
@@ -113,7 +133,8 @@ class AutofillUnlockActivity : FragmentActivity() {
                     snapshot.secrets.filter { it.deletedAt == null && it.kind == "LOGIN_CREDENTIALS" }.mapNotNull { record ->
                         // One incompatible imported item must not hide the other matching logins.
                         val content = runCatching { SecretContentDecoder.decode(AuthierCrypto.decrypt(key, record.encrypted), record.kind) }.getOrNull()
-                        if (content != null && content.password.isNotEmpty()) VaultItem(record, content) else null
+                        if (content != null && content.password.isNotEmpty() &&
+                            (destination.webOrigin == null || destination.matches(content))) VaultItem(record, content) else null
                     }
                 }
                 if (password != null || biometric) unlockStore.remember(snapshot, key)
@@ -146,9 +167,10 @@ class AutofillUnlockActivity : FragmentActivity() {
             try {
                 withContext(Dispatchers.IO) {
                     val store = VaultStore(this@AutofillUnlockActivity)
-                    if (NativeAutofillTarget.matchesAssociation(item.content.androidUri, requestedPackage)) {
+                    if (destination.matches(item.content)) {
                         validateAutofillSelection(store.read(), unlockedVault, item)
                     } else {
+                        require(destination.webOrigin == null) { "This login belongs to a different website." }
                         store.update { current -> associateAutofillLogin(current, unlockedVault, item, key, requestedPackage) }
                     }
                 }
@@ -163,13 +185,44 @@ class AutofillUnlockActivity : FragmentActivity() {
         }
     }
 
-    private fun returnFill(item: VaultItem) {
+    private fun createAndFill(content: SecretContent) {
+        if (busy || !unlocked || !destinationVerified || generationIds.isEmpty()) return
+        val key = masterKey ?: return
+        val unlockedVault = unlockedSnapshot ?: return
+        if (unlockedVault.lockTimeoutSeconds > 0 && unlockStore.restore(unlockedVault) == null) { finish(); return }
+        busy = true
+        error = null
+        activeJob = lifecycleScope.launch {
+            try {
+                val item = withContext(Dispatchers.IO) {
+                    var created: VaultItem? = null
+                    VaultStore(this@AutofillUnlockActivity).update { current ->
+                        val (saved, item) = createAutofillLogin(current, unlockedVault, content, key, destination)
+                        created = item
+                        saved
+                    }
+                    requireNotNull(created)
+                }
+                returnFill(item, generated = true)
+            } catch (cancelled: CancellationException) {
+                throw cancelled
+            } catch (failure: Exception) {
+                error = failure.message ?: "Unable to save this password. Nothing was filled."
+            } finally {
+                busy = false
+            }
+        }
+    }
+
+    private fun returnFill(item: VaultItem, generated: Boolean = false) {
         val presentation = RemoteViews(packageName, android.R.layout.simple_list_item_1).apply {
             setTextViewText(android.R.id.text1, item.content.label)
         }
         val dataset = Dataset.Builder(presentation)
-            .setValue(passwordId, AutofillValue.forText(item.content.password))
-        usernameId?.let { dataset.setValue(it, AutofillValue.forText(item.content.username)) }
+        val targets = if (generated) generationIds else listOf(requireNotNull(passwordId))
+        targets.forEach { dataset.setValue(it, AutofillValue.forText(item.content.password)) }
+        // A password-only step may omit the username. Never erase text with an empty draft.
+        usernameId?.takeIf { item.content.username.isNotEmpty() }?.let { dataset.setValue(it, AutofillValue.forText(item.content.username)) }
         setResult(RESULT_OK, Intent().putExtra(AutofillManager.EXTRA_AUTHENTICATION_RESULT, dataset.build()))
         choices = emptyList()
         unlocked = false
@@ -188,6 +241,10 @@ class AutofillUnlockActivity : FragmentActivity() {
     }
 
     companion object {
+        const val EXTRA_ORIGIN = "dev.authier.android.autofill.ORIGIN"
+        const val EXTRA_GENERATION_IDS = "dev.authier.android.autofill.GENERATION_IDS"
+        const val EXTRA_CREATE = "dev.authier.android.autofill.CREATE"
+        const val EXTRA_USERNAME = "dev.authier.android.autofill.USERNAME"
         const val EXTRA_PACKAGE = "dev.authier.android.autofill.PACKAGE"
         const val EXTRA_PASSWORD_ID = "dev.authier.android.autofill.PASSWORD_ID"
         const val EXTRA_USERNAME_ID = "dev.authier.android.autofill.USERNAME_ID"
@@ -205,13 +262,21 @@ internal fun AutofillUnlockScreen(
     onSelect: (VaultItem) -> Unit,
     onCancel: () -> Unit,
     onBiometricUnlock: (() -> Unit)? = null,
+    webOrigin: String? = null,
+    canCreate: Boolean = false,
+    initiallyCreating: Boolean = false,
+    initialUsername: String = "",
+    onCreate: (SecretContent) -> Unit = {},
 ) {
     var password by remember { mutableStateOf("") }
     var selected by remember { mutableStateOf<VaultItem?>(null) }
     var search by remember { mutableStateOf("") }
-    val linked = choices.filter { NativeAutofillTarget.matchesAssociation(it.content.androidUri, requestedPackage) }
+    val destination = AutofillDestination(requestedPackage, webOrigin)
+    var creating by remember { mutableStateOf(initiallyCreating && canCreate) }
+    val eligibleChoices = choices.filter { webOrigin == null || destination.matches(it.content) }
+    val linked = eligibleChoices.filter { destination.matches(it.content) }
     var showOther by remember { mutableStateOf(false) }
-    val other = choices.filter { it !in linked &&
+    val other = eligibleChoices.filter { it !in linked &&
         (it.content.label.contains(search, ignoreCase = true) || it.content.username.contains(search, ignoreCase = true)) }
     if (unlocked) selected?.let { item ->
         AutofillAssociationConfirmation(item, requestedPackage, busy,
@@ -220,30 +285,38 @@ internal fun AutofillUnlockScreen(
     Surface(Modifier.fillMaxSize(), color = Canvas) {
         LazyColumn(Modifier.fillMaxSize().safeDrawingPadding().imePadding(), contentPadding = PaddingValues(24.dp), verticalArrangement = Arrangement.spacedBy(20.dp)) {
             item {
-                Text("Fill with Authier", style = MaterialTheme.typography.headlineLarge)
+                Text(if (creating) "Create a password" else "Fill with Authier", style = MaterialTheme.typography.headlineLarge)
                 Spacer(Modifier.height(12.dp))
-                Text("Share a saved login with this Android app:", color = Muted)
-                Text(requestedPackage, color = Mint)
+                Text(if (webOrigin != null) "Website receiving your login:" else "Android app receiving your login:", color = Muted)
+                Text(destination.label, color = Mint)
+                if (webOrigin != null) Text("In $requestedPackage", color = Muted, style = MaterialTheme.typography.bodySmall)
             }
             if (!unlocked) item {
                 if (onBiometricUnlock != null) Button(onBiometricUnlock, enabled = !busy, modifier = Modifier.fillMaxWidth()) { Text("Unlock with fingerprint") }
                 PasswordField(password, { password = it }, "Master password")
                 Spacer(Modifier.height(18.dp))
                 Button({ onUnlock(password); password = "" }, enabled = !busy && password.isNotEmpty(), modifier = Modifier.fillMaxWidth()) {
-                    Text(if (busy) "Unlocking…" else "Unlock and choose a login")
+                    Text(when { busy -> "Unlocking…"; creating -> "Unlock and create a password"; else -> "Unlock and choose a login" })
                 }
             }
             error?.let { message -> item { Text(message, color = MaterialTheme.colorScheme.error) } }
-            if (unlocked) {
-                if (choices.isEmpty()) item { Text("No saved passwords yet. Add a login in Authier first.", color = Muted) }
+            if (unlocked && creating) item {
+                AutofillPasswordForm(destination, initialUsername, busy, onCreate,
+                    onCancel = { if (initiallyCreating) onCancel() else creating = false })
+            }
+            if (unlocked && !creating) {
+                if (canCreate) item {
+                    Button({ creating = true }, enabled = !busy, modifier = Modifier.fillMaxWidth()) { Text("Create a strong password") }
+                }
+                if (eligibleChoices.isEmpty()) item { Text("No saved logins for this ${if (webOrigin != null) "website" else "app"} yet.", color = Muted) }
                 if (linked.isNotEmpty()) {
-                    item { Text("Linked to this app", style = MaterialTheme.typography.titleMedium) }
+                    item { Text(if (webOrigin != null) "Logins for this website" else "Linked to this app", style = MaterialTheme.typography.titleMedium) }
                     items(linked, key = { it.record.id }) { item -> AutofillLoginButton(item, busy) { onSelect(item) } }
-                    item { TextButton({ showOther = !showOther }, enabled = !busy) {
+                    if (webOrigin == null) item { TextButton({ showOther = !showOther }, enabled = !busy) {
                         Text(if (showOther) "Hide other logins" else "Choose another saved login")
                     } }
                 }
-                if (choices.isNotEmpty() && (linked.isEmpty() || showOther)) {
+                if (webOrigin == null && eligibleChoices.isNotEmpty() && (linked.isEmpty() || showOther)) {
                     item {
                         Text("Choose a saved login", style = MaterialTheme.typography.titleMedium)
                         Spacer(Modifier.height(8.dp))
@@ -255,7 +328,7 @@ internal fun AutofillUnlockScreen(
                     if (other.isEmpty()) item { Text("No other logins match your search.", color = Muted) }
                 }
             }
-            item { TextButton(onCancel, modifier = Modifier.fillMaxWidth()) { Text("Cancel") } }
+            if (!unlocked || !creating) item { TextButton(onCancel, enabled = !busy, modifier = Modifier.fillMaxWidth()) { Text("Cancel") } }
         }
     }
 }

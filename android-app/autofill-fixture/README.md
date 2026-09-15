@@ -40,3 +40,35 @@ wrong master password, or backgrounding the picker must return no credentials.
 The implementation follows the [Android autofill authentication flow](https://developer.android.com/identity/autofill/autofill-services).
 It currently supports native login filling only; web/browser origin verification, automatic saving,
 passkeys, and credential-manager integration are separate features.
+
+## Password generation and web forms
+
+`--ez signup true` creates two explicit new-password fields. `--ez change true`
+adds a populated current-password field. Request autofill, choose **Create a
+strong password with Authier**, then **Save and fill**. **Check synthetic
+credentials** checks that both generated fields match and the current password
+is unchanged. Canceling the Authier review must leave the vault file unchanged.
+
+`--ez web true` loads a synthetic HTTPS form into WebView, with current, new,
+and confirmation fields. The fixture never submits the form or makes a network
+request. Authier must block filling while the fixture is an unverified embedded
+app. To test browser origin reporting without contacting a real website, temporarily
+select this development fixture as the emulator's default browser:
+
+```sh
+adb shell cmd role get-role-holders android.app.role.BROWSER
+adb shell cmd role add-role-holder --user 0 android.app.role.BROWSER dev.authier.autofillfixture
+adb shell am force-stop dev.authier.autofillfixture
+adb shell am start -n dev.authier.autofillfixture/.AutofillFixtureActivity --ez web true
+```
+
+Tap the new-password field, create and save a password, then tap **Check generated
+web password**. Restore the previous browser role and autofill provider afterward.
+The fixture's browser intent filter exists solely for this test and is not in the
+Authier application.
+
+On a clean debug emulator, `UnlockRestartFixture` with `-e unlockFixture seed`
+prepares an offline synthetic vault. After exactly one native and one web save,
+`AutofillPersistenceFixture` with `-e autofillFixture verify` checks ciphertext,
+queued creates, and separate app/site associations. Run the seed fixture with
+`-e unlockFixture clear` to remove the synthetic vault afterward.

@@ -76,4 +76,43 @@ class AutofillAssociationTest {
             }
         }
     }
+    @Test fun `creation is encrypted associated and queued without changing existing items or writes`() {
+        val draft = SecretContent(label = "New account", username = "new-user", password = "new-generated-password",
+            url = "https://untrusted.example", androidUri = "com.untrusted.app")
+        val pending = PendingWrite(operation = "delete", id = "unrelated")
+        val current = snapshot.copy(outbox = listOf(pending), cursor = "latest")
+        for (destination in listOf(AutofillDestination("com.example.app"), AutofillDestination("com.browser.app", "https://example.com"))) {
+            val (saved, created) = createAutofillLogin(current, snapshot, draft, key, destination)
+            assertEquals(record, saved.secrets.first())
+            assertEquals(pending, saved.outbox.first())
+            assertEquals("latest", saved.cursor)
+            assertEquals(2, saved.secrets.size)
+            val decoded = SecretContentDecoder.decode(AuthierCrypto.decrypt(key, created.record.encrypted), created.record.kind)
+            assertEquals(draft.password, decoded.password)
+            assertTrue(destination.matches(decoded))
+            assertEquals(destination.webOrigin.orEmpty(), decoded.url.orEmpty())
+            assertEquals(destination.packageName.takeIf { destination.webOrigin == null }.orEmpty(), decoded.androidUri.orEmpty())
+            assertEquals("create", saved.outbox.last().operation)
+            assertEquals(created.record.id, saved.outbox.last().id)
+            assertEquals(created.record.encrypted, saved.outbox.last().encrypted)
+            val serialized = vaultJson.encodeToString(saved)
+            assertFalse(serialized.contains(draft.password))
+            assertFalse(serialized.contains(draft.username))
+            assertFalse(serialized.contains(destination.label))
+        }
+    }
+
+    @Test fun `creation refuses changed accounts invalid targets and empty drafts`() {
+        val draft = SecretContent(label = "New", password = "password")
+        val destination = AutofillDestination("com.example.app")
+        for (changed in listOf(snapshot.copy(email = "other"), snapshot.copy(deviceId = "other"),
+            snapshot.copy(serverUrl = "other"), snapshot.copy(encryptionSalt = "other"), snapshot.copy(authSecretEncrypted = "rotated"))) {
+            assertThrows(IllegalArgumentException::class.java) { createAutofillLogin(changed, snapshot, draft, key, destination) }
+        }
+        for (invalid in listOf(AutofillDestination("invalid"), destination.copy(webOrigin = "http://example.com"))) {
+            assertThrows(IllegalArgumentException::class.java) { createAutofillLogin(snapshot, snapshot, draft, key, invalid) }
+        }
+        assertThrows(IllegalArgumentException::class.java) { createAutofillLogin(snapshot, snapshot, draft.copy(password = ""), key, destination) }
+    }
+
 }

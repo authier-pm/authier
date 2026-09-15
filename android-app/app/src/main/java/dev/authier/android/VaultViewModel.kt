@@ -336,7 +336,7 @@ class VaultViewModel(application: Application) : AndroidViewModel(application) {
     fun saveItem(id: String?, kind: String, content: SecretContent) = action {
         requireNativeEditableKind(kind)
         require(content.label.isNotBlank()) { "Give this item a name." }
-        if (kind == "LOGIN_CREDENTIALS") require(content.password.isNotBlank() && content.username.isNotBlank()) { "Enter a username and password." }
+        if (kind == "LOGIN_CREDENTIALS") require(content.password.isNotBlank()) { "Enter a password." }
         if (kind == "TOTP") {
             require(content.algorithm == "SHA1") { "Use SHA1 codes for compatibility with the other Authier apps." }
             dev.authier.android.crypto.Totp.generate(content.secret, content.algorithm, content.digits, content.period)

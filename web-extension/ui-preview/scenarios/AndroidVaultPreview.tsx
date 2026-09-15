@@ -1,3 +1,5 @@
+import createPasswordScreenshot from '../../../docs/screenshots/android-autofill-create.png'
+import webAutofillScreenshot from '../../../docs/screenshots/android-autofill-web.png'
 import unlockSettingsScreenshot from '../../../docs/screenshots/android-unlock-settings.png'
 import fingerprintScreenshot from '../../../docs/screenshots/android-fingerprint-unlock.png'
 import automaticFingerprintScreenshot from '../../../docs/screenshots/android-fingerprint-auto-prompt.png'
@@ -16,6 +18,18 @@ import memberDevicesScreenshot from '../../../docs/screenshots/android-devices-m
 // Compose runs in Android, so this scenario displays captures from the actual
 // debug app instead of maintaining a second implementation of its UI in React.
 const screens = [
+  {
+    title: 'Create a password',
+    image: createPasswordScreenshot,
+    description:
+      'Review or regenerate a strong password, then save it encrypted before filling the new-password and confirmation fields.'
+  },
+  {
+    title: 'Website autofill',
+    image: webAutofillScreenshot,
+    description:
+      'Match saved logins by exact HTTPS origin in the default browser or a verified embedded web form.'
+  },
   {
     title: 'Master device',
     image: masterDevicesScreenshot,

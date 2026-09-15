@@ -115,3 +115,44 @@ in-memory transfers. Fresh native captures are `android-devices-master.png`,
 Android UI gallery includes all three; its TypeScript check and Playwright render
 pass. Production device transfers use the existing API and recheck server role
 before submitting. No backend deployment or migration is required.
+
+## Autofill password creation and HTTPS forms — September 14, 2026
+
+All 59 JVM tests pass. Debug/release APK builds and both lint variants pass.
+The four `AutofillPasswordTest` Compose tests pass on the API 34 emulator,
+covering unlock-before-generation, explicit save, regeneration/cancellation,
+empty passwords, busy controls, and creation with an empty vault. Tests cover
+exact HTTPS origins (including ports), hidden/ambiguous fields, conflicting hints,
+current/new password separation, unknown and mixed-origin frames, and Digital
+Asset Links package/signing-certificate/credential-relation checks.
+
+Using the separate fixture and an offline synthetic encrypted vault:
+
+- A native password-change form offered generation. Cancel left the vault file's
+  SHA-256 unchanged. Save created one encrypted record and one queued create;
+  the fixture confirmed identical new/confirmation values and an unchanged
+  current password.
+- The synthetic WebView HTTPS form was blocked as an unverified embedded app.
+  After selecting the fixture as the emulator's default browser, the same form
+  completed generation and filling. Both new fields matched, and the existing
+  current-password value was unchanged.
+- `AutofillPersistenceFixture` decrypted the two saved synthetic entries and
+  verified password length, ciphertext-only persistence, matching queued creates,
+  native package association, and separate website association without linking
+  the browser package.
+
+These checks exercise the production AutofillService and authentication activity,
+including WebView's empty container metadata and HTTPS virtual child fields.
+The default-browser round trip uses a local development browser fixture, not a
+live website account. Positive Digital Asset Links matching is covered on the JVM;
+a live authorized third-party WebView and physical-device browser variations have
+not been exercised. Embedded-app verification needs connectivity and a website
+credential-sharing statement; missing schemes and mixed origins remain rejected.
+
+The synthetic vault was cleared, and the emulator's previous Chrome browser role
+and Google autofill provider were restored. Fresh production Compose captures
+with debug-only synthetic data are `android-autofill-create.png`,
+`android-autofill-web.png`, `android-autofill.png`, and
+`android-autofill-association.png`. The checked-in `android-vault` scenario includes
+them; preview TypeScript and the Playwright gallery render pass. No production
+account, database migration, deployment, or release publication was used.

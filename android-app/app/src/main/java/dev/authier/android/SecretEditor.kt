@@ -54,11 +54,11 @@ fun SecretEditor(initial: SecretContent, initialKind: String, existing: Boolean,
                 OutlinedTextField(content.label, { content = content.copy(label = it) }, label = { Text("Name") }, singleLine = true, modifier = Modifier.fillMaxWidth())
                 OutlinedTextField(content.url.orEmpty(), { content = content.copy(url = it) }, label = { Text("Website") }, singleLine = true, modifier = Modifier.fillMaxWidth(), keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri))
                 if (kind == "LOGIN_CREDENTIALS") {
-                    OutlinedTextField(content.username, { content = content.copy(username = it) }, label = { Text("Username or email") }, singleLine = true, modifier = Modifier.fillMaxWidth())
+                    OutlinedTextField(content.username, { content = content.copy(username = it) }, label = { Text("Username or email (optional)") }, singleLine = true, modifier = Modifier.fillMaxWidth())
                     PasswordField(content.password, { content = content.copy(password = it) }, "Password")
                     OutlinedButton({ content = content.copy(password = generatePassword()) }, modifier = Modifier.fillMaxWidth()) { Text("Generate strong password") }
                     OutlinedTextField(content.androidUri.orEmpty(), { content = content.copy(androidUri = it.trim().ifBlank { null }) }, label = { Text("Android package (optional)") }, placeholder = { Text("com.github.android") }, singleLine = true, modifier = Modifier.fillMaxWidth())
-                    Text("Autofill only offers this password in the exact app package you enter. Websites and embedded web pages are not matched.", color = Muted, style = MaterialTheme.typography.bodySmall)
+                    Text("Autofill matches this exact Android package, or the HTTPS origin of the saved website in your default browser and verified embedded web forms.", color = Muted, style = MaterialTheme.typography.bodySmall)
                 } else {
                     PasswordField(content.secret, { content = content.copy(secret = it.replace(" ", "").uppercase()) }, "Setup key (Base32)")
                     Text("Scan the service's QR code, or enter its setup key manually.", color = Muted, style = MaterialTheme.typography.bodySmall)
@@ -76,9 +76,8 @@ fun SecretEditor(initial: SecretContent, initialKind: String, existing: Boolean,
                 Button(onClick = {
                     error = when {
                         content.label.isBlank() -> "Enter a name for this item."
-                        kind == "LOGIN_CREDENTIALS" && content.username.isBlank() -> "Enter a username."
                         kind == "LOGIN_CREDENTIALS" && content.password.isBlank() -> "Enter a password."
-                        kind == "LOGIN_CREDENTIALS" && content.url.isNullOrBlank() -> "Enter the website for this password."
+                        kind == "LOGIN_CREDENTIALS" && content.url.isNullOrBlank() && content.androidUri.isNullOrBlank() -> "Enter a website or Android package for this password."
                         !content.androidUri.isNullOrBlank() && NativeAutofillTarget.packageFromAssociation(content.androidUri) == null -> "Enter an exact Android package, such as com.github.android."
                         kind == "TOTP" && runCatching { dev.authier.android.crypto.Totp.generate(content.secret, content.algorithm, content.digits, content.period) }.isFailure -> "Check the Base32 setup key and code settings."
                         else -> null

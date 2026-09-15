@@ -12,18 +12,21 @@ class AutofillPreviewActivity : ComponentActivity() {
         val previewChoices = listOf(
             VaultItem(
                 SecretRecord("autofill-preview-personal", "synthetic", "LOGIN_CREDENTIALS", 1, "2026-09-08T00:00:00Z"),
-                SecretContent(label = "GitHub · Personal", username = "alexmorgan", password = "synthetic-only"),
+                SecretContent(label = "GitHub · Personal", username = "alexmorgan", url = "https://github.com", password = "synthetic-only"),
             ),
             VaultItem(
                 SecretRecord("autofill-preview-work", "synthetic", "LOGIN_CREDENTIALS", 1, "2026-09-08T00:00:00Z"),
-                SecretContent(label = "GitHub · Studio", username = "alex@studio.design", password = "synthetic-only"),
+                SecretContent(label = "GitHub · Studio", username = "alex@studio.design", url = "https://github.com", password = "synthetic-only"),
             ),
         )
         setContent {
             var unlocked by remember { mutableStateOf(!intent.getBooleanExtra("locked", false)) }
             AuthierTheme {
-                AutofillUnlockScreen("com.github.android", if (unlocked) previewChoices else emptyList(), unlocked, false, null,
-                    onUnlock = { unlocked = true }, onSelect = { finish() }, onCancel = ::finish)
+                AutofillUnlockScreen(if (intent.getBooleanExtra("web", false)) "com.android.chrome" else "com.github.android", if (unlocked) previewChoices else emptyList(), unlocked, false, null,
+                    onUnlock = { unlocked = true }, onSelect = { finish() }, onCancel = ::finish,
+                    webOrigin = if (intent.getBooleanExtra("web", false)) "https://github.com" else null,
+                    canCreate = true, initiallyCreating = intent.getBooleanExtra("create", false),
+                    initialUsername = "alex@example.com", onCreate = { finish() })
             }
         }
     }

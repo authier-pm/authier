@@ -129,3 +129,11 @@ The Android gallery also includes `android-totp-camera-entry.png` and
 **2FA codes → Add item → Scan QR code** flow. The review capture must follow an
 actual camera scan of a synthetic `otpauth://totp` QR code, with the setup key
 hidden. Run `pnpm playwright:ui-preview androidVault.spec.ts` to render the gallery.
+
+The Android gallery includes generated-password review and exact-origin website
+matching. Capture `android-autofill-create.png` from the debug
+`AutofillPreviewActivity` with `--ez web true --ez create true`, and
+`android-autofill-web.png` with `--ez web true`. Force-stop the debug app between
+launches. These invoke the actual production Compose screens with synthetic
+accounts; they never access a vault or save generated credentials. The native
+fixture separately exercises real encrypted saving and Android field filling.
