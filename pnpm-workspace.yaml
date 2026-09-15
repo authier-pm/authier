@@ -37,38 +37,38 @@ minimumReleaseAgeExclude:
   - '@types/chrome@0.2.0 || 0.2.8'
   - lint-staged@17.0.8
   - sql-formatter@15.8.2
-  - '@orpc/client@1.14.14 || 1.14.15'
-  - '@orpc/contract@1.14.14 || 1.14.15'
-  - '@orpc/interop@1.14.14 || 1.14.15'
-  - '@orpc/server@1.14.14 || 1.14.15'
-  - '@orpc/shared@1.14.14 || 1.14.15'
-  - '@orpc/standard-server-aws-lambda@1.14.14 || 1.14.15'
-  - '@orpc/standard-server-fastify@1.14.14 || 1.14.15'
-  - '@orpc/standard-server-fetch@1.14.14 || 1.14.15'
-  - '@orpc/standard-server-node@1.14.14 || 1.14.15'
-  - '@orpc/standard-server-peer@1.14.14 || 1.14.15'
-  - '@orpc/standard-server@1.14.14 || 1.14.15'
-  - '@oxfmt/binding-android-arm-eabi@0.62.0'
-  - '@oxfmt/binding-android-arm64@0.62.0'
-  - '@oxfmt/binding-darwin-arm64@0.62.0'
-  - '@oxfmt/binding-darwin-x64@0.62.0'
-  - '@oxfmt/binding-freebsd-x64@0.62.0'
-  - '@oxfmt/binding-linux-arm-gnueabihf@0.62.0'
-  - '@oxfmt/binding-linux-arm-musleabihf@0.62.0'
-  - '@oxfmt/binding-linux-arm64-gnu@0.62.0'
-  - '@oxfmt/binding-linux-arm64-musl@0.62.0'
-  - '@oxfmt/binding-linux-ppc64-gnu@0.62.0'
-  - '@oxfmt/binding-linux-riscv64-gnu@0.62.0'
-  - '@oxfmt/binding-linux-riscv64-musl@0.62.0'
-  - '@oxfmt/binding-linux-s390x-gnu@0.62.0'
-  - '@oxfmt/binding-linux-x64-gnu@0.62.0'
-  - '@oxfmt/binding-linux-x64-musl@0.62.0'
-  - '@oxfmt/binding-openharmony-arm64@0.62.0'
-  - '@oxfmt/binding-win32-arm64-msvc@0.62.0'
-  - '@oxfmt/binding-win32-ia32-msvc@0.62.0'
-  - '@oxfmt/binding-win32-x64-msvc@0.62.0'
+  - '@orpc/client@1.14.14 || 1.14.15 || 1.15.1'
+  - '@orpc/contract@1.14.14 || 1.14.15 || 1.15.1'
+  - '@orpc/interop@1.14.14 || 1.14.15 || 1.15.1'
+  - '@orpc/server@1.14.14 || 1.14.15 || 1.15.1'
+  - '@orpc/shared@1.14.14 || 1.14.15 || 1.15.1'
+  - '@orpc/standard-server-aws-lambda@1.14.14 || 1.14.15 || 1.15.1'
+  - '@orpc/standard-server-fastify@1.14.14 || 1.14.15 || 1.15.1'
+  - '@orpc/standard-server-fetch@1.14.14 || 1.14.15 || 1.15.1'
+  - '@orpc/standard-server-node@1.14.14 || 1.14.15 || 1.15.1'
+  - '@orpc/standard-server-peer@1.14.14 || 1.14.15 || 1.15.1'
+  - '@orpc/standard-server@1.14.14 || 1.14.15 || 1.15.1'
+  - '@oxfmt/binding-android-arm-eabi@0.62.0 || 0.68.0'
+  - '@oxfmt/binding-android-arm64@0.62.0 || 0.68.0'
+  - '@oxfmt/binding-darwin-arm64@0.62.0 || 0.68.0'
+  - '@oxfmt/binding-darwin-x64@0.62.0 || 0.68.0'
+  - '@oxfmt/binding-freebsd-x64@0.62.0 || 0.68.0'
+  - '@oxfmt/binding-linux-arm-gnueabihf@0.62.0 || 0.68.0'
+  - '@oxfmt/binding-linux-arm-musleabihf@0.62.0 || 0.68.0'
+  - '@oxfmt/binding-linux-arm64-gnu@0.62.0 || 0.68.0'
+  - '@oxfmt/binding-linux-arm64-musl@0.62.0 || 0.68.0'
+  - '@oxfmt/binding-linux-ppc64-gnu@0.62.0 || 0.68.0'
+  - '@oxfmt/binding-linux-riscv64-gnu@0.62.0 || 0.68.0'
+  - '@oxfmt/binding-linux-riscv64-musl@0.62.0 || 0.68.0'
+  - '@oxfmt/binding-linux-s390x-gnu@0.62.0 || 0.68.0'
+  - '@oxfmt/binding-linux-x64-gnu@0.62.0 || 0.68.0'
+  - '@oxfmt/binding-linux-x64-musl@0.62.0 || 0.68.0'
+  - '@oxfmt/binding-openharmony-arm64@0.62.0 || 0.68.0'
+  - '@oxfmt/binding-win32-arm64-msvc@0.62.0 || 0.68.0'
+  - '@oxfmt/binding-win32-ia32-msvc@0.62.0 || 0.68.0'
+  - '@oxfmt/binding-win32-x64-msvc@0.62.0 || 0.68.0'
   - '@testing-library/user-event@14.6.3 || 14.6.7'
-  - oxfmt@0.62.0
+  - oxfmt@0.62.0 || 0.68.0
   - unplugin-swc@1.5.10 || 1.6.0
   - postcss@8.5.26
   - tsx@4.23.10
@@ -76,12 +76,33 @@ minimumReleaseAgeExclude:
   - '@mermaid-js/mermaid-cli@11.17.0'
   - '@types/node@26.4.1'
   - '@types/webextension-polyfill@0.12.6'
-  - framer-motion@13.2.0
+  - framer-motion@13.2.0 || 13.3.0
   - miniflare@5.20260831.0-alpha
-  - motion-dom@13.2.0
+  - motion-dom@13.2.0 || 13.3.0
   - stripe@22.6.1
   - webpack@5.110.3
   - wrangler@4.128.0
+  - '@orpc/json-schema@1.15.1'
+  - '@orpc/openapi-client@1.15.1'
+  - '@orpc/openapi@1.15.1'
+  - '@orpc/tanstack-query@1.15.1'
+  - '@orpc/zod@1.15.1'
+  - '@turbo/darwin-64@2.10.13'
+  - '@turbo/darwin-arm64@2.10.13'
+  - '@turbo/linux-64@2.10.13'
+  - '@turbo/linux-arm64@2.10.13'
+  - '@turbo/windows-64@2.10.13'
+  - '@turbo/windows-arm64@2.10.13'
+  - '@vitest/coverage-v8@5.0.1'
+  - '@vitest/mocker@5.0.1'
+  - '@vitest/pretty-format@5.0.1'
+  - '@vitest/spy@5.0.1'
+  - '@vitest/ui@5.0.1'
+  - '@vitest/utils@5.0.1'
+  - motion-utils@13.3.0
+  - react-dropzone@20.1.2
+  - turbo@2.10.13
+  - vitest@5.0.1
 
 allowBuilds:
   '@capaj/type-graphql': true

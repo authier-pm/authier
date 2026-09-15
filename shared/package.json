@@ -4,14 +4,14 @@
   "version": "1.0.0",
   "license": "AGPL-3.0-or-later",
   "dependencies": {
-    "@apollo/client": "4.1.9",
+    "@apollo/client": "4.3.0",
     "@chakra-ui/react": "2.10.4",
-    "@lingui/core": "^6.4.0",
-    "@orpc/contract": "1.14.6",
+    "@lingui/core": "^6.7.0",
+    "@orpc/contract": "1.15.1",
     "graphql": "16.8.1",
-    "otplib": "^13.4.1",
-    "tldts": "^7.4.11",
+    "otplib": "^13.5.0",
+    "tldts": "^7.4.13",
     "yup": "^1.7.1",
-    "zod": "^4.5.4"
+    "zod": "^4.6.5"
   }
 }
