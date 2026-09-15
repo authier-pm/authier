@@ -20,6 +20,10 @@ The static output is written to `landing-page/dist`. The site intentionally does
 not use the Cloudflare Astro adapter because every route is pre-rendered at build
 time.
 
+Keep this package on TypeScript 6.0.3 while `astro check` requires the JavaScript
+compiler API. TypeScript 7's native compiler does not provide that API yet;
+the other workspace packages can continue using TypeScript 7.
+
 ## Cloudflare Pages
 
 - Account: `fbd16d9252980833034caa69e11aa064`
