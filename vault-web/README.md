@@ -119,6 +119,27 @@ cd backend
 pnpm exec vitest run orpcHandler.spec.ts
 ```
 
+## Cloudflare Workers Builds
+
+Configure `authier-vault-web` with these build settings:
+
+- Root directory: `/vault-web`
+- Build command: `pnpm run build`
+- Deploy command: `pnpm run wrdeploy`
+- Version command (preview branches): `pnpm exec wrangler versions upload`
+
+These commands use Wrangler from the workspace lockfile. Avoid `pnpx wrangler`:
+it installs a separate copy whose dependency build scripts are blocked by pnpm,
+causing `ERR_PNPM_IGNORED_BUILDS` for `esbuild` and `workerd`.
+
+To verify deployment packaging locally without publishing:
+
+```bash
+cd vault-web
+pnpm run build
+pnpm run wrdeploy --dry-run
+```
+
 ## Troubleshooting
 
 - If the vault cannot reach the API, make sure the backend is running on `http://localhost:5051`.
