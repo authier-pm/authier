@@ -530,6 +530,9 @@ const completeLogin = async (
       base64ToBuffer(input.challenge.encryptionSalt)
     ))
   const encryptedData = base64ToBuffer(input.challenge.addDeviceSecretEncrypted)
+  if (encryptedData.length < 16 + 12 + 16) {
+    throw new LoginSessionError('Login failed, check your email or password', false)
+  }
   const iv = encryptedData.slice(16, 28)
   const data = encryptedData.slice(28)
   const decryptedContent = await self.crypto.subtle.decrypt(

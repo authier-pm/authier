@@ -1,5 +1,10 @@
 const PBKDF2_ITERATIONS = 600_000
 
+const ENVELOPE_SALT_BYTES = 16
+const ENVELOPE_IV_BYTES = 12
+// AES-GCM tag is 16 bytes; empty plaintext still yields a 16-byte tag.
+const MIN_ENVELOPE_BYTES = ENVELOPE_SALT_BYTES + ENVELOPE_IV_BYTES + 16
+
 export const enc = new TextEncoder()
 export const dec = new TextDecoder()
 
@@ -97,8 +102,17 @@ export async function decryptString(
   encryptedBase64: string
 ): Promise<string> {
   const encryptedData = base64ToBuffer(encryptedBase64)
-  const iv = encryptedData.slice(16, 28)
-  const data = encryptedData.slice(28)
+  if (
+    encryptedData.length < MIN_ENVELOPE_BYTES ||
+    bufferToBase64(encryptedData) !== encryptedBase64
+  ) {
+    throw new Error('Invalid encrypted payload')
+  }
+  const iv = encryptedData.slice(
+    ENVELOPE_SALT_BYTES,
+    ENVELOPE_SALT_BYTES + ENVELOPE_IV_BYTES
+  )
+  const data = encryptedData.slice(ENVELOPE_SALT_BYTES + ENVELOPE_IV_BYTES)
   const decrypted = await crypto.subtle.decrypt(
     { name: 'AES-GCM', iv },
     key,
@@ -109,9 +123,14 @@ export async function decryptString(
 }
 
 export function generateBackendSecret() {
-  const parts = crypto.getRandomValues(new Uint32Array(8))
-
-  return Array.from(parts, (part) => part.toString(36)).join('')
+  // Fixed-length 256-bit secret as lowercase hex (64 chars). The previous
+  // `Uint32Array(...).toString(36)` form stripped leading zeros, producing
+  // variable lengths and leaking zero-prefixes. Secrets are opaque strings
+  // (hashed with PBKDF2 server-side), so existing secrets keep verifying.
+  const bytes = crypto.getRandomValues(new Uint8Array(32))
+  return Array.from(bytes, (byte) => byte.toString(16).padStart(2, '0')).join(
+    ''
+  )
 }
 
 export async function initLocalDeviceAuthSecret(

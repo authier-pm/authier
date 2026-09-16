@@ -260,6 +260,9 @@ export class DeviceState implements IBackgroundStateSerializable {
       base64ToBuffer(this.masterEncryptionKey)
     )
     const encryptedDataBuff = base64ToBuffer(encrypted)
+    if (encryptedDataBuff.length < 16 + 12 + 16) {
+      throw new Error('Invalid encrypted payload')
+    }
     const iv = encryptedDataBuff.slice(16, 16 + 12)
     const data = encryptedDataBuff.slice(16 + 12)
 
