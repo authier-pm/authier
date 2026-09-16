@@ -15,28 +15,21 @@ export const getWebInputsForUrl = (url: string) => {
     return exactMatch
   }
 
-  // Helper function to strip subdomains
-  const stripSubdomains = (hostname: string): string[] => {
-    const parts = hostname.split('.')
-    const stripped = [] as string[]
-    while (parts.length > 2) {
-      parts.shift()
-      stripped.push(parts.join('.'))
-    }
-    stripped.push(parts.join('.')) // include the original hostname without modification
-    return stripped
-  }
+  // Hostname-bound match: a stored entry only applies to the same host or a
+  // subdomain in either direction (parent learned selectors apply to
+  // subdomains and vice versa). Never use substring matching here:
+  // `'https://example.com/login'.includes('ample.com')` is true, so an
+  // attacker domain like `ample.com` would receive another site's selectors.
+  const isSameHostOrSubdomain = (visited: string, stored: string) =>
+    visited === stored ||
+    visited.endsWith(`.${stored}`) ||
+    stored.endsWith(`.${visited}`)
 
-  const hostnamesToCheck = stripSubdomains(hostname)
-
-  for (const host of hostnamesToCheck) {
-    const partialMatch = webInputs.filter((i) => i.url.includes(host)) ?? []
-    if (partialMatch.length > 0) {
-      return partialMatch
-    }
-  }
-
-  return []
+  return webInputs.filter((i) => {
+    const entryHostname = constructURL(i.url).hostname
+    if (!entryHostname) return false
+    return isSameHostOrSubdomain(hostname, entryHostname)
+  })
 }
 
 export const getWebInputsForUrlOfKinds = (
