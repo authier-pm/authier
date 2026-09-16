@@ -135,6 +135,13 @@ Run the `Android launch article` test in `playwrightAndroidUpdates.config.ts` to
 verify desktop/mobile layout, screenshot assets and download links, and capture
 `docs/screenshots/android-blog-desktop.png` and `android-blog-mobile.png`.
 
+The `september-release-blog` scenario embeds the article covering extension
+1.2.13 and Android 0.1.5. With the Astro server running on port 4321, open
+`/?scenario=september-release-blog` to inspect the production article. Its browser
+check runs with `bunx playwright test --config playwrightAndroidUpdates.config.ts
+--grep 'September release article'` and captures `september-release-blog-desktop.png`
+and `september-release-blog-mobile.png` in `docs/screenshots/`.
+
 The `android-vault` password and authenticator captures show the production
 lazy-loading favicon component. Refresh both native screenshots after icon changes.
 `FaviconLoadingTest` uses a local HTTP server and 1,000 synthetic rows to verify

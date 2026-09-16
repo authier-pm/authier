@@ -1,6 +1,61 @@
 import { expect, test } from '@playwright/test'
 import { androidObtainiumUrl } from '../../../shared/androidDistribution'
 
+test('September release article renders both updates and screenshots on desktop and mobile', async ({
+  page
+}) => {
+  await page.setViewportSize({ width: 1440, height: 1200 })
+  await page.goto('/?scenario=september-release-blog')
+  const article = page.frameLocator('iframe')
+  await expect(
+    article.getByRole('heading', {
+      level: 1,
+      name: 'Email codes in your popup, easier sign-ins on Android'
+    })
+  ).toBeVisible()
+  for (const tag of ['v1.2.13-extension', 'v0.1.5-android']) {
+    await expect(
+      article.getByRole('link', { name: tag, exact: true })
+    ).toHaveAttribute(
+      'href',
+      `https://github.com/authier-pm/authier/releases/tag/${tag}`
+    )
+  }
+  const images = article.locator('article img')
+  await expect(images).toHaveCount(3)
+  for (const image of await images.all()) {
+    await image.scrollIntoViewIfNeeded()
+    await expect
+      .poll(() =>
+        image.evaluate((element: HTMLImageElement) => element.naturalWidth)
+      )
+      .toBeGreaterThan(0)
+  }
+  await page.goto('http://127.0.0.1:4321/blog/email-codes-and-easier-sign-ins')
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
+    'href',
+    'https://www.authier.pm/blog/email-codes-and-easier-sign-ins'
+  )
+  await page.screenshot({
+    style: 'astro-dev-toolbar { visibility: hidden; }',
+    path: '../docs/screenshots/september-release-blog-desktop.png'
+  })
+  await page.setViewportSize({ width: 390, height: 1100 })
+  expect(
+    await page.locator('body').evaluate((element) => element.scrollWidth)
+  ).toBeLessThanOrEqual(390)
+  await page.screenshot({
+    style: 'astro-dev-toolbar { visibility: hidden; }',
+    path: '../docs/screenshots/september-release-blog-mobile.png'
+  })
+  await page.goto('http://127.0.0.1:4321/blog')
+  await expect(
+    page.getByRole('link', {
+      name: /Email codes in your popup, easier sign-ins on Android/
+    })
+  ).toHaveAttribute('href', '/blog/email-codes-and-easier-sign-ins')
+})
+
 test('links the homepage hero, platform list and final call to action to Obtainium', async ({
   page
 }) => {

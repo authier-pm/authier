@@ -8,7 +8,8 @@ import { AndroidIconPreview } from './scenarios/AndroidIconPreview'
 import {
   AndroidLandingPreview,
   AndroidBlogPreview,
-  AndroidUpdatesPreview
+  AndroidUpdatesPreview,
+  SeptemberReleaseBlogPreview
 } from './scenarios/AndroidUpdatesPreview'
 import { BitfinexTotpPreview } from './scenarios/BitfinexTotpPreview'
 import { KostkohratkyPasswordPreview } from './scenarios/KostkohratkyPasswordPreview'
@@ -28,6 +29,7 @@ const scenarios: Record<string, ComponentType> = {
   'android-icon': AndroidIconPreview,
   'android-updates': AndroidUpdatesPreview,
   'android-blog': AndroidBlogPreview,
+  'september-release-blog': SeptemberReleaseBlogPreview,
   'android-landing': AndroidLandingPreview,
   'bitfinex-totp': BitfinexTotpPreview,
   'kostkohratky-password': KostkohratkyPasswordPreview
@@ -47,6 +49,7 @@ document.body.classList.toggle(
     requestedScenario !== 'bitfinex-totp' &&
     requestedScenario !== 'kostkohratky-password' &&
     requestedScenario !== 'email-verification-codes' &&
+    requestedScenario !== 'september-release-blog' &&
     !requestedScenario.startsWith('passkey-')
 )
 

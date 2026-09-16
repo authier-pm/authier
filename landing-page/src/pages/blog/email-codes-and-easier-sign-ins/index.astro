@@ -1,0 +1,197 @@
+---
+import ArticleLayout from '../../../layouts/ArticleLayout.astro'
+---
+
+<ArticleLayout
+  title="Email codes in your popup, easier sign-ins on Android"
+  description="What’s new in Authier extension 1.2.13 and Android 0.1.5: Gmail verification codes, browser passkeys, better autofill, and faster fingerprint unlock."
+  publishedAt="2026-09-16"
+  readingTime="5 min read"
+  imagePaths={[
+    '/blog/september-2026/email-verification-codes.png',
+    '/blog/september-2026/android-autofill-create.png',
+    '/blog/september-2026/android-fingerprint-auto-prompt.png'
+  ]}
+  socialImage={{
+    path: '/blog/september-2026/email-verification-codes.png',
+    width: 920,
+    height: 700,
+    alt: 'Authier showing a masked Gmail verification code with a mail badge over the sender favicon',
+    type: 'image/png'
+  }}
+>
+  <p>
+    A sign-in often involves more than a password: a code in another tab, a
+    passkey in another browser, or a new account to save on your phone. Our
+    latest updates make those steps easier to get through.
+  </p>
+  <p>
+    <strong>Authier extension 1.2.13</strong> adds Gmail verification codes and
+    encrypted browser passkeys, alongside improvements to autofill.
+    <strong>Authier for Android 0.1.5</strong> opens the fingerprint prompt
+    automatically and lets you create, save, and fill passwords from supported
+    login forms. Here is what changed since extension 1.2.12 and Android 0.1.4.
+  </p>
+
+  <h2>Your email verification code, one click away</h2>
+  <p>
+    Keep Gmail open in another tab. When Authier finds a verification code in an
+    opened message or an unread inbox preview, a red dot appears on the extension
+    icon. Open the popup to see who sent it and a masked code, such as
+    <strong>213***</strong>. Click the code to copy it and reveal the full value.
+  </p>
+  <figure class="email-shot">
+    <img
+      src="/blog/september-2026/email-verification-codes.png"
+      alt="A sample Gmail message alongside the Authier popup, with a masked code and a small red mail badge on the sender favicon"
+      width="920"
+      height="700"
+      loading="eager"
+    />
+    <figcaption>
+      The code stays masked until you copy it. The sender icon opens its Gmail tab.
+      This preview uses a synthetic email and sample favicon.
+    </figcaption>
+  </figure>
+  <p>
+    The sender’s domain favicon helps you recognize the message. A small red mail
+    badge marks a new code; if the favicon cannot load, a mail icon takes its
+    place. Clicking the icon brings the source Gmail tab and its window forward,
+    while clicking the code copies it. They are separate actions.
+  </p>
+  <p>
+    Emails format codes in many ways. Authier converts the rendered message to
+    plain text and looks for verification language around six-to-eight-character
+    codes. It handles characters split across HTML spans, table cells, spaces,
+    and lines, including codes containing letters.
+  </p>
+  <p>
+    Detection reads content Gmail has already rendered; it does not fetch your
+    mailbox. If the inbox preview does not contain the code, open the message.
+    Codes stay in browser session storage and disappear after ten minutes; the
+    service that sent a code may expire it sooner. Gmail is the first supported
+    email provider. After updating, reload existing Gmail tabs to start detection.
+  </p>
+
+  <h2>Browser passkeys that travel with your vault</h2>
+  <p>
+    You can now create and use passkeys on compatible websites through the
+    extension. Authier stores them encrypted in your vault and asks you to approve
+    registration and sign-in. The passkey’s detail view shows its website and
+    account so you can tell your saved passkeys apart.
+  </p>
+  <p>
+    Install Authier in another supported browser, connect the same vault, and
+    sync to use the passkey there. Requests Authier does not support fall back to
+    the browser’s own authenticator. Android preserves these encrypted records
+    during sync, but creating or signing in with passkeys on Android is not part
+    of this release.
+  </p>
+
+  <h2>Autofill that understands more forms</h2>
+  <p>
+    The extension better distinguishes sign-in, registration, and password-change
+    forms, helping it offer the password generator where you need a new password.
+    When local rules are uncertain, a model-assisted classification service can
+    analyze a limited form snapshot. The snapshot omits input values, hidden
+    controls, and scripts; it includes field descriptions and nearby form text.
+    Results are checked against the current form before use.
+  </p>
+  <p>
+    Authenticator autofill also handles more split-code inputs and forms that
+    process pasted codes asynchronously. Website matching now checks hostname
+    boundaries, preventing a similarly named unrelated domain from matching a
+    saved login. And when you pause autofill for a domain, that choice persists
+    across tabs and browser restarts until you turn it back on.
+  </p>
+
+  <h2>Android: open, authenticate, continue</h2>
+  <p>
+    With fingerprint unlock enabled, opening a locked vault now starts Android’s
+    biometric prompt automatically. Authier first checks whether your chosen
+    timed session is still valid, so you do not get an extra prompt when the
+    vault can already open.
+  </p>
+  <p>
+    Dismiss the prompt or choose <strong>Use master password</strong> to type
+    your password instead. Rotating the phone does not immediately bring back a
+    prompt you just dismissed, and you can tap <strong>Unlock with fingerprint</strong>
+    whenever you want to retry.
+  </p>
+
+  <h2>Create a password from Android Autofill</h2>
+  <p>
+    Choose <strong>Create a strong password with Authier</strong> from Android’s
+    autofill menu on a supported form. Review the username and generated password,
+    generate another if you like, then tap <strong>Save and fill</strong>.
+    Authier saves a new encrypted login on your phone before returning the values
+    to the form, and queues it for sync.
+  </p>
+  <div class="android-gallery" aria-label="New Android sign-in features">
+    <figure>
+      <img
+        src="/blog/september-2026/android-fingerprint-auto-prompt.png"
+        alt="Android’s fingerprint prompt opening over the locked Authier vault, with a master-password fallback"
+        width="1280"
+        height="2856"
+        loading="lazy"
+      />
+      <figcaption>Fingerprint unlock starts when you open a locked vault.</figcaption>
+    </figure>
+    <figure>
+      <img
+        src="/blog/september-2026/android-autofill-create.png"
+        alt="Authier’s Android password creation screen showing the receiving website, username, generated password, and Save and fill button"
+        width="1080"
+        height="2400"
+        loading="lazy"
+      />
+      <figcaption>Review the receiving website, then save and fill a new login.</figcaption>
+    </figure>
+  </div>
+  <p class="screenshot-note">Native Android screenshots use synthetic test accounts.</p>
+  <p>
+    Explicit new-password and confirmation fields receive the same generated
+    value, while current-password fields stay unchanged. This creates a separate
+    saved login, so it does not overwrite an existing vault entry. Canceling
+    leaves both the form and vault untouched. You still submit the website’s form
+    yourself.
+  </p>
+  <p>
+    Android Autofill now also supports HTTPS forms in your system-selected default
+    browser, and embedded web forms whose website authorizes the app. Saved web
+    logins must match the exact website origin. Browser autofill needs Android 9
+    or newer and fields exposed through Android Autofill; native app forms remain
+    supported on Android 8.
+  </p>
+
+  <h2>Get the updates</h2>
+  <p>
+    The release tags are <a href="https://github.com/authier-pm/authier/releases/tag/v1.2.13-extension">v1.2.13-extension</a>
+    and <a href="https://github.com/authier-pm/authier/releases/tag/v0.1.5-android">v0.1.5-android</a>.
+    Builds and store submissions run after tagging, so download and store
+    availability may follow later. The <a href="/download#browsers">browser download page</a>
+    links to Chrome, Firefox, and Edge.
+  </p>
+  <p>
+    On Android, use <a href="/download#android">Obtainium or the signed APK</a>
+    once the new build is available. Update the existing installation in place to
+    keep your local vault. Obtainium can check for subsequent releases for you.
+  </p>
+  <p>
+    Want the full changes? Browse the
+    <a href="https://github.com/authier-pm/authier/compare/v1.2.12-extension...v1.2.13-extension">extension comparison</a>
+    and <a href="https://github.com/authier-pm/authier/compare/v0.1.4-android...v0.1.5-android">Android comparison</a>,
+    or <a href="https://github.com/authier-pm/authier/issues">tell us about a sign-in flow that still needs work</a>.
+  </p>
+</ArticleLayout>
+
+<style>
+  figure { margin: 0; min-width: 0; }
+  figure img { display: block; width: 100%; height: auto; border: 1px solid var(--border-strong); border-radius: 16px; }
+  figcaption { margin-top: 12px; color: var(--text-muted); font-size: 0.8rem; line-height: 1.6; }
+  .email-shot { margin: 32px 0; }
+  .android-gallery { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; margin: 32px 0 20px; }
+  .screenshot-note { color: var(--text-subtle); font-size: 0.8rem; }
+  @media (max-width: 540px) { .android-gallery { grid-template-columns: 1fr; max-width: 300px; margin-inline: auto; gap: 30px; } }
+</style>

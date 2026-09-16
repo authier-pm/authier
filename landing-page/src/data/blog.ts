@@ -4,6 +4,16 @@ export type BlogPost = ContentEntry
 
 export const blogPosts = [
   {
+    title: 'Email codes in your popup, easier sign-ins on Android',
+    description:
+      'What’s new in Authier extension 1.2.13 and Android 0.1.5: Gmail verification codes, browser passkeys, better autofill, and faster fingerprint unlock.',
+    href: '/blog/email-codes-and-easier-sign-ins',
+    publishedAt: '2026-09-16',
+    updatedAt: '2026-09-16',
+    readingTime: '5 min read',
+    category: 'Product update'
+  },
+  {
     title: 'Meet the new Authier for Android',
     description:
       'Your passwords and authenticator codes, now in a native Android app—with fingerprint unlock, Autofill, and a lock timer that respects your choice.',

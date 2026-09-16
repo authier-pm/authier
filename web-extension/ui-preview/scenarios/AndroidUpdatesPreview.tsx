@@ -15,3 +15,7 @@ export const AndroidLandingPreview = () => <WebsitePreview path="/" />
 export const AndroidBlogPreview = () => (
   <WebsitePreview path="/blog/native-android-app" />
 )
+
+export const SeptemberReleaseBlogPreview = () => (
+  <WebsitePreview path="/blog/email-codes-and-easier-sign-ins" />
+)
