@@ -39,14 +39,13 @@ export const throwIfNotAuthenticated: MiddlewareFn<
     }
   })
 
-  if (!currentDevice) {
+  if (
+    !currentDevice ||
+    currentDevice.userId !== jwtPayload.userId ||
+    currentDevice.logoutAt ||
+    currentDevice.deletedAt
+  ) {
     context.reply.clearCookie('access-token')
-    throw new GraphqlErrorUnauthorized('not authenticated')
-  }
-
-  if (currentDevice?.logoutAt) {
-    context.reply.clearCookie('access-token')
-
     throw new GraphqlErrorUnauthorized('not authenticated')
   }
   context.device = currentDevice
