@@ -74,6 +74,23 @@ import {
 
 export const log = debug('au:Device')
 
+// The plaintext `decryptedSecrets` cache is derived on demand via
+// `getAllSecretsDecrypted()` and must never hit disk: strip it from every
+// `storage.session` write. Restored states recompute it in `initialize()`.
+// (Raw `masterEncryptionKey`/`authSecret` still persist in session storage so
+// the service worker can survive restarts; moving those to OS-keystore-held
+// non-extractable keys is tracked follow-up work.)
+export const toPersistedBackgroundState = (
+  state: object | null | undefined
+) => {
+  const { decryptedSecrets: _secrets, ...persisted } = (state ?? {}) as Record<
+    string,
+    unknown
+  >
+  void _secrets
+  return { ...persisted, decryptedSecrets: [] as never[] }
+}
+
 const port = browser.runtime.connect()
 export const extensionDeviceTrpc = createTRPCProxyClient<AppRouter>({
   links: [chromeLink({ port })]
@@ -194,7 +211,12 @@ export class DeviceState implements IBackgroundStateSerializable {
       device.state = new DeviceState(nextSnapshot)
       return
     }
-    Object.assign(device.state, changes.backgroundState.newValue)
+    // Never overwrite the in-memory plaintext cache from disk: persisted
+    // snapshots always carry `decryptedSecrets: []`.
+    const { decryptedSecrets: _ignored, ...rest } = changes.backgroundState
+      .newValue as Record<string, unknown>
+    void _ignored
+    Object.assign(device.state, rest)
   }
 
   async initialize() {
@@ -259,7 +281,7 @@ export class DeviceState implements IBackgroundStateSerializable {
     this.decryptedSecrets = decryptedSecrets
     await Promise.all([
       browser.storage.session.set({
-        backgroundState: this,
+        backgroundState: toPersistedBackgroundState(this),
         lockedState: null
       }),
       setAutofillCredentialsEnabled(this.autofillCredentialsEnabled),
@@ -520,7 +542,7 @@ export class DeviceState implements IBackgroundStateSerializable {
   async removeSecret(secretId: string) {
     browser.storage.session.set({
       backgroundState: {
-        ...device.state,
+        ...toPersistedBackgroundState(device.state),
         secrets: device.state?.secrets.filter((s) => s.id !== secretId)
       }
     })
@@ -531,7 +553,7 @@ export class DeviceState implements IBackgroundStateSerializable {
   async removeSecrets(secretIds: string[]) {
     browser.storage.session.set({
       backgroundState: {
-        ...device.state,
+        ...toPersistedBackgroundState(device.state),
         secrets: device.state?.secrets.filter((s) => !secretIds.includes(s.id))
       }
     })

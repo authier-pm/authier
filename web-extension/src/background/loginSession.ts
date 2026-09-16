@@ -69,6 +69,13 @@ const createEmptyLoginSession = (): LoginSessionSnapshot => ({
   error: null
 })
 
+// The master password lives only in `LoginSessionManager.session` memory.
+// Every persistence call goes through here so no storage backend (session
+// storage, mocks, future backends) ever receives it.
+export const toPersistedLoginSession = (
+  session: LoginSessionSnapshot
+): LoginSessionSnapshot => ({ ...session, password: '' })
+
 export interface LoginSessionStorage {
   read: () => Promise<LoginSessionSnapshot | null>
   write: (session: LoginSessionSnapshot) => Promise<void>
@@ -126,7 +133,12 @@ class BrowserLoginSessionStorage implements LoginSessionStorage {
           stored[LOGIN_SESSION_STORAGE_KEY]
         )
 
-        return parsed.success ? parsed.data : null
+        if (!parsed.success) return null
+        // The master password is memory-only: never trust a persisted copy
+        // (older versions wrote it to storage.session). Strip on read so a
+        // stolen disk image cannot yield the password, and a restarted
+        // worker forces re-entry instead of silently resuming.
+        return { ...parsed.data, password: '' }
       })
       .catch((error: unknown) => {
         console.warn(
@@ -143,9 +155,14 @@ class BrowserLoginSessionStorage implements LoginSessionStorage {
       return Promise.resolve()
     }
 
+    // Keep the master password memory-only (survives popup teardown via the
+    // background manager's in-memory session, but never hits disk). Persist
+    // only the non-secret progress so a restart forces password re-entry.
+    const { password: _password, ...persisted } = session
+    void _password
     return this.storageArea
       .set({
-        [LOGIN_SESSION_STORAGE_KEY]: session
+        [LOGIN_SESSION_STORAGE_KEY]: { ...persisted, password: '' }
       })
       .catch((error: unknown) => {
         console.warn(
@@ -198,6 +215,10 @@ export class LoginSessionManager {
     return this.initialization
   }
 
+  private persist() {
+    return this.storage.write(toPersistedLoginSession(this.session))
+  }
+
   private async restore() {
     const storedSession = await this.storage.read()
 
@@ -216,7 +237,7 @@ export class LoginSessionManager {
         : storedSession
 
     if (storedSession.status === 'completing') {
-      await this.storage.write(this.session)
+      await this.persist()
     }
 
     if (this.session.status === 'awaiting-approval') {
@@ -242,7 +263,7 @@ export class LoginSessionManager {
       ...draft,
       error: null
     }
-    await this.storage.write(this.session)
+    await this.persist()
     return this.cloneSnapshot()
   }
 
@@ -259,7 +280,7 @@ export class LoginSessionManager {
       challenge: null,
       error: null
     }
-    await this.storage.write(this.session)
+    await this.persist()
     this.startPolling()
     await this.queuePoll()
 
@@ -367,7 +388,7 @@ export class LoginSessionManager {
         challenge,
         error: null
       }
-      await this.storage.write(this.session)
+      await this.persist()
       return
     }
 
@@ -378,7 +399,7 @@ export class LoginSessionManager {
       challenge: null,
       error: null
     }
-    await this.storage.write(this.session)
+    await this.persist()
     await this.operations.completeLogin({
       session: sessionAtStart,
       challenge,
@@ -418,7 +439,7 @@ export class LoginSessionManager {
       }
     }
 
-    await this.storage.write(this.session)
+    await this.persist()
   }
 
   private cloneSnapshot(): LoginSessionSnapshot {

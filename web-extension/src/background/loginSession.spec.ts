@@ -77,7 +77,7 @@ const createOperations = (
 }
 
 describe('LoginSessionManager', () => {
-  it('restores form values after the popup is recreated', async () => {
+  it('restores the email but keeps the master password memory-only', async () => {
     const { storage, getStoredValue } = createStorage()
     const { operations } = createOperations(async () => approvalChallenge)
     const firstManager = new LoginSessionManager(operations, storage, 60_000)
@@ -86,6 +86,12 @@ describe('LoginSessionManager', () => {
       email: 'person@example.com',
       password: 'secret-password'
     })
+    // In-memory session still holds the password for this worker lifetime.
+    expect(await firstManager.getSnapshot()).toMatchObject({
+      email: 'person@example.com',
+      password: 'secret-password',
+      status: 'editing'
+    })
     firstManager.dispose()
 
     const restoredManager = new LoginSessionManager(operations, storage, 60_000)
@@ -93,12 +99,12 @@ describe('LoginSessionManager', () => {
 
     expect(restored).toMatchObject({
       email: 'person@example.com',
-      password: 'secret-password',
+      password: '',
       status: 'editing'
     })
     expect(getStoredValue()).toMatchObject({
       email: 'person@example.com',
-      password: 'secret-password'
+      password: ''
     })
     restoredManager.dispose()
   })
