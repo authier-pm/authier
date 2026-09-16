@@ -300,7 +300,12 @@ const getRefreshSessionActor = async (
     where: { id: payload.deviceId }
   })
 
-  if (!device || device.logoutAt) {
+  if (
+    !device ||
+    device.userId !== payload.userId ||
+    device.logoutAt ||
+    device.deletedAt
+  ) {
     throw new ORPCError('UNAUTHORIZED', {
       message: 'not authenticated'
     })

@@ -388,17 +388,35 @@ export const buildApp = (app = new Elysia()) => {
         })
 
         if (!user) {
-          return reply.send({ ok: false, accessToken: null })
+          return reply
+            .clearCookie('refresh-token')
+            .send({ ok: false, accessToken: null })
         }
 
         if (user.tokenVersion !== payload.tokenVersion) {
-          return reply.send({ ok: false, accessToken: null })
+          return reply
+            .clearCookie('refresh-token')
+            .send({ ok: false, accessToken: null })
         }
 
         const device = await requestDb.db.query.device.findFirst({
           where: { id: payload.deviceId }
         })
-        if (!device) throw new Error('Device not found')
+        // Logout / device removal must revoke refresh: the token is bound to
+        // a single (user, device) pair, and a logged-out or deleted device
+        // must not be able to mint fresh tokens from a stolen copy.
+        if (
+          !device ||
+          device.userId !== payload.userId ||
+          device.logoutAt ||
+          device.deletedAt
+        ) {
+          return reply
+            .clearCookie('refresh-token')
+            .clearCookie('access-token')
+            .status(401)
+            .send({ ok: false, accessToken: null })
+        }
 
         const legacyCtx: IContext = {
           request,
