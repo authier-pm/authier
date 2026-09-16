@@ -52,6 +52,49 @@ import {
 
 const log = debug('au:userMutation')
 
+const STRIPE_ENV = (process.env.STRIPE_ENV as 'test' | 'live') ?? 'live'
+
+// Only these products may be purchased through createCheckoutSession.
+// Accepting an arbitrary `product` ID would let a caller force the victim
+// into buying any price from the same Stripe account.
+const allowedCheckoutProducts: ReadonlySet<string> = new Set(
+  STRIPE_ENV === 'test'
+    ? ['prod_LquWXgjk6kl5sM', 'prod_LquVrkwfsXjTAL', 'prod_Lp3NU9UcNWduBm']
+    : ['prod_O70NGKoIusmxwE', 'prod_O70Pl3a3CW9XNz', 'prod_O7KTrrFYqhOrJR']
+)
+
+// `Referer` is attacker-controlled. Only redirect back to first-party
+// billing origins; fall back to FRONTEND_URL otherwise (open-redirect fix).
+const getSafeBillingReturnBase = (referer: unknown): string => {
+  const fallback =
+    process.env.FRONTEND_URL ?? 'https://vault.authier.pm'
+  const allowedOrigins = new Set(
+    [
+      'https://vault.authier.pm',
+      process.env.FRONTEND_URL,
+      'http://localhost:5173',
+      'http://127.0.0.1:5173'
+    ]
+      .filter((origin): origin is string => Boolean(origin))
+      .map((origin) => {
+        try {
+          return new URL(origin).origin
+        } catch {
+          return null
+        }
+      })
+      .filter((origin): origin is string => Boolean(origin))
+  )
+  if (typeof referer !== 'string' || referer.length === 0) return fallback
+  try {
+    const origin = new URL(referer).origin
+    if (allowedOrigins.has(origin)) return origin
+  } catch {
+    // fall through to fallback
+  }
+  return fallback
+}
+
 @ObjectType()
 export class UserMutation extends UserBase {
   @Field(() => String)
@@ -592,12 +635,21 @@ export class UserMutation extends UserBase {
     @Ctx() ctx: IContextAuthenticated,
     @Arg('product', () => String) product: string
   ) {
+    if (!allowedCheckoutProducts.has(product)) {
+      throw new GraphqlError('Unknown product')
+    }
     const stripeClient = ctx.getStripeClient()
     const userPaidProduct = await ctx.db.query.userPaidProducts.findFirst({
       where: { userId: ctx.jwtPayload.userId }
     })
 
     const productItem = await stripeClient.products.retrieve(product)
+    const defaultPrice = productItem['default_price'] as string | null
+    if (!defaultPrice) {
+      throw new GraphqlError('Product is not purchasable')
+    }
+
+    const returnBase = getSafeBillingReturnBase(ctx.request.headers.referer)
 
     if (userPaidProduct) {
       const checkoutSession = await stripeClient.checkout.sessions.retrieve(
@@ -608,7 +660,7 @@ export class UserMutation extends UserBase {
         billing_address_collection: 'auto',
         line_items: [
           {
-            price: productItem['default_price'] as string,
+            price: defaultPrice,
             //For metered billing, do not pass quantity
             quantity: 1
           }
@@ -618,8 +670,8 @@ export class UserMutation extends UserBase {
         },
         customer: checkoutSession.customer as string,
         mode: 'subscription',
-        success_url: `${ctx.request.headers.referer}/?success=true&session_id={CHECKOUT_SESSION_ID}`,
-        cancel_url: `${ctx.request.headers.referer}?canceled=true`
+        success_url: `${returnBase}/?success=true&session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: `${returnBase}?canceled=true`
       })
 
       return session.id
@@ -633,7 +685,7 @@ export class UserMutation extends UserBase {
         customer_email: newCustomer?.email as string,
         line_items: [
           {
-            price: productItem['default_price'] as string,
+            price: defaultPrice,
             //For metered billing, do not pass quantity
             quantity: 1
           }
@@ -642,8 +694,8 @@ export class UserMutation extends UserBase {
           productId: productItem.id
         },
         mode: 'subscription',
-        success_url: `${ctx.request.headers.referer}/?success=true&session_id={CHECKOUT_SESSION_ID}`,
-        cancel_url: `${ctx.request.headers.referer}?canceled=true`
+        success_url: `${returnBase}/?success=true&session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: `${returnBase}?canceled=true`
       })
 
       return session.id
