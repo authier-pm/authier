@@ -27,6 +27,7 @@ const entries = {
   passkey: path.join(__dirname, 'src/passkeys/passkeyIndex.tsx'),
   passkeyPage: path.join(__dirname, 'src/passkeys/pageEntry.ts'),
   passkeyBridge: path.join(__dirname, 'src/passkeys/bridgeEntry.ts'),
+  gmailCodes: path.join(__dirname, 'src/email-codes/gmailEntry.ts'),
   contentScript: path.join(__dirname, 'src/content-script/contentScript.ts')
 }
 require('dotenv/config')

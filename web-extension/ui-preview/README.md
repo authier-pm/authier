@@ -19,6 +19,22 @@ This checked-in harness renders extension UI against predictable mock browser
 and device state. Use it for visual development and screenshots instead of
 creating one-off harnesses outside the repository.
 
+The `email-verification-codes` scenario runs the production Gmail DOM observer,
+background message handler and popup component with a synthetic email and mock
+browser APIs. Run `bun run playwright:ui-preview emailVerificationCodes.spec.ts`
+to verify masked codes, copy/reveal, clipboard rejection, new inbox previews,
+expiry, sender favicons with a mail-icon fallback, and opening the source Gmail
+tab without copying the code. The popover's sender favicon carries a red mail
+badge for a new code. The favicon response is a deterministic fixture.
+It captures `docs/screenshots/email-verification-codes.png` and
+`docs/screenshots/email-verification-codes-copied.png`.
+
+For a real Chromium extension smoke test, run `bun scripts/generateExtensionManifest.ts`,
+`bun run prodBuild`, then `bunx playwright test --config playwrightEmailCodes.config.ts`
+from `web-extension`. It loads the production build into a disposable profile,
+intercepts all network requests, and verifies Gmail injection, native badge and
+alarm APIs, popup navigation, deduplication and expiry against synthetic mail.
+
 The `kostkohratky-password` scenario reproduces the supplied Czech registration
 form without live tokens. It runs production detection, classification validation,
 the generator and password filling with a deterministic background classifier mock.

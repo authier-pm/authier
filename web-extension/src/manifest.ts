@@ -15,6 +15,13 @@ export const manifestVersion = Number(process.env.MANIFEST_VERSION ?? 3)
 
 const firefoxGeckoId = '{18c8ffa6-f17c-4d43-bfab-5dae503c8c31}'
 
+const gmailContentScript = {
+  matches: ['https://mail.google.com/mail/*'],
+  js: ['js/browser-polyfill.js', 'js/gmailCodes.js'],
+  run_at: 'document_idle' as const,
+  all_frames: false
+}
+
 const passkeyContentScripts = [
   {
     matches: ['https://*/*', 'http://localhost/*', 'http://127.0.0.1/*'],
@@ -50,6 +57,7 @@ function getFirefoxManifestV2(
     },
     content_scripts: [
       ...passkeyContentScripts,
+      gmailContentScript,
       {
         matches: ['*://*/*'],
         js: ['js/browser-polyfill.js', 'js/contentScript.js'],
@@ -65,6 +73,7 @@ function getFirefoxManifestV2(
       'tabs',
       'activeTab',
       'storage',
+      'alarms',
       'clipboardRead',
       'scripting',
       'http://*/',
@@ -118,6 +127,7 @@ export async function getManifest() {
     },
     content_scripts: [
       ...passkeyContentScripts,
+      gmailContentScript,
       {
         matches: ['<all_urls>'],
         all_frames: true,
@@ -130,7 +140,14 @@ export async function getManifest() {
       128: 'icon-128.png'
     },
     host_permissions: ['<all_urls>'],
-    permissions: ['activeTab', 'storage', 'tabs', 'clipboardRead', 'scripting'],
+    permissions: [
+      'activeTab',
+      'storage',
+      'alarms',
+      'tabs',
+      'clipboardRead',
+      'scripting'
+    ],
     web_accessible_resources: [
       {
         resources: ['*.png'],

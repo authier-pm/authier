@@ -15,6 +15,7 @@ import { KostkohratkyPasswordPreview } from './scenarios/KostkohratkyPasswordPre
 
 import { PasskeyApprovalPreview } from './scenarios/PasskeyApprovalPreview'
 import { PasskeyVaultPreview } from './scenarios/PasskeyVaultPreview'
+import { EmailVerificationCodesPreview } from './scenarios/EmailVerificationCodesPreview'
 
 const DEFAULT_SCENARIO = 'autofill-controls'
 const scenarios: Record<string, ComponentType> = {
@@ -22,6 +23,7 @@ const scenarios: Record<string, ComponentType> = {
   'remembered-session': RememberedSessionPreview,
   'passkey-vault': PasskeyVaultPreview,
   'passkey-approval': PasskeyApprovalPreview,
+  'email-verification-codes': EmailVerificationCodesPreview,
   'android-vault': AndroidVaultPreview,
   'android-icon': AndroidIconPreview,
   'android-updates': AndroidUpdatesPreview,
@@ -44,6 +46,7 @@ document.body.classList.toggle(
   !requestedScenario.startsWith('android-') &&
     requestedScenario !== 'bitfinex-totp' &&
     requestedScenario !== 'kostkohratky-password' &&
+    requestedScenario !== 'email-verification-codes' &&
     !requestedScenario.startsWith('passkey-')
 )
 

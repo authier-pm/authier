@@ -7,7 +7,7 @@ test('remembers unlock after closing and restarting the browser', async ({}, tes
   })
   const firstPage = await firstBrowser.newPage()
   await firstPage.goto('http://127.0.0.1:4174/?scenario=remembered-session')
-  await expect(firstPage.getByText('Example account')).toBeVisible()
+  await expect(firstPage.getByText('Example domain account')).toBeVisible()
   await firstBrowser.close()
 
   const restartedBrowser = await chromium.launchPersistentContext(profile, {

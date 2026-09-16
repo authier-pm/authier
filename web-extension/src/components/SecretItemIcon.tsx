@@ -1,10 +1,12 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { BiFileBlank } from 'react-icons/bi'
 import { constructURL } from '@shared/urlUtils'
 
 export function SecretItemIcon(props: {
   iconUrl: string | null | undefined
   url?: string | null | undefined
+  alt?: string
+  fallback?: ReactNode
 }) {
   const containerRef = useRef<HTMLDivElement | null>(null)
   const [shouldLoadImage, setShouldLoadImage] = useState(false)
@@ -71,7 +73,7 @@ export function SecretItemIcon(props: {
         className="flex size-[30px] items-center justify-center"
         ref={containerRef}
       >
-        <BiFileBlank className="size-[30px]" />
+        {props.fallback ?? <BiFileBlank className="size-[30px]" />}
       </div>
     )
   }
@@ -83,16 +85,20 @@ export function SecretItemIcon(props: {
     >
       {shouldLoadImage ? (
         <img
-          alt="item icon"
+          alt={props.alt ?? 'item icon'}
           className="size-[30px] rounded-sm object-contain"
           loading="lazy"
+          referrerPolicy="no-referrer"
           onError={() => {
             setDidImageFail(true)
           }}
           src={imageSrc}
         />
       ) : (
-        <BiFileBlank className="size-[24px] opacity-60" />
+        <span
+          className="size-[24px] animate-pulse rounded-sm bg-current opacity-10"
+          aria-hidden
+        />
       )}
     </div>
   )

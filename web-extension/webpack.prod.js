@@ -17,7 +17,8 @@ module.exports = merge(common, {
           'contentScript',
           'backgroundPage',
           'passkeyPage',
-          'passkeyBridge'
+          'passkeyBridge',
+          'gmailCodes'
         ].includes(chunk.name)
       },
       minChunks: 2,

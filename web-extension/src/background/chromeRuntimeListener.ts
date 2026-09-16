@@ -1,5 +1,9 @@
 import { handlePasskeyMessage } from '../passkeys/backgroundPasskeys'
 import {
+  handleEmailVerificationCodeMessage,
+  initializeEmailVerificationCodes
+} from './emailVerificationCodes'
+import {
   appendGeneratedPasswordHistoryEntry,
   generatedPasswordHistoryEntrySchema
 } from '@src/util/generatedPasswordHistory'
@@ -78,6 +82,8 @@ let capturedInputEvents: ICapturedInput[] = []
 let inputsUrl: string
 
 const tcProcedure = tc.procedure.use(loggerMiddleware)
+
+initializeEmailVerificationCodes()
 
 void loginSessionManager.initialize().catch((error: unknown) => {
   console.error('Failed to initialize the background login session', error)
@@ -381,6 +387,9 @@ createChromeHandler({
 console.log('background page loaded')
 
 browser.runtime.onMessage.addListener((request: unknown, sender) => {
+  const emailCodeResponse = handleEmailVerificationCodeMessage(request, sender)
+  if (emailCodeResponse) return emailCodeResponse
+
   const passkeyResponse = handlePasskeyMessage(request, sender)
   if (passkeyResponse) return passkeyResponse
 
