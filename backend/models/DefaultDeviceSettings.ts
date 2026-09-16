@@ -4,6 +4,7 @@ import { DefaultDeviceSettingsGQLScalars } from './generated/DefaultDeviceSettin
 import type { IContextAuthenticated } from './types/ContextTypes'
 import { DefaultSettingsInput } from './models'
 import { defaultSettings } from '../drizzle/schema'
+import { assertValidVaultLockTimeoutSeconds } from '../userAuth'
 import { eq } from 'drizzle-orm'
 
 @ObjectType()
@@ -22,6 +23,7 @@ export class DefaultDeviceSettingsMutation extends DefaultDeviceSettingsGQLScala
     @Arg('config', () => DefaultSettingsInput) config: DefaultSettingsInput,
     @Ctx() ctx: IContextAuthenticated
   ) {
+    assertValidVaultLockTimeoutSeconds(config.vaultLockTimeoutSeconds)
     const data = {
       autofillTOTPEnabled: config.autofillTOTPEnabled,
       syncTOTP: config.syncTOTP,

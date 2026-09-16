@@ -198,7 +198,7 @@
           "vaultLockTimeoutSeconds": {
             "type": "integer",
             "minimum": 0,
-            "maximum": 9007199254740991
+            "maximum": 31536000
           },
           "createdAt": {
             "type": "string"
@@ -857,7 +857,7 @@
           "vaultLockTimeoutSeconds": {
             "type": "integer",
             "minimum": 0,
-            "maximum": 9007199254740991
+            "maximum": 31536000
           }
         },
         "required": [
@@ -2629,7 +2629,7 @@
                           "vaultLockTimeoutSeconds": {
                             "type": "integer",
                             "minimum": 0,
-                            "maximum": 9007199254740991
+                            "maximum": 31536000
                           },
                           "createdAt": {
                             "type": "string"
@@ -3158,7 +3158,7 @@
                   "vaultLockTimeoutSeconds": {
                     "type": "integer",
                     "minimum": 0,
-                    "maximum": 9007199254740991
+                    "maximum": 31536000
                   }
                 },
                 "required": [

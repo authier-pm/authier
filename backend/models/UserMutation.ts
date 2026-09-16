@@ -1,5 +1,6 @@
 import { runVaultTransaction } from '../vault/vaultWrites'
 import { hashDeviceSecret } from '../utils/deviceSecretHash'
+import { assertValidVaultLockTimeoutSeconds } from '../userAuth'
 import { Arg, Ctx, Field, ID, Info, Int, ObjectType } from 'type-graphql'
 import type { IContext, IContextAuthenticated } from './types/ContextTypes'
 import {
@@ -203,6 +204,7 @@ export class UserMutation extends UserBase {
     @Arg('config', () => SettingsInput) config: SettingsInput,
     @Ctx() ctx: IContextAuthenticated
   ) {
+    assertValidVaultLockTimeoutSeconds(config.vaultLockTimeoutSeconds)
     await ctx.db
       .update(deviceSchema)
       .set({

@@ -15,6 +15,7 @@ import { SecretUsageEventGQLScalars } from './generated/SecretUsageEventGQL'
 
 import { GraphqlError } from '../lib/GraphqlError'
 import { EncryptedSecretTypeGQL } from './types/EncryptedSecretType'
+import { assertValidVaultLockTimeoutSeconds } from '../userAuth'
 
 import { getGeoIpLocation } from '../lib/getGeoIpLocation'
 import {
@@ -196,6 +197,7 @@ export class DeviceMutation extends DeviceGQLScalars {
     @Arg('vaultLockTimeoutSeconds', () => Int) vaultLockTimeoutSeconds: number,
     @Ctx() ctx: IContext
   ) {
+    assertValidVaultLockTimeoutSeconds(vaultLockTimeoutSeconds)
     const res = await ctx.db
       .update(device)
       .set({

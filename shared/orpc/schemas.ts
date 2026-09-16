@@ -89,8 +89,19 @@ export const updateRecoveryCooldownInputSchema = z.object({
   deviceRecoveryCooldownMinutes: z.number().int().nonnegative()
 })
 
+// Matches the longest legitimate option in `vaultLockTimeoutOptions`
+// (shared/constants.ts, 1 year). Anything larger would mint near-immortal
+// JWTs via userAuth.ts `expiresIn`. 0 = "Never lock locally" in the UI.
+export const MAX_VAULT_LOCK_TIMEOUT_SECONDS = 31_536_000
+
+export const vaultLockTimeoutSchema = z
+  .number()
+  .int()
+  .min(0)
+  .max(MAX_VAULT_LOCK_TIMEOUT_SECONDS)
+
 export const updateVaultLockTimeoutInputSchema = z.object({
-  vaultLockTimeoutSeconds: z.number().int().nonnegative()
+  vaultLockTimeoutSeconds: vaultLockTimeoutSchema
 })
 
 export const completeDeviceLoginInputSchema = z.object({
@@ -123,7 +134,7 @@ export const currentDeviceSchema = z.object({
   name: z.string().min(1),
   platform: z.string().min(1),
   syncTOTP: z.boolean(),
-  vaultLockTimeoutSeconds: z.number().int().nonnegative(),
+  vaultLockTimeoutSeconds: vaultLockTimeoutSchema,
   createdAt: z.string(),
   lastSyncAt: z.string().nullable(),
   logoutAt: z.string().nullable()
@@ -153,7 +164,7 @@ export const securityStateSchema = z.object({
   newDevicePolicy: userNewDevicePolicySchema.nullable(),
   deviceRecoveryCooldownMinutes: z.number().int().nonnegative(),
   masterDeviceId: z.string().nullable(),
-  vaultLockTimeoutSeconds: z.number().int().nonnegative()
+  vaultLockTimeoutSeconds: vaultLockTimeoutSchema
 })
 
 export const sessionUserSchema = z.object({
