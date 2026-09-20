@@ -29,9 +29,10 @@ query DevicesRequests {
       deviceName
       deviceId
       ipAddress
-      ipGeoLocation
+      deviceLocationFromIp { city countryName }
       pushNotificationsSentCount
       pushNotificationsFailedCount
+      resetStatus { requiredApprovals approvalCount processAt expiresAt confirmedAt completedAt rejectedAt }
       masterDeviceResetRequestedAt
       masterDeviceResetProcessAt
       masterDeviceResetConfirmedAt
@@ -91,4 +92,8 @@ mutation renameDevice($id: String!, $name: String!) {
       }
     }
   }
+}
+
+mutation ApproveMasterDeviceReset($id: Int!) {
+  me { decryptionChallenge(id: $id) { approveMasterDeviceReset { id } } }
 }

@@ -39,7 +39,8 @@ The HTTP client and wire models are generated from the monorepo OpenAPI contract
 
 ## Implemented flows
 
-- Create an account, request device approval, and sign in using the approved encrypted challenge. Existing installations can approve or reject new device requests.
+- Create an account after choosing recovery safeguards: 0–10 other device approvals, a 5-minute–90-day waiting period, and additional notification addresses. Defaults match extension/web signup: one approval and 48 hours. The choice is submitted with registration and stored as JSON by the backend.
+- Request device approval, and sign in using the approved encrypted challenge. Existing installations can approve or reject new device requests.
 - Unlock the local vault with the master password, including while offline. The password and plaintext vault items are never written to disk. Saved unlock keys are encrypted by Android Keystore.
 - Create, edit, delete and search passwords and TOTP entries. Scan authenticator setup QR codes with the camera or enter a setup key manually. Generate random passwords and copy passwords or current verification codes.
 - Keep an encrypted outbox while offline. Sync reuses each operation ID, detects stale writes, applies opaque cursor pages atomically, and retains deletion tombstones to avoid resurrecting records during history replay.
@@ -173,3 +174,15 @@ supports SHA1. Scanning never silently substitutes a different algorithm.
 rejects malformed or unsupported setup data. `TotpEditorTest` covers cancellation,
 Android Back, draft preservation, and explicit save. The `android-vault` UI preview
 includes actual emulator captures of the camera entry and scanned-account review.
+
+## Recovery signup preview
+
+Launch the debug-only `RecoverySetupPreviewActivity` to render the production
+recovery step with synthetic email addresses, without creating an account or
+accessing a vault. Capture the initial view and scroll to the email fields for
+`docs/screenshots/android-recovery-setup.png` and `android-recovery-emails.png`.
+The `android-vault` UI preview includes both captures.
+
+`RecoverySetupTest` verifies explicit creation, defaults, custom values, multiple
+emails, validation, and busy/back behavior. `ApiFacadeTest` checks the actual JSON
+registration request using a local mock server.

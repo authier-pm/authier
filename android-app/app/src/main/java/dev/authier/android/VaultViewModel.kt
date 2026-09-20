@@ -199,7 +199,7 @@ class VaultViewModel(application: Application) : AndroidViewModel(application) {
             error = if (corrupt > 0) "$corrupt encrypted item(s) could not be opened. Their ciphertext is preserved; inspect them on another Authier device." else state.value.error)
     }
 
-    fun authenticate(email: String, password: String, serverUrl: String, register: Boolean) = action {
+    fun authenticate(email: String, password: String, serverUrl: String, register: Boolean, recoveryConfig: MasterDeviceResetConfig? = null) = action {
         require(email.contains('@')) { "Enter a valid email address." }
         require(password.isNotEmpty()) { "Enter your master password." }
         if (register) require(password.length >= 12) { "Use a master password with at least 12 characters." }
@@ -219,12 +219,13 @@ class VaultViewModel(application: Application) : AndroidViewModel(application) {
         val session: AuthSession
         val encryptedAuthSecret: String
         if (register) {
+            val config = requireNotNull(recoveryConfig) { "Choose your recovery settings before creating an account." }.validated()
             salt = AuthierCrypto.generateSalt()
             key = withContext(Dispatchers.Default) { AuthierCrypto.deriveMasterKey(password, salt) }
             val secret = AuthierCrypto.createDeviceSecret(key, salt)
             encryptedAuthSecret = secret.addDeviceSecretEncrypted
             session = api.register(normalizedEmail, UUID.randomUUID().toString(), snapshot.deviceId, deviceName,
-                DeviceSecretInput(secret.addDeviceSecret, secret.addDeviceSecretEncrypted, salt))
+                DeviceSecretInput(secret.addDeviceSecret, secret.addDeviceSecretEncrypted, salt), config)
         } else {
             val challenge = api.challenge(normalizedEmail, snapshot.deviceId, deviceName)
             if (challenge.status != "approved") {

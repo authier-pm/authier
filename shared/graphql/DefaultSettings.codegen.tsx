@@ -1,27 +1,46 @@
+/** Internal type. DO NOT USE DIRECTLY. */
+type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
+/** Internal type. DO NOT USE DIRECTLY. */
+export type Incremental<T> = T | { [P in keyof T]?: P extends ' $fragmentName' | '__typename' ? T[P] : never };
 import * as Types from '@shared/generated/graphqlBaseTypes';
 
 import { gql } from '@apollo/client';
 import * as ApolloReactCommon from '@apollo/client/react';
 import * as ApolloReactHooks from '@apollo/client/react';
 const defaultOptions = {} as const;
-export type UpdateDefaultDeviceSettingsMutationVariables = Types.Exact<{
+export type DefaultSettingsInput = {
+  autofillTOTPEnabled: boolean;
+  syncTOTP: boolean;
+  theme: string;
+  uiLanguage: string;
+  vaultLockTimeoutSeconds: number;
+};
+
+export type UpdateDefaultDeviceSettingsMutationVariables = Exact<{
   config: Types.DefaultSettingsInput;
 }>;
 
 
-export type UpdateDefaultDeviceSettingsMutation = { __typename?: 'Mutation', me: { __typename?: 'UserMutation', defaultDeviceSettings: { __typename?: 'DefaultDeviceSettingsMutation', id: number, update: { __typename?: 'DefaultDeviceSettingsGQLScalars', id: number, autofillTOTPEnabled: boolean, theme: string, syncTOTP: boolean, vaultLockTimeoutSeconds: number } } } };
+export type UpdateDefaultDeviceSettingsMutation = { me: { defaultDeviceSettings: { id: number, update: { id: number, autofillTOTPEnabled: boolean, theme: string, syncTOTP: boolean, vaultLockTimeoutSeconds: number } } } };
 
-export type UpdateMasterDeviceResetTimeoutMutationVariables = Types.Exact<{
-  deviceRecoveryCooldownMinutes: Types.Scalars['NonNegativeInt']['input'];
+export type UpdateMasterDeviceResetTimeoutMutationVariables = Exact<{
+  deviceRecoveryCooldownMinutes: number;
 }>;
 
 
-export type UpdateMasterDeviceResetTimeoutMutation = { __typename?: 'Mutation', me: { __typename?: 'UserMutation', setDeviceRecoveryCooldownMinutes: { __typename?: 'UserGQL', id: string, deviceRecoveryCooldownMinutes: number } } };
+export type UpdateMasterDeviceResetTimeoutMutation = { me: { setDeviceRecoveryCooldownMinutes: { id: string, deviceRecoveryCooldownMinutes: number } } };
 
-export type DefaultSettingsQueryVariables = Types.Exact<{ [key: string]: never; }>;
+export type DefaultSettingsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type DefaultSettingsQuery = { __typename?: 'Query', me: { __typename?: 'UserQuery', id: string, masterDeviceId?: string | null, uiLanguage: string, deviceRecoveryCooldownMinutes: number, defaultDeviceSettings: { __typename?: 'DefaultDeviceSettingsQuery', id: number, autofillTOTPEnabled: boolean, syncTOTP: boolean, vaultLockTimeoutSeconds: number, theme: string } } };
+export type DefaultSettingsQuery = { me: { id: string, masterDeviceId: string | null, uiLanguage: string, deviceRecoveryCooldownMinutes: number, masterDeviceResetConfig: unknown, defaultDeviceSettings: { id: number, autofillTOTPEnabled: boolean, syncTOTP: boolean, vaultLockTimeoutSeconds: number, theme: string } } };
+
+export type UpdateMasterDeviceResetConfigMutationVariables = Exact<{
+  config: unknown;
+}>;
+
+
+export type UpdateMasterDeviceResetConfigMutation = { me: { setMasterDeviceResetConfig: { id: string, masterDeviceResetConfig: unknown, deviceRecoveryCooldownMinutes: number } } };
 
 
 export const UpdateDefaultDeviceSettingsDocument = gql`
@@ -107,6 +126,7 @@ export const DefaultSettingsDocument = gql`
     masterDeviceId
     uiLanguage
     deviceRecoveryCooldownMinutes
+    masterDeviceResetConfig
     defaultDeviceSettings {
       id
       autofillTOTPEnabled
@@ -153,3 +173,38 @@ export type DefaultSettingsQueryHookResult = ReturnType<typeof useDefaultSetting
 export type DefaultSettingsLazyQueryHookResult = ReturnType<typeof useDefaultSettingsLazyQuery>;
 export type DefaultSettingsSuspenseQueryHookResult = ReturnType<typeof useDefaultSettingsSuspenseQuery>;
 export type DefaultSettingsQueryResult = ApolloReactCommon.QueryResult<DefaultSettingsQuery, DefaultSettingsQueryVariables>;
+export const UpdateMasterDeviceResetConfigDocument = gql`
+    mutation updateMasterDeviceResetConfig($config: JSON!) {
+  me {
+    setMasterDeviceResetConfig(config: $config) {
+      id
+      masterDeviceResetConfig
+      deviceRecoveryCooldownMinutes
+    }
+  }
+}
+    `;
+
+/**
+ * __useUpdateMasterDeviceResetConfigMutation__
+ *
+ * To run a mutation, you first call `useUpdateMasterDeviceResetConfigMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateMasterDeviceResetConfigMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateMasterDeviceResetConfigMutation, { data, loading, error }] = useUpdateMasterDeviceResetConfigMutation({
+ *   variables: {
+ *      config: // value for 'config'
+ *   },
+ * });
+ */
+export function useUpdateMasterDeviceResetConfigMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<UpdateMasterDeviceResetConfigMutation, UpdateMasterDeviceResetConfigMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return ApolloReactHooks.useMutation<UpdateMasterDeviceResetConfigMutation, UpdateMasterDeviceResetConfigMutationVariables>(UpdateMasterDeviceResetConfigDocument, options);
+      }
+export type UpdateMasterDeviceResetConfigMutationHookResult = ReturnType<typeof useUpdateMasterDeviceResetConfigMutation>;
+export type UpdateMasterDeviceResetConfigMutationResult = ApolloReactCommon.MutationResult<UpdateMasterDeviceResetConfigMutation>;

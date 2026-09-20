@@ -1,65 +1,81 @@
+/** Internal type. DO NOT USE DIRECTLY. */
+type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
+/** Internal type. DO NOT USE DIRECTLY. */
+export type Incremental<T> = T | { [P in keyof T]?: P extends ' $fragmentName' | '__typename' ? T[P] : never };
 import * as Types from '@shared/generated/graphqlBaseTypes';
 
 import { gql } from '@apollo/client';
 import * as ApolloReactCommon from '@apollo/client/react';
 import * as ApolloReactHooks from '@apollo/client/react';
 const defaultOptions = {} as const;
-export type RejectChallengeMutationVariables = Types.Exact<{
-  id: Types.Scalars['Int']['input'];
+export type UserNewDevicePolicy =
+  | 'ALLOW'
+  | 'REQUIRE_ANY_DEVICE_APPROVAL'
+  | 'REQUIRE_MASTER_DEVICE_APPROVAL';
+
+export type RejectChallengeMutationVariables = Exact<{
+  id: number;
 }>;
 
 
-export type RejectChallengeMutation = { __typename?: 'Mutation', me: { __typename?: 'UserMutation', decryptionChallenge: { __typename?: 'DecryptionChallengeMutation', reject: { __typename?: 'DecryptionChallengeGQL', id: number } } } };
+export type RejectChallengeMutation = { me: { decryptionChallenge: { reject: { id: number } } } };
 
-export type ApproveChallengeMutationVariables = Types.Exact<{
-  id: Types.Scalars['Int']['input'];
+export type ApproveChallengeMutationVariables = Exact<{
+  id: number;
 }>;
 
 
-export type ApproveChallengeMutation = { __typename?: 'Mutation', me: { __typename?: 'UserMutation', decryptionChallenge: { __typename?: 'DecryptionChallengeMutation', approve: { __typename?: 'DecryptionChallengeGQL', id: number } } } };
+export type ApproveChallengeMutation = { me: { decryptionChallenge: { approve: { id: number } } } };
 
-export type DevicesRequestsQueryVariables = Types.Exact<{ [key: string]: never; }>;
+export type DevicesRequestsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type DevicesRequestsQuery = { __typename?: 'Query', me: { __typename?: 'UserQuery', id: string, masterDeviceId?: string | null, newDevicePolicy?: Types.UserNewDevicePolicy | null, decryptionChallengesWaiting: Array<{ __typename?: 'DecryptionChallengeForApproval', id: number, createdAt: string, deviceName: string, deviceId: string, ipAddress: string, ipGeoLocation?: any | null, pushNotificationsSentCount: number, pushNotificationsFailedCount: number, masterDeviceResetRequestedAt?: string | null, masterDeviceResetProcessAt?: string | null, masterDeviceResetConfirmedAt?: string | null, masterDeviceResetRejectedAt?: string | null }> } };
+export type DevicesRequestsQuery = { me: { id: string, masterDeviceId: string | null, newDevicePolicy: Types.UserNewDevicePolicy | null, decryptionChallengesWaiting: Array<{ id: number, createdAt: string, deviceName: string, deviceId: string, ipAddress: string, pushNotificationsSentCount: number, pushNotificationsFailedCount: number, masterDeviceResetRequestedAt: string | null, masterDeviceResetProcessAt: string | null, masterDeviceResetConfirmedAt: string | null, masterDeviceResetRejectedAt: string | null, deviceLocationFromIp: { city: string, countryName: string } | null, resetStatus: { requiredApprovals: number, approvalCount: number, processAt: string, expiresAt: string, confirmedAt: string | null, completedAt: string | null, rejectedAt: string | null } | null }> } };
 
-export type LogoutDeviceMutationVariables = Types.Exact<{
-  id: Types.Scalars['String']['input'];
+export type LogoutDeviceMutationVariables = Exact<{
+  id: string;
 }>;
 
 
-export type LogoutDeviceMutation = { __typename?: 'Mutation', me: { __typename?: 'UserMutation', device: { __typename?: 'DeviceMutation', logout: { __typename?: 'DeviceGQL', id: string } } } };
+export type LogoutDeviceMutation = { me: { device: { logout: { id: string } } } };
 
-export type RemoveDeviceMutationVariables = Types.Exact<{
-  id: Types.Scalars['String']['input'];
+export type RemoveDeviceMutationVariables = Exact<{
+  id: string;
 }>;
 
 
-export type RemoveDeviceMutation = { __typename?: 'Mutation', me: { __typename?: 'UserMutation', device: { __typename?: 'DeviceMutation', removeDevice: boolean } } };
+export type RemoveDeviceMutation = { me: { device: { removeDevice: boolean } } };
 
-export type ChangeMasterDeviceMutationVariables = Types.Exact<{
-  newMasterDeviceId: Types.Scalars['String']['input'];
+export type ChangeMasterDeviceMutationVariables = Exact<{
+  newMasterDeviceId: string;
 }>;
 
 
-export type ChangeMasterDeviceMutation = { __typename?: 'Mutation', me: { __typename?: 'UserMutation', setMasterDevice: { __typename?: 'MasterDeviceChangeGQL', id: string } } };
+export type ChangeMasterDeviceMutation = { me: { setMasterDevice: { id: string } } };
 
-export type ChangeDeviceSettingsMutationVariables = Types.Exact<{
-  id: Types.Scalars['String']['input'];
-  syncTOTP: Types.Scalars['Boolean']['input'];
-  vaultLockTimeoutSeconds: Types.Scalars['Int']['input'];
+export type ChangeDeviceSettingsMutationVariables = Exact<{
+  id: string;
+  syncTOTP: boolean;
+  vaultLockTimeoutSeconds: number;
 }>;
 
 
-export type ChangeDeviceSettingsMutation = { __typename?: 'Mutation', me: { __typename?: 'UserMutation', device: { __typename?: 'DeviceMutation', updateDeviceSettings: { __typename?: 'DeviceGQL', id: string } } } };
+export type ChangeDeviceSettingsMutation = { me: { device: { updateDeviceSettings: { id: string } } } };
 
-export type RenameDeviceMutationVariables = Types.Exact<{
-  id: Types.Scalars['String']['input'];
-  name: Types.Scalars['String']['input'];
+export type RenameDeviceMutationVariables = Exact<{
+  id: string;
+  name: string;
 }>;
 
 
-export type RenameDeviceMutation = { __typename?: 'Mutation', me: { __typename?: 'UserMutation', device: { __typename?: 'DeviceMutation', rename: { __typename?: 'DeviceGQL', id: string } } } };
+export type RenameDeviceMutation = { me: { device: { rename: { id: string } } } };
+
+export type ApproveMasterDeviceResetMutationVariables = Exact<{
+  id: number;
+}>;
+
+
+export type ApproveMasterDeviceResetMutation = { me: { decryptionChallenge: { approveMasterDeviceReset: { id: number } } } };
 
 
 export const RejectChallengeDocument = gql`
@@ -144,9 +160,21 @@ export const DevicesRequestsDocument = gql`
       deviceName
       deviceId
       ipAddress
-      ipGeoLocation
+      deviceLocationFromIp {
+        city
+        countryName
+      }
       pushNotificationsSentCount
       pushNotificationsFailedCount
+      resetStatus {
+        requiredApprovals
+        approvalCount
+        processAt
+        expiresAt
+        confirmedAt
+        completedAt
+        rejectedAt
+      }
       masterDeviceResetRequestedAt
       masterDeviceResetProcessAt
       masterDeviceResetConfirmedAt
@@ -368,3 +396,38 @@ export function useRenameDeviceMutation(baseOptions?: ApolloReactHooks.MutationH
       }
 export type RenameDeviceMutationHookResult = ReturnType<typeof useRenameDeviceMutation>;
 export type RenameDeviceMutationResult = ApolloReactCommon.MutationResult<RenameDeviceMutation>;
+export const ApproveMasterDeviceResetDocument = gql`
+    mutation ApproveMasterDeviceReset($id: Int!) {
+  me {
+    decryptionChallenge(id: $id) {
+      approveMasterDeviceReset {
+        id
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useApproveMasterDeviceResetMutation__
+ *
+ * To run a mutation, you first call `useApproveMasterDeviceResetMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useApproveMasterDeviceResetMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [approveMasterDeviceResetMutation, { data, loading, error }] = useApproveMasterDeviceResetMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useApproveMasterDeviceResetMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<ApproveMasterDeviceResetMutation, ApproveMasterDeviceResetMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return ApolloReactHooks.useMutation<ApproveMasterDeviceResetMutation, ApproveMasterDeviceResetMutationVariables>(ApproveMasterDeviceResetDocument, options);
+      }
+export type ApproveMasterDeviceResetMutationHookResult = ReturnType<typeof useApproveMasterDeviceResetMutation>;
+export type ApproveMasterDeviceResetMutationResult = ApolloReactCommon.MutationResult<ApproveMasterDeviceResetMutation>;

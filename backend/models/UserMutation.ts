@@ -1,3 +1,5 @@
+import { updateResetConfig } from '../lib/masterDeviceReset'
+import type { MasterDeviceResetConfig } from '../../shared/masterDeviceResetConfig'
 import { runVaultTransaction } from '../vault/vaultWrites'
 import { hashDeviceSecret } from '../utils/deviceSecretHash'
 import { assertValidVaultLockTimeoutSeconds } from '../userAuth'
@@ -17,6 +19,7 @@ import type { GraphQLResolveInfo } from 'graphql'
 import { getPrismaRelationsFromGQLInfo } from '../utils/getPrismaRelationsFromInfo'
 import { ChangeMasterPasswordInput } from './AuthInputs'
 import {
+  GraphQLJSON,
   GraphQLEmailAddress,
   GraphQLNonNegativeInt,
   GraphQLUUID
@@ -66,8 +69,7 @@ const allowedCheckoutProducts: ReadonlySet<string> = new Set(
 // `Referer` is attacker-controlled. Only redirect back to first-party
 // billing origins; fall back to FRONTEND_URL otherwise (open-redirect fix).
 const getSafeBillingReturnBase = (referer: unknown): string => {
-  const fallback =
-    process.env.FRONTEND_URL ?? 'https://vault.authier.pm'
+  const fallback = process.env.FRONTEND_URL ?? 'https://vault.authier.pm'
   const allowedOrigins = new Set(
     [
       'https://vault.authier.pm',
@@ -535,24 +537,22 @@ export class UserMutation extends UserBase {
     deviceRecoveryCooldownMinutes: number,
     @Ctx() ctx: IContextAuthenticated
   ) {
-    if (
-      this.masterDeviceId !== null &&
-      this.masterDeviceId !== undefined &&
-      ctx.device.id !== this.masterDeviceId
-    ) {
-      throw new GraphqlError(
-        'deviceRecoveryCooldownMinutes can be set only from master device'
-      )
-    }
+    const user = await ctx.db.query.user.findFirst({
+      where: { id: ctx.jwtPayload.userId }
+    })
+    if (!user) throw new GraphqlError('User not found')
+    return updateResetConfig(ctx, {
+      ...user.masterDeviceResetConfig,
+      waitMinutes: deviceRecoveryCooldownMinutes
+    })
+  }
 
-    const res = await ctx.db
-      .update(userSchema)
-      .set({
-        deviceRecoveryCooldownMinutes
-      })
-      .where(eq(userSchema.id, this.id))
-      .returning()
-    return res[0]
+  @Field(() => UserQuery)
+  async setMasterDeviceResetConfig(
+    @Arg('config', () => GraphQLJSON) config: MasterDeviceResetConfig,
+    @Ctx() ctx: IContextAuthenticated
+  ) {
+    return updateResetConfig(ctx, config)
   }
 
   @Field(() => MasterDeviceChangeGQL)

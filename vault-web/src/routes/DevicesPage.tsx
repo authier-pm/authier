@@ -1,3 +1,4 @@
+import { MasterDeviceResetProgress } from '../../../shared/MasterDeviceResetProgress'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { Button } from '@/components/ui/button'
 import {
@@ -19,8 +20,10 @@ export function DevicesPage() {
 
   const approveMutation = useMutation({
     ...orpc.devices.approveChallenge.mutationOptions(),
-    mutationFn: (input: { id: number }) =>
-      orpcClient.devices.approveChallenge(input)
+    mutationFn: (input: { id: number; reset: boolean }) =>
+      input.reset
+        ? orpcClient.devices.approveReset({ id: input.id })
+        : orpcClient.devices.approveChallenge({ id: input.id })
   })
 
   const rejectMutation = useMutation({
@@ -57,20 +60,32 @@ export function DevicesPage() {
                     {new Date(challenge.createdAt).toLocaleString()}
                   </p>
                 </div>
+                <MasterDeviceResetProgress status={challenge.resetStatus} />
                 <div className="flex gap-2">
                   <Button
-                    disabled={approveMutation.isPending}
+                    disabled={
+                      approveMutation.isPending ||
+                      Boolean(
+                        challenge.resetStatus &&
+                        session?.currentDevice.id ===
+                          session?.user.masterDeviceId
+                      )
+                    }
                     onClick={() => {
                       void approveMutation
-                        .mutateAsync({ id: challenge.id })
+                        .mutateAsync({
+                          id: challenge.id,
+                          reset: Boolean(challenge.resetStatus)
+                        })
                         .then(() => {
                           void refreshLists()
                         })
+                        .catch(() => {})
                     }}
                     size="sm"
                     type="button"
                   >
-                    Approve
+                    {challenge.resetStatus ? 'Approve reset' : 'Approve'}
                   </Button>
                   <Button
                     disabled={rejectMutation.isPending}
@@ -80,6 +95,7 @@ export function DevicesPage() {
                         .then(() => {
                           void refreshLists()
                         })
+                        .catch(() => {})
                     }}
                     size="sm"
                     type="button"
@@ -92,6 +108,11 @@ export function DevicesPage() {
             </Card>
           ))}
 
+          {(approveMutation.error || rejectMutation.error) && (
+            <p role="alert" className="text-red-400">
+              {(approveMutation.error || rejectMutation.error)?.message}
+            </p>
+          )}
           {challengesQuery.data?.challenges?.length === 0 ? (
             <p className="text-sm text-[color:var(--color-muted)]">
               No pending approvals right now.
@@ -152,6 +173,7 @@ export function DevicesPage() {
                         .then(() => {
                           void refreshLists()
                         })
+                        .catch(() => {})
                     }}
                     size="sm"
                     type="button"

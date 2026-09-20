@@ -1,6 +1,8 @@
+import type { MasterDeviceResetConfig } from '../../shared/masterDeviceResetConfig'
 import { Field, ID, InputType } from 'type-graphql'
 import { EncryptedSecretPatchInput } from './models'
 import {
+  GraphQLJSON,
   GraphQLEmailAddress,
   GraphQLNonEmptyString,
   GraphQLPositiveInt
@@ -29,6 +31,9 @@ export class AddNewDeviceInput {
 
 @InputType()
 export class RegisterNewAccountInput extends AddNewDeviceInput {
+  @Field(() => GraphQLJSON, { nullable: true })
+  masterDeviceResetConfig?: MasterDeviceResetConfig
+
   @Field(() => ID)
   deviceId: string
 

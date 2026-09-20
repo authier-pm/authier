@@ -6,6 +6,7 @@ mutation addNewDeviceForUser(
   $deviceId: String!
 ) {
   deviceDecryptionChallenge(email: $email, deviceInput: $deviceInput) {
+    __typename
     ... on DecryptionChallengeApproved {
       id
       addNewDeviceForUser(
@@ -51,6 +52,7 @@ mutation deviceDecryptionChallenge(
   $deviceInput: DeviceInput!
 ) {
   deviceDecryptionChallenge(email: $email, deviceInput: $deviceInput) {
+    __typename
     ... on DecryptionChallengeApproved {
       id
       addDeviceSecretEncrypted
@@ -64,6 +66,7 @@ mutation deviceDecryptionChallenge(
       id
       pushNotificationsSentCount
       pushNotificationsFailedCount
+      resetStatus { requiredApprovals approvalCount processAt expiresAt confirmedAt completedAt rejectedAt }
       masterDeviceResetRequestedAt
       masterDeviceResetProcessAt
       masterDeviceResetConfirmedAt

@@ -1,10 +1,10 @@
+import { MasterDeviceRecoverySettings } from './MasterDeviceRecoverySettings'
 import { Field, Formik, type FormikHelpers } from 'formik'
 import { Trans } from '@lingui/react/macro'
 import {
   DefaultSettingsDocument,
   useDefaultSettingsQuery,
-  useUpdateDefaultDeviceSettingsMutation,
-  useUpdateMasterDeviceResetTimeoutMutation
+  useUpdateDefaultDeviceSettingsMutation
 } from '@shared/graphql/DefaultSettings.codegen'
 import { Button } from '@src/components/ui/button'
 import {
@@ -19,7 +19,6 @@ import { useVaultLockTimeoutOptions } from '@src/util/useVaultLockTimeoutOptions
 
 interface Values {
   vaultLockTimeoutSeconds: number
-  deviceRecoveryCooldownMinutes: number
   autofillTOTPEnabled: boolean
   syncTOTP: boolean
   uiLanguage: string
@@ -33,21 +32,7 @@ export function DeviceDefaultsForm() {
   const [updateDefaultSettings] = useUpdateDefaultDeviceSettingsMutation({
     refetchQueries: [{ query: DefaultSettingsDocument, variables: {} }]
   })
-  const [updateMasterDeviceResetTimeout] =
-    useUpdateMasterDeviceResetTimeoutMutation({
-      refetchQueries: [{ query: DefaultSettingsDocument, variables: {} }]
-    })
   const options = useVaultLockTimeoutOptions()
-  const masterDeviceResetTimeoutOptions = [
-    { label: '1 hour', value: 60 },
-    { label: '6 hours', value: 360 },
-    { label: '12 hours', value: 720 },
-    { label: '24 hours', value: 1440 },
-    { label: '3 days', value: 4320 },
-    { label: '7 days', value: 10080 },
-    { label: '14 days', value: 20160 },
-    { label: '30 days', value: 43200 }
-  ]
 
   if (loading && !data) {
     return (
@@ -101,8 +86,6 @@ export function DeviceDefaultsForm() {
             syncTOTP: data.me.defaultDeviceSettings.syncTOTP,
             vaultLockTimeoutSeconds:
               data.me.defaultDeviceSettings.vaultLockTimeoutSeconds,
-            deviceRecoveryCooldownMinutes:
-              data.me.deviceRecoveryCooldownMinutes,
             theme: data.me.defaultDeviceSettings.theme,
             uiLanguage: data.me.uiLanguage
           }}
@@ -121,27 +104,12 @@ export function DeviceDefaultsForm() {
               )
             }
 
-            const deviceRecoveryCooldownMinutes = Number.parseInt(
-              values.deviceRecoveryCooldownMinutes.toString(),
-              10
-            )
-
             await updateDefaultSettings({
               variables: {
                 config
               }
             })
-            await updateMasterDeviceResetTimeout({
-              variables: {
-                deviceRecoveryCooldownMinutes
-              }
-            })
-            resetForm({
-              values: {
-                ...config,
-                deviceRecoveryCooldownMinutes
-              }
-            })
+            resetForm({ values: config })
             setSubmitting(false)
           }}
         >
@@ -166,33 +134,6 @@ export function DeviceDefaultsForm() {
                         value={values.vaultLockTimeoutSeconds}
                       >
                         {options.map((option) => (
-                          <option key={option.value} value={option.value}>
-                            {option.label}
-                          </option>
-                        ))}
-                      </select>
-                    </FormField>
-                  )}
-                </Field>
-
-                <Field name="deviceRecoveryCooldownMinutes">
-                  {() => (
-                    <FormField
-                      description="How long a master device reset must wait before it can be completed."
-                      label="Master device reset timeout"
-                    >
-                      <select
-                        className="h-10 w-full rounded-[var(--radius-md)] border border-[color:var(--color-border)] bg-[color:var(--color-input)] px-3 text-sm text-[color:var(--color-foreground)] outline-none transition focus:border-[color:var(--color-ring)] focus:ring-2 focus:ring-[color:var(--color-ring)]/30"
-                        id="deviceRecoveryCooldownMinutes"
-                        onChange={(event) => {
-                          setFieldValue(
-                            'deviceRecoveryCooldownMinutes',
-                            Number.parseInt(event.target.value, 10)
-                          )
-                        }}
-                        value={values.deviceRecoveryCooldownMinutes}
-                      >
-                        {masterDeviceResetTimeoutOptions.map((option) => (
                           <option key={option.value} value={option.value}>
                             {option.label}
                           </option>
@@ -276,6 +217,7 @@ export function DeviceDefaultsForm() {
             </form>
           )}
         </Formik>
+        <MasterDeviceRecoverySettings />
       </CardContent>
     </Card>
   )

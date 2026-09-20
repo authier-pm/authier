@@ -23,6 +23,7 @@
 
 package dev.authier.android.generated.model
 
+import dev.authier.android.generated.model.SecurityUpdateResetConfigRequest
 
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerialName
@@ -31,6 +32,7 @@ import kotlinx.serialization.Contextual
 /**
  *
  *
+ * @param masterDeviceResetConfig
  * @param newDevicePolicy
  * @param deviceRecoveryCooldownMinutes
  * @param masterDeviceId
@@ -39,6 +41,9 @@ import kotlinx.serialization.Contextual
 @Serializable
 
 data class SecurityState (
+
+    @SerialName(value = "masterDeviceResetConfig")
+    val masterDeviceResetConfig: SecurityUpdateResetConfigRequest,
 
     @SerialName(value = "newDevicePolicy")
     val newDevicePolicy: SecurityState.NewDevicePolicy?,

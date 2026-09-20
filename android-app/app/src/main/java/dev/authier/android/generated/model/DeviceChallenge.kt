@@ -25,6 +25,7 @@ package dev.authier.android.generated.model
 
 import dev.authier.android.generated.model.ApprovedChallenge
 import dev.authier.android.generated.model.PendingChallenge
+import dev.authier.android.generated.model.PendingChallengeResetStatus
 
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerialName

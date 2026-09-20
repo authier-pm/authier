@@ -24,6 +24,7 @@
 package dev.authier.android.generated.model
 
 import dev.authier.android.generated.model.AddNewDeviceInput
+import dev.authier.android.generated.model.SecurityUpdateResetConfigRequest
 
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerialName
@@ -37,6 +38,7 @@ import kotlinx.serialization.Contextual
  * @param deviceName
  * @param email
  * @param input
+ * @param masterDeviceResetConfig
  */
 @Serializable
 
@@ -55,7 +57,10 @@ data class RegisterInput (
     val email: kotlin.String,
 
     @SerialName(value = "input")
-    val input: AddNewDeviceInput
+    val input: AddNewDeviceInput,
+
+    @SerialName(value = "masterDeviceResetConfig")
+    val masterDeviceResetConfig: SecurityUpdateResetConfigRequest? = null
 
 ) {
 

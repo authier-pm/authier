@@ -31,6 +31,15 @@ fun AuthScreen(state: VaultUiState, model: VaultViewModel) {
     var password by remember { mutableStateOf("") }
     var server by remember { mutableStateOf(state.serverUrl) }
     var registering by remember { mutableStateOf(false) }
+    var recoveryStep by remember { mutableStateOf(false) }
+    var recoveryDraft by remember { mutableStateOf(RecoverySetupDraft()) }
+    var signupError by remember { mutableStateOf<String?>(null) }
+    if (recoveryStep && registering && !state.remembered) {
+        RecoverySetupScreen(email.trim(), recoveryDraft, { recoveryDraft = it }, state.busy,
+            onBack = { recoveryStep = false },
+            onCreate = { config -> model.authenticate(email, password, server, true, config) })
+        return
+    }
     var showServer by remember { mutableStateOf(false) }
     Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 28.dp).padding(top = 52.dp, bottom = 28.dp), verticalArrangement = Arrangement.spacedBy(20.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
@@ -57,16 +66,25 @@ fun AuthScreen(state: VaultUiState, model: VaultViewModel) {
                 Text("Open Devices in an existing Authier app and approve this phone. Then check again.", style = MaterialTheme.typography.bodyMedium)
             }
         }
+        signupError?.let { Text(it, color = MaterialTheme.colorScheme.error) }
         Button(onClick = {
             when {
                 state.demo -> model.demo()
                 state.remembered -> model.unlock(password)
-                else -> model.authenticate(email, password, server, registering)
+                registering -> {
+                    signupError = when {
+                        !isRecoveryEmail(email.trim()) -> "Enter a valid email address."
+                        password.length < 12 -> "Use a master password with at least 12 characters."
+                        else -> null
+                    }
+                    if (signupError == null) recoveryStep = true
+                }
+                else -> model.authenticate(email, password, server, false)
             }
             if (state.remembered) password = ""
         }, enabled = !state.busy, modifier = Modifier.fillMaxWidth().height(54.dp), shape = RoundedCornerShape(14.dp)) {
             if (state.busy) CircularProgressIndicator(Modifier.size(20.dp), color = Canvas, strokeWidth = 2.dp)
-            else Text(when { state.remembered -> "Unlock vault"; state.pendingApproval -> "Check approval & sign in"; registering -> "Create encrypted vault"; else -> "Sign in" }, fontWeight = FontWeight.Bold)
+            else Text(when { state.remembered -> "Unlock vault"; state.pendingApproval -> "Check approval & sign in"; registering -> "Continue to recovery setup"; else -> "Sign in" }, fontWeight = FontWeight.Bold)
         }
         if (!state.remembered) {
             TextButton(onClick = { registering = !registering }, modifier = Modifier.fillMaxWidth()) { Text(if (registering) "Already have a vault? Sign in" else "New to Authier? Create a vault") }

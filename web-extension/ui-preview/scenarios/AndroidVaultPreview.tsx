@@ -1,3 +1,5 @@
+import recoverySetupScreenshot from '../../../docs/screenshots/android-recovery-setup.png'
+import recoveryEmailsScreenshot from '../../../docs/screenshots/android-recovery-emails.png'
 import createPasswordScreenshot from '../../../docs/screenshots/android-autofill-create.png'
 import webAutofillScreenshot from '../../../docs/screenshots/android-autofill-web.png'
 import unlockSettingsScreenshot from '../../../docs/screenshots/android-unlock-settings.png'
@@ -18,6 +20,18 @@ import memberDevicesScreenshot from '../../../docs/screenshots/android-devices-m
 // Compose runs in Android, so this scenario displays captures from the actual
 // debug app instead of maintaining a second implementation of its UI in React.
 const screens = [
+  {
+    title: 'Recovery setup',
+    image: recoverySetupScreenshot,
+    description:
+      'Android signup asks for a recovery policy before account creation: one other device approval and 48 hours by default, with the same bounds as extension and web signup.'
+  },
+  {
+    title: 'Recovery notification emails',
+    image: recoveryEmailsScreenshot,
+    description:
+      'Add multiple notification addresses before creating the account. The selected JSON configuration is sent with registration.'
+  },
   {
     title: 'Create a password',
     image: createPasswordScreenshot,

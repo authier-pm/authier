@@ -90,6 +90,15 @@ CREATE TABLE "MasterDeviceChange" (
 	"userId" uuid NOT NULL
 );
 --> statement-breakpoint
+CREATE TABLE "MasterDeviceResetEmail" (
+	"id" serial PRIMARY KEY,
+	"userId" uuid NOT NULL,
+	"recipient" text NOT NULL,
+	"subject" text NOT NULL,
+	"message" text NOT NULL,
+	"sentAt" timestamp(3)
+);
+--> statement-breakpoint
 CREATE TABLE "MasterDeviceResetRequest" (
 	"id" serial PRIMARY KEY,
 	"createdAt" timestamp(3) DEFAULT CURRENT_TIMESTAMP NOT NULL,
@@ -100,6 +109,9 @@ CREATE TABLE "MasterDeviceResetRequest" (
 	"rejectedAt" timestamp(3),
 	"confirmationTokenHash" text NOT NULL,
 	"targetMasterDeviceId" text NOT NULL,
+	"config" jsonb DEFAULT '{"requiredApprovals":1,"waitMinutes":2880,"notificationEmails":[]}' NOT NULL,
+	"eligibleDeviceIds" jsonb DEFAULT '[]' NOT NULL,
+	"approvedDeviceIds" jsonb DEFAULT '[]' NOT NULL,
 	"decryptionChallengeId" integer NOT NULL,
 	"userId" uuid NOT NULL
 );
@@ -149,6 +161,7 @@ CREATE TABLE "User" (
 	"loginCredentialsLimit" integer NOT NULL,
 	"encryptionSalt" text NOT NULL,
 	"deviceRecoveryCooldownMinutes" integer NOT NULL,
+	"masterDeviceResetConfig" jsonb DEFAULT '{"requiredApprovals":1,"waitMinutes":2880,"notificationEmails":[]}' NOT NULL,
 	"recoveryDecryptionChallengeId" integer,
 	"notificationOnVaultUnlock" boolean DEFAULT false NOT NULL,
 	"notificationOnWrongPasswordAttempts" integer DEFAULT 3 NOT NULL,
@@ -215,6 +228,8 @@ ALTER TABLE "EmailVerification" ADD CONSTRAINT "EmailVerification_userId_User_id
 ALTER TABLE "EncryptedSecret" ADD CONSTRAINT "EncryptedSecret_userId_User_id_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 --> statement-breakpoint
 ALTER TABLE "MasterDeviceChange" ADD CONSTRAINT "MasterDeviceChange_userId_User_id_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+--> statement-breakpoint
+ALTER TABLE "MasterDeviceResetEmail" ADD CONSTRAINT "MasterDeviceResetEmail_userId_User_id_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE;
 --> statement-breakpoint
 ALTER TABLE "MasterDeviceResetRequest" ADD CONSTRAINT "MasterDeviceResetRequest_HvFB3D6sZNJH_fkey" FOREIGN KEY ("decryptionChallengeId") REFERENCES "DecryptionChallenge"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 --> statement-breakpoint

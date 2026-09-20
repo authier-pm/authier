@@ -1,3 +1,8 @@
+import { MasterDeviceResetSetup } from '../../../shared/MasterDeviceResetSetup'
+import {
+  defaultMasterDeviceResetConfig,
+  type MasterDeviceResetConfig
+} from '../../../shared/masterDeviceResetConfig'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
@@ -21,6 +26,9 @@ const registerSchema = z.object({
 })
 
 export function RegisterPage() {
+  const [credentials, setCredentials] = useState<z.infer<
+    typeof registerSchema
+  > | null>(null)
   const navigate = useNavigate()
   const { isBusy, register } = useVaultSession()
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
@@ -32,18 +40,21 @@ export function RegisterPage() {
     }
   })
 
-  const handleSubmit = form.handleSubmit(async (values) => {
+  const handleSubmit = form.handleSubmit((values) => setCredentials(values))
+  const finishRegistration = async (config: MasterDeviceResetConfig) => {
+    if (!credentials) return
+    const values = credentials
     setErrorMessage(null)
 
     try {
-      await register(values.email, values.password)
+      await register(values.email, values.password, config)
       navigate('/vault')
     } catch (error) {
       setErrorMessage(
         error instanceof Error ? error.message : 'Unable to create account'
       )
     }
-  })
+  }
 
   return (
     <div className="vault-grid flex min-h-screen items-center justify-center px-4 py-8">
@@ -60,45 +71,60 @@ export function RegisterPage() {
         </CardHeader>
 
         <CardContent>
-          <form className="space-y-5" onSubmit={handleSubmit}>
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input id="email" type="email" {...form.register('email')} />
-              <p className="text-xs text-[color:var(--color-danger)]">
-                {form.formState.errors.email?.message}
-              </p>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="password">Master password</Label>
-              <Input
-                id="password"
-                type="password"
-                {...form.register('password')}
-              />
-              <div className="rounded-[var(--radius-md)] border border-[color:var(--color-border)] bg-[color:var(--color-card)]/70 px-3 py-3 text-sm text-[color:var(--color-muted)]">
-                Use at least 12 characters. Longer is better.
+          {credentials ? (
+            <MasterDeviceResetSetup
+              initialConfig={defaultMasterDeviceResetConfig}
+              email={credentials.email}
+              busy={isBusy}
+              onBack={() => setCredentials(null)}
+              onSave={finishRegistration}
+            />
+          ) : (
+            <form className="space-y-5" onSubmit={handleSubmit}>
+              <div className="space-y-2">
+                <Label htmlFor="email">Email</Label>
+                <Input id="email" type="email" {...form.register('email')} />
+                <p className="text-xs text-[color:var(--color-danger)]">
+                  {form.formState.errors.email?.message}
+                </p>
               </div>
-              <p className="text-xs text-[color:var(--color-danger)]">
-                {form.formState.errors.password?.message}
-              </p>
-            </div>
 
-            {errorMessage ? (
-              <p className="rounded-[var(--radius-md)] border border-[color:var(--color-danger)] bg-[color:var(--color-danger-bg)] px-4 py-3 text-sm text-[color:var(--color-danger-foreground)]">
-                {errorMessage}
-              </p>
-            ) : null}
+              <div className="space-y-2">
+                <Label htmlFor="password">Master password</Label>
+                <Input
+                  id="password"
+                  type="password"
+                  {...form.register('password')}
+                />
+                <div className="rounded-[var(--radius-md)] border border-[color:var(--color-border)] bg-[color:var(--color-card)]/70 px-3 py-3 text-sm text-[color:var(--color-muted)]">
+                  Use at least 12 characters. Longer is better.
+                </div>
+                <p className="text-xs text-[color:var(--color-danger)]">
+                  {form.formState.errors.password?.message}
+                </p>
+              </div>
 
-            <Button
-              className="w-full"
-              disabled={isBusy}
-              type="submit"
-              variant="outline"
-            >
-              {isBusy ? 'Creating account...' : 'Create account'}
-            </Button>
-          </form>
+              {errorMessage ? (
+                <p className="rounded-[var(--radius-md)] border border-[color:var(--color-danger)] bg-[color:var(--color-danger-bg)] px-4 py-3 text-sm text-[color:var(--color-danger-foreground)]">
+                  {errorMessage}
+                </p>
+              ) : null}
+
+              <Button
+                className="w-full"
+                disabled={isBusy}
+                type="submit"
+                variant="outline"
+              >
+                Continue to recovery setup
+              </Button>
+            </form>
+          )}
+          {credentials && errorMessage && (
+            <p role="alert" className="mt-3 text-red-400">
+              {errorMessage}
+            </p>
+          )}
 
           <p className="mt-6 text-sm text-[color:var(--color-muted)]">
             Already have an account?{' '}

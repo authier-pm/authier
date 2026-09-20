@@ -1,4 +1,8 @@
 import {
+  defaultMasterDeviceResetConfig,
+  type MasterDeviceResetConfig
+} from '../../../shared/masterDeviceResetConfig'
+import {
   forgetRememberedVault,
   readRememberedVault,
   rememberVault
@@ -93,7 +97,11 @@ type VaultSessionContextValue = {
   ) => Promise<'authenticated' | 'pending'>
   pollPendingLogin: () => Promise<'authenticated' | 'pending'>
   requestMasterDeviceReset: (challengeId: number) => Promise<void>
-  register: (email: string, password: string) => Promise<void>
+  register: (
+    email: string,
+    password: string,
+    config?: MasterDeviceResetConfig
+  ) => Promise<void>
   unlockVault: (password: string) => Promise<void>
   syncVault: () => Promise<void>
   lockVault: () => void
@@ -562,7 +570,11 @@ export function VaultSessionProvider({ children }: { children: ReactNode }) {
     await completeApprovedLogin(result, email, password, rememberedKey)
   }
 
-  const register = async (email: string, password: string) => {
+  const register = async (
+    email: string,
+    password: string,
+    config = defaultMasterDeviceResetConfig
+  ) => {
     setIsBusy(true)
 
     try {
@@ -575,6 +587,7 @@ export function VaultSessionProvider({ children }: { children: ReactNode }) {
       )
 
       const authenticatedSession = await orpcClient.auth.register({
+        masterDeviceResetConfig: config,
         userId: crypto.randomUUID(),
         deviceId: deviceIdentity.id,
         deviceName: deviceIdentity.name,

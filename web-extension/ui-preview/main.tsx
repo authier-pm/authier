@@ -1,3 +1,7 @@
+import {
+  MasterDeviceRecoveryPreview,
+  MasterDeviceResetProgressPreview
+} from './scenarios/MasterDeviceRecoveryPreview'
 import { RememberedSessionPreview } from './scenarios/RememberedSessionPreview'
 import { type ComponentType } from 'react'
 import ReactDOM from 'react-dom/client'
@@ -21,6 +25,8 @@ import { EmailVerificationCodesPreview } from './scenarios/EmailVerificationCode
 const DEFAULT_SCENARIO = 'autofill-controls'
 const scenarios: Record<string, ComponentType> = {
   [DEFAULT_SCENARIO]: AutofillControlsPreview,
+  'master-device-recovery': MasterDeviceRecoveryPreview,
+  'master-device-reset-progress': MasterDeviceResetProgressPreview,
   'remembered-session': RememberedSessionPreview,
   'passkey-vault': PasskeyVaultPreview,
   'passkey-approval': PasskeyApprovalPreview,
@@ -45,7 +51,8 @@ if (!Scenario) {
 
 document.body.classList.toggle(
   'extension-popup',
-  !requestedScenario.startsWith('android-') &&
+  !requestedScenario.startsWith('master-device-') &&
+    !requestedScenario.startsWith('android-') &&
     requestedScenario !== 'bitfinex-totp' &&
     requestedScenario !== 'kostkohratky-password' &&
     requestedScenario !== 'email-verification-codes' &&

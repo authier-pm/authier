@@ -1,3 +1,5 @@
+import { updateResetConfig, getResetStatus } from '../lib/masterDeviceReset'
+import type { MasterDeviceResetConfig } from '../../shared/masterDeviceResetConfig'
 import { implement, ORPCError } from '@orpc/server'
 import { desc, eq, sql } from 'drizzle-orm'
 import { verify } from 'jsonwebtoken'
@@ -119,6 +121,7 @@ const mapSecurityState = (
       | 'REQUIRE_ANY_DEVICE_APPROVAL'
       | 'REQUIRE_MASTER_DEVICE_APPROVAL'
       | null
+    masterDeviceResetConfig: MasterDeviceResetConfig
     deviceRecoveryCooldownMinutes: number
     masterDeviceId: string | null
   },
@@ -126,11 +129,26 @@ const mapSecurityState = (
     vaultLockTimeoutSeconds: number
   }
 ) => ({
+  masterDeviceResetConfig: user.masterDeviceResetConfig,
   newDevicePolicy: user.newDevicePolicy,
   deviceRecoveryCooldownMinutes: user.deviceRecoveryCooldownMinutes,
   masterDeviceId: user.masterDeviceId,
   vaultLockTimeoutSeconds: device.vaultLockTimeoutSeconds
 })
+
+const serializeResetStatus = (
+  status: Awaited<ReturnType<typeof getResetStatus>>
+) =>
+  status
+    ? {
+        ...status,
+        processAt: status.processAt.toISOString(),
+        expiresAt: status.expiresAt.toISOString(),
+        confirmedAt: asIsoString(status.confirmedAt),
+        completedAt: asIsoString(status.completedAt),
+        rejectedAt: asIsoString(status.rejectedAt)
+      }
+    : null
 
 const getPendingChallenges = async (
   ctx: OrpcContext['legacyCtx'],
@@ -147,21 +165,7 @@ const getPendingChallenges = async (
 
   return Promise.all(
     challenges.map(async (challenge) => {
-      const [resetRequest] = await ctx.db
-        .select({
-          requestedAt: schema.masterDeviceResetRequest.createdAt,
-          processAt: schema.masterDeviceResetRequest.processAt,
-          confirmedAt: schema.masterDeviceResetRequest.confirmedAt,
-          rejectedAt: schema.masterDeviceResetRequest.rejectedAt
-        })
-        .from(schema.masterDeviceResetRequest)
-        .where(
-          eq(
-            schema.masterDeviceResetRequest.decryptionChallengeId,
-            challenge.id
-          )
-        )
-        .limit(1)
+      const resetStatus = await getResetStatus(ctx.db, challenge.id)
 
       return {
         id: challenge.id,
@@ -171,10 +175,11 @@ const getPendingChallenges = async (
         ipAddress: challenge.ipAddress,
         pushNotificationsSentCount: challenge.pushNotificationsSentCount,
         pushNotificationsFailedCount: challenge.pushNotificationsFailedCount,
-        masterDeviceResetRequestedAt: asIsoString(resetRequest?.requestedAt),
-        masterDeviceResetProcessAt: asIsoString(resetRequest?.processAt),
-        masterDeviceResetConfirmedAt: asIsoString(resetRequest?.confirmedAt),
-        masterDeviceResetRejectedAt: asIsoString(resetRequest?.rejectedAt)
+        resetStatus: serializeResetStatus(resetStatus),
+        masterDeviceResetRequestedAt: asIsoString(resetStatus?.requestedAt),
+        masterDeviceResetProcessAt: asIsoString(resetStatus?.processAt),
+        masterDeviceResetConfirmedAt: asIsoString(resetStatus?.confirmedAt),
+        masterDeviceResetRejectedAt: asIsoString(resetStatus?.rejectedAt)
       }
     })
   )
@@ -192,7 +197,8 @@ const getSessionBootstrap = async (
       email: true,
       masterDeviceId: true,
       newDevicePolicy: true,
-      deviceRecoveryCooldownMinutes: true
+      deviceRecoveryCooldownMinutes: true,
+      masterDeviceResetConfig: true
     }
   })
 
@@ -370,7 +376,8 @@ const getSessionUser = async (
       email: true,
       masterDeviceId: true,
       newDevicePolicy: true,
-      deviceRecoveryCooldownMinutes: true
+      deviceRecoveryCooldownMinutes: true,
+      masterDeviceResetConfig: true
     }
   })
 
@@ -409,6 +416,7 @@ export const vaultOrpcRouter = os.router({
         await rootResolver.registerNewUser(
           {
             ...input.input,
+            masterDeviceResetConfig: input.masterDeviceResetConfig,
             email: input.email,
             deviceId: input.deviceId,
             deviceName: input.deviceName
@@ -456,6 +464,9 @@ export const vaultOrpcRouter = os.router({
             challengeId: result.id,
             pushNotificationsSentCount: result.pushNotificationsSentCount,
             pushNotificationsFailedCount: result.pushNotificationsFailedCount,
+            resetStatus: serializeResetStatus(
+              await result.resetStatus(context.legacyCtx)
+            ),
             masterDeviceResetRequestedAt: asIsoString(
               result.masterDeviceResetRequestedAt
             ),
@@ -805,6 +816,19 @@ export const vaultOrpcRouter = os.router({
         )
       })
     ),
+    approveReset: protectedBase.devices.approveReset.handler(
+      async ({ input, context }) => {
+        const challenge = await getOwnedChallenge(
+          context.legacyCtx,
+          context.authCtx.jwtPayload.userId,
+          input.id
+        )
+        await Object.assign(new DecryptionChallengeMutation(), challenge)
+          .approveMasterDeviceReset(context.authCtx)
+          .catch(raiseAsOrpcError)
+        return { ok: true }
+      }
+    ),
     approveChallenge: protectedBase.devices.approveChallenge.handler(
       async ({ input, context }) => {
         try {
@@ -918,6 +942,16 @@ export const vaultOrpcRouter = os.router({
     )
   },
   security: {
+    updateResetConfig: protectedBase.security.updateResetConfig.handler(
+      async ({ input, context }) => ({
+        security: mapSecurityState(
+          await updateResetConfig(context.authCtx, input).catch(
+            raiseAsOrpcError
+          ),
+          context.authCtx.device
+        )
+      })
+    ),
     get: protectedBase.security.get.handler(async ({ context }) => {
       const user = await getSessionUser(
         context.legacyCtx,

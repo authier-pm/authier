@@ -1,3 +1,4 @@
+import { masterDeviceResetConfigSchema } from '../masterDeviceResetConfig'
 import { oc } from '@orpc/contract'
 import { z } from 'zod'
 import type {
@@ -229,6 +230,15 @@ export const vaultApiContract = {
       })
       .input(challengeActionInputSchema)
       .output(okResultSchema),
+    approveReset: oc
+      .route({
+        method: 'POST',
+        path: '/devices/approveReset',
+        operationId: 'devicesApproveReset',
+        tags: ['devices']
+      })
+      .input(challengeActionInputSchema)
+      .output(okResultSchema),
     rejectChallenge: oc
       .route({
         method: 'POST',
@@ -276,6 +286,15 @@ export const vaultApiContract = {
       .output(okResultSchema)
   },
   security: {
+    updateResetConfig: oc
+      .route({
+        method: 'POST',
+        path: '/security/updateResetConfig',
+        operationId: 'securityUpdateResetConfig',
+        tags: ['security']
+      })
+      .input(masterDeviceResetConfigSchema)
+      .output(securityResponseSchema),
     get: oc
       .route({
         method: 'POST',

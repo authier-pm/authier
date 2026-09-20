@@ -1,3 +1,8 @@
+import {
+  defaultMasterDeviceResetConfig,
+  masterDeviceResetConfigSchema
+} from '../../shared/masterDeviceResetConfig'
+import { initiateReset, hashResetToken } from '../lib/masterDeviceReset'
 import { hashDeviceSecret } from '../utils/deviceSecretHash'
 import { throwIfNotAuthenticated } from '../lib/authMiddleware'
 import {
@@ -54,23 +59,16 @@ import type {
   IContext,
   IContextAuthenticated
 } from '../models/types/ContextTypes'
-import { eq, and, or, like, sql, gte, count, isNull, desc } from 'drizzle-orm'
+import { eq, and, or, like, sql, gte, count } from 'drizzle-orm'
 import * as schema from '../drizzle/schema'
-import { createHash } from 'crypto'
 import { defaultAccountLimits } from '../models/accountLimits'
 
 const log = debug('au:RootResolver')
 
-// Confirmation links for master-device-reset are valid for 7 days from the
-// moment they are created. Anything still outstanding past that window is
-// considered abandoned and must be re-initiated.
-const MASTER_DEVICE_RESET_TOKEN_TTL_MS = 7 * 24 * 60 * 60 * 1000
-
 // SHA-256 of a 122-bit UUID is sufficient — these tokens have plenty of
 // entropy on their own, so we just need a one-way function to make DB
 // reads non-actionable. (No bcrypt/argon2 needed for high-entropy tokens.)
-export const hashMasterDeviceResetToken = (token: string) =>
-  createHash('sha256').update(token).digest('hex')
+export const hashMasterDeviceResetToken = hashResetToken
 
 type PushDeliveryCounts = {
   pushNotificationsSentCount: number
@@ -131,22 +129,7 @@ const sendNewDeviceLoginPushNotifications = async (
   }
 }
 
-export const getBackendOrigin = () => {
-  const origin = new URL(process.env.BACKEND_URL ?? 'https://api.authier.pm')
-  if (
-    origin.username ||
-    origin.password ||
-    (origin.protocol !== 'https:' &&
-      !(
-        process.env.NODE_ENV !== 'production' &&
-        origin.protocol === 'http:' &&
-        ['localhost', '127.0.0.1'].includes(origin.hostname)
-      ))
-  ) {
-    throw new Error('BACKEND_URL must be a trusted HTTPS origin')
-  }
-  return origin.origin
-}
+export { getBackendOrigin } from '../utils/getBackendOrigin'
 
 @Resolver()
 export class RootResolver {
@@ -239,6 +222,9 @@ export class RootResolver {
       addDeviceSecretEncrypted,
       encryptionSalt
     } = input
+    const resetConfig = masterDeviceResetConfigSchema.parse(
+      input.masterDeviceResetConfig ?? defaultMasterDeviceResetConfig
+    )
     let user: any
     let devices: any[]
 
@@ -252,7 +238,8 @@ export class RootResolver {
           addDeviceSecret: await hashDeviceSecret(addDeviceSecret),
           addDeviceSecretEncrypted,
           encryptionSalt,
-          deviceRecoveryCooldownMinutes: 16 * 60,
+          deviceRecoveryCooldownMinutes: resetConfig.waitMinutes,
+          masterDeviceResetConfig: resetConfig,
           loginCredentialsLimit: defaultAccountLimits.loginCredentialsLimit,
           TOTPlimit: defaultAccountLimits.TOTPlimit
         })
@@ -601,143 +588,10 @@ export class RootResolver {
     decryptionChallengeId: number,
     @Ctx() ctx: IContext
   ) {
-    const ipAddress = ctx.getIpAddress()
-
-    const user = await ctx.db.query.user.findFirst({
-      where: { email },
-      columns: {
-        id: true,
-        email: true,
-        masterDeviceId: true,
-        deviceRecoveryCooldownMinutes: true
-      }
-    })
-
-    if (!user) {
-      throw new GraphqlError(
-        'Login failed, check your email and master password'
-      )
-    }
-
-    const challenge = await ctx.db.query.decryptionChallenge.findFirst({
-      where: {
-        id: decryptionChallengeId,
-        userId: user.id,
-        deviceId: deviceInput.id
-      }
-    })
-
-    if (!challenge || challenge.rejectedAt) {
-      throw new GraphqlError('login failed')
-    }
-
-    const now = new Date()
-    const [activeResetRequest] = await ctx.db
-      .select({
-        id: schema.masterDeviceResetRequest.id,
-        requestedAt: schema.masterDeviceResetRequest.createdAt,
-        processAt: schema.masterDeviceResetRequest.processAt
-      })
-      .from(schema.masterDeviceResetRequest)
-      .where(
-        and(
-          eq(schema.masterDeviceResetRequest.userId, user.id),
-          isNull(schema.masterDeviceResetRequest.completedAt),
-          isNull(schema.masterDeviceResetRequest.rejectedAt)
-        )
-      )
-      .orderBy(desc(schema.masterDeviceResetRequest.createdAt))
-      .limit(1)
-
-    if (activeResetRequest) {
-      return plainToClass(MasterDeviceResetRequestResult, {
-        requestedAt: activeResetRequest.requestedAt,
-        processAt: activeResetRequest.processAt,
-        alreadyPending: true
-      })
-    }
-
-    if (!user.masterDeviceId) {
-      return plainToClass(MasterDeviceResetRequestResult, {
-        requestedAt: now,
-        processAt: now,
-        alreadyPending: false
-      })
-    }
-
-    const requestedAt = now
-    const processAt = new Date(
-      requestedAt.getTime() + user.deviceRecoveryCooldownMinutes * 60_000
+    return plainToClass(
+      MasterDeviceResetRequestResult,
+      await initiateReset(ctx, email, deviceInput.id, decryptionChallengeId)
     )
-    const expiresAt = new Date(
-      Math.max(
-        processAt.getTime(),
-        requestedAt.getTime() + MASTER_DEVICE_RESET_TOKEN_TTL_MS
-      )
-    )
-    const confirmationToken = crypto.randomUUID()
-    const confirmationTokenHash = hashMasterDeviceResetToken(confirmationToken)
-
-    const [existingResetRequestForChallenge] = await ctx.db
-      .select({
-        id: schema.masterDeviceResetRequest.id
-      })
-      .from(schema.masterDeviceResetRequest)
-      .where(
-        eq(schema.masterDeviceResetRequest.decryptionChallengeId, challenge.id)
-      )
-      .limit(1)
-
-    if (existingResetRequestForChallenge) {
-      await ctx.db
-        .update(schema.masterDeviceResetRequest)
-        .set({
-          createdAt: requestedAt,
-          processAt,
-          expiresAt,
-          confirmedAt: null,
-          completedAt: null,
-          rejectedAt: null,
-          confirmationTokenHash,
-          targetMasterDeviceId: user.masterDeviceId
-        })
-        .where(
-          eq(
-            schema.masterDeviceResetRequest.id,
-            existingResetRequestForChallenge.id
-          )
-        )
-    } else {
-      await ctx.db.insert(schema.masterDeviceResetRequest).values({
-        userId: user.id,
-        decryptionChallengeId: challenge.id,
-        confirmationTokenHash,
-        targetMasterDeviceId: user.masterDeviceId,
-        processAt,
-        expiresAt
-      })
-    }
-
-    if (user.email) {
-      const backendOrigin = getBackendOrigin()
-      const confirmationLink = `${backendOrigin}/confirm-master-device-reset?token=${confirmationToken}`
-      await sendEmail(user.email, {
-        Subject: 'Confirm master device reset',
-        TextPart: `A delayed reset of your master device was requested for account ${user.email} from IP ${ipAddress}.
-To confirm this request, open:
-${confirmationLink}
-
-After confirmation, the reset is scheduled for ${processAt.toISOString()}.
-If this was not you, ignore this email or reject the login request from your current master device.`,
-        HTMLPart: `<p>A delayed reset of your master device was requested for account ${user.email} from IP ${ipAddress}.</p><p>To confirm this request, click <a href="${confirmationLink}">Confirm master device reset</a>.</p><p>After confirmation, the reset is scheduled for <strong>${processAt.toISOString()}</strong>.</p><p>If this was not you, ignore this email or reject the login request from your current master device.</p>`
-      })
-    }
-
-    return plainToClass(MasterDeviceResetRequestResult, {
-      requestedAt,
-      processAt,
-      alreadyPending: false
-    })
   }
 
   @UseMiddleware(throwIfNotAuthenticated)

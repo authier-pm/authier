@@ -1,3 +1,4 @@
+import { actOnReset, getResetStatus } from '../lib/masterDeviceReset'
 import { hashDeviceSecret, verifyDeviceSecret } from '../utils/deviceSecretHash'
 import 'reflect-metadata'
 import {
@@ -36,6 +37,17 @@ class DeviceLocation {
 
   @Field(() => String, { nullable: false })
   countryName: string
+}
+
+@ObjectType()
+class MasterDeviceResetStatus {
+  @Field(() => Int) requiredApprovals: number
+  @Field(() => Int) approvalCount: number
+  @Field(() => GraphQLISODateTime) processAt: Date
+  @Field(() => GraphQLISODateTime) expiresAt: Date
+  @Field(() => GraphQLISODateTime, { nullable: true }) confirmedAt: Date | null
+  @Field(() => GraphQLISODateTime, { nullable: true }) completedAt: Date | null
+  @Field(() => GraphQLISODateTime, { nullable: true }) rejectedAt: Date | null
 }
 
 @ObjectType()
@@ -78,6 +90,11 @@ export class DecryptionChallengeForApproval {
 
   @Field(() => Int)
   pushNotificationsFailedCount: number
+
+  @Field(() => MasterDeviceResetStatus, { nullable: true })
+  async resetStatus(@Ctx() ctx: IContext) {
+    return getResetStatus(ctx.db, this.id)
+  }
 
   @Field(() => GraphQLISODateTime, { nullable: true })
   masterDeviceResetRequestedAt: Date | null
@@ -262,6 +279,12 @@ export class MasterDeviceResetRequestResult {
 export class DecryptionChallengeMutation extends DecryptionChallengeGQL {
   @Field(() => DecryptionChallengeGQL)
   async approve(@Ctx() ctx: IContextAuthenticated) {
+    const reset = await getResetStatus(ctx.db, this.id)
+    if (reset && !reset.completedAt && !reset.rejectedAt)
+      throw new GraphqlError(
+        'Use the explicit master device reset approval action'
+      )
+
     const userData = await ctx.db.query.user.findFirst({
       where: { id: ctx.jwtPayload.userId },
       columns: {
@@ -295,7 +318,17 @@ export class DecryptionChallengeMutation extends DecryptionChallengeGQL {
   }
 
   @Field(() => DecryptionChallengeGQL)
+  async approveMasterDeviceReset(@Ctx() ctx: IContextAuthenticated) {
+    const challenge = await actOnReset(ctx, this.id, 'approve')
+    if (!challenge) throw new GraphqlError('No pending master device reset')
+    return challenge
+  }
+
+  @Field(() => DecryptionChallengeGQL)
   async reject(@Ctx() ctx: IContextAuthenticated) {
+    const reset = await actOnReset(ctx, this.id, 'reject')
+    if (reset) return reset
+
     const rejectingUser = await ctx.db.query.user.findFirst({
       where: { id: this.userId },
       columns: {

@@ -31,6 +31,19 @@ interface DevicesApi {
     suspend fun devicesApproveChallenge(@Body devicesApproveChallengeRequest: DevicesApproveChallengeRequest): OkResult
 
     /**
+     * POST devices/approveReset
+     *
+     *
+     * Responses:
+     *  - 200: OK
+     *
+     * @param devicesApproveChallengeRequest
+     * @return [OkResult]
+     */
+    @POST("devices/approveReset")
+    suspend fun devicesApproveReset(@Body devicesApproveChallengeRequest: DevicesApproveChallengeRequest): OkResult
+
+    /**
      * POST devices/list
      *
      *
