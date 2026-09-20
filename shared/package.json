@@ -10,8 +10,12 @@
     "@orpc/contract": "1.15.1",
     "graphql": "16.8.1",
     "otplib": "^13.5.0",
+    "react": "^19.2.4",
     "tldts": "^7.4.13",
     "yup": "^1.7.1",
     "zod": "^4.6.5"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.2"
   }
 }
