@@ -23,6 +23,7 @@
 
 package dev.authier.android.generated.model
 
+import dev.authier.android.generated.model.PendingChallengeResetStatus
 
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerialName
@@ -42,6 +43,7 @@ import kotlinx.serialization.Contextual
  * @param masterDeviceResetProcessAt
  * @param masterDeviceResetConfirmedAt
  * @param masterDeviceResetRejectedAt
+ * @param resetStatus
  */
 @Serializable
 
@@ -78,7 +80,10 @@ data class PendingDeviceApproval (
     val masterDeviceResetConfirmedAt: kotlin.String?,
 
     @SerialName(value = "masterDeviceResetRejectedAt")
-    val masterDeviceResetRejectedAt: kotlin.String?
+    val masterDeviceResetRejectedAt: kotlin.String?,
+
+    @SerialName(value = "resetStatus")
+    val resetStatus: PendingChallengeResetStatus? = null
 
 ) {
 

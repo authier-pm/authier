@@ -1,47 +1,72 @@
+/** Internal type. DO NOT USE DIRECTLY. */
+type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
+/** Internal type. DO NOT USE DIRECTLY. */
+export type Incremental<T> = T | { [P in keyof T]?: P extends ' $fragmentName' | '__typename' ? T[P] : never };
 import * as Types from '@shared/generated/graphqlBaseTypes';
 
 import { gql } from '@apollo/client';
 import * as ApolloReactCommon from '@apollo/client/react';
 import * as ApolloReactHooks from '@apollo/client/react';
 const defaultOptions = {} as const;
-export type AddNewDeviceForUserMutationVariables = Types.Exact<{
-  email: Types.Scalars['EmailAddress']['input'];
+export type AddNewDeviceInput = {
+  addDeviceSecret: string;
+  addDeviceSecretEncrypted: string;
+  devicePlatform: string;
+  encryptionSalt: string;
+  /** Firebase token is only used for mobile app */
+  firebaseToken?: string | null | undefined;
+};
+
+export type DeviceInput = {
+  id: string;
+  name: string;
+  platform: string;
+};
+
+export type EncryptedSecretType =
+  | 'LOGIN_CREDENTIALS'
+  | 'PASSKEY'
+  | 'TOTP';
+
+export type AddNewDeviceForUserMutationVariables = Exact<{
+  email: string;
   deviceInput: Types.DeviceInput;
-  currentAddDeviceSecret: Types.Scalars['NonEmptyString']['input'];
+  currentAddDeviceSecret: string;
   input: Types.AddNewDeviceInput;
-  deviceId: Types.Scalars['String']['input'];
+  deviceId: string;
 }>;
 
 
-export type AddNewDeviceForUserMutation = { __typename?: 'Mutation', deviceDecryptionChallenge?:
-    | { __typename?: 'DecryptionChallengeApproved', id: number, addNewDeviceForUser: { __typename?: 'LoginResponse', accessToken: string, user: { __typename?: 'UserMutation', id: string, uiLanguage: string, notificationOnVaultUnlock: boolean, notificationOnWrongPasswordAttempts: number, autofillForbiddenUrlPatterns: string, EncryptedSecrets: Array<{ __typename?: 'EncryptedSecretGQL', id: string, encrypted: string, kind: Types.EncryptedSecretType, createdAt: string, updatedAt?: string | null, version: number }>, device: { __typename?: 'DeviceMutation', id: string, syncTOTP: boolean, vaultLockTimeoutSeconds: number, autofillTOTPEnabled: boolean }, defaultDeviceSettings: { __typename?: 'DefaultDeviceSettingsMutation', id: number, autofillTOTPEnabled: boolean, theme: string, syncTOTP: boolean, vaultLockTimeoutSeconds: number } } } }
-    | { __typename?: 'DecryptionChallengeForApproval' }
+export type AddNewDeviceForUserMutation = { deviceDecryptionChallenge:
+    | { __typename: 'DecryptionChallengeApproved', id: number, addNewDeviceForUser: { accessToken: string, user: { id: string, uiLanguage: string, notificationOnVaultUnlock: boolean, notificationOnWrongPasswordAttempts: number, autofillForbiddenUrlPatterns: string, EncryptedSecrets: Array<{ id: string, encrypted: string, kind: Types.EncryptedSecretType, createdAt: string, updatedAt: string | null, version: number }>, device: { id: string, syncTOTP: boolean, vaultLockTimeoutSeconds: number, autofillTOTPEnabled: boolean }, defaultDeviceSettings: { id: number, autofillTOTPEnabled: boolean, theme: string, syncTOTP: boolean, vaultLockTimeoutSeconds: number } } } }
+    | { __typename: 'DecryptionChallengeForApproval' }
    | null };
 
-export type DeviceDecryptionChallengeMutationVariables = Types.Exact<{
-  email: Types.Scalars['EmailAddress']['input'];
+export type DeviceDecryptionChallengeMutationVariables = Exact<{
+  email: string;
   deviceInput: Types.DeviceInput;
 }>;
 
 
-export type DeviceDecryptionChallengeMutation = { __typename?: 'Mutation', deviceDecryptionChallenge?:
-    | { __typename?: 'DecryptionChallengeApproved', id: number, addDeviceSecretEncrypted: string, encryptionSalt: string, userId: string, approvedAt?: string | null, deviceId: string, deviceName: string }
-    | { __typename?: 'DecryptionChallengeForApproval', id: number, pushNotificationsSentCount: number, pushNotificationsFailedCount: number, masterDeviceResetRequestedAt?: string | null, masterDeviceResetProcessAt?: string | null, masterDeviceResetConfirmedAt?: string | null, masterDeviceResetRejectedAt?: string | null }
+export type DeviceDecryptionChallengeMutation = { deviceDecryptionChallenge:
+    | { __typename: 'DecryptionChallengeApproved', id: number, addDeviceSecretEncrypted: string, encryptionSalt: string, userId: string, approvedAt: string | null, deviceId: string, deviceName: string }
+    | { __typename: 'DecryptionChallengeForApproval', id: number, pushNotificationsSentCount: number, pushNotificationsFailedCount: number, masterDeviceResetRequestedAt: string | null, masterDeviceResetProcessAt: string | null, masterDeviceResetConfirmedAt: string | null, masterDeviceResetRejectedAt: string | null, resetStatus: { requiredApprovals: number, approvalCount: number, processAt: string, expiresAt: string, confirmedAt: string | null, completedAt: string | null, rejectedAt: string | null } | null }
    | null };
 
-export type InitiateMasterDeviceResetMutationVariables = Types.Exact<{
-  email: Types.Scalars['EmailAddress']['input'];
+export type InitiateMasterDeviceResetMutationVariables = Exact<{
+  email: string;
   deviceInput: Types.DeviceInput;
-  decryptionChallengeId: Types.Scalars['PositiveInt']['input'];
+  decryptionChallengeId: number;
 }>;
 
 
-export type InitiateMasterDeviceResetMutation = { __typename?: 'Mutation', initiateMasterDeviceReset: { __typename?: 'MasterDeviceResetRequestResult', requestedAt: string, processAt: string, alreadyPending: boolean } };
+export type InitiateMasterDeviceResetMutation = { initiateMasterDeviceReset: { requestedAt: string, processAt: string, alreadyPending: boolean } };
 
 
 export const AddNewDeviceForUserDocument = gql`
     mutation addNewDeviceForUser($email: EmailAddress!, $deviceInput: DeviceInput!, $currentAddDeviceSecret: NonEmptyString!, $input: AddNewDeviceInput!, $deviceId: String!) {
   deviceDecryptionChallenge(email: $email, deviceInput: $deviceInput) {
+    __typename
     ... on DecryptionChallengeApproved {
       id
       addNewDeviceForUser(
@@ -113,6 +138,7 @@ export type AddNewDeviceForUserMutationResult = ApolloReactCommon.MutationResult
 export const DeviceDecryptionChallengeDocument = gql`
     mutation deviceDecryptionChallenge($email: EmailAddress!, $deviceInput: DeviceInput!) {
   deviceDecryptionChallenge(email: $email, deviceInput: $deviceInput) {
+    __typename
     ... on DecryptionChallengeApproved {
       id
       addDeviceSecretEncrypted
@@ -126,6 +152,15 @@ export const DeviceDecryptionChallengeDocument = gql`
       id
       pushNotificationsSentCount
       pushNotificationsFailedCount
+      resetStatus {
+        requiredApprovals
+        approvalCount
+        processAt
+        expiresAt
+        confirmedAt
+        completedAt
+        rejectedAt
+      }
       masterDeviceResetRequestedAt
       masterDeviceResetProcessAt
       masterDeviceResetConfirmedAt

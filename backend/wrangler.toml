@@ -7,9 +7,10 @@ observability = { logs = { enabled = true, invocation_logs = true } }
 
 [vars]
 NODE_ENV = "production"
+DISABLE_EMAIL_SENDING = "false"
 
 [triggers]
-crons = ["*/15 * * * *"]
+crons = ["* * * * *"]
 
 [alias]
 "graphql/package.json" = "./node_modules/graphql/package.json"

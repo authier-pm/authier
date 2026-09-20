@@ -1,3 +1,7 @@
+import {
+  masterDeviceResetConfigSchema,
+  resetWaitMinutesSchema
+} from '../masterDeviceResetConfig'
 import { z } from 'zod'
 
 export const emptyInputSchema = z.object({})
@@ -29,6 +33,7 @@ export const addNewDeviceInputSchema = z.object({
 })
 
 export const registerInputSchema = z.object({
+  masterDeviceResetConfig: masterDeviceResetConfigSchema.optional(),
   userId: z.string().uuid(),
   deviceId: z.string().min(1),
   deviceName: z.string().min(1),
@@ -86,7 +91,7 @@ export const updateNewDevicePolicyInputSchema = z.object({
 })
 
 export const updateRecoveryCooldownInputSchema = z.object({
-  deviceRecoveryCooldownMinutes: z.number().int().nonnegative()
+  deviceRecoveryCooldownMinutes: resetWaitMinutesSchema
 })
 
 // Matches the longest legitimate option in `vaultLockTimeoutOptions`
@@ -146,7 +151,18 @@ export const deviceListItemSchema = currentDeviceSchema.extend({
   lastGeoLocation: z.string()
 })
 
+export const resetStatusSchema = z.object({
+  expiresAt: z.string().optional(),
+  requiredApprovals: z.number().int(),
+  approvalCount: z.number().int(),
+  processAt: z.string(),
+  confirmedAt: z.string().nullable(),
+  completedAt: z.string().nullable(),
+  rejectedAt: z.string().nullable()
+})
+
 export const pendingChallengeSchema = z.object({
+  resetStatus: resetStatusSchema.nullable().optional(),
   id: z.number().int().positive(),
   createdAt: z.string(),
   deviceName: z.string().min(1),
@@ -161,6 +177,7 @@ export const pendingChallengeSchema = z.object({
 })
 
 export const securityStateSchema = z.object({
+  masterDeviceResetConfig: masterDeviceResetConfigSchema,
   newDevicePolicy: userNewDevicePolicySchema.nullable(),
   deviceRecoveryCooldownMinutes: z.number().int().nonnegative(),
   masterDeviceId: z.string().nullable(),
@@ -206,6 +223,7 @@ export const approvedChallengeSchema = z.object({
 })
 
 export const pendingChallengeResultSchema = z.object({
+  resetStatus: resetStatusSchema.nullable().optional(),
   status: z.literal('pending'),
   challengeId: z.number().int().positive(),
   pushNotificationsSentCount: z.number().int().nonnegative(),

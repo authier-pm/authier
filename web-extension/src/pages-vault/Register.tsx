@@ -1,4 +1,6 @@
-import { useState } from 'react'
+import { MasterDeviceResetSetup } from '@shared/MasterDeviceResetSetup'
+import { defaultMasterDeviceResetConfig } from '@shared/masterDeviceResetConfig'
+import { useRef, useState } from 'react'
 import { Formik, Form, Field, type FormikHelpers } from 'formik'
 import { Link, useNavigate } from 'react-router-dom'
 import { IoEye, IoEyeOff } from 'react-icons/io5'
@@ -70,6 +72,10 @@ const PasswordHint = ({ password }: { password: string }) => {
 }
 
 export default function Register() {
+  const selectedResetConfig = useRef(defaultMasterDeviceResetConfig)
+  const [recoveryStep, setRecoveryStep] = useState(false)
+  const [resetConfig, setResetConfig] = useState(defaultMasterDeviceResetConfig)
+  const [registrationError, setRegistrationError] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [register] = useRegisterNewUserMutation()
   const navigate = useNavigate()
@@ -77,7 +83,7 @@ export default function Register() {
   const fireToken = device.fireToken || `web-ext-${crypto.randomUUID()}`
 
   return (
-    <div className="extension-surface mx-10 min-w-[100vw] rounded-[var(--radius-lg)] border border-[color:var(--color-border)] p-8 shadow-lg md:mx-0 md:min-w-[450px]">
+    <div className="extension-surface mx-auto w-full max-w-[600px] rounded-[var(--radius-lg)] border border-[color:var(--color-border)] p-8 shadow-lg ">
       <div className="mb-6 flex items-center justify-center">
         <h1 className="text-2xl font-semibold text-[color:var(--color-foreground)]">
           Create account
@@ -89,6 +95,18 @@ export default function Register() {
           values: Values,
           { setSubmitting }: FormikHelpers<Values>
         ) => {
+          if (!recoveryStep) {
+            if (values.password.length < 8) {
+              toast({
+                title: 'Password must be at least 8 characters long',
+                status: 'error'
+              })
+              return
+            }
+            setRecoveryStep(true)
+            setSubmitting(false)
+            return
+          }
           const userId = crypto.randomUUID()
           const deviceId = await device.getDeviceId()
           const encryptionSalt = self.crypto.getRandomValues(new Uint8Array(16))
@@ -115,6 +133,7 @@ export default function Register() {
             variables: {
               userId,
               input: {
+                masterDeviceResetConfig: selectedResetConfig.current,
                 encryptionSalt: bufferToBase64(encryptionSalt),
                 email: values.email,
                 ...params,
@@ -163,71 +182,100 @@ export default function Register() {
           setSubmitting(false)
         }}
       >
-        {(props) => (
-          <Form className="space-y-4">
-            <Field name="email">
-              {({ field, form }: any) => (
-                <label className="block">
-                  <div className="mb-2 text-sm font-medium">Email</div>
-                  <Input {...field} id="Email" />
-                  {form.errors.email && form.touched.email ? (
-                    <div className="mt-1 text-sm text-[color:var(--color-danger)]">
-                      {form.errors.email}
-                    </div>
-                  ) : null}
-                </label>
+        {(props) =>
+          recoveryStep ? (
+            <>
+              <MasterDeviceResetSetup
+                initialConfig={resetConfig}
+                email={props.values.email}
+                busy={props.isSubmitting}
+                onBack={() => setRecoveryStep(false)}
+                onSave={async (config) => {
+                  setResetConfig(config)
+                  selectedResetConfig.current = config
+                  await props
+                    .submitForm()
+                    .catch((error: unknown) =>
+                      setRegistrationError(
+                        error instanceof Error
+                          ? error.message
+                          : 'Unable to create account'
+                      )
+                    )
+                }}
+              />
+              {registrationError && (
+                <p role="alert" className="mt-3 text-red-400">
+                  {registrationError}
+                </p>
               )}
-            </Field>
-            <Field name="password">
-              {({ field, form }: any) => (
-                <label className="block">
-                  <div className="mb-2 mt-3 text-sm font-medium">
-                    Master password
-                  </div>
-                  <div className="relative">
-                    <Input
-                      {...field}
-                      className="pr-10"
-                      placeholder="*******"
-                      type={showPassword ? 'text' : 'password'}
-                    />
-                    <button
-                      className="absolute inset-y-0 right-0 flex w-10 items-center justify-center text-[color:var(--color-muted)]"
-                      onClick={() => setShowPassword((value) => !value)}
-                      type="button"
-                    >
-                      {showPassword ? (
-                        <IoEyeOff className="size-4" />
-                      ) : (
-                        <IoEye className="size-4" />
-                      )}
-                    </button>
-                  </div>
-                  <PasswordHint password={field.value} />
-                  {form.errors.password && form.touched.password ? (
-                    <div className="mt-1 text-sm text-[color:var(--color-danger)]">
-                      {form.errors.password}
+            </>
+          ) : (
+            <Form className="space-y-4">
+              <Field name="email">
+                {({ field, form }: any) => (
+                  <label className="block">
+                    <div className="mb-2 text-sm font-medium">Email</div>
+                    <Input {...field} id="Email" type="email" required />
+                    {form.errors.email && form.touched.email ? (
+                      <div className="mt-1 text-sm text-[color:var(--color-danger)]">
+                        {form.errors.email}
+                      </div>
+                    ) : null}
+                  </label>
+                )}
+              </Field>
+              <Field name="password">
+                {({ field, form }: any) => (
+                  <label className="block">
+                    <div className="mb-2 mt-3 text-sm font-medium">
+                      Master password
                     </div>
-                  ) : null}
-                  <p className="mt-2 text-xs text-[color:var(--color-muted)]">
-                    it is never sent anywhere-your vault is e2e encrypted
-                  </p>
-                </label>
-              )}
-            </Field>
-            <Button
-              className="w-full"
-              disabled={props.isSubmitting}
-              type="submit"
-              variant="outline"
-            >
-              Register
-            </Button>
-            <p className="p-2 text-center text-xs text-[color:var(--color-muted)]">
-              By signing up you agree to our Terms of Service
-            </p>
-          </Form>
-        )}
+                    <div className="relative">
+                      <Input
+                        {...field}
+                        className="pr-10"
+                        placeholder="*******"
+                        type={showPassword ? 'text' : 'password'}
+                      />
+                      <button
+                        className="absolute inset-y-0 right-0 flex w-10 items-center justify-center text-[color:var(--color-muted)]"
+                        onClick={() => setShowPassword((value) => !value)}
+                        type="button"
+                      >
+                        {showPassword ? (
+                          <IoEyeOff className="size-4" />
+                        ) : (
+                          <IoEye className="size-4" />
+                        )}
+                      </button>
+                    </div>
+                    <PasswordHint password={field.value} />
+                    {form.errors.password && form.touched.password ? (
+                      <div className="mt-1 text-sm text-[color:var(--color-danger)]">
+                        {form.errors.password}
+                      </div>
+                    ) : null}
+                    <p className="mt-2 text-xs text-[color:var(--color-muted)]">
+                      it is never sent anywhere-your vault is e2e encrypted
+                    </p>
+                  </label>
+                )}
+              </Field>
+              <Button
+                className="w-full"
+                disabled={props.isSubmitting}
+                type="submit"
+                variant="outline"
+              >
+                Continue to recovery setup
+              </Button>
+              <p className="p-2 text-center text-xs text-[color:var(--color-muted)]">
+                By signing up you agree to our Terms of Service
+              </p>
+            </Form>
+          )
+        }
       </Formik>
       <Link
         className="pt-3 text-sm text-[color:var(--color-muted)] hover:text-[color:var(--color-foreground)]"

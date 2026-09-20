@@ -1,3 +1,4 @@
+import { resetStatusSchema } from '@shared/orpc/schemas'
 import { CombinedGraphQLErrors } from '@apollo/client/errors'
 import browser from 'webextension-polyfill'
 import { z } from 'zod'
@@ -43,6 +44,7 @@ const loginApprovalChallengeSchema = z.object({
   id: z.number(),
   pushNotificationsSentCount: z.number(),
   pushNotificationsFailedCount: z.number(),
+  resetStatus: resetStatusSchema.nullable().optional(),
   masterDeviceResetRequestedAt: z.string().nullable(),
   masterDeviceResetProcessAt: z.string().nullable(),
   masterDeviceResetConfirmedAt: z.string().nullable(),
@@ -487,6 +489,7 @@ const requestChallenge: LoginSessionOperations['requestChallenge'] = (input) =>
           id: challenge.id,
           pushNotificationsSentCount: challenge.pushNotificationsSentCount,
           pushNotificationsFailedCount: challenge.pushNotificationsFailedCount,
+          resetStatus: challenge.resetStatus,
           masterDeviceResetRequestedAt:
             challenge.masterDeviceResetRequestedAt ?? null,
           masterDeviceResetProcessAt:
@@ -531,7 +534,10 @@ const completeLogin = async (
     ))
   const encryptedData = base64ToBuffer(input.challenge.addDeviceSecretEncrypted)
   if (encryptedData.length < 16 + 12 + 16) {
-    throw new LoginSessionError('Login failed, check your email or password', false)
+    throw new LoginSessionError(
+      'Login failed, check your email or password',
+      false
+    )
   }
   const iv = encryptedData.slice(16, 28)
   const data = encryptedData.slice(28)

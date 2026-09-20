@@ -10,6 +10,7 @@ import kotlinx.serialization.Serializable
 import dev.authier.android.generated.model.SecurityResponse
 import dev.authier.android.generated.model.SecurityUpdateNewDevicePolicyRequest
 import dev.authier.android.generated.model.SecurityUpdateRecoveryCooldownRequest
+import dev.authier.android.generated.model.SecurityUpdateResetConfigRequest
 import dev.authier.android.generated.model.SecurityUpdateVaultLockTimeoutRequest
 
 interface SecurityApi {
@@ -51,6 +52,19 @@ interface SecurityApi {
      */
     @POST("security/updateRecoveryCooldown")
     suspend fun securityUpdateRecoveryCooldown(@Body securityUpdateRecoveryCooldownRequest: SecurityUpdateRecoveryCooldownRequest): SecurityResponse
+
+    /**
+     * POST security/updateResetConfig
+     *
+     *
+     * Responses:
+     *  - 200: OK
+     *
+     * @param securityUpdateResetConfigRequest
+     * @return [SecurityResponse]
+     */
+    @POST("security/updateResetConfig")
+    suspend fun securityUpdateResetConfig(@Body securityUpdateResetConfigRequest: SecurityUpdateResetConfigRequest): SecurityResponse
 
     /**
      * POST security/updateVaultLockTimeout

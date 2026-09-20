@@ -1,3 +1,7 @@
+import {
+  MasterDeviceResetProgress,
+  isResetConfirmationExpired
+} from '../../../shared/MasterDeviceResetProgress'
 import { useEffect, useState } from 'react'
 import { Navigate, useNavigate } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
@@ -90,13 +94,15 @@ export function AwaitingApprovalPage() {
             </div>
           </div>
 
-          {pendingLogin.lastResult.masterDeviceResetProcessAt ? (
+          <MasterDeviceResetProgress
+            status={pendingLogin.lastResult.resetStatus}
+          />
+          {pendingLogin.lastResult.masterDeviceResetRequestedAt &&
+          !pendingLogin.lastResult.masterDeviceResetRejectedAt &&
+          !isResetConfirmationExpired(pendingLogin.lastResult.resetStatus) ? (
             <p className="rounded-[var(--radius-md)] border border-[color:var(--color-border)] bg-[color:var(--color-card)] px-4 py-3 text-sm text-[color:var(--color-foreground)]">
-              Recovery is scheduled for{' '}
-              {new Date(
-                pendingLogin.lastResult.masterDeviceResetProcessAt
-              ).toLocaleString()}
-              .
+              Confirm the link in your account email to start the waiting
+              period. Device approvals are also required if configured.
             </p>
           ) : (
             <Button
@@ -122,7 +128,7 @@ export function AwaitingApprovalPage() {
             >
               {isRequestingReset
                 ? 'Scheduling recovery...'
-                : 'I no longer have an approved device'}
+                : 'Reset my lost master device'}
             </Button>
           )}
 

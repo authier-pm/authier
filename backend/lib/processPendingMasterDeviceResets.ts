@@ -1,196 +1,100 @@
-import debug from 'debug'
-import { and, eq, gt, isNotNull, isNull, lte } from 'drizzle-orm'
-import { createRequestDb } from '../prisma/prismaClient'
+import { and, eq, isNotNull, isNull, lte } from 'drizzle-orm'
+import { createRequestDb, type DbType } from '../prisma/prismaClient'
 import * as schema from '../drizzle/schema'
-import { sendEmail } from '../utils/email'
+import { flushResetEmails, queueResetEmail } from './masterDeviceReset'
 
-const log = debug('au:processPendingMasterDeviceResets')
-
-type PendingResetRequest = {
-  id: number
-  userId: string
-  targetMasterDeviceId: string
-  processAt: Date
-}
-
-type ProcessResult = {
-  completed: boolean
-  userId: string
-  sendCompletionEmailTo: string | null
-  deletedDeviceName: string | null
-}
-
-const processSinglePendingReset = async (
-  db: ReturnType<typeof createRequestDb>['db'],
-  pendingResetRequest: PendingResetRequest,
-  now: Date
-): Promise<ProcessResult> => {
-  let completed = false
-  let sendCompletionEmailTo: string | null = null
-  let deletedDeviceName: string | null = null
-
-  await db.transaction(async (tx) => {
-    const [resetRequest] = await tx
-      .select({
-        id: schema.masterDeviceResetRequest.id,
-        userId: schema.masterDeviceResetRequest.userId,
-        targetMasterDeviceId:
-          schema.masterDeviceResetRequest.targetMasterDeviceId,
-        processAt: schema.masterDeviceResetRequest.processAt,
-        confirmedAt: schema.masterDeviceResetRequest.confirmedAt,
-        completedAt: schema.masterDeviceResetRequest.completedAt,
-        rejectedAt: schema.masterDeviceResetRequest.rejectedAt
+export const processDueResets = async (db: DbType, now = new Date()) => {
+  const pending = await db
+    .select()
+    .from(schema.masterDeviceResetRequest)
+    .where(
+      and(
+        isNull(schema.masterDeviceResetRequest.completedAt),
+        isNull(schema.masterDeviceResetRequest.rejectedAt),
+        isNotNull(schema.masterDeviceResetRequest.confirmedAt),
+        lte(schema.masterDeviceResetRequest.processAt, now)
+      )
+    )
+  let completedCount = 0
+  for (const candidate of pending) {
+    const completed = await db.transaction(async (tx) => {
+      // Same lock order as confirmation, approvals and cancellation.
+      const [user] = await tx
+        .select()
+        .from(schema.user)
+        .where(eq(schema.user.id, candidate.userId))
+        .for('update')
+      const [request] = await tx
+        .select()
+        .from(schema.masterDeviceResetRequest)
+        .where(eq(schema.masterDeviceResetRequest.id, candidate.id))
+        .for('update')
+      if (
+        !user ||
+        !request ||
+        request.completedAt ||
+        request.rejectedAt ||
+        !request.confirmedAt ||
+        request.processAt > now
+      )
+        return false
+      if (user.masterDeviceId !== request.targetMasterDeviceId) return false
+      const challenge = await tx.query.decryptionChallenge.findFirst({
+        where: { id: request.decryptionChallengeId }
       })
-      .from(schema.masterDeviceResetRequest)
-      .where(eq(schema.masterDeviceResetRequest.id, pendingResetRequest.id))
-      .limit(1)
-
-    if (!resetRequest) {
-      return
-    }
-
-    if (
-      resetRequest.completedAt ||
-      resetRequest.rejectedAt ||
-      !resetRequest.confirmedAt
-    ) {
-      return
-    }
-
-    if (resetRequest.processAt > now) {
-      return
-    }
-
-    const user = await tx.query.user.findFirst({
-      where: { id: resetRequest.userId },
-      columns: {
-        id: true,
-        email: true,
-        masterDeviceId: true
-      }
+      if (!challenge || challenge.rejectedAt || challenge.blockIp) return false
+      const devices = await tx
+        .select()
+        .from(schema.device)
+        .where(
+          and(eq(schema.device.userId, user.id), isNull(schema.device.logoutAt))
+        )
+      const approvalCount = new Set(
+        request.approvedDeviceIds.filter(
+          (id) =>
+            request.eligibleDeviceIds.includes(id) &&
+            id !== request.targetMasterDeviceId &&
+            id !== challenge.deviceId &&
+            devices.some((device) => device.id === id)
+        )
+      ).size
+      if (approvalCount < request.config.requiredApprovals) return false
+      await tx
+        .update(schema.user)
+        .set({ masterDeviceId: null })
+        .where(eq(schema.user.id, user.id))
+      await tx
+        .delete(schema.device)
+        .where(
+          and(
+            eq(schema.device.id, request.targetMasterDeviceId),
+            eq(schema.device.userId, user.id)
+          )
+        )
+      await tx
+        .update(schema.masterDeviceResetRequest)
+        .set({ completedAt: now })
+        .where(eq(schema.masterDeviceResetRequest.id, request.id))
+      await queueResetEmail(
+        tx,
+        user.id,
+        user.email,
+        request.config,
+        'Master device reset completed',
+        'Your previous master device has been removed. Log in with your existing vault password on a new device to make it your master device. Your encrypted secrets are unchanged.'
+      )
+      return true
     })
-
-    if (!user) {
-      await tx
-        .delete(schema.masterDeviceResetRequest)
-        .where(eq(schema.masterDeviceResetRequest.id, resetRequest.id))
-      return
-    }
-
-    if (user.masterDeviceId !== resetRequest.targetMasterDeviceId) {
-      await tx
-        .delete(schema.masterDeviceResetRequest)
-        .where(eq(schema.masterDeviceResetRequest.id, resetRequest.id))
-      return
-    }
-
-    const deletedDevices = await tx
-      .delete(schema.device)
-      .where(
-        and(
-          eq(schema.device.id, resetRequest.targetMasterDeviceId),
-          eq(schema.device.userId, user.id)
-        )
-      )
-      .returning({
-        name: schema.device.name
-      })
-
-    if (deletedDevices[0]?.name) {
-      deletedDeviceName = deletedDevices[0].name
-    }
-
-    await tx
-      .update(schema.user)
-      .set({
-        masterDeviceId: null
-      })
-      .where(eq(schema.user.id, user.id))
-
-    await tx
-      .update(schema.masterDeviceResetRequest)
-      .set({
-        completedAt: now
-      })
-      .where(
-        and(
-          eq(schema.masterDeviceResetRequest.id, resetRequest.id),
-          isNull(schema.masterDeviceResetRequest.completedAt),
-          isNull(schema.masterDeviceResetRequest.rejectedAt)
-        )
-      )
-
-    completed = true
-    sendCompletionEmailTo = user.email
-  })
-
-  return {
-    completed,
-    userId: pendingResetRequest.userId,
-    sendCompletionEmailTo,
-    deletedDeviceName
+    if (completed) completedCount++
   }
+  await flushResetEmails(db)
+  return { dueCount: pending.length, completedCount }
 }
 
 export const processPendingMasterDeviceResets = async (now = new Date()) => {
   const requestDb = createRequestDb()
-
   try {
-    const pendingResetRequests = await requestDb.db
-      .select({
-        id: schema.masterDeviceResetRequest.id,
-        userId: schema.masterDeviceResetRequest.userId,
-        targetMasterDeviceId:
-          schema.masterDeviceResetRequest.targetMasterDeviceId,
-        processAt: schema.masterDeviceResetRequest.processAt
-      })
-      .from(schema.masterDeviceResetRequest)
-      .where(
-        and(
-          isNull(schema.masterDeviceResetRequest.completedAt),
-          isNull(schema.masterDeviceResetRequest.rejectedAt),
-          isNotNull(schema.masterDeviceResetRequest.confirmedAt),
-          lte(schema.masterDeviceResetRequest.processAt, now),
-          // Belt-and-braces: don't process a confirmation whose token has
-          // already expired. The /confirm endpoint refuses to set
-          // confirmedAt past expiresAt, so this should never fire — but if
-          // it ever did (e.g. a bad migration), we'd rather skip than
-          // silently delete a master device.
-          gt(schema.masterDeviceResetRequest.expiresAt, now)
-        )
-      )
-
-    let completedCount = 0
-
-    for (const pendingResetRequest of pendingResetRequests) {
-      const result = await processSinglePendingReset(
-        requestDb.db,
-        pendingResetRequest,
-        now
-      )
-
-      if (!result.completed) {
-        continue
-      }
-
-      completedCount += 1
-      log('completed master device reset for user', result.userId)
-
-      if (result.sendCompletionEmailTo) {
-        await sendEmail(result.sendCompletionEmailTo, {
-          Subject: 'Master device reset completed',
-          TextPart: `Your master device reset has completed.
-The previous master device has been removed${result.deletedDeviceName ? ` (${result.deletedDeviceName})` : ''}.
-You can now log in from a new device and it will become your new master device after successful login.`,
-          HTMLPart: `<p>Your master device reset has completed.</p><p>The previous master device has been removed${result.deletedDeviceName ? ` (<strong>${result.deletedDeviceName}</strong>)` : ''}.</p><p>You can now log in from a new device and it will become your new master device after successful login.</p>`
-        })
-      }
-    }
-
-    return {
-      dueCount: pendingResetRequests.length,
-      completedCount
-    }
+    return await processDueResets(requestDb.db, now)
   } finally {
     await requestDb.close()
   }

@@ -13,6 +13,7 @@ export default defineConfig({
   ),
   plugins: [react()],
   resolve: {
+    dedupe: ['react', 'react-dom'],
     alias: [
       {
         find: /^(?:\.\.?\/connectTRPC|.*\/src\/content-script\/connectTRPC)(?:\.ts)?$/,

@@ -88,6 +88,7 @@ export type DecryptionChallengeForApproval = {
   pushNotificationsFailedCount: Scalars['Int']['output']
   pushNotificationsSentCount: Scalars['Int']['output']
   rejectedAt?: Maybe<Scalars['DateTime']['output']>
+  resetStatus?: Maybe<MasterDeviceResetStatus>
 }
 
 export type DecryptionChallengeGql = {
@@ -112,6 +113,7 @@ export type DecryptionChallengeMutation = {
   __typename?: 'DecryptionChallengeMutation'
   User: Array<UserGql>
   approve: DecryptionChallengeGql
+  approveMasterDeviceReset: DecryptionChallengeGql
   approvedAt?: Maybe<Scalars['DateTime']['output']>
   approvedByRecovery: Scalars['Boolean']['output']
   approvedFromDevice?: Maybe<DeviceGql>
@@ -417,6 +419,17 @@ export type MasterDeviceResetRequestResult = {
   requestedAt: Scalars['DateTime']['output']
 }
 
+export type MasterDeviceResetStatus = {
+  __typename?: 'MasterDeviceResetStatus'
+  approvalCount: Scalars['Int']['output']
+  completedAt?: Maybe<Scalars['DateTime']['output']>
+  confirmedAt?: Maybe<Scalars['DateTime']['output']>
+  expiresAt: Scalars['DateTime']['output']
+  processAt: Scalars['DateTime']['output']
+  rejectedAt?: Maybe<Scalars['DateTime']['output']>
+  requiredApprovals: Scalars['Int']['output']
+}
+
 export type Mutation = {
   __typename?: 'Mutation'
   addWebInputs: Array<WebInputGql>
@@ -498,6 +511,7 @@ export type RegisterNewAccountInput = {
   encryptionSalt: Scalars['NonEmptyString']['input']
   /** Firebase token is only used for mobile app */
   firebaseToken?: InputMaybe<Scalars['String']['input']>
+  masterDeviceResetConfig?: InputMaybe<Scalars['JSON']['input']>
 }
 
 export type SecretUsageEventGql = {
@@ -638,6 +652,7 @@ export type UserMutation = {
   loginCredentialsLimit: Scalars['Int']['output']
   masterDevice?: Maybe<DeviceGql>
   masterDeviceId?: Maybe<Scalars['String']['output']>
+  masterDeviceResetConfig: Scalars['JSON']['output']
   newDevicePolicy?: Maybe<UserNewDevicePolicy>
   notificationOnVaultUnlock: Scalars['Boolean']['output']
   notificationOnWrongPasswordAttempts: Scalars['Int']['output']
@@ -647,6 +662,7 @@ export type UserMutation = {
   sendEmailVerification: Scalars['NonNegativeInt']['output']
   setDeviceRecoveryCooldownMinutes: UserGql
   setMasterDevice: MasterDeviceChangeGql
+  setMasterDeviceResetConfig: UserQuery
   setNewDevicePolicy: UserGql
   tokenVersion: Scalars['Int']['output']
   uiLanguage: Scalars['String']['output']
@@ -709,6 +725,10 @@ export type UserMutationSetMasterDeviceArgs = {
   newMasterDeviceId: Scalars['String']['input']
 }
 
+export type UserMutationSetMasterDeviceResetConfigArgs = {
+  config: Scalars['JSON']['input']
+}
+
 export type UserMutationSetNewDevicePolicyArgs = {
   newDevicePolicy: UserNewDevicePolicy
 }
@@ -769,6 +789,7 @@ export type UserQuery = {
   loginCredentialsLimit: Scalars['Int']['output']
   masterDevice?: Maybe<DeviceGql>
   masterDeviceId?: Maybe<Scalars['String']['output']>
+  masterDeviceResetConfig: Scalars['JSON']['output']
   newDevicePolicy?: Maybe<UserNewDevicePolicy>
   notificationOnVaultUnlock: Scalars['Boolean']['output']
   notificationOnWrongPasswordAttempts: Scalars['Int']['output']

@@ -32,6 +32,7 @@ query defaultSettings {
     masterDeviceId
     uiLanguage
     deviceRecoveryCooldownMinutes
+    masterDeviceResetConfig
     defaultDeviceSettings {
       id
       autofillTOTPEnabled
@@ -40,4 +41,8 @@ query defaultSettings {
       theme
     }
   }
+}
+
+mutation updateMasterDeviceResetConfig($config: JSON!) {
+  me { setMasterDeviceResetConfig(config: $config) { id masterDeviceResetConfig deviceRecoveryCooldownMinutes } }
 }

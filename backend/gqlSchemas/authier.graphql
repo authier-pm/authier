@@ -45,6 +45,7 @@ type UserQuery {
   DecryptionChallenges: [DecryptionChallengeGQL!]!
   MasterDeviceChange: [MasterDeviceChangeGQL!]!
   DefaultDeviceSettings: DefaultDeviceSettingsGQL
+  masterDeviceResetConfig: JSON!
   devices: [DeviceQuery!]!
   defaultDeviceSettings: DefaultDeviceSettingsQuery!
   device(id: String!): DeviceQuery!
@@ -367,6 +368,7 @@ type DecryptionChallengeForApproval {
   deviceId: ID!
   pushNotificationsSentCount: Int!
   pushNotificationsFailedCount: Int!
+  resetStatus: MasterDeviceResetStatus
   masterDeviceResetRequestedAt: DateTime
   masterDeviceResetProcessAt: DateTime
   masterDeviceResetConfirmedAt: DateTime
@@ -376,6 +378,16 @@ type DecryptionChallengeForApproval {
 type DeviceLocation {
   city: String!
   countryName: String!
+}
+
+type MasterDeviceResetStatus {
+  requiredApprovals: Int!
+  approvalCount: Int!
+  processAt: DateTime!
+  expiresAt: DateTime!
+  confirmedAt: DateTime
+  completedAt: DateTime
+  rejectedAt: DateTime
 }
 
 type WebInputGQLScalars {
@@ -458,6 +470,7 @@ type UserMutation {
   DecryptionChallenges: [DecryptionChallengeGQL!]!
   MasterDeviceChange: [MasterDeviceChangeGQL!]!
   DefaultDeviceSettings: DefaultDeviceSettingsGQL
+  masterDeviceResetConfig: JSON!
   addCookie: String!
   device(id: String!): DeviceMutation!
   defaultDeviceSettings: DefaultDeviceSettingsMutation!
@@ -487,6 +500,7 @@ type UserMutation {
   setDeviceRecoveryCooldownMinutes(
     deviceRecoveryCooldownMinutes: NonNegativeInt!
   ): UserGQL!
+  setMasterDeviceResetConfig(config: JSON!): UserQuery!
   setMasterDevice(newMasterDeviceId: String!): MasterDeviceChangeGQL!
   createPortalSession: String!
   createCheckoutSession(product: String!): String!
@@ -675,6 +689,7 @@ type DecryptionChallengeMutation {
   approvedFromDevice: DeviceGQL
   User: [UserGQL!]!
   approve: DecryptionChallengeGQL!
+  approveMasterDeviceReset: DecryptionChallengeGQL!
   reject: DecryptionChallengeGQL!
   recoverAccount: DecryptionChallengeGQL!
 }
@@ -694,6 +709,7 @@ input RegisterNewAccountInput {
   addDeviceSecretEncrypted: NonEmptyString!
   encryptionSalt: NonEmptyString!
   devicePlatform: String!
+  masterDeviceResetConfig: JSON
   deviceId: ID!
   deviceName: String!
   email: EmailAddress!

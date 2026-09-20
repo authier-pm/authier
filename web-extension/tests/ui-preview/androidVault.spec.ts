@@ -10,6 +10,8 @@ test('renders captured native Android vault, authenticator and autofill screens'
   ).toBeVisible()
   await expect(page.locator('body')).not.toHaveClass(/extension-popup/)
   for (const name of [
+    'Recovery setup',
+    'Recovery notification emails',
     'Create a password',
     'Website autofill',
     'Master device',

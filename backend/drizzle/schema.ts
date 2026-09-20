@@ -20,6 +20,10 @@ import {
   primaryKey
 } from 'drizzle-orm/pg-core'
 import { sql } from 'drizzle-orm'
+import {
+  defaultMasterDeviceResetConfig,
+  type MasterDeviceResetConfig
+} from '../../shared/masterDeviceResetConfig'
 import type { CachedPasswordFormClassification } from '../../shared/passwordFormClassification'
 
 export const tokenType = pgEnum('TokenType', ['EMAIL', 'API'])
@@ -296,6 +300,12 @@ export const masterDeviceResetRequest = pgTable(
     // grant takeover even during an active cooldown window.
     confirmationTokenHash: text().notNull(),
     targetMasterDeviceId: text().notNull(),
+    config: jsonb()
+      .$type<MasterDeviceResetConfig>()
+      .notNull()
+      .default(defaultMasterDeviceResetConfig),
+    eligibleDeviceIds: jsonb().$type<string[]>().notNull().default([]),
+    approvedDeviceIds: jsonb().$type<string[]>().notNull().default([]),
     decryptionChallengeId: integer()
       .notNull()
       .references(() => decryptionChallenge.id, {
@@ -436,6 +446,10 @@ export const user = pgTable(
     loginCredentialsLimit: integer().notNull(),
     encryptionSalt: text().notNull(),
     deviceRecoveryCooldownMinutes: integer().notNull(),
+    masterDeviceResetConfig: jsonb()
+      .$type<MasterDeviceResetConfig>()
+      .notNull()
+      .default(defaultMasterDeviceResetConfig),
     recoveryDecryptionChallengeId: integer().references(
       (): AnyPgColumn => decryptionChallenge.id,
       { onDelete: 'set null', onUpdate: 'cascade' }
@@ -511,3 +525,15 @@ export const webInput = pgTable(
     )
   ]
 )
+
+// Durable, retryable security notifications; confirmation tokens never enter this outbox.
+export const masterDeviceResetEmail = pgTable('MasterDeviceResetEmail', {
+  id: serial().primaryKey(),
+  userId: uuid()
+    .notNull()
+    .references(() => user.id, { onDelete: 'cascade' }),
+  recipient: text().notNull(),
+  subject: text().notNull(),
+  message: text().notNull(),
+  sentAt: timestamp({ precision: 3 })
+})

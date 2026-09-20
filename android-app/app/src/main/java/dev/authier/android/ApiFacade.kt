@@ -17,6 +17,7 @@ import dev.authier.android.generated.model.DevicesLogoutRequest
 import dev.authier.android.generated.model.DevicesSetMasterRequest
 import dev.authier.android.generated.model.PendingDeviceApproval
 import dev.authier.android.generated.model.RefreshInput
+import dev.authier.android.generated.model.SecurityUpdateResetConfigRequest
 import dev.authier.android.generated.model.RegisterInput
 import dev.authier.android.generated.model.RequestDeviceChallengeInput
 import dev.authier.android.generated.model.SecretRecord as ApiSecret
@@ -72,8 +73,10 @@ class ApiFacade(serverUrl: String, private var currentDeviceId: String? = null) 
     private val device = retrofit.create(DevicesApi::class.java)
     private val settings = retrofit.create(SecurityApi::class.java)
 
-    override suspend fun register(email: String, userId: String, deviceId: String, deviceName: String, secret: DeviceSecretInput) = request {
-        auth.authRegister(RegisterInput(userId, deviceId, deviceName, email, secret.toApi())).toDomain()
+    override suspend fun register(email: String, userId: String, deviceId: String, deviceName: String, secret: DeviceSecretInput, recoveryConfig: MasterDeviceResetConfig) = request {
+        val config = recoveryConfig.validated()
+        auth.authRegister(RegisterInput(userId, deviceId, deviceName, email, secret.toApi(),
+            SecurityUpdateResetConfigRequest(config.requiredApprovals, config.waitMinutes, config.notificationEmails))).toDomain()
     }
 
     override suspend fun challenge(email: String, deviceId: String, deviceName: String) = request {

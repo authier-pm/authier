@@ -1,3 +1,7 @@
+import {
+  MasterDeviceResetProgress,
+  isResetConfirmationExpired
+} from '@shared/MasterDeviceResetProgress'
 import { useState } from 'react'
 import { t } from '@lingui/core/macro'
 import { Trans } from '@lingui/react/macro'
@@ -124,10 +128,11 @@ export const LoginAwaitingApproval = ({
           </div>
         ) : null}
 
-        {pendingResetAt ? (
+        <MasterDeviceResetProgress status={challenge.resetStatus} />
+        {pendingResetAt && !challenge.resetStatus ? (
           <p>
             <Trans>
-              Master device reset scheduled for{' '}
+              Master device reset can complete after{' '}
               {new Date(pendingResetAt).toLocaleString()}.
             </Trans>
           </p>
@@ -155,8 +160,11 @@ export const LoginAwaitingApproval = ({
           <Button
             className="flex-1"
             disabled={
-              Boolean(requestedResetAt && !rejectedResetAt) ||
-              resetMasterDeviceLoading
+              Boolean(
+                requestedResetAt &&
+                !rejectedResetAt &&
+                !isResetConfirmationExpired(challenge.resetStatus)
+              ) || resetMasterDeviceLoading
             }
             onClick={() => {
               setResetMasterDeviceLoading(true)
@@ -164,9 +172,8 @@ export const LoginAwaitingApproval = ({
                 .then((result) => {
                   toast({
                     title: t`Master device reset confirmation email sent`,
-                    description: `${t`After you confirm the email link, reset is scheduled for`} ${new Date(
-                      result.processAt
-                    ).toLocaleString()}`,
+                    description:
+                      'Confirm the link in your account email to start the waiting period. Your configured device approvals are also required.',
                     status: 'warning',
                     isClosable: true
                   })

@@ -1,8 +1,11 @@
+import { useAppToast } from '@src/ExtensionProviders'
+import { MasterDeviceResetProgress } from '@shared/MasterDeviceResetProgress'
 import { Trans } from '@lingui/react/macro'
 import { formatRelative } from 'date-fns'
 import { Button } from '@src/components/ui/button'
 import { device } from '@src/background/ExtensionDevice'
 import {
+  useApproveMasterDeviceResetMutation,
   useApproveChallengeMutation,
   useDevicesRequestsQuery,
   useRejectChallengeMutation
@@ -12,12 +15,14 @@ import { LOGIN_DECRYPTION_CHALLENGE_REFETCH_INTERVAL } from '@src/background/log
 import { useDevicesListWithDataQuery } from './Devices.codegen'
 
 export const NewDevicesApprovalStack = () => {
+  const toast = useAppToast()
   const { refetch: devicesRefetch } = useDevicesListWithDataQuery()
   const { data: devicesRequests, refetch } = useDevicesRequestsQuery({
     fetchPolicy: 'cache-and-network'
   })
   const [reject] = useRejectChallengeMutation()
   const [approve] = useApproveChallengeMutation()
+  const [approveReset] = useApproveMasterDeviceResetMutation()
 
   const showMasterDevicePolicyHint =
     device.id !== devicesRequests?.me.masterDeviceId &&
@@ -29,8 +34,8 @@ export const NewDevicesApprovalStack = () => {
       {devicesRequests?.me?.decryptionChallengesWaiting.map(
         (challengeToApprove) => {
           const parts = [
-            challengeToApprove.ipGeoLocation?.city,
-            challengeToApprove.ipGeoLocation?.country_name
+            challengeToApprove.deviceLocationFromIp?.city,
+            challengeToApprove.deviceLocationFromIp?.countryName
           ].filter(Boolean)
 
           return (
@@ -38,6 +43,9 @@ export const NewDevicesApprovalStack = () => {
               className="rounded-[var(--radius-lg)] border border-amber-400/50 bg-amber-500/10 p-4"
               key={challengeToApprove.id}
             >
+              <MasterDeviceResetProgress
+                status={challengeToApprove.resetStatus}
+              />
               <div className="flex flex-col gap-3 md:flex-row md:items-center">
                 <div className="text-sm text-[color:var(--color-foreground)]">
                   <Trans>
@@ -60,7 +68,15 @@ export const NewDevicesApprovalStack = () => {
                         variables: {
                           id: challengeToApprove.id
                         }
-                      })
+                      }).catch((error: unknown) =>
+                        toast({
+                          title:
+                            error instanceof Error
+                              ? error.message
+                              : 'Unable to update request',
+                          status: 'error'
+                        })
+                      )
                       await refetch()
                     }}
                     variant="destructive"
@@ -68,12 +84,27 @@ export const NewDevicesApprovalStack = () => {
                     <Trans>Reject</Trans>
                   </Button>
                   <Button
+                    disabled={Boolean(
+                      challengeToApprove.resetStatus &&
+                      device.id === devicesRequests?.me.masterDeviceId
+                    )}
                     onClick={async () => {
-                      await approve({
+                      const action = challengeToApprove.resetStatus
+                        ? approveReset
+                        : approve
+                      await action({
                         variables: {
                           id: challengeToApprove.id
                         }
-                      })
+                      }).catch((error: unknown) =>
+                        toast({
+                          title:
+                            error instanceof Error
+                              ? error.message
+                              : 'Unable to update request',
+                          status: 'error'
+                        })
+                      )
                       await refetch()
                       setTimeout(() => {
                         devicesRefetch()
@@ -81,7 +112,11 @@ export const NewDevicesApprovalStack = () => {
                     }}
                     variant="primary"
                   >
-                    <Trans>Approve</Trans>
+                    {challengeToApprove.resetStatus ? (
+                      'Approve reset'
+                    ) : (
+                      <Trans>Approve</Trans>
+                    )}
                   </Button>
                 </div>
               </div>

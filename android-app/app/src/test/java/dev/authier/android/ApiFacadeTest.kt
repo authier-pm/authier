@@ -25,6 +25,16 @@ class ApiFacadeTest {
         server.enqueue(MockResponse().setResponseCode(status).setHeader("Content-Type", "application/json").setBody(body))
     }
 
+    @Test fun `signup sends the chosen recovery policy through the generated client`() = runTest {
+        respond("""{"code":"CONFLICT","message":"Synthetic duplicate account"}""", 409)
+        val config = MasterDeviceResetConfig(0, 5, listOf("backup@example.com", "family@example.com"))
+        runCatching { api.register("alex@example.com", "user", "device", "Pixel", DeviceSecretInput("secret", "encrypted", "salt"), config) }
+        val request = server.takeRequest()
+        assertEquals("/api/v1/auth/register", request.path)
+        val body = Json.parseToJsonElement(request.body.readUtf8()).jsonObject
+        assertEquals(Json.parseToJsonElement("""{"requiredApprovals":0,"waitMinutes":5,"notificationEmails":["backup@example.com","family@example.com"]}"""), body["masterDeviceResetConfig"])
+    }
+
     @Test fun `decodes both generated challenge variants`() = runTest {
         respond("""{"status":"pending","challengeId":12,"pushNotificationsSentCount":0,"pushNotificationsFailedCount":0,"masterDeviceResetRequestedAt":null,"masterDeviceResetProcessAt":null,"masterDeviceResetConfirmedAt":null,"masterDeviceResetRejectedAt":null}""")
         val pending = api.challenge("test@example.com", "device", "Pixel")
@@ -43,7 +53,7 @@ class ApiFacadeTest {
 
     @Test fun `sends empty JSON input and bearer auth without a JS serializer`() = runTest {
         api.accessToken = "test-token"
-        respond("""{"security":{"newDevicePolicy":"ALLOW","deviceRecoveryCooldownMinutes":60,"masterDeviceId":null,"vaultLockTimeoutSeconds":300}}""")
+        respond("""{"security":{"masterDeviceResetConfig":{"requiredApprovals":1,"waitMinutes":2880,"notificationEmails":[]},"newDevicePolicy":"ALLOW","deviceRecoveryCooldownMinutes":60,"masterDeviceId":null,"vaultLockTimeoutSeconds":300}}""")
         val security = api.security()
         assertEquals("ALLOW", security.newDevicePolicy)
         assertNull(security.masterDeviceId)
@@ -65,7 +75,7 @@ class ApiFacadeTest {
         assertEquals("Bearer master-session", request.getHeader("Authorization"))
         assertEquals("""{"newMasterDeviceId":"next-master"}""", request.body.readUtf8())
 
-        respond("""{"security":{"newDevicePolicy":"REQUIRE_MASTER_DEVICE_APPROVAL","deviceRecoveryCooldownMinutes":60,"masterDeviceId":"next-master","vaultLockTimeoutSeconds":300}}""")
+        respond("""{"security":{"masterDeviceResetConfig":{"requiredApprovals":1,"waitMinutes":2880,"notificationEmails":[]},"newDevicePolicy":"REQUIRE_MASTER_DEVICE_APPROVAL","deviceRecoveryCooldownMinutes":60,"masterDeviceId":"next-master","vaultLockTimeoutSeconds":300}}""")
         assertEquals("next-master", api.security().masterDeviceId)
     }
 

@@ -160,3 +160,18 @@ matching. Capture `android-autofill-create.png` from the debug
 launches. These invoke the actual production Compose screens with synthetic
 accounts; they never access a vault or save generated credentials. The native
 fixture separately exercises real encrypted saving and Android field filling.
+
+The `master-device-recovery` scenario renders the production shared onboarding
+form with the default one approval / 48-hour policy and additional email inputs.
+`master-device-reset-progress` renders the production approval and waiting status.
+Run `pnpm playwright:ui-preview masterDeviceRecovery.spec.ts` to check limits,
+zero-approval recovery, multiple email addresses and mobile overflow, and capture
+`docs/screenshots/master-device-recovery.png`, `master-device-recovery-mobile.png`
+and `master-device-reset-progress.png`.
+
+The Android gallery also includes `android-recovery-setup.png` and
+`android-recovery-emails.png`, captured from the debug-only
+`RecoverySetupPreviewActivity`. It renders the production native signup step
+with synthetic addresses and never calls registration. `RecoverySetupTest`
+covers the controls; run `pnpm playwright:ui-preview androidVault.spec.ts` to
+render the updated gallery.

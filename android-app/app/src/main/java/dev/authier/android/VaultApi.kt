@@ -3,7 +3,7 @@ package dev.authier.android
 /** Transport boundary; ApiFacade implements this with the generated OpenAPI client. */
 interface VaultApi {
     var accessToken: String?
-    suspend fun register(email: String, userId: String, deviceId: String, deviceName: String, secret: DeviceSecretInput): AuthSession
+    suspend fun register(email: String, userId: String, deviceId: String, deviceName: String, secret: DeviceSecretInput, recoveryConfig: MasterDeviceResetConfig): AuthSession
     suspend fun challenge(email: String, deviceId: String, deviceName: String): LoginChallenge
     suspend fun completeLogin(challengeId: Int, currentAddDeviceSecret: String, secret: DeviceSecretInput): AuthSession
     suspend fun refresh(refreshToken: String): SessionTokens

@@ -1,3 +1,6 @@
+import { useState } from 'react'
+import { MasterDeviceResetSetup } from '../../../shared/MasterDeviceResetSetup'
+import { useVaultSession } from '@/providers/VaultSessionProvider'
 import { useQuery } from '@tanstack/react-query'
 import { Button } from '@/components/ui/button'
 import {
@@ -7,13 +10,15 @@ import {
   CardHeader,
   CardTitle
 } from '@/components/ui/card'
-import { Input, inputClassName } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
+import { inputClassName } from '@/components/ui/input'
 import { orpc, orpcClient } from '@/lib/orpc'
 
 const lockTimeoutOptions = [300, 1800, 3600, 28800, 86400, 0]
 
 export function SecurityPage() {
+  const { session } = useVaultSession()
+  const [saving, setSaving] = useState(false)
+  const [recoveryMessage, setRecoveryMessage] = useState('')
   const securityQuery = useQuery(orpc.security.get.queryOptions({ input: {} }))
   const security = securityQuery.data?.security
 
@@ -58,30 +63,41 @@ export function SecurityPage() {
         </CardContent>
       </Card>
 
-      <Card className="border-white/10 bg-[color:var(--color-surface)] backdrop-blur-[14px]">
-        <CardHeader>
-          <CardTitle>Recovery cooldown</CardTitle>
-          <CardDescription>
-            Delay before a recovery-based device reset can finish.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-3">
-          <Label htmlFor="cooldown">Minutes</Label>
-          <Input
-            defaultValue={security.deviceRecoveryCooldownMinutes}
-            id="cooldown"
-            min={0}
-            onBlur={(event) => {
-              void orpcClient.security
-                .updateRecoveryCooldown({
-                  deviceRecoveryCooldownMinutes: Number(event.target.value)
-                })
-                .then(() => {
-                  void securityQuery.refetch()
-                })
-            }}
-            type="number"
-          />
+      <Card className="border-white/10 bg-[color:var(--color-surface)] lg:col-span-3">
+        <CardContent className="p-6">
+          {session?.currentDevice.id === security.masterDeviceId ? (
+            <MasterDeviceResetSetup
+              initialConfig={security.masterDeviceResetConfig}
+              email={session?.user.email ?? 'your account email'}
+              busy={saving}
+              submitLabel="Save recovery settings"
+              onSave={async (config) => {
+                setSaving(true)
+                setRecoveryMessage('')
+                await orpcClient.security
+                  .updateResetConfig(config)
+                  .then(async () => {
+                    await securityQuery.refetch()
+                    setRecoveryMessage(
+                      'Saved. Pending resets keep their original rules.'
+                    )
+                  })
+                  .catch((error: unknown) =>
+                    setRecoveryMessage(
+                      error instanceof Error ? error.message : 'Unable to save'
+                    )
+                  )
+                  .finally(() => setSaving(false))
+              }}
+            />
+          ) : (
+            <p>Open your master device to change recovery settings.</p>
+          )}
+          {recoveryMessage && (
+            <p role="status" className="mt-3 text-sm">
+              {recoveryMessage}
+            </p>
+          )}
         </CardContent>
       </Card>
 

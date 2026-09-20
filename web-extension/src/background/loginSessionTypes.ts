@@ -1,8 +1,10 @@
+import type { ResetProgressStatus } from '@shared/MasterDeviceResetProgress'
 export const LOGIN_DECRYPTION_CHALLENGE_REFETCH_INTERVAL = 6000
 
 export type LoginSessionStatus = 'editing' | 'awaiting-approval' | 'completing'
 
 export type LoginApprovalChallenge = {
+  resetStatus?: ResetProgressStatus | null
   type: 'awaiting-approval'
   id: number
   pushNotificationsSentCount: number

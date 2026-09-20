@@ -1,3 +1,4 @@
+import type { MasterDeviceResetConfig } from '../../shared/masterDeviceResetConfig'
 import { db } from '../prisma/prismaClient'
 import {
   Arg,
@@ -11,7 +12,7 @@ import type { IContext, IContextAuthenticated } from './types/ContextTypes'
 
 import { EncryptedSecretQuery } from './EncryptedSecret'
 
-import { GraphQLEmailAddress } from 'graphql-scalars'
+import { GraphQLJSON, GraphQLEmailAddress } from 'graphql-scalars'
 import { UserGQL } from './generated/UserGQL'
 
 import { setNewAccessTokenIntoCookie, setNewRefreshToken } from '../userAuth'
@@ -28,6 +29,9 @@ import { encryptedSecret, device as deviceSchema } from '../drizzle/schema'
 
 @ObjectType()
 export class UserBase extends UserGQL {
+  @Field(() => GraphQLJSON)
+  masterDeviceResetConfig: MasterDeviceResetConfig
+
   constructor(parameters: Record<string, unknown>) {
     super()
     Object.assign(this, parameters)
