@@ -1,4 +1,5 @@
 import { debounce } from 'lodash'
+import { initializeTotpAccountEmail } from './totpAccountEmail'
 
 import {
   DOMEventsRecorder,
@@ -320,6 +321,7 @@ export const refreshInputWatch = async () => {
   inputWatchCleanup = nextCleanup
 }
 
+initializeTotpAccountEmail()
 void refreshInputWatch()
 
 // For SPA websites https://stackoverflow.com/questions/2844565/is-there-a-javascript-jquery-dom-change-listener/39508954#39508954

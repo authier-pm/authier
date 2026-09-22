@@ -1,4 +1,5 @@
 import { handlePasskeyMessage } from '../passkeys/backgroundPasskeys'
+import { handleTotpAccountEmailMessage } from './totpAccountEmail'
 import {
   handleEmailVerificationCodeMessage,
   initializeEmailVerificationCodes
@@ -387,6 +388,9 @@ createChromeHandler({
 console.log('background page loaded')
 
 browser.runtime.onMessage.addListener((request: unknown, sender) => {
+  const totpEmailResponse = handleTotpAccountEmailMessage(request, sender)
+  if (totpEmailResponse) return totpEmailResponse
+
   const emailCodeResponse = handleEmailVerificationCodeMessage(request, sender)
   if (emailCodeResponse) return emailCodeResponse
 
