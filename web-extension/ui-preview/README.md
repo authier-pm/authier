@@ -175,3 +175,11 @@ The Android gallery also includes `android-recovery-setup.png` and
 with synthetic addresses and never calls registration. `RecoverySetupTest`
 covers the controls; run `pnpm playwright:ui-preview androidVault.spec.ts` to
 render the updated gallery.
+
+The `new-device-policy` scenario renders the production existing-account onboarding
+with an in-memory Apollo transport and synthetic vault background. Add `&error=1`
+for a failed save followed by a successful retry, or `&configured=1` for an account
+that has already chosen a policy. Run `pnpm playwright:ui-preview newDevicePolicy.spec.ts`
+to check radio selection, saving, keyboard focus, dark/light themes, and scrolling
+on small screens. Captures: `docs/screenshots/new-device-policy-dark.png`,
+`new-device-policy-light.png`, and `new-device-policy-mobile.png`.
