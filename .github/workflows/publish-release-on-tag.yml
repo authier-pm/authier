@@ -53,6 +53,26 @@ jobs:
           asset_name: ${{ env.ZIP_FILE_NAME }}
           asset_content_type: application/zip
 
+      # Release assets must be complete before publication locks the release.
+      - name: Build offline signed CRX
+        if: steps.getRelease.outcome != 'success'
+        uses: cardinalby/webext-buildtools-chrome-crx-action@v2
+        with:
+          zipFilePath: ${{ env.ZIP_FILE_PATH }}
+          crxFilePath: ${{ env.OFFLINE_CRX_FILE_PATH }}
+          privateKey: ${{ secrets.CHROME_CRX_PRIVATE_KEY }}
+
+      - name: Upload offline signed CRX
+        if: steps.getRelease.outcome != 'success'
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.createRelease.outputs.upload_url }}
+          asset_path: ${{ env.OFFLINE_CRX_FILE_PATH }}
+          asset_name: ${{ env.OFFLINE_CRX_FILE_NAME }}
+          asset_content_type: application/x-chrome-extension
+
       # Should trigger build-assets-on-release.yml
       - name: Publish release
         if: steps.getRelease.outcome != 'success'

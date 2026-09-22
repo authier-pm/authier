@@ -23,3 +23,8 @@ it does not establish that Mozilla has approved or published the version.
 
 Workflow changes apply to new commits and tags. Re-running an old tag uses the
 workflow stored at that tag; it does not pick up a later retry fix from `main`.
+
+The ZIP and offline-signed CRX are attached while the GitHub release is still a
+draft. Publishing makes the release immutable. The CRX later downloaded from the
+Chrome Web Store is retained as an Actions artifact instead of being appended to
+the published release.
