@@ -21,10 +21,12 @@ import { KostkohratkyPasswordPreview } from './scenarios/KostkohratkyPasswordPre
 import { PasskeyApprovalPreview } from './scenarios/PasskeyApprovalPreview'
 import { PasskeyVaultPreview } from './scenarios/PasskeyVaultPreview'
 import { EmailVerificationCodesPreview } from './scenarios/EmailVerificationCodesPreview'
+import { NewDevicePolicyPreview } from './scenarios/NewDevicePolicyPreview'
 
 const DEFAULT_SCENARIO = 'autofill-controls'
 const scenarios: Record<string, ComponentType> = {
   [DEFAULT_SCENARIO]: AutofillControlsPreview,
+  'new-device-policy': NewDevicePolicyPreview,
   'master-device-recovery': MasterDeviceRecoveryPreview,
   'master-device-reset-progress': MasterDeviceResetProgressPreview,
   'remembered-session': RememberedSessionPreview,
@@ -52,6 +54,7 @@ if (!Scenario) {
 document.body.classList.toggle(
   'extension-popup',
   !requestedScenario.startsWith('master-device-') &&
+    requestedScenario !== 'new-device-policy' &&
     !requestedScenario.startsWith('android-') &&
     requestedScenario !== 'bitfinex-totp' &&
     requestedScenario !== 'kostkohratky-password' &&
