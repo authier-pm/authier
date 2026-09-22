@@ -183,3 +183,13 @@ that has already chosen a policy. Run `pnpm playwright:ui-preview newDevicePolic
 to check radio selection, saving, keyboard focus, dark/light themes, and scrolling
 on small screens. Captures: `docs/screenshots/new-device-policy-dark.png`,
 `new-device-policy-light.png`, and `new-device-policy-mobile.png`.
+
+The `totp-labels` scenario decodes a rendered synthetic Microsoft QR code through
+the production scanner and builds an account-first label. The `source` query
+parameter selects `qr`, `page` (default), `session`, or `missing`. The session
+scenario records an email input before moving to a setup page without an email;
+`missing` renders the production account-email form. Run
+`bun run playwright:ui-preview totpLabels.spec.ts` from `web-extension` to verify
+all four flows and capture `docs/screenshots/totp-account-label.png` and
+`docs/screenshots/totp-account-email-prompt.png`. Session fallback is stored only
+for the current browser session, separately for regular and private windows.

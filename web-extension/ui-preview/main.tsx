@@ -22,6 +22,7 @@ import { PasskeyApprovalPreview } from './scenarios/PasskeyApprovalPreview'
 import { PasskeyVaultPreview } from './scenarios/PasskeyVaultPreview'
 import { EmailVerificationCodesPreview } from './scenarios/EmailVerificationCodesPreview'
 import { NewDevicePolicyPreview } from './scenarios/NewDevicePolicyPreview'
+import { TotpLabelsPreview } from './scenarios/TotpLabelsPreview'
 
 const DEFAULT_SCENARIO = 'autofill-controls'
 const scenarios: Record<string, ComponentType> = {
@@ -40,6 +41,7 @@ const scenarios: Record<string, ComponentType> = {
   'september-release-blog': SeptemberReleaseBlogPreview,
   'android-landing': AndroidLandingPreview,
   'bitfinex-totp': BitfinexTotpPreview,
+  'totp-labels': TotpLabelsPreview,
   'kostkohratky-password': KostkohratkyPasswordPreview
 }
 const requestedScenario =
@@ -57,6 +59,7 @@ document.body.classList.toggle(
     requestedScenario !== 'new-device-policy' &&
     !requestedScenario.startsWith('android-') &&
     requestedScenario !== 'bitfinex-totp' &&
+    requestedScenario !== 'totp-labels' &&
     requestedScenario !== 'kostkohratky-password' &&
     requestedScenario !== 'email-verification-codes' &&
     requestedScenario !== 'september-release-blog' &&

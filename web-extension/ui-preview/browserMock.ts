@@ -21,6 +21,13 @@ let badgeText = ''
 let messageHandler:
   | ((message: unknown) => Promise<unknown> | undefined)
   | undefined
+let tabMessageHandler: ((message: unknown) => unknown) | undefined
+
+export const setPreviewTabMessageHandler = (
+  handler: typeof tabMessageHandler
+) => {
+  tabMessageHandler = handler
+}
 
 export const setPreviewMessageHandler = (handler: typeof messageHandler) => {
   messageHandler = handler
@@ -149,7 +156,8 @@ const browser = {
       return { ...gmailTab, active: true }
     },
     create: async (_details: { url: string; active: boolean }) => undefined,
-    sendMessage: async (_tabId: number, _message: unknown) => undefined
+    sendMessage: async (_tabId: number, message: unknown) =>
+      tabMessageHandler?.(message)
   },
   windows: {
     update: async (_windowId: number, _details: { focused: boolean }) =>
