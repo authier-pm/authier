@@ -25,6 +25,18 @@ class ApiFacadeTest {
         server.enqueue(MockResponse().setResponseCode(status).setHeader("Content-Type", "application/json").setBody(body))
     }
 
+    @Test fun `registers rotated push tokens using the current authenticated device`() = runTest {
+        api.accessToken = "phone-session"
+        for (token in listOf("initial-token", "rotated-token", null)) {
+            respond("""{"ok":true}""")
+            api.updatePushToken(token)
+            val request = server.takeRequest()
+            assertEquals("/api/v1/session/updatePushToken", request.path)
+            assertEquals("Bearer phone-session", request.getHeader("Authorization"))
+            assertEquals(Json.parseToJsonElement(if (token == null) """{"token":null}""" else """{"token":"$token"}"""), Json.parseToJsonElement(request.body.readUtf8()))
+        }
+    }
+
     @Test fun `signup sends the chosen recovery policy through the generated client`() = runTest {
         respond("""{"code":"CONFLICT","message":"Synthetic duplicate account"}""", 409)
         val config = MasterDeviceResetConfig(0, 5, listOf("backup@example.com", "family@example.com"))

@@ -6,7 +6,10 @@ import {
   IBackgroundStateSerializableLocked
 } from '@src/background/backgroundPage'
 import { EncryptedSecretType } from '../../../shared/generated/graphqlBaseTypes'
-import type { SecuritySettings } from '@src/background/backgroundSchemas'
+import {
+  backgroundStateSerializableLockedSchema,
+  type SecuritySettings
+} from '@src/background/backgroundSchemas'
 import debug from 'debug'
 import {
   device,
@@ -18,6 +21,7 @@ import { z, ZodError } from 'zod'
 import type { PasskeyData } from '@shared/passkeySchema'
 import type { SecretTypeUnion } from '@src/background/ExtensionDevice'
 import { getCurrentTab } from './executeScriptInCurrentTab'
+import { lockedVaultSnapshotSchema } from '@src/background/lockedVaultStorage'
 
 import {
   totpSchema,
@@ -69,8 +73,6 @@ export interface ISecuritySettingsInBg {
   noHandsLogin: boolean
 }
 
-let storageOnchangeListenerRegistered = false // we need to only register once
-
 export const pathNameToTypes = {
   '/credentials': [EncryptedSecretType.LOGIN_CREDENTIALS],
   '/totps': [EncryptedSecretType.TOTP],
@@ -94,42 +96,61 @@ export function useDeviceState() {
   const [isInitialized, setIsInitialized] = useState(device.isInitialized)
   const [selectedItems, setSelectedItems] = useState<SecretTypeUnion[]>([])
 
-  const onStorageChange = async (
-    changes: Record<string, browser.Storage.StorageChange>,
-    areaName: string
-  ): Promise<void> => {
-    log('onStorageChange', areaName)
-    //WARNING: Not sure if this condition is correct
-    if (areaName === 'session' && changes.backgroundState) {
-      setDeviceState(changes.backgroundState.newValue as DeviceState)
-      if (changes.lockedState) {
-        setLockedState(changes.lockedState.newValue as DeviceState)
-      }
-
-      log('states loaded from storage')
-    }
-  }
-
   //TODO move this whole thing into it' own hook
   useEffect(() => {
+    let revision = 0
+    let disposed = false
+    const onStorageChange = async (
+      changes: Record<string, browser.Storage.StorageChange>,
+      areaName: string
+    ) => {
+      if (areaName !== 'session' || !changes.backgroundState) return
+      const currentRevision = ++revision
+      if (changes.lockedState) {
+        setLockedState(
+          changes.lockedState.newValue
+            ? lockedVaultSnapshotSchema.parse(changes.lockedState.newValue)
+            : null
+        )
+      }
+      const snapshot = changes.backgroundState.newValue
+      if (!snapshot) {
+        setDeviceState(null)
+        return
+      }
+
+      // Storage contains ciphertext only. Build a separate in-memory UI snapshot
+      // and wait for decryption before rendering the newly logged-in vault.
+      const nextState = new DeviceState(
+        backgroundStateSerializableLockedSchema.parse(snapshot),
+        { listenToStorage: false }
+      )
+      await nextState.initialized
+      if (!disposed && currentRevision === revision) {
+        setDeviceState(nextState)
+      }
+    }
+
     getCurrentTab().then((tab) => {
       setCurrentTab(tab ?? null)
       setCurrentURL(tab?.url ?? '')
     })
 
     device.onInitDone(() => {
+      if (disposed) return
+      setIsInitialized(true)
+      if (revision > 0) return
       setDeviceState(device.state)
       if (device.lockedState) {
         setLockedState(device.lockedState)
       }
-      setIsInitialized(true)
     })
-    if (storageOnchangeListenerRegistered) {
-      return
-    }
     browser.storage.onChanged.addListener(onStorageChange)
-    storageOnchangeListenerRegistered = true
     log('registered storage change listener')
+    return () => {
+      disposed = true
+      browser.storage.onChanged.removeListener(onStorageChange)
+    }
   }, [])
 
   const loginCredentials = useMemo(
@@ -230,7 +251,6 @@ export function useDeviceState() {
       setDeviceState: saveDeviceState,
       lockedState,
       device,
-      registered: storageOnchangeListenerRegistered,
       searchSecrets,
       selectedItems,
       setSelectedItems,

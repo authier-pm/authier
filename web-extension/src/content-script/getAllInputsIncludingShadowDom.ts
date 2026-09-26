@@ -272,9 +272,42 @@ export function mainWorldAutofillFunction(
     return []
   }
 
-  const recentlyUsedLogin = loginCredentials.sort((a, b) => {
-    return (a.lastUsedAt ?? '') > (b.lastUsedAt ?? '') ? -1 : 1
-  })[0]
+  // This function is serialized into the page's MAIN world, so it cannot
+  // import the isolated-world account selector. Preserve the chosen account here too.
+  let username = allInputs
+    .find(
+      (input) =>
+        input.autocomplete?.includes('username') ||
+        input.autocomplete?.includes('email')
+    )
+    ?.value.trim()
+  if (!username && location.hostname === 'accounts.google.com') {
+    username =
+      document
+        .querySelector<HTMLInputElement>('input[autocomplete="username"]')
+        ?.value.trim() ||
+      document.getElementById('profileIdentifier')?.textContent?.trim()
+  }
+  let recentlyUsedLogin = [...loginCredentials].sort((a, b) =>
+    (b.lastUsedAt ?? '').localeCompare(a.lastUsedAt ?? '')
+  )[0]
+  if (username) {
+    const match = loginCredentials.find(
+      (login) => login.username.trim().toLowerCase() === username.toLowerCase()
+    )
+    if (!match) return []
+    recentlyUsedLogin = match
+  } else if (
+    storedPasswordTarget &&
+    loginCredentials.length > 1 &&
+    !allInputs.some(
+      (input) =>
+        input.autocomplete?.includes('username') ||
+        input.autocomplete?.includes('email')
+    )
+  ) {
+    return []
+  }
 
   for (let index = 0; index < inputs.length; index++) {
     const input = inputs[index]

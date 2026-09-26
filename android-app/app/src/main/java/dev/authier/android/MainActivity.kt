@@ -1,6 +1,11 @@
 package dev.authier.android
 
 import android.os.Bundle
+import android.Manifest
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.os.Build
+import androidx.activity.result.contract.ActivityResultContracts
 import android.view.MotionEvent
 import android.view.WindowManager
 import androidx.fragment.app.FragmentActivity
@@ -19,16 +24,43 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 class MainActivity : FragmentActivity() {
     private val model: VaultViewModel by viewModels()
+    private val notificationRequest = mutableIntStateOf(0)
+    private val notificationPermission = registerForActivityResult(ActivityResultContracts.RequestPermission()) {
+        PushTokenWorker.enqueue(this)
+    }
+
+    private fun requestNotifications() {
+        PushNotifications.createChannel(this)
+        val preferences = getSharedPreferences("notification-permission", MODE_PRIVATE)
+        if (Build.VERSION.SDK_INT >= 33 && checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED &&
+            !preferences.getBoolean("asked", false)) {
+            preferences.edit().putBoolean("asked", true).apply()
+            notificationPermission.launch(Manifest.permission.POST_NOTIFICATIONS)
+        }
+        PushTokenWorker.enqueue(this)
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        if (intent.getStringExtra("type") == "Devices") notificationRequest.intValue++
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge(statusBarStyle = SystemBarStyle.dark(android.graphics.Color.TRANSPARENT), navigationBarStyle = SystemBarStyle.dark(android.graphics.Color.TRANSPARENT))
         if (!(BuildConfig.DEBUG && intent.getBooleanExtra("demo", false))) window.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
         if (BuildConfig.DEBUG && intent.getBooleanExtra("demo", false)) model.demo(intent.getBooleanExtra("locked", false))
-        setContent { AuthierTheme { AuthierApp(model, intent.getIntExtra("tab", 0).takeIf { BuildConfig.DEBUG && intent.getBooleanExtra("demo", false) } ?: 0) } }
+        if (intent.getStringExtra("type") == "Devices") notificationRequest.intValue++
+        PushNotifications.createChannel(this)
+        setContent {
+            val state by model.ui.collectAsStateWithLifecycle()
+            LaunchedEffect(state.remembered) { if (state.remembered && !state.demo) requestNotifications() }
+            AuthierTheme { AuthierApp(model, intent.getIntExtra("tab", 0).takeIf { BuildConfig.DEBUG && intent.getBooleanExtra("demo", false) } ?: 0, notificationRequest.intValue) }
+        }
     }
 
-    override fun onResume() { super.onResume(); model.resume(this) }
+    override fun onResume() { super.onResume(); model.resume(this); if (!model.ui.value.demo) PushTokenWorker.enqueue(this) }
     override fun onStop() { model.background(isChangingConfigurations); super.onStop() }
     override fun dispatchTouchEvent(event: MotionEvent): Boolean { if (event.actionMasked == MotionEvent.ACTION_DOWN) model.touch(); return super.dispatchTouchEvent(event) }
     override fun onWindowFocusChanged(hasFocus: Boolean) {
@@ -38,9 +70,17 @@ class MainActivity : FragmentActivity() {
 }
 
 @Composable
-fun AuthierApp(model: VaultViewModel, initialTab: Int = 0) {
+fun AuthierApp(model: VaultViewModel, initialTab: Int = 0, notificationRequest: Int = 0) {
     val state by model.ui.collectAsStateWithLifecycle()
     var tab by remember { mutableIntStateOf(initialTab) }
+    var handledNotification by remember { mutableIntStateOf(0) }
+    LaunchedEffect(notificationRequest, state.unlocked, state.busy) {
+        if (notificationRequest > handledNotification && state.unlocked && !state.busy) {
+            handledNotification = notificationRequest
+            tab = 1
+            model.loadDevices()
+        }
+    }
     Scaffold(containerColor = Canvas, bottomBar = {
         if (state.unlocked) NavigationBar(containerColor = Canvas, tonalElevation = 0.dp) {
             listOf("Vault" to Icons.Outlined.GridView, "Devices" to Icons.Outlined.Devices, "Settings" to Icons.Outlined.Tune).forEachIndexed { index, (label, icon) ->

@@ -15,7 +15,7 @@ import {
 } from '../util/useDeviceState'
 
 import { trpc } from './connectTRPC'
-import { getAllVisibleTextOnDocumentBody } from './getAllVisibleTextOnDocumentBody'
+import { selectLoginForPage } from './selectLoginForPage'
 import { renderSaveCredentialsForm } from './renderSaveCredentialsForm'
 
 import browser from 'webextension-polyfill'
@@ -463,7 +463,8 @@ export const autofill = (
 
   log('init autofill', initState)
 
-  const firstLoginCred = secretsForHost.loginCredentials[0]
+  let firstLoginCred: ILoginSecret | undefined =
+    secretsForHost.loginCredentials[0]
   const totpSecret = secretsForHost.totpSecrets[0]
   log('autofill secrets snapshot', {
     loginCredentialsCount: secretsForHost.loginCredentials.length,
@@ -593,6 +594,15 @@ export const autofill = (
         classification.signals.includes('openrouter:classification'))
     ) {
       log('page kind is unknown, offering the picker instead of autofilling')
+      offerCredentialPicker(classification)
+      return
+    }
+
+    firstLoginCred = selectLoginForPage(
+      secretsForHost.loginCredentials,
+      classification
+    )
+    if (storedPasswordTarget && !firstLoginCred) {
       offerCredentialPicker(classification)
       return
     }
@@ -792,7 +802,10 @@ export const autofill = (
 
           // For one input on page
           if (inputEl.type === 'username' || inputEl.type === 'email') {
-            if (secretsForHost.loginCredentials.length === 1) {
+            if (
+              firstLoginCred &&
+              secretsForHost.loginCredentials.length === 1
+            ) {
               autofillValueIntoInput(
                 inputEl,
                 firstLoginCred.loginCredentials.username
@@ -882,29 +895,21 @@ export const autofill = (
       ).filter((el) => formClassification.scope.contains(el))
       log('inputElsArray', inputElsArray)
 
-      if (inputElsArray.length === 1) {
-        if (inputElsArray[0] === storedPasswordTarget) {
-          // this branch handles multi step google login pages specifically. We might add more cases in the future
-          const visibleText = getAllVisibleTextOnDocumentBody()
+      const matchingLogin = selectLoginForPage(
+        secretsForHost.loginCredentials,
+        formClassification
+      )
+      if (!matchingLogin) {
+        offerCredentialPicker(formClassification)
+        return false
+      }
 
-          let matchingLogin =
-            secretsForHost.loginCredentials.length === 1
-              ? secretsForHost.loginCredentials[0]
-              : secretsForHost.loginCredentials.find((login) => {
-                  return visibleText.includes(login.loginCredentials.username)
-                })
-
-          if (matchingLogin) {
-            const autofilledElPassword = fillStringIntoInput({
-              inputEl: inputElsArray[0],
-              loginCredential: matchingLogin.loginCredentials,
-              inputType: WebInputType.PASSWORD
-            })
-
-            // TODO we should show a notification to let user know which login was used for autofill to prevent confusion when multiple logins are available and maybe some of them are wrong
-            return autofilledElPassword
-          }
-        }
+      if (!formClassification.usernameInput && storedPasswordTarget) {
+        return fillStringIntoInput({
+          inputEl: storedPasswordTarget,
+          loginCredential: matchingLogin.loginCredentials,
+          inputType: WebInputType.PASSWORD
+        })
       } else {
         for (let index = 0; index < inputElsArray.length; index++) {
           const input = inputElsArray[index]
@@ -945,7 +950,8 @@ export const autofill = (
               //Save username input, if we have more credentials with no DOM PATH then let user choose which psw to use
               if (
                 webInputs.length === 0 &&
-                secretsForHost.loginCredentials.length > 1
+                secretsForHost.loginCredentials.length > 1 &&
+                !usernameInputEl.value.trim()
               ) {
                 const selector = getSelectorForElement(usernameInputEl)
                 newWebInputs.push({
@@ -964,11 +970,7 @@ export const autofill = (
                   inputted: usernameInputEl.value
                 })
               } else {
-                const recentlyUsedLogin = secretsForHost.loginCredentials.sort(
-                  (a, b) => {
-                    return (a.lastUsedAt ?? '') > (b.lastUsedAt ?? '') ? -1 : 1
-                  }
-                )[0]
+                const recentlyUsedLogin = matchingLogin
 
                 const autofilledElUsername = autofillValueIntoInput(
                   usernameInputEl,
@@ -1023,11 +1025,7 @@ export const autofill = (
           input.autocomplete?.includes('username') ||
           input.autocomplete?.includes('email')
         ) {
-          const recentlyUsedLogin = secretsForHost.loginCredentials.sort(
-            (a, b) => {
-              return (a.lastUsedAt ?? '') > (b.lastUsedAt ?? '') ? -1 : 1
-            }
-          )[0]
+          const recentlyUsedLogin = matchingLogin
 
           const autofilledElUsername = autofillValueIntoInput(
             input,

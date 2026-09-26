@@ -922,3 +922,97 @@ describe('auto-submit', () => {
     expect(submitSpy).not.toHaveBeenCalled()
   })
 })
+
+describe('selected account on multi-step login', () => {
+  const googleCredentials = () => {
+    const state = initState()
+    const base = state.secretsForHost.loginCredentials[0]
+    state.secretsForHost.loginCredentials = [
+      {
+        ...base,
+        lastUsedAt: '2026-09-26T00:00:00.000Z',
+        loginCredentials: {
+          ...base.loginCredentials,
+          username: 'other@gmail.com',
+          password: 'wrong-account-password'
+        }
+      },
+      {
+        ...base,
+        loginCredentials: {
+          ...base.loginCredentials,
+          username: 'capajj@gmail.com',
+          password: 'selected-account-password'
+        }
+      }
+    ]
+    return state
+  }
+
+  it.each([false, true])(
+    'matches the selected Google email with learned selectors=%s',
+    async (learned) => {
+      setPage(
+        `<div id="profileIdentifier">capajj@gmail.com</div>
+      <form><input id="password" type="password" autocomplete="current-password"></form>`,
+        { url: 'https://accounts.google.com/v3/signin/challenge/pwd' }
+      )
+      const state = googleCredentials()
+      if (learned)
+        state.webInputs = [
+          {
+            domPath: '#password',
+            domOrdinal: 0,
+            kind: WebInputType.PASSWORD
+          }
+        ] as IInitStateRes['webInputs']
+      const stop = await runAutofill(state)
+      expect(inputById('password').value).toBe('selected-account-password')
+      stop?.()
+    }
+  )
+
+  it('uses the hidden Google username even with extra helper fields', async () => {
+    setPage(
+      `<form><input type="email" autocomplete="username" value="CAPAJJ@gmail.com" style="display:none">
+      <input id="password" type="password" autocomplete="current-password"><input type="checkbox"></form>`,
+      { url: 'https://accounts.google.com/v3/signin/challenge/pwd' }
+    )
+    const stop = await runAutofill(googleCredentials())
+    expect(inputById('password').value).toBe('selected-account-password')
+    stop?.()
+  })
+
+  it.each(['unknown@gmail.com', 'notcapajj@gmail.com'])(
+    'offers a choice when %s has no exact saved account',
+    async (email) => {
+      setPage(
+        `<div id="profileIdentifier">${email}</div>
+      <form><input id="password" type="password" autocomplete="current-password"></form>`,
+        { url: 'https://accounts.google.com/v3/signin/challenge/pwd' }
+      )
+      const state = googleCredentials()
+      state.webInputs = [
+        { domPath: '#password', domOrdinal: 0, kind: WebInputType.PASSWORD }
+      ] as IInitStateRes['webInputs']
+      const stop = await runAutofill(state)
+      expect(inputById('password').value).toBe('')
+      expect(renderLoginCredOption).toHaveBeenCalled()
+      stop?.()
+    }
+  )
+
+  it('preserves a chosen username on a normal login form with learned selectors', async () => {
+    setPage(`<form><input id="user" autocomplete="username" value="capajj@gmail.com">
+      <input id="password" type="password" autocomplete="current-password"></form>`)
+    const state = googleCredentials()
+    state.webInputs = [
+      { domPath: '#user', domOrdinal: 0, kind: WebInputType.USERNAME },
+      { domPath: '#password', domOrdinal: 0, kind: WebInputType.PASSWORD }
+    ] as IInitStateRes['webInputs']
+    const stop = await runAutofill(state)
+    expect(inputById('user').value).toBe('capajj@gmail.com')
+    expect(inputById('password').value).toBe('selected-account-password')
+    stop?.()
+  })
+})

@@ -55,7 +55,11 @@ For registration or password changes, tap **Create a strong password with Authie
 
 Passkeys created by the browser extension remain encrypted in Android's synchronized snapshot, including deletion records. They are excluded from the password/TOTP editor, native Autofill, and unsupported-payload error reporting. This Android version does not list, edit, create, or authenticate with passkeys; manage them in the browser extension. Native sync preserves passkey ciphertext without decoding or reencoding it.
 
-This initial native application does not yet implement Android Credential Provider, push notifications, or encrypted import/export. Device approval checks are explicit through the sign-in button; device requests refresh on the Devices tab.
+Push notifications use Firebase Cloud Messaging. After signing in, allow Android notifications; you can change the permission later in Settings → Notification settings. Tapping a sign-in notification opens Devices after unlocking. Approval requests follow the account policy (master device or any trusted device); accounts allowing sign-in without approval notify existing devices after a new device successfully signs in. Foreground and background notifications use the same device-request channel. Token registration and rotation retry through WorkManager when offline.
+
+The checked-in `app/src/debug/google-services.json` and `app/src/release/google-services.json` contain public Firebase client configuration for the native package IDs. Self-hosted builds should replace these with their own Firebase app configuration, using the same project as the backend service account. The backend must expose `/api/v1/session/updatePushToken` before installing the updated app. No database migration is needed for this endpoint.
+
+This native application does not yet implement Android Credential Provider or encrypted import/export. Device approval checks on the sign-in screen remain explicit through the sign-in button.
 
 ## Fingerprint unlock
 
@@ -186,3 +190,9 @@ The `android-vault` UI preview includes both captures.
 `RecoverySetupTest` verifies explicit creation, defaults, custom values, multiple
 emails, validation, and busy/back behavior. `ApiFacadeTest` checks the actual JSON
 registration request using a local mock server.
+
+## Push notification validation
+
+Run `./gradlew :app:testDebugUnitTest :app:connectedDebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.class=dev.authier.android.PushNotificationsTest` to test the generated token-registration API and Android notification display. Add `-Pandroid.testInstrumentationRunnerArguments.liveFcm=true` on a disposable emulator with Google Play services to obtain an actual FCM token for a delivery smoke test; this writes the token only to the debug app cache (`push-smoke-token`), never to logs.
+
+The debug-only `NotificationPreviewActivity` renders a synthetic sign-in alert with the production notification code. Grant notification permission and launch it with `--ez showNotification true` to capture the notification shade. The checked-in `android-notifications` UI preview displays the captured Android UI.

@@ -124,6 +124,15 @@ export const vaultApiContract = {
       .output(okResultSchema)
   },
   session: {
+    updatePushToken: oc
+      .route({
+        method: 'POST',
+        path: '/session/updatePushToken',
+        operationId: 'sessionUpdatePushToken',
+        tags: ['session']
+      })
+      .input(z.object({ token: z.string().trim().min(1).max(4096).nullable() }))
+      .output(okResultSchema),
     bootstrap: oc
       .route({
         method: 'POST',

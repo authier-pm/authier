@@ -25,6 +25,7 @@ import dev.authier.android.generated.model.SecurityState
 import dev.authier.android.generated.model.SecurityUpdateNewDevicePolicyRequest
 import dev.authier.android.generated.model.SecurityUpdateVaultLockTimeoutRequest
 import dev.authier.android.generated.model.Session
+import dev.authier.android.generated.model.SessionUpdatePushTokenRequest
 import dev.authier.android.generated.model.SyncSecretRecord
 import dev.authier.android.generated.model.UpdateVaultSecretInput
 import dev.authier.android.generated.model.VaultSyncInput
@@ -98,6 +99,7 @@ class ApiFacade(serverUrl: String, private var currentDeviceId: String? = null) 
     }
 
     override suspend fun logout() { request { auth.authLogout(emptyInput) } }
+    suspend fun updatePushToken(token: String?) { request { session.sessionUpdatePushToken(SessionUpdatePushTokenRequest(token)) } }
     override suspend fun bootstrap() = request { session.sessionBootstrap(emptyInput).toDomain() }
     override suspend fun sync(cursor: String?) = request {
         val page = vault.vaultSync(VaultSyncInput(cursor, 200))

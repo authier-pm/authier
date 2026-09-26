@@ -193,3 +193,9 @@ scenario records an email input before moving to a setup page without an email;
 all four flows and capture `docs/screenshots/totp-account-label.png` and
 `docs/screenshots/totp-account-email-prompt.png`. Session fallback is stored only
 for the current browser session, separately for regular and private windows.
+
+The `android-notifications` scenario displays the real Android notification shade
+captured after a Firebase delivery to a disposable emulator. Run
+`bun run playwright:ui-preview androidNotifications.spec.ts` to render it.
+The native `NotificationPreviewActivity` can also produce a synthetic request
+without sending anything to the backend; see `android-app/README.md`.

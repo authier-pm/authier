@@ -29,6 +29,11 @@ fun SettingsScreen(state: VaultUiState, model: VaultViewModel) {
                 OutlinedButton({ context.startActivity(Intent(Settings.ACTION_REQUEST_SET_AUTOFILL_SERVICE, Uri.parse("package:${context.packageName}"))) }, enabled = !state.demo, modifier = Modifier.fillMaxWidth()) { Text("Set up Android Autofill") }
             }
         }
+        item {
+            SettingSection("SIGN-IN NOTIFICATIONS", "Get notified when another device signs in or needs your approval. Your device access policy determines which trusted devices receive requests.") {
+                OutlinedButton({ context.startActivity(Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)) }, enabled = !state.demo, modifier = Modifier.fillMaxWidth()) { Text("Notification settings") }
+            }
+        }
         if (state.writes.isNotEmpty()) item {
             SettingSection("PENDING CHANGES", "Your local changes remain encrypted until the server accepts them.") {
                 state.writes.forEach { write ->

@@ -647,14 +647,21 @@ export const resumeRememberedDevice = async () => {
 }
 
 const completeLoginWithUserFacingError: LoginSessionOperations['completeLogin'] =
-  (input) =>
-    completeLogin(input).catch((error: unknown) => {
+  async (input) => {
+    await completeLogin(input).catch((error: unknown) => {
       throw new LoginSessionError(
         'Login failed, check your email or password',
         false,
         error
       )
     })
+
+    // Run in the background so closing the popup cannot interrupt the first sync.
+    // A network failure here must not turn a successful login into a password error.
+    await device.state?.backendSync().catch((error: unknown) => {
+      console.error('Failed to synchronize the vault after login', error)
+    })
+  }
 
 const initiateMasterDeviceReset: LoginSessionOperations['initiateMasterDeviceReset'] =
   async (input) => {

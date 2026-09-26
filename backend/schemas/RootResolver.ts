@@ -51,7 +51,10 @@ import {
 } from '../models/DecryptionChallenge'
 import { plainToClass } from 'class-transformer'
 
-import { firebaseSendNotification } from '../lib/firebaseAdmin'
+import {
+  sendNewDeviceLoginPushNotifications,
+  type PushDeliveryCounts
+} from '../lib/deviceLoginNotifications'
 import { getGeoIpLocation } from '../lib/getGeoIpLocation'
 import { sendEmail } from '../utils/email'
 import { WebInputMutation } from '../models/WebInput'
@@ -69,65 +72,6 @@ const log = debug('au:RootResolver')
 // entropy on their own, so we just need a one-way function to make DB
 // reads non-actionable. (No bcrypt/argon2 needed for high-entropy tokens.)
 export const hashMasterDeviceResetToken = hashResetToken
-
-type PushDeliveryCounts = {
-  pushNotificationsSentCount: number
-  pushNotificationsFailedCount: number
-}
-
-const sendNewDeviceLoginPushNotifications = async (
-  firebaseTokens: string[],
-  notificationBody: string
-): Promise<PushDeliveryCounts> => {
-  const results = await Promise.allSettled(
-    firebaseTokens.map((firebaseToken) => {
-      log('sending notification to', firebaseToken)
-
-      return firebaseSendNotification({
-        token: firebaseToken,
-        notification: {
-          title: 'New device login!',
-          body: notificationBody
-        },
-        data: {
-          type: 'Devices'
-        },
-        android: {
-          priority: 'high'
-        },
-        apns: {
-          payload: {
-            aps: {
-              contentAvailable: true,
-              priority: 10
-            }
-          }
-        }
-      })
-    })
-  )
-
-  let pushNotificationsSentCount = 0
-  let pushNotificationsFailedCount = 0
-
-  for (const result of results) {
-    if (result.status === 'rejected') {
-      pushNotificationsFailedCount += 1
-      continue
-    }
-
-    if (result.value.ok) {
-      pushNotificationsSentCount += 1
-    } else {
-      pushNotificationsFailedCount += 1
-    }
-  }
-
-  return {
-    pushNotificationsSentCount,
-    pushNotificationsFailedCount
-  }
-}
 
 export { getBackendOrigin } from '../utils/getBackendOrigin'
 
@@ -474,7 +418,11 @@ export class RootResolver {
 
         if (user.newDevicePolicy === 'REQUIRE_ANY_DEVICE_APPROVAL') {
           devicesToNotify = await ctx.db.query.device.findMany({
-            where: { userId: user.id },
+            where: {
+              userId: user.id,
+              logoutAt: { isNull: true },
+              deletedAt: { isNull: true }
+            },
             columns: { firebaseToken: true }
           })
         } else if (masterDevice?.firebaseToken) {
