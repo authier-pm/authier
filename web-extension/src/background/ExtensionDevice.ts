@@ -140,10 +140,18 @@ export const getDecryptedSecretProp = (
 }
 
 export class DeviceState implements IBackgroundStateSerializable {
-  decryptedSecrets: (ILoginSecret | ITOTPSecret | IPasskeySecret)[]
+  decryptedSecrets: (ILoginSecret | ITOTPSecret | IPasskeySecret)[] = []
+  #initialization: Promise<void>
+
+  get initialized() {
+    return this.#initialization
+  }
   lockTimeEnd: number
   webInputs: WebInputForAutofill[]
-  constructor(parameters: IBackgroundStateSerializable) {
+  constructor(
+    parameters: IBackgroundStateSerializable,
+    { listenToStorage = true } = {}
+  ) {
     Object.assign(this, parameters)
     this.autofillCredentialsEnabled =
       parameters.autofillCredentialsEnabled ?? true
@@ -151,8 +159,9 @@ export class DeviceState implements IBackgroundStateSerializable {
       parameters.autofillForbiddenUrlPatterns ?? ''
     //log('device state created', this)
 
-    browser.storage.onChanged.addListener(this.onStorageChange)
-    this.initialize()
+    if (listenToStorage)
+      browser.storage.onChanged.addListener(this.onStorageChange)
+    this.#initialization = this.initialize()
   }
 
   email: string
@@ -422,7 +431,12 @@ export class DeviceState implements IBackgroundStateSerializable {
 
         deviceState.secrets = [...unchangedSecrets, ...newAndUpdatedSecrets]
 
+        await this.initialize()
+        if (device.state !== this || this.masterEncryptionKey !== syncKey)
+          return
         const webInputs = await this.getWebInputs()
+        if (device.state !== this || this.masterEncryptionKey !== syncKey)
+          return
 
         this.webInputs = webInputs
         await this.save()

@@ -1,3 +1,4 @@
+import { sendNewDeviceLoginPushNotifications } from '../lib/deviceLoginNotifications'
 import { actOnReset, getResetStatus } from '../lib/masterDeviceReset'
 import { hashDeviceSecret, verifyDeviceSecret } from '../utils/deviceSecretHash'
 import 'reflect-metadata'
@@ -200,6 +201,7 @@ export class DecryptionChallengeApproved extends DecryptionChallengeGQL {
         where: { id: deviceId }
       })
 
+      const isNewDevice = !deviceRec
       const defaultSettings =
         userData.defaultSettings ?? defaultDeviceSettingSystemValues
 
@@ -252,9 +254,30 @@ export class DecryptionChallengeApproved extends DecryptionChallengeGQL {
         userData.masterDeviceId = deviceRec.id
       }
 
-      return { userData, deviceRec }
+      return { userData, deviceRec, isNewDevice }
     })
-    const { userData, deviceRec } = result
+    const { userData, deviceRec, isNewDevice } = result
+
+    // ALLOW skips the approval-request push. Notify existing devices only after
+    // the new device has proved the master password and enrollment has committed.
+    if (isNewDevice && userData.newDevicePolicy === 'ALLOW') {
+      const recipients = await ctx.db.query.device.findMany({
+        where: {
+          userId,
+          logoutAt: { isNull: true },
+          deletedAt: { isNull: true }
+        },
+        columns: { id: true, firebaseToken: true }
+      })
+      const tokens = recipients
+        .filter((recipient) => recipient.id !== deviceRec.id)
+        .map((recipient) => recipient.firebaseToken)
+        .filter((token): token is string => Boolean(token))
+      await sendNewDeviceLoginPushNotifications(
+        [...new Set(tokens)],
+        `${deviceRec.name} signed in to your Authier account.`
+      )
+    }
 
     return new UserMutation(userData).setCookiesAndConstructLoginResponse(
       deviceRec,

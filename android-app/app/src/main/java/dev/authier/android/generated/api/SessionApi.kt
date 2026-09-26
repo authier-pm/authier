@@ -7,9 +7,11 @@ import okhttp3.RequestBody
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
+import dev.authier.android.generated.model.OkResult
 import dev.authier.android.generated.model.Session
 import dev.authier.android.generated.model.SessionMarkAsSynced200Response
 import dev.authier.android.generated.model.SessionSyncSecrets200Response
+import dev.authier.android.generated.model.SessionUpdatePushTokenRequest
 
 interface SessionApi {
     /**
@@ -50,5 +52,18 @@ interface SessionApi {
      */
     @POST("session/syncSecrets")
     suspend fun sessionSyncSecrets(@Body body: kotlinx.serialization.json.JsonObject): SessionSyncSecrets200Response
+
+    /**
+     * POST session/updatePushToken
+     *
+     *
+     * Responses:
+     *  - 200: OK
+     *
+     * @param sessionUpdatePushTokenRequest
+     * @return [OkResult]
+     */
+    @POST("session/updatePushToken")
+    suspend fun sessionUpdatePushToken(@Body sessionUpdatePushTokenRequest: SessionUpdatePushTokenRequest): OkResult
 
 }

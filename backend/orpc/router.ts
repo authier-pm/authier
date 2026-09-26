@@ -1,7 +1,7 @@
 import { updateResetConfig, getResetStatus } from '../lib/masterDeviceReset'
 import type { MasterDeviceResetConfig } from '../../shared/masterDeviceResetConfig'
 import { implement, ORPCError } from '@orpc/server'
-import { desc, eq, sql } from 'drizzle-orm'
+import { and, desc, eq, sql } from 'drizzle-orm'
 import { verify } from 'jsonwebtoken'
 import {
   DecryptionChallengeApproved,
@@ -597,6 +597,21 @@ export const vaultOrpcRouter = os.router({
     })
   },
   session: {
+    updatePushToken: protectedBase.session.updatePushToken.handler(
+      async ({ context, input }) => {
+        const { userId, deviceId } = context.authCtx.jwtPayload
+        await context.legacyCtx.db
+          .update(schema.device)
+          .set({ firebaseToken: input.token })
+          .where(
+            and(
+              eq(schema.device.id, deviceId),
+              eq(schema.device.userId, userId)
+            )
+          )
+        return { ok: true }
+      }
+    ),
     bootstrap: protectedBase.session.bootstrap.handler(async ({ context }) => {
       return getSessionBootstrap(
         context.legacyCtx,

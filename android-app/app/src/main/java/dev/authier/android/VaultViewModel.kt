@@ -254,6 +254,7 @@ class VaultViewModel(application: Application) : AndroidViewModel(application) {
             sealedTokens = sealed, cursor = null, secrets = records, outbox = pending, lockTimeoutSeconds = timeout))
         state.value = state.value.copy(email = normalizedEmail, serverUrl = origin, remembered = true, pendingApproval = false, approvals = session.bootstrap.approvals)
         openVault(key)
+        PushTokenWorker.enqueue(getApplication())
         syncNow()
     }
 

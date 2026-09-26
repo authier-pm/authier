@@ -70,6 +70,33 @@ describe('main-world autofill fallback', () => {
     expect(inputById('password').value).toBe(PASSWORD)
   })
 
+  it('uses the chosen account instead of the most recent account', () => {
+    document.body.innerHTML = `<form>
+      <input id="user" autocomplete="username" value="${USERNAME}" />
+      <input id="password" type="password" autocomplete="current-password" />
+    </form>`
+    mainWorldAutofillFunction([
+      {
+        username: 'other@example.com',
+        password: 'wrong-password',
+        lastUsedAt: '2026-09-26T00:00:00Z'
+      },
+      ...credentials()
+    ])
+    expect(inputById('user').value).toBe(USERNAME)
+    expect(inputById('password').value).toBe(PASSWORD)
+  })
+
+  it('leaves the password blank when the chosen account is not saved', () => {
+    document.body.innerHTML = `<form>
+      <input id="user" autocomplete="username" value="unknown@example.com" />
+      <input id="password" type="password" autocomplete="current-password" />
+    </form>`
+    expect(mainWorldAutofillFunction(credentials())).toEqual([])
+    expect(inputById('user').value).toBe('unknown@example.com')
+    expect(inputById('password').value).toBe('')
+  })
+
   it('abstains from signup fields', () => {
     document.body.innerHTML = `<form>
       <input id="user" autocomplete="username" />

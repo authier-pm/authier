@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "500382892914",
+    "project_id": "authier-bc184",
+    "storage_bucket": "authier-bc184.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:500382892914:android:154ed002acb7b0c2c213eb",
+        "android_client_info": {
+          "package_name": "com.authier"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD1lVcFH-FqufCeLuALRs5R2VY97NRxEAg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:500382892914:android:1592fac9cf6c61d8c213eb",
+        "android_client_info": {
+          "package_name": "dev.authier.android"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD1lVcFH-FqufCeLuALRs5R2VY97NRxEAg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

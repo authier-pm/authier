@@ -1,3 +1,4 @@
+import { AndroidNotificationsPreview } from './scenarios/AndroidNotificationsPreview'
 import {
   MasterDeviceRecoveryPreview,
   MasterDeviceResetProgressPreview
@@ -35,6 +36,7 @@ const scenarios: Record<string, ComponentType> = {
   'passkey-approval': PasskeyApprovalPreview,
   'email-verification-codes': EmailVerificationCodesPreview,
   'android-vault': AndroidVaultPreview,
+  'android-notifications': AndroidNotificationsPreview,
   'android-icon': AndroidIconPreview,
   'android-updates': AndroidUpdatesPreview,
   'android-blog': AndroidBlogPreview,
