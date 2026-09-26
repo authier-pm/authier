@@ -107,19 +107,8 @@ jobs:
           crxFilePath: ${{ env.WEBSTORE_CRX_FILE_PATH }}
           prodVersion: '133.0.6943.127'
 
-      - name: Upload webstore published crx release asset
-        if: needs.publish-on-webstore.outputs.releaseUploadUrl
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ needs.publish-on-webstore.outputs.releaseUploadUrl }}
-          asset_path: ${{ env.WEBSTORE_CRX_FILE_PATH }}
-          asset_name: ${{ env.WEBSTORE_CRX_FILE_NAME }}
-          asset_content_type: application/x-chrome-extension
-
+      # GitHub releases are immutable by the time the store publishes its CRX.
       - name: Upload webstore crx file artifact to workflow
-        if: '!needs.publish-on-webstore.outputs.releaseUploadUrl'
         uses: actions/upload-artifact@v4
         with:
           name: ${{ env.WEBSTORE_CRX_FILE_NAME }}

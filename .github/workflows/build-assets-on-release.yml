@@ -1,6 +1,5 @@
 # On release published:
 # - if no built extension.zip asset attached to release, does that
-# - builds and attaches signed crx asset to release
 # - builds and attaches signed xpi asset to release
 name: Build release assets
 
@@ -61,43 +60,8 @@ jobs:
 
       - run: echo "TEST ${{ github.ref }}"
 
-  # Chrome offline-signed crx
-  build-signed-crx-asset:
-    needs: ensure-zip
-    runs-on: ubuntu-latest
-    if: ${{ !contains(github.ref , 'firefox')}}
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: cardinalby/export-env-action@v2
-        with:
-          envFile: './.github/workflows/constants.env'
-          expand: true
-
-      - name: Download zip release asset
-        uses: cardinalby/download-release-asset-action@v1
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          assetId: ${{ needs.ensure-zip.outputs.zipAssetId }}
-          targetPath: ${{ env.ZIP_FILE_PATH }}
-
-      - name: Build offline crx
-        id: buildOfflineCrx
-        uses: cardinalby/webext-buildtools-chrome-crx-action@v2
-        with:
-          zipFilePath: ${{ env.ZIP_FILE_PATH }}
-          crxFilePath: ${{ env.OFFLINE_CRX_FILE_PATH }}
-          privateKey: ${{ secrets.CHROME_CRX_PRIVATE_KEY }}
-
-      - name: Upload offline crx release asset
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ github.event.release.upload_url }}
-          asset_path: ${{ env.OFFLINE_CRX_FILE_PATH }}
-          asset_name: ${{ env.OFFLINE_CRX_FILE_NAME }}
-          asset_content_type: application/x-chrome-extension
+  # The tag workflow uploads the offline CRX before publishing the release.
+  # Published releases are immutable, so it cannot be attached here.
 
   # Firefox offline-signed xpi
   build-signed-xpi-asset:
