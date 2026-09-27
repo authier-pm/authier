@@ -1,3 +1,4 @@
+/** @jsxImportSource preact */
 import { h, render } from 'preact'
 import { PromptPasswordGenerator } from './components/PromptPasswordGenerator'
 import { authierOverlayBaseStyles } from './components/authierOverlayStyles'

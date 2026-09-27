@@ -25,17 +25,27 @@ cp .env.example .env
 pnpm dev
 ```
 
+Then load `web-extension/dist` as an unpacked extension (see below) and keep `pnpm dev` running.
+
+`pnpm dev` is built on [Vite](https://vite.dev/):
+
+- the popup, vault and passkey pages load their modules from the Vite dev server on `http://127.0.0.1:5180`, so React components hot reload in place and the browser devtools show the original sources. The dev manifest allows that origin in its content security policy; a production build never does.
+- the background and content scripts are rebuilt in watch mode, with inline source maps. After a rebuild the extension reloads itself, together with the active tab, so the page runs the fresh content script. This goes through a small WebSocket server on port 5181. In Chrome it also keeps the background service worker from idling out while `pnpm dev` runs.
+- `pnpm dev:firefox` does the same with the Firefox Manifest V2 manifest.
+
+The extension pages stay blank while the dev server is stopped. Run `pnpm devBuild` when you need an unminified build which works on its own.
+
 **Scripts** (from `web-extension/package.json`)
 
-- `pnpm dev` — run webpack in watch mode (`webpack.dev.js`)
-- `pnpm devBuild` — one-shot development webpack build
+- `pnpm dev` — Vite dev server with hot reload for the pages, watch builds for the background and content scripts
+- `pnpm dev:firefox` — the same for Firefox (Manifest V2)
+- `pnpm devBuild` — one-shot unminified build with source maps, no dev server needed
 - `pnpm prodBuild` — production-ready unpacked extension into `dist/`
 - `pnpm test` — run Vitest once
 - `pnpm test:watch` — Vitest in watch mode
 - `pnpm test:ui` — Vitest UI
 - `pnpm tsc` — TypeScript check
-- `pnpm checkBuildOutput` — sanity-check webpack output parsing
-- `pnpm generateManifest` — regenerate the extension manifest
+- `pnpm generateManifest` — regenerate the extension manifest (`devBuild`/`prodBuild` write it too)
 
 From the repository root, `pnpm fmt:check web-extension/README.md` checks formatting.
 
@@ -46,8 +56,10 @@ Chrome, Edge, and Firefox publishing is automated on CI. Run `pnpm release` (fro
 To build the Firefox Manifest V2 extension locally:
 
 ```bash
-MANIFEST_VERSION=2 pnpm generateManifest && MANIFEST_VERSION=2 pnpm prodBuild
+MANIFEST_VERSION=2 pnpm prodBuild
 ```
+
+The build configuration lives in `vite/`. The pages (`js/popup.html`, `js/vault.html`, `js/passkey.html`) are bundled as ES modules with shared chunks. Each background and content script is bundled into its own single classic script, because content scripts cannot load modules; CSS imported by content scripts is injected into the page as a `<style>` element.
 
 Official install links (source of truth): [authier.pm/download](https://www.authier.pm/download) — Google Chrome, Mozilla Firefox (desktop and Firefox for Android), and Microsoft Edge. Authier ships as a browser extension only; there is no native desktop or mobile app download.
 
@@ -56,7 +68,7 @@ Official install links (source of truth): [authier.pm/download](https://www.auth
 
 In [Google Chrome](https://www.google.com/chrome/), open [chrome://extensions](chrome://extensions) in a new tab. Turn on **Developer mode**, click **Load unpacked**, and select the `web-extension/dist` directory — your extension should now be loaded.
 
-![Installed Extension in Google Chrome](https://i.imgur.com/ORuHbDR.png "Installed Extension in Google Chrome")
+![Installed Extension in Google Chrome](https://i.imgur.com/ORuHbDR.png 'Installed Extension in Google Chrome')
 
 </details>
 
@@ -72,7 +84,7 @@ In [Microsoft Edge](https://www.microsoft.com/edge), open [edge://extensions](ed
 
 In [Brave](https://brave.com/), open [brave://extensions](brave://extensions) in a new tab. Turn on **Developer mode**, click **Load unpacked**, and select the `web-extension/dist` directory.
 
-![Installed Extension in Brave](https://i.imgur.com/z8lW02m.png "Installed Extension in Brave")
+![Installed Extension in Brave](https://i.imgur.com/z8lW02m.png 'Installed Extension in Brave')
 
 </details>
 
@@ -81,9 +93,9 @@ In [Brave](https://brave.com/), open [brave://extensions](brave://extensions) in
 
 In [Mozilla Firefox](https://www.mozilla.org/en-US/firefox/new/), open [about:debugging](about:debugging) in a new tab. Click **Load Temporary Add-on...** and select the `manifest.json` from the `web-extension/dist` directory — your extension should now be loaded.
 
-For a Firefox-oriented local build, use the Manifest V2 commands above before loading `dist`.
+For a Firefox-oriented local build, use the Manifest V2 commands above (or `pnpm dev:firefox`) before loading `dist`.
 
-![Installed Extension in Mozilla Firefox](https://i.imgur.com/gO2Lrb5.png "Installed Extension in Mozilla Firefox")
+![Installed Extension in Mozilla Firefox](https://i.imgur.com/gO2Lrb5.png 'Installed Extension in Mozilla Firefox')
 
 </details>
 
@@ -99,7 +111,7 @@ For a Firefox-oriented local build, use the Manifest V2 commands above before lo
 - [React](https://reactjs.org)
 - [TypeScript](https://www.typescriptlang.org/)
 - [Vitest](https://vitest.dev/)
-- [Webpack](https://webpack.js.org/)
+- [Vite](https://vite.dev/)
 - [Chakra UI](https://chakra-ui.com/)
 
 **Misc. References**
@@ -111,11 +123,3 @@ For a Firefox-oriented local build, use the Manifest V2 commands above before lo
 
 - **strict:** you never have your codes on another device other than your primary phone. One code only is sent to the device from your phone after every biometric verification.
 - **lax:** your codes are decrypted on your devices too. You can choose a timeout to lock the vault. When unlocked, all the OTP codes are filled effortlessly without the need for your primary phone.
-
-## Check output in dist
-
-Since it is common to bump into a dependency which breaks webpack silently, check parsing on the webpack output:
-
-```bash
-pnpm checkBuildOutput
-```

@@ -1,3 +1,4 @@
+/** @jsxImportSource preact */
 import { h, render } from 'preact'
 import { PromptItemPopup } from './components/PromptItemPopup'
 import { trpc } from './connectTRPC'

@@ -1,3 +1,4 @@
+/** @jsxImportSource preact */
 import { h } from 'preact'
 import { useEffect } from 'preact/hooks'
 

@@ -1,6 +1,6 @@
-import { h } from 'preact'
+/** @jsxImportSource preact */
+import { h, type ComponentChildren } from 'preact'
 import { useState } from 'preact/hooks'
-import type { ReactNode } from 'react'
 import browser from 'webextension-polyfill'
 
 import { ICapturedInput } from '../../background/backgroundPage'
@@ -154,7 +154,7 @@ const CredentialRow = ({
   password,
   value
 }: {
-  action?: ReactNode
+  action?: ComponentChildren
   label: string
   password?: boolean
   value: string

@@ -1,7 +1,7 @@
 import fs from 'fs-extra'
 import { execSync } from 'child_process'
 import type PkgType from '../package.json'
-import { dir } from './generateExtensionManifest'
+import { dir } from './extensionDir'
 
 async function pushNewTag() {
   const pkg = (await fs.readJSON(dir('package.json'))) as typeof PkgType

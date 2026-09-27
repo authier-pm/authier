@@ -1,3 +1,4 @@
+/** @jsxImportSource preact */
 import { h, render } from 'preact'
 import { PromptPassword } from './components/PromptPassword'
 import { trpc } from './connectTRPC'

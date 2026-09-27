@@ -1,7 +1,7 @@
 import fs from 'fs-extra'
 import type { Manifest } from 'webextension-polyfill'
 import type PkgType from '../package.json'
-import { dir } from '../scripts/generateExtensionManifest'
+import { dir } from '../scripts/extensionDir'
 
 declare module 'webextension-polyfill' {
   namespace Manifest {
@@ -12,6 +12,11 @@ declare module 'webextension-polyfill' {
 }
 
 export const manifestVersion = Number(process.env.MANIFEST_VERSION ?? 3)
+
+export interface ManifestOptions {
+  /** origin of the Vite dev server the extension pages load their modules from during development */
+  devServerOrigin?: string
+}
 
 const firefoxGeckoId = '{18c8ffa6-f17c-4d43-bfab-5dae503c8c31}'
 
@@ -39,8 +44,13 @@ const passkeyContentScripts = [
 ]
 
 function getFirefoxManifestV2(
-  pkg: typeof PkgType
+  pkg: typeof PkgType,
+  { devServerOrigin }: ManifestOptions
 ): Manifest.WebExtensionManifest {
+  const scriptSources = ["'self'", "'unsafe-eval'", devServerOrigin]
+    .filter(Boolean)
+    .join(' ')
+
   return {
     manifest_version: 2,
     name: pkg.displayName,
@@ -93,16 +103,15 @@ function getFirefoxManifestV2(
       }
     },
     web_accessible_resources: ['icon-16.png'],
-    content_security_policy:
-      "script-src 'self' 'unsafe-eval'; https://www.googleapis.com https://js.stripe.com/v3 https://*.firebaseio.com; object-src 'self'"
+    content_security_policy: `script-src ${scriptSources}; https://www.googleapis.com https://js.stripe.com/v3 https://*.firebaseio.com; object-src 'self'`
   }
 }
 
-export async function getManifest() {
+export async function getManifest(options: ManifestOptions = {}) {
   const pkg = (await fs.readJSON(dir('package.json'))) as typeof PkgType
 
   if (manifestVersion === 2) {
-    return getFirefoxManifestV2(pkg)
+    return getFirefoxManifestV2(pkg, options)
   }
 
   // update this file to update this manifest.json
@@ -153,8 +162,25 @@ export async function getManifest() {
         resources: ['*.png'],
         matches: ['<all_urls>']
       }
-    ]
+    ],
+    ...(options.devServerOrigin && {
+      content_security_policy: {
+        extension_pages: `script-src 'self' ${options.devServerOrigin}; object-src 'self'`
+      }
+    })
   }
 
   return manifest
+}
+
+export async function writeExtensionManifest(options: ManifestOptions = {}) {
+  const manifest = await getManifest(options)
+
+  await fs.writeFile(
+    dir('dist/manifest.json'),
+    JSON.stringify(manifest, null, 2)
+  )
+  console.log(
+    `written manifest.json v${manifest.manifest_version} with version ${manifest.version}`
+  )
 }

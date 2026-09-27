@@ -5,10 +5,15 @@ import {
   WebInputType
 } from '@shared/generated/graphqlBaseTypes'
 import { isRunningInBgServiceWorker } from './ExtensionDevice'
+import { connectDevReloadServer } from './devReloadClient'
 
 export const log = debug('au:backgroundPage')
 if (!isRunningInBgServiceWorker) {
   localStorage.debug = 'au:*' // enable all debug messages
+}
+// only defined by `pnpm dev`
+if (process.env.AUTHIER_DEV_RELOAD_URL) {
+  connectDevReloadServer(process.env.AUTHIER_DEV_RELOAD_URL)
 }
 // log('background page loaded')
 export type SecretSerializedType = Pick<
