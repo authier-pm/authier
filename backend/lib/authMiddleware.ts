@@ -27,7 +27,7 @@ export const throwIfNotAuthenticated: MiddlewareFn<
     jwtPayload = verify(token, process.env.ACCESS_TOKEN_SECRET!) as IJWTPayload
 
     context.jwtPayload = jwtPayload
-  } catch (err) {
+  } catch {
     context.reply.clearCookie('access-token')
 
     throw new GraphqlErrorUnauthorized('not authenticated')
@@ -99,7 +99,7 @@ export const authenticateFromToken: MiddlewareFn<IContextAuthenticated> = (
     const payload = verify(token, process.env.ACCESS_TOKEN_SECRET!)
 
     context.jwtPayload = payload as IJWTPayload
-  } catch (err) {
+  } catch {
     context.reply.clearCookie('access-token')
   }
 

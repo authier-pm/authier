@@ -1,14 +1,11 @@
 /** @jsxImportSource preact */
-import { h, render } from 'preact'
+import { render } from 'preact'
 import { PromptPassword } from './components/PromptPassword'
 import { trpc } from './connectTRPC'
 import {
   getSingleVisibleEmailFromPage,
   getUsernameFromCapturedInputs
 } from './DOMEventsRecorder'
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const nano = h
 
 export let loginPrompt: HTMLDivElement | null
 

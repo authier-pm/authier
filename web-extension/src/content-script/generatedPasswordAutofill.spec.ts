@@ -1,8 +1,5 @@
 import browser from 'webextension-polyfill'
-import {
-  GENERATED_PASSWORD_HISTORY_STORAGE_KEY,
-  getGeneratedPasswordHistory
-} from '@src/util/generatedPasswordHistory'
+import { GENERATED_PASSWORD_HISTORY_STORAGE_KEY } from '@src/util/generatedPasswordHistory'
 import { WebInputType } from '@shared/generated/graphqlBaseTypes'
 
 const renderSaveCredentialsForm = vi.fn().mockResolvedValue(undefined)

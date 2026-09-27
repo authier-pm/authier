@@ -267,8 +267,11 @@ describe('ExtensionDevice', () => {
 
     it('keeps a vault locked while updating the encrypted verifier after a request completes', async () => {
       const previous = previousState()
-      const { masterEncryptionKey, authSecret, ...lockedSnapshot } =
-        previousSnapshot
+      const {
+        masterEncryptionKey: _masterEncryptionKey,
+        authSecret: _authSecret,
+        ...lockedSnapshot
+      } = previousSnapshot
       device.state = null
       device.lockedState = lockedSnapshot
       await device.commitPasswordRotation(previous, nextSnapshot)

@@ -145,7 +145,7 @@ const appRouter = tc.router({
 
       try {
         urlParsed = new URL(url)
-      } catch (err) {
+      } catch {
         return false
       }
 
@@ -175,7 +175,9 @@ const appRouter = tc.router({
         return false
       }
 
-      tab.id && saveLoginModalsStates.delete(tab.id)
+      if (tab.id) {
+        saveLoginModalsStates.delete(tab.id)
+      }
       const webInputs = credentials.capturedInputEvents.map((captured) => {
         return {
           domPath: captured.cssSelector,

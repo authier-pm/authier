@@ -1,5 +1,5 @@
 /** @jsxImportSource preact */
-import { h, type ComponentChildren } from 'preact'
+import type { ComponentChildren } from 'preact'
 import { useState } from 'preact/hooks'
 import browser from 'webextension-polyfill'
 
@@ -7,9 +7,6 @@ import { ICapturedInput } from '../../background/backgroundPage'
 import { trpc } from '../connectTRPC'
 import { loginPrompt } from '../renderSaveCredentialsForm'
 import { authierOverlayBaseStyles } from './authierOverlayStyles'
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const nano = h
 
 const savePromptStyles = `
   ${authierOverlayBaseStyles}

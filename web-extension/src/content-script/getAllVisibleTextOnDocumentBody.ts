@@ -24,7 +24,7 @@ export const getAllVisibleTextOnDocumentBody = () => {
         return
       }
 
-      for (var i = 0; i < elm.childNodes.length; i++) {
+      for (let i = 0; i < elm.childNodes.length; i++) {
         // recursively call to traverse
         traverse(elm.childNodes[i] as HTMLElement)
       }

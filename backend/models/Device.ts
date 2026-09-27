@@ -19,7 +19,6 @@ import { assertValidVaultLockTimeoutSeconds } from '../userAuth'
 
 import { getGeoIpLocation } from '../lib/getGeoIpLocation'
 import {
-  user,
   encryptedSecret,
   device,
   decryptionChallenge,

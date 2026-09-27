@@ -9,7 +9,6 @@ import { eq } from 'drizzle-orm'
 import { faker } from '@faker-js/faker'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { DeviceMutation, DeviceQuery } from './Device'
-import { EncryptedSecretTypeGQL } from './types/EncryptedSecretType'
 import { defaultDeviceSettingSystemValues } from './defaultDeviceSettingSystemValues'
 
 type User = InferSelectModel<typeof schema.user>
@@ -110,7 +109,6 @@ describe('Device', () => {
 
       // Create mock objects
       const fakeCtx = {
-        // eslint-disable-next-line @typescript-eslint/no-empty-function
         reply: { setCookie: () => {}, clearCookie: () => {} },
         request: { headers: {} },
         db,
@@ -147,7 +145,6 @@ describe('Device', () => {
 
       // Create mock objects
       const fakeCtx = {
-        // eslint-disable-next-line @typescript-eslint/no-empty-function
         reply: { setCookie: () => {}, clearCookie: () => vi.fn() },
         request: { headers: {} },
         db,
@@ -214,7 +211,6 @@ describe('Device', () => {
 
       // Create mock objects
       const fakeCtx = {
-        // eslint-disable-next-line @typescript-eslint/no-empty-function
         reply: { setCookie: () => {}, clearCookie: () => vi.fn() },
         request: { headers: {} },
         db,
@@ -239,7 +235,6 @@ describe('Device', () => {
 
       // Create mock objects
       const fakeCtx = {
-        // eslint-disable-next-line @typescript-eslint/no-empty-function
         reply: { setCookie: () => {}, clearCookie: () => vi.fn() },
         request: { headers: {} },
         db,
@@ -264,7 +259,6 @@ describe('Device', () => {
 
     // Create mock objects
     const fakeCtx = {
-      // eslint-disable-next-line @typescript-eslint/no-empty-function
       reply: { setCookie: () => {}, clearCookie: () => vi.fn() },
       request: { headers: {} },
       device: {

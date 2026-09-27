@@ -16,8 +16,8 @@ describe('RedisBasicRateLimiter', () => {
   beforeAll(reset)
   afterAll(reset)
   it('should not throw when hits are not exceeded', async () => {
-    await limiter.increment('127.0.0.1')
-    await limiter.increment('127.0.0.1')
+    await expect(limiter.increment('127.0.0.1')).resolves.toBeUndefined()
+    await expect(limiter.increment('127.0.0.1')).resolves.toBeUndefined()
   })
   it('should throw when max count of hits is exceeded', async () => {
     await expect(

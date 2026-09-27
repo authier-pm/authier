@@ -1,12 +1,9 @@
 /** @jsxImportSource preact */
-import { h, render } from 'preact'
+import { render } from 'preact'
 import { autofill, resetAutofillStateForThisPage } from './autofill'
 import { ILoginSecret } from '../util/useDeviceState'
 import { PromptPasswordOption } from './components/PromptPasswordOption'
 import { WebInputForAutofill } from '../background/WebInputForAutofill'
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const nano = h
 
 export let promptOption: HTMLDivElement | null = null
 

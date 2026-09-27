@@ -1,5 +1,4 @@
 import { getPrismaRelationsFromGQLInfo } from './getPrismaRelationsFromInfo'
-import gqlInfo from './fixtures/gqlInfo.json'
 import { describe, expect, it } from 'vitest'
 import { Kind } from 'graphql'
 

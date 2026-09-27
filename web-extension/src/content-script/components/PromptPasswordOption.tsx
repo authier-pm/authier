@@ -1,5 +1,4 @@
 /** @jsxImportSource preact */
-import { h } from 'preact'
 import { findCredentialPickerInput } from '../findCredentialPickerInput'
 import { useEffect, useState } from 'preact/hooks'
 import type { PromptPasswordOptionProps } from '../renderLoginCredOption'
@@ -7,8 +6,6 @@ import browser from 'webextension-polyfill'
 import { formatDistanceToNow } from 'date-fns'
 
 //import { css } from '@emotion/css'
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const nano = h
 import './Option.css'
 import debug from 'debug'
 import type { ILoginSecret } from '../../util/useDeviceState'

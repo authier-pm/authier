@@ -16,7 +16,6 @@ import { DeviceGQL } from './generated/DeviceGQL'
 import { UserBase, UserQuery } from './UserQuery'
 import { GraphQLInt } from 'graphql'
 import type { GraphQLResolveInfo } from 'graphql'
-import { getPrismaRelationsFromGQLInfo } from '../utils/getPrismaRelationsFromInfo'
 import { ChangeMasterPasswordInput } from './AuthInputs'
 import {
   GraphQLJSON,
@@ -43,14 +42,12 @@ import { UserNewDevicePolicyGQL } from './types/UserNewDevicePolicy'
 import { eq, and, sql, isNull } from 'drizzle-orm'
 import {
   device as deviceSchema,
-  defaultSettings as defaultSettingsSchema,
   secretUsageEvent as secretUsageEventSchema,
   user as userSchema,
   emailVerification as emailVerificationSchema,
   decryptionChallenge as decryptionChallengeSchema,
   masterDeviceChange as masterDeviceChangeSchema,
-  masterDeviceResetRequest as masterDeviceResetRequestSchema,
-  userPaidProducts as userPaidProductsSchema
+  masterDeviceResetRequest as masterDeviceResetRequestSchema
 } from '../drizzle/schema'
 
 const log = debug('au:userMutation')
@@ -166,7 +163,7 @@ export class UserMutation extends UserBase {
   async encryptedSecret(
     @Arg('id', () => ID) id: string,
     @Ctx() ctx: IContextAuthenticated,
-    @Info() info: GraphQLResolveInfo
+    @Info() _info: GraphQLResolveInfo
   ) {
     // Note: getPrismaRelationsFromGQLInfo won't work with Drizzle out of the box.
     // Drizzle relations are nested via nested objects instead of Prisma `include`.

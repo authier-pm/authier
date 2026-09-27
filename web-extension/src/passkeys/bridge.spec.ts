@@ -256,6 +256,7 @@ describe('WebAuthn page interception', () => {
   it('keeps acknowledged requests open until approval and propagates DOM errors', async () => {
     cleanups.push(installPasskeyPage())
     const result = navigator.credentials.get(getOptions)
+    // oxlint-disable-next-line vitest/valid-expect -- attached before the rejection happens, awaited below
     const expectation = expect(result).rejects.toMatchObject({
       name: 'NotAllowedError',
       message: 'Cancelled'
@@ -278,6 +279,7 @@ describe('WebAuthn page interception', () => {
       ...getOptions,
       signal: controller.signal
     })
+    // oxlint-disable-next-line vitest/valid-expect -- attached before the rejection happens, awaited below
     const expectation = expect(result).rejects.toMatchObject({
       name: 'AbortError'
     })
@@ -297,6 +299,7 @@ describe('WebAuthn page interception', () => {
     const result = navigator.credentials.get({
       publicKey: { ...getOptions.publicKey!, timeout: 1000 }
     })
+    // oxlint-disable-next-line vitest/valid-expect -- attached before the rejection happens, awaited below
     const expectation = expect(result).rejects.toMatchObject({
       name: 'NotAllowedError'
     })

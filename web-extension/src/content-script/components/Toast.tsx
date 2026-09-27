@@ -1,9 +1,6 @@
 /** @jsxImportSource preact */
-import { h } from 'preact'
 import { useEffect } from 'preact/hooks'
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const nano = h
 import './Toast.css'
 
 export const Toast = ({ header, text }: { header: string; text: string }) => {

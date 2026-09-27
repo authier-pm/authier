@@ -1,5 +1,4 @@
 import { hashDeviceSecret } from '../utils/deviceSecretHash'
-/* eslint-disable @typescript-eslint/no-empty-function */
 import { db } from '../prisma/prismaClient'
 import { RootResolver } from './RootResolver'
 import type { IContextAuthenticated } from '../models/types/ContextTypes'
@@ -8,10 +7,7 @@ import type { RegisterNewAccountInput } from '../models/AuthInputs'
 import { describe, expect, it } from 'vitest'
 
 import { makeFakeCtx } from '../tests/makeFakeCtx'
-import type {
-  DecryptionChallengeApproved,
-  DecryptionChallengeForApproval
-} from '../models/DecryptionChallenge'
+import type { DecryptionChallengeForApproval } from '../models/DecryptionChallenge'
 import { WebInputTypeGQL } from '../models/types/WebInputType'
 import { fakeUserAndContext } from './__test__/fakeUserAndContext'
 import { makeRegisterAccountInput } from './__test__/makeRegisterAccountInput'

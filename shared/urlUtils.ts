@@ -36,7 +36,7 @@ export const constructURL = (url: string): ConstructURLReturnType => {
       return new URL(`https://${url}`)
     }
     return new URL(url)
-  } catch (err) {
+  } catch {
     return {
       // this is not a valid URL object, but that's ok for our needs,
       hostname: null,

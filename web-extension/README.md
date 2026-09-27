@@ -101,7 +101,7 @@ For a Firefox-oriented local build, use the Manifest V2 commands above (or `pnpm
 
 **Notes**
 
-- TypeScript is checked with `pnpm tsc`. Formatting is handled at the monorepo root (`pnpm fmt` / `pnpm fmt:check`).
+- TypeScript is checked with `pnpm tsc`. Linting (oxlint) and formatting (oxfmt) are handled at the monorepo root: `pnpm lint` / `pnpm lint:fix` and `pnpm fmt` / `pnpm fmt:check`.
 - Unit tests use Vitest (`pnpm test`), not Jest.
 - Recommended: Visual Studio Code with Format on Save.
 - Example icons courtesy of [FontAwesome](https://fontawesome.com).

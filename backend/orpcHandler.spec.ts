@@ -12,7 +12,7 @@ import {
   generateEncryptionKey,
   initLocalDeviceAuthSecret
 } from '@shared/cryptoUtils'
-import { vaultApiContract } from '@shared/orpc/contract'
+import type { vaultApiContract } from '@shared/orpc/contract'
 
 // Keep API integration tests independent of external geolocation/Redis.
 vi.mock('./lib/getGeoIpLocation', () => ({

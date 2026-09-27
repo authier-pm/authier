@@ -56,7 +56,6 @@ import {
   type PushDeliveryCounts
 } from '../lib/deviceLoginNotifications'
 import { getGeoIpLocation } from '../lib/getGeoIpLocation'
-import { sendEmail } from '../utils/email'
 import { WebInputMutation } from '../models/WebInput'
 import type {
   IContext,
@@ -100,7 +99,7 @@ export class RootResolver {
       }
 
       return false
-    } catch (err) {
+    } catch {
       return false
     }
   }
@@ -114,7 +113,7 @@ export class RootResolver {
   })
   async me(
     @Ctx() ctx: IContextAuthenticated,
-    @Info() info: GraphQLResolveInfo
+    @Info() _info: GraphQLResolveInfo
   ) {
     const { jwtPayload } = ctx
 
@@ -139,7 +138,7 @@ export class RootResolver {
   @Mutation(() => DeviceMutation)
   async currentDevice(
     @Ctx() ctx: IContextAuthenticated,
-    @Info() info: GraphQLResolveInfo
+    @Info() _info: GraphQLResolveInfo
   ) {
     const { jwtPayload } = ctx
 

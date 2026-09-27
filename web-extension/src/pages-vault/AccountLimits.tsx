@@ -1,5 +1,4 @@
 import { useState, type ReactNode } from 'react'
-import { t } from '@lingui/core/macro'
 import { Trans } from '@lingui/react/macro'
 import { FaCheck } from 'react-icons/fa'
 import {

@@ -568,6 +568,7 @@ function validateGenerationResult(result: GenerationResult) {
 }
 
 function validateSingleLineText(value: string, label: string) {
+  // oxlint-disable-next-line no-control-regex -- intentionally rejects control characters
   if (value !== value.trim() || /[\u0000-\u001f\u007f]/.test(value)) {
     throw new Error(`The generated ${label} must be clean, single-line text.`)
   }

@@ -1,6 +1,4 @@
-import getFieldNames from 'graphql-list-fields'
 import type { GraphQLResolveInfo } from 'graphql'
-import set from 'lodash.set'
 
 /**
  * @deprecated This utility relied on Prisma's DMMF metadata. With Drizzle, relation loading
@@ -9,10 +7,7 @@ import set from 'lodash.set'
  *
  * @returns null — callers should use Drizzle's `with` option directly
  */
-export const getPrismaRelationsFromGQLInfo = ({
-  info,
-  rootModel
-}: {
+export const getPrismaRelationsFromGQLInfo = (_args: {
   info: GraphQLResolveInfo
   rootModel: unknown
 }) => {

@@ -169,7 +169,7 @@ export const LoginAwaitingApproval = ({
             onClick={() => {
               setResetMasterDeviceLoading(true)
               void initiateMasterDeviceReset()
-                .then((result) => {
+                .then(() => {
                   toast({
                     title: t`Master device reset confirmation email sent`,
                     description:

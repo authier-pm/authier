@@ -13,8 +13,7 @@ export default defineConfig({
     include: ['./src/**/*.spec.ts', './src/**/*.spec.tsx'],
     exclude: ['node_modules', 'dist', 'playwright-report', 'test-results'],
     coverage: {
-      reporter: ['text', 'json', 'html'],
-      exclude: ['node_modules/', 'tests/setupTests.ts', 'tests/vitest.setup.ts']
+      reporter: ['text', 'json', 'html']
     }
   },
   resolve: {

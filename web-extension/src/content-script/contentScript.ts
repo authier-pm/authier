@@ -215,7 +215,6 @@ export async function initInputWatch(
       return
     }
     const targetElement = ev.target as HTMLInputElement
-    const isPasswordType = targetElement.type === 'password'
 
     if (captureInputValue(targetElement) && targetElement.type === 'password') {
       log('password inputted', targetElement.value)
@@ -231,7 +230,7 @@ export async function initInputWatch(
 
         form.addEventListener(
           'submit',
-          (ev) => {
+          () => {
             onSubmit(form)
           },
           { once: true }

@@ -60,6 +60,9 @@ jobs:
       - name: Typecheck all packages
         run: pnpm tsc
 
+      - name: Lint
+        run: pnpm lint
+
       - uses: dorny/paths-filter@v2
         id: changes
         with:
