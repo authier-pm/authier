@@ -45,6 +45,7 @@ import {
   selectStoredPasswordAutofillTarget
 } from './storedPasswordAutofillPolicy'
 import { renderPasswordGenerator } from './renderPasswordGenerator'
+import { findGeneratedPasswordCompanions } from './findGeneratedPasswordCompanions'
 import { resolvePasswordFormClassification } from './resolvePasswordFormClassification'
 import { isLikelyOtpField } from './findOtpInputs'
 import { fillOtpInputs } from './fillOtpInputs'
@@ -354,9 +355,35 @@ export const resolveLiveGeneratedPasswordInput = (
 }
 
 /**
- * Fills and verifies a generated password against the current live input. Some
- * controlled forms replace their input during the first synthetic input event,
- * so a successful write to the original detached node is not enough.
+ * Types the generated password into the confirmation fields next to `primary`.
+ * Each pass looks the fields up again, because forms re-render them on input or
+ * only reveal the confirmation box once the first password was typed.
+ */
+const fillGeneratedPasswordCompanions = async (
+  primary: HTMLInputElement,
+  password: string
+) => {
+  for (let attempt = 0; attempt < GENERATED_PASSWORD_FILL_ATTEMPTS; attempt++) {
+    const pendingCompanions = findGeneratedPasswordCompanions(primary).filter(
+      (companion) => companion.value !== password
+    )
+    if (pendingCompanions.length === 0) {
+      return
+    }
+
+    for (const companion of pendingCompanions) {
+      imitateKeyInput(companion, password)
+      filledElements.add(companion)
+    }
+    await wait(0)
+  }
+}
+
+/**
+ * Fills and verifies a generated password against the current live input, then
+ * repeats it into any confirmation fields of the same form. Some controlled
+ * forms replace their input during the first synthetic input event, so a
+ * successful write to the original detached node is not enough.
  */
 export const fillGeneratedPasswordIntoInput = async (
   initialInput: HTMLInputElement,
@@ -373,6 +400,7 @@ export const fillGeneratedPasswordIntoInput = async (
 
     const verifiedInput = resolveLiveGeneratedPasswordInput(currentInput)
     if (verifiedInput?.value === password) {
+      await fillGeneratedPasswordCompanions(verifiedInput, password)
       return verifiedInput
     }
 

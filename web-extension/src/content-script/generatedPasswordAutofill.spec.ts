@@ -35,6 +35,7 @@ vi.mock('./connectTRPC', () => ({
 
 vi.mock('./isElementInViewport', () => ({
   isElementVisibleInViewport: (element: HTMLElement) => element.isConnected,
+  isElementRendered: (element: HTMLElement) => element.isConnected,
   isElementInViewport: () => true,
   isHidden: () => false
 }))
@@ -188,5 +189,134 @@ describe('handleGeneratedPasswordAutofill', () => {
     expect(filledInput).toBe(replacementInput)
     expect(replacementInput?.value).toBe('generated-password')
     expect(replacementInput?.style.backgroundColor).toBe('')
+  })
+})
+
+describe('fillGeneratedPasswordIntoInput confirmation fields', () => {
+  const fillInto = async (primaryId: string) => {
+    const { fillGeneratedPasswordIntoInput, resetAutofillStateForThisPage } =
+      await import('./autofill')
+    resetAutofillStateForThisPage()
+
+    return fillGeneratedPasswordIntoInput(
+      document.getElementById(primaryId) as HTMLInputElement,
+      'generated-password'
+    )
+  }
+  const valueOf = (id: string) =>
+    (document.getElementById(id) as HTMLInputElement).value
+
+  it('repeats the password into an unlabelled confirmation field', async () => {
+    document.body.innerHTML = `<form>
+      <input id="login" type="text" name="login" />
+      <input id="password" type="password" name="heslo" />
+      <input id="confirm" type="password" name="heslo2" />
+      <input id="email" type="email" name="email" />
+    </form>`
+
+    await fillInto('password')
+
+    expect(valueOf('password')).toBe('generated-password')
+    expect(valueOf('confirm')).toBe('generated-password')
+    expect(valueOf('login')).toBe('')
+    expect(valueOf('email')).toBe('')
+  })
+
+  it('keeps the current password of a change-password form untouched', async () => {
+    document.body.innerHTML = `<form>
+      <input id="current" type="password" />
+      <input id="new" type="password" />
+      <input id="confirm" type="password" />
+    </form>`
+
+    await fillInto('new')
+
+    expect(valueOf('current')).toBe('')
+    expect(valueOf('new')).toBe('generated-password')
+    expect(valueOf('confirm')).toBe('generated-password')
+  })
+
+  it('fills an earlier field only when it is marked new-password', async () => {
+    document.body.innerHTML = `<form>
+      <input id="current" type="password" autocomplete="current-password" />
+      <input id="new" type="password" autocomplete="new-password" />
+      <input id="confirm" type="password" autocomplete="new-password" />
+    </form>`
+
+    await fillInto('confirm')
+
+    expect(valueOf('current')).toBe('')
+    expect(valueOf('new')).toBe('generated-password')
+    expect(valueOf('confirm')).toBe('generated-password')
+  })
+
+  it('finds the confirmation field of a formless signup without touching other forms', async () => {
+    document.body.innerHTML = `<form id="header-login">
+        <input id="header-password" type="password" />
+      </form>
+      <div>
+        <div><input id="password" type="password" /></div>
+        <div><input id="confirm" type="password" /></div>
+      </div>
+      <form><input id="footer-password" type="password" /></form>`
+
+    await fillInto('password')
+
+    expect(valueOf('confirm')).toBe('generated-password')
+    expect(valueOf('header-password')).toBe('')
+    expect(valueOf('footer-password')).toBe('')
+  })
+
+  it('skips disabled and read-only confirmation fields', async () => {
+    document.body.innerHTML = `<form>
+      <input id="password" type="password" />
+      <input id="disabled" type="password" disabled />
+      <input id="readonly" type="password" readonly />
+    </form>`
+
+    await fillInto('password')
+
+    expect(valueOf('disabled')).toBe('')
+    expect(valueOf('readonly')).toBe('')
+  })
+
+  it('fills a confirmation field revealed after the first password is typed', async () => {
+    document.body.innerHTML = `<form id="signup">
+      <input id="password" type="password" />
+    </form>`
+    const passwordInput = document.getElementById(
+      'password'
+    ) as HTMLInputElement
+    passwordInput.addEventListener(
+      'input',
+      () => {
+        const confirmInput = document.createElement('input')
+        confirmInput.id = 'confirm'
+        confirmInput.type = 'password'
+        document.getElementById('signup')?.append(confirmInput)
+      },
+      { once: true }
+    )
+
+    await fillInto('password')
+
+    expect(valueOf('confirm')).toBe('generated-password')
+  })
+
+  it('fills a confirmation field that re-renders on input', async () => {
+    document.body.innerHTML = `<form>
+      <input id="password" type="password" />
+      <input id="confirm" type="password" />
+    </form>`
+    const confirmInput = document.getElementById('confirm') as HTMLInputElement
+    confirmInput.addEventListener(
+      'input',
+      () => confirmInput.replaceWith(confirmInput.cloneNode()),
+      { once: true }
+    )
+
+    await fillInto('password')
+
+    expect(valueOf('confirm')).toBe('generated-password')
   })
 })

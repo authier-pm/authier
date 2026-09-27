@@ -31,18 +31,11 @@ export function isHidden(el: HTMLElement): boolean {
   )
 }
 
+/** laid out and not hidden by CSS, but possibly scrolled out of the viewport */
+export function isElementRendered(el: HTMLElement): boolean {
+  return el.isConnected && el.getClientRects().length > 0 && !isHidden(el)
+}
+
 export function isElementVisibleInViewport(el: HTMLElement): boolean {
-  if (!el.isConnected) {
-    return false
-  }
-
-  if (el.getClientRects().length === 0) {
-    return false
-  }
-
-  if (isHidden(el)) {
-    return false
-  }
-
-  return isElementInViewport(el)
+  return isElementRendered(el) && isElementInViewport(el)
 }
