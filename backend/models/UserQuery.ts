@@ -11,6 +11,8 @@ import {
 import type { IContext, IContextAuthenticated } from './types/ContextTypes'
 
 import { EncryptedSecretQuery } from './EncryptedSecret'
+import { RelayedVerificationCodeGQL } from './RelayedVerificationCode'
+import { listRelayedVerificationCodes } from '../lib/relayedVerificationCodes'
 
 import { GraphQLJSON, GraphQLEmailAddress } from 'graphql-scalars'
 import { UserGQL } from './generated/UserGQL'
@@ -186,6 +188,13 @@ export class UserQuery extends UserBase {
         deletedAt: { isNull: true } // check if this works for isNull
       }
     })
+  }
+
+  @Field(() => [RelayedVerificationCodeGQL], {
+    description: 'Unexpired codes relayed from phones, newest first'
+  })
+  async relayedVerificationCodes(@Ctx() ctx: IContext) {
+    return listRelayedVerificationCodes(ctx.db, this.id)
   }
 
   // TODO use this to send notifications to the master device about unlock and wrong password attempts

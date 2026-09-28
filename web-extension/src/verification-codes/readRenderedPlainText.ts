@@ -29,13 +29,13 @@ const blockDisplays = new Set([
   'table',
   'table-row'
 ])
-const MAX_EMAIL_TEXT_LENGTH = 32_000
+const MAX_RENDERED_TEXT_LENGTH = 32_000
 
 /** Read rendered text without changing Gmail's DOM or inspecting HTML strings.
  * Inline markup stays joined, paragraphs/line breaks stay separated, and table
  * cells become tabs. The extractor can then handle formatting as plain text.
  */
-export const createEmailTextReader = () => {
+export const createRenderedTextReader = () => {
   // A new reader is created for each scan, so visibility cannot go stale.
   const styles = new WeakMap<Element, CSSStyleDeclaration | undefined>()
   const visibility = new WeakMap<Element, boolean>()
@@ -86,12 +86,16 @@ export const createEmailTextReader = () => {
     let length = 0
     let visited = 0
     const append = (text: string) => {
-      const part = text.slice(0, MAX_EMAIL_TEXT_LENGTH - length)
+      const part = text.slice(0, MAX_RENDERED_TEXT_LENGTH - length)
       parts.push(part)
       length += part.length
     }
     const visit = (node: Node, depth: number) => {
-      if (length >= MAX_EMAIL_TEXT_LENGTH || ++visited > 20_000 || depth > 256)
+      if (
+        length >= MAX_RENDERED_TEXT_LENGTH ||
+        ++visited > 20_000 ||
+        depth > 256
+      )
         return
       if (node.nodeType === Node.TEXT_NODE) {
         append(node.textContent ?? '')

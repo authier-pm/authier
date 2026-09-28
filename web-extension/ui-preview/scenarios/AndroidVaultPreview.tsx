@@ -4,6 +4,7 @@ import createPasswordScreenshot from '../../../docs/screenshots/android-autofill
 import webAutofillScreenshot from '../../../docs/screenshots/android-autofill-web.png'
 import unlockSettingsScreenshot from '../../../docs/screenshots/android-unlock-settings.png'
 import fingerprintScreenshot from '../../../docs/screenshots/android-fingerprint-unlock.png'
+import smsRelayScreenshot from '../../../docs/screenshots/android-sms-relay-settings.png'
 import automaticFingerprintScreenshot from '../../../docs/screenshots/android-fingerprint-auto-prompt.png'
 import passwordFallbackScreenshot from '../../../docs/screenshots/android-fingerprint-password-fallback.png'
 import errorScreenshot from '../../../docs/screenshots/android-api-error.png'
@@ -67,6 +68,12 @@ const screens = [
     image: unlockSettingsScreenshot,
     description:
       'Choose an idle timeout up to one day that survives backgrounding and app restarts, and enable fingerprint unlock.'
+  },
+  {
+    title: 'SMS codes to browsers',
+    image: smsRelayScreenshot,
+    description:
+      'Opt in to send verification codes from incoming texts, end-to-end encrypted, to the browser extension while the vault is unlocked.'
   },
   {
     title: 'Automatic fingerprint prompt',

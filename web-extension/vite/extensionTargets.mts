@@ -52,7 +52,11 @@ export const extensionScripts: ExtensionScript[] = [
   { name: 'contentScript', entry: 'src/content-script/contentScript.ts' },
   { name: 'passkeyPage', entry: 'src/passkeys/pageEntry.ts' },
   { name: 'passkeyBridge', entry: 'src/passkeys/bridgeEntry.ts' },
-  { name: 'gmailCodes', entry: 'src/email-codes/gmailEntry.ts' }
+  { name: 'gmailCodes', entry: 'src/verification-codes/gmailEntry.ts' },
+  {
+    name: 'googleMessagesCodes',
+    entry: 'src/verification-codes/googleMessagesEntry.ts'
+  }
 ]
 
 const mobileViewport =

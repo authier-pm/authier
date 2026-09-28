@@ -22,6 +22,7 @@ import { KostkohratkyPasswordPreview } from './scenarios/KostkohratkyPasswordPre
 import { PasskeyApprovalPreview } from './scenarios/PasskeyApprovalPreview'
 import { PasskeyVaultPreview } from './scenarios/PasskeyVaultPreview'
 import { EmailVerificationCodesPreview } from './scenarios/EmailVerificationCodesPreview'
+import { SmsVerificationCodesPreview } from './scenarios/SmsVerificationCodesPreview'
 import { NewDevicePolicyPreview } from './scenarios/NewDevicePolicyPreview'
 import { TotpLabelsPreview } from './scenarios/TotpLabelsPreview'
 import { VaultScrollingPreview } from './scenarios/VaultScrollingPreview'
@@ -36,6 +37,7 @@ const scenarios: Record<string, ComponentType> = {
   'passkey-vault': PasskeyVaultPreview,
   'passkey-approval': PasskeyApprovalPreview,
   'email-verification-codes': EmailVerificationCodesPreview,
+  'sms-verification-codes': SmsVerificationCodesPreview,
   'android-vault': AndroidVaultPreview,
   'android-notifications': AndroidNotificationsPreview,
   'android-icon': AndroidIconPreview,
@@ -67,6 +69,7 @@ document.body.classList.toggle(
     requestedScenario !== 'vault-scrolling' &&
     requestedScenario !== 'kostkohratky-password' &&
     requestedScenario !== 'email-verification-codes' &&
+    requestedScenario !== 'sms-verification-codes' &&
     requestedScenario !== 'september-release-blog' &&
     !requestedScenario.startsWith('passkey-')
 )

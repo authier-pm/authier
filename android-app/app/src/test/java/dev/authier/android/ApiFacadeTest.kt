@@ -37,6 +37,20 @@ class ApiFacadeTest {
         }
     }
 
+    @Test fun `relays verification code ciphertext with the phone session`() = runTest {
+        api.accessToken = "phone-session"
+        respond("""{"ok":true}""")
+        api.relayVerificationCode("0c9d5f0e-3c8b-4c52-9d0e-8f6f1d9a3b21", "ciphertext")
+        val request = server.takeRequest()
+        assertEquals("/api/v1/verificationCodes/relay", request.path)
+        assertEquals("Bearer phone-session", request.getHeader("Authorization"))
+        assertEquals(Json.parseToJsonElement("""{"id":"0c9d5f0e-3c8b-4c52-9d0e-8f6f1d9a3b21","encrypted":"ciphertext"}"""), Json.parseToJsonElement(request.body.readUtf8()))
+
+        respond("""{"defined":true,"code":"TOO_MANY_REQUESTS","status":429,"message":"Too many verification codes are waiting. Try again later."}""", 429)
+        val error = runCatching { api.relayVerificationCode("0c9d5f0e-3c8b-4c52-9d0e-8f6f1d9a3b21", "ciphertext") }.exceptionOrNull() as ApiFailure
+        assertEquals(429, error.status)
+    }
+
     @Test fun `signup sends the chosen recovery policy through the generated client`() = runTest {
         respond("""{"code":"CONFLICT","message":"Synthetic duplicate account"}""", 409)
         val config = MasterDeviceResetConfig(0, 5, listOf("backup@example.com", "family@example.com"))

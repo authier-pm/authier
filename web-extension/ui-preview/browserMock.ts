@@ -14,6 +14,13 @@ const gmailTab = {
   url: 'https://mail.google.com/mail/u/0/#inbox',
   incognito: false
 }
+const googleMessagesTab = {
+  id: 43,
+  windowId: 7,
+  url: 'https://messages.google.com/web/conversations/6',
+  incognito: false
+}
+const previewTabs = [gmailTab, googleMessagesTab]
 let activeTabId = 17
 const alarmListeners = new Set<(alarm: { name: string }) => void>()
 const alarms = new Map<string, ReturnType<typeof setTimeout>>()
@@ -149,11 +156,17 @@ const browser = {
     }
   },
   tabs: {
-    query: async () => [{ ...gmailTab, active: activeTabId === gmailTab.id }],
+    query: async ({ url }: { url?: string } = {}) =>
+      previewTabs
+        .filter((tab) => !url || tab.url.startsWith(url.replace(/\*$/, '')))
+        .map((tab) => ({ ...tab, active: activeTabId === tab.id })),
     update: async (tabId: number, _details: { active: boolean }) => {
       activeTabId = tabId
       for (const listener of tabListeners) listener()
-      return { ...gmailTab, active: true }
+      return {
+        ...previewTabs.find((tab) => tab.id === tabId),
+        active: true
+      }
     },
     create: async (_details: { url: string; active: boolean }) => undefined,
     sendMessage: async (_tabId: number, message: unknown) =>

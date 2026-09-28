@@ -1,16 +1,22 @@
-import { chromium, expect, test } from '@playwright/test'
+import { chromium, expect, test, type TestInfo } from '@playwright/test'
 import { resolve } from 'node:path'
 import { gmailVerificationEmail } from '../../ui-preview/fixtures/gmailVerificationEmail'
+import { googleMessagesInbox } from '../../ui-preview/fixtures/googleMessagesConversation'
 import {
-  EMAIL_CODE_STORAGE_KEY,
-  EMAIL_CODE_EXPIRY_ALARM,
-  EmailCodeMessageKind,
-  emailVerificationCodesSchema
-} from '../../src/email-codes/emailCodeProtocol'
+  VERIFICATION_CODE_STORAGE_KEY,
+  VERIFICATION_CODE_EXPIRY_ALARM,
+  CodeMessageKind,
+  verificationCodesSchema
+} from '../../src/verification-codes/verificationCodeProtocol'
+
+const webAppFixtures: Record<string, string> = {
+  'mail.google.com': `<!doctype html><title>Gmail test fixture</title>${gmailVerificationEmail}`,
+  'messages.google.com': `<!doctype html><title>Google Messages test fixture</title>${googleMessagesInbox}`
+}
 
 // Run generateManifest + prodBuild first. Only a disposable profile and synthetic
-// mail are used; all network requests are intercepted before opening any tab.
-test('built extension detects Gmail in another tab and manages a real toolbar badge', async ({}, testInfo) => {
+// messages are used; all network requests are intercepted before opening any tab.
+const launchExtension = async (testInfo: TestInfo) => {
   const context = await chromium.launchPersistentContext(
     testInfo.outputPath('profile'),
     {
@@ -25,32 +31,38 @@ test('built extension detects Gmail in another tab and manages a real toolbar ba
   await context.route('**/*', (route) => {
     const url = new URL(route.request().url())
     if (url.protocol === 'chrome-extension:') return route.continue()
-    if (url.hostname === 'mail.google.com')
+    const fixture = webAppFixtures[url.hostname]
+    if (fixture)
       return route.fulfill({
-        contentType: 'text/html',
-        body: `<!doctype html><title>Gmail test fixture</title>${gmailVerificationEmail}`
+        contentType: 'text/html; charset=utf-8',
+        body: fixture
       })
     return route.fulfill({
       contentType: 'application/json',
       json: { data: {} }
     })
   })
+  const worker =
+    context.serviceWorkers()[0] ?? (await context.waitForEvent('serviceworker'))
+  const extensionId = new URL(worker.url()).hostname
+  const popup = await context.newPage()
+  const readEntries = async () =>
+    verificationCodesSchema.parse(
+      await popup.evaluate(
+        (kind) => chrome.runtime.sendMessage({ kind }),
+        CodeMessageKind.LIST
+      )
+    )
+  return { context, worker, extensionId, popup, readEntries }
+}
+
+test('built extension detects Gmail in another tab and manages a real toolbar badge', async ({}, testInfo) => {
+  const { context, worker, extensionId, popup, readEntries } =
+    await launchExtension(testInfo)
   try {
-    const worker =
-      context.serviceWorkers()[0] ??
-      (await context.waitForEvent('serviceworker'))
-    const extensionId = new URL(worker.url()).hostname
     const mail = await context.newPage()
     await mail.goto('https://mail.google.com/mail/u/0/#inbox')
-    const popup = await context.newPage()
     await popup.goto(`chrome-extension://${extensionId}/js/popup.html`)
-    const readEntries = async () =>
-      emailVerificationCodesSchema.parse(
-        await popup.evaluate(
-          (kind) => chrome.runtime.sendMessage({ kind }),
-          EmailCodeMessageKind.LIST
-        )
-      )
     await expect.poll(async () => (await readEntries()).length).toBe(1)
     expect((await readEntries())[0]).toMatchObject({
       provider: 'Gmail',
@@ -64,7 +76,7 @@ test('built extension detects Gmail in another tab and manages a real toolbar ba
     expect(
       await worker.evaluate(
         (name) => chrome.alarms.get(name),
-        EMAIL_CODE_EXPIRY_ALARM
+        VERIFICATION_CODE_EXPIRY_ALARM
       )
     ).toBeTruthy()
 
@@ -75,7 +87,7 @@ test('built extension detects Gmail in another tab and manages a real toolbar ba
     expect(
       await popup.evaluate(
         ({ kind, id }) => chrome.runtime.sendMessage({ kind, id }),
-        { kind: EmailCodeMessageKind.OPEN_SOURCE, id: entry.id }
+        { kind: CodeMessageKind.OPEN_SOURCE, id: entry.id }
       )
     ).toBe(true)
     expect(
@@ -91,7 +103,7 @@ test('built extension detects Gmail in another tab and manages a real toolbar ba
     await popup.bringToFront()
     await popup.evaluate(
       ({ kind, id }) => chrome.runtime.sendMessage({ kind, id }),
-      { kind: EmailCodeMessageKind.COPIED, id: entry.id }
+      { kind: CodeMessageKind.COPIED, id: entry.id }
     )
     expect(await worker.evaluate(() => chrome.action.getBadgeText({}))).toBe('')
 
@@ -112,15 +124,44 @@ test('built extension detects Gmail in another tab and manages a real toolbar ba
       const state = stored[key] as { entries: { expiresAt: number }[] }
       for (const item of state.entries) item.expiresAt = Date.now() - 1
       await chrome.storage.session.set({ [key]: state })
-    }, EMAIL_CODE_STORAGE_KEY)
+    }, VERIFICATION_CODE_STORAGE_KEY)
     expect(await readEntries()).toEqual([])
     expect(await worker.evaluate(() => chrome.action.getBadgeText({}))).toBe('')
     expect(
       await worker.evaluate(
         (name) => chrome.alarms.get(name),
-        EMAIL_CODE_EXPIRY_ALARM
+        VERIFICATION_CODE_EXPIRY_ALARM
       )
     ).toBeUndefined()
+  } finally {
+    await context.close()
+  }
+})
+
+test('built extension reads unread SMS codes from Google Messages for Web', async ({}, testInfo) => {
+  const { context, worker, extensionId, popup, readEntries } =
+    await launchExtension(testInfo)
+  try {
+    const messages = await context.newPage()
+    await messages.goto('https://messages.google.com/web/conversations')
+    await popup.goto(`chrome-extension://${extensionId}/js/popup.html`)
+    await expect.poll(async () => (await readEntries()).length).toBe(2)
+    expect(
+      (await readEntries()).map(({ provider, sender, code }) => [
+        provider,
+        sender,
+        code
+      ])
+    ).toEqual([
+      ['Google Messages', 'Google', '482913'],
+      ['Google Messages', 'AirBank', '474230']
+    ])
+    expect(await worker.evaluate(() => chrome.action.getBadgeText({}))).toBe(
+      '•'
+    )
+    // Reloading rerenders the same messages; they must not be added again.
+    await messages.reload()
+    await expect.poll(async () => (await readEntries()).length).toBe(2)
   } finally {
     await context.close()
   }

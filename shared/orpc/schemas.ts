@@ -2,6 +2,7 @@ import {
   masterDeviceResetConfigSchema,
   resetWaitMinutesSchema
 } from '../masterDeviceResetConfig'
+import { MAX_RELAYED_CODE_CIPHERTEXT_LENGTH } from '../relayedVerificationCode'
 import { z } from 'zod'
 
 export const emptyInputSchema = z.object({})
@@ -301,6 +302,16 @@ export const updateVaultSecretInputSchema = createVaultSecretInputSchema.extend(
     expectedVersion: z.number().int().positive()
   }
 )
+// The server stores only this ciphertext; see shared/relayedVerificationCode.ts.
+export const relayVerificationCodeInputSchema = z.object({
+  id: z.string().uuid(),
+  encrypted: z
+    .string()
+    .min(60)
+    .max(MAX_RELAYED_CODE_CIPHERTEXT_LENGTH)
+    .regex(/^[A-Za-z0-9+/]+={0,2}$/)
+})
+
 export const deleteVaultSecretInputSchema = z.object({
   operationId: z.string().uuid(),
   id: z.string().uuid(),

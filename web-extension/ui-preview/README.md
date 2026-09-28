@@ -29,11 +29,22 @@ badge for a new code. The favicon response is a deterministic fixture.
 It captures `docs/screenshots/email-verification-codes.png` and
 `docs/screenshots/email-verification-codes-copied.png`.
 
+The `sms-verification-codes` scenario runs the production Google Messages for Web
+observer against a sanitized Messages DOM (`fixtures/googleMessagesConversation.ts`),
+and feeds the background an already-decrypted code relayed by an Android phone.
+Run `bun run playwright:ui-preview smsVerificationCodes.spec.ts` to verify that
+unread previews and the open thread's newest code appear masked while older codes,
+amounts and card numbers do not, copying and revealing, a phone relay arriving
+while the popup is open, and opening the Messages tab without copying. It captures
+`docs/screenshots/sms-verification-codes.png` and
+`docs/screenshots/sms-verification-codes-copied.png`.
+
 For a real Chromium extension smoke test, run `bun scripts/generateExtensionManifest.ts`,
-`bun run prodBuild`, then `bunx playwright test --config playwrightEmailCodes.config.ts`
+`bun run prodBuild`, then `bunx playwright test --config playwrightVerificationCodes.config.ts`
 from `web-extension`. It loads the production build into a disposable profile,
-intercepts all network requests, and verifies Gmail injection, native badge and
-alarm APIs, popup navigation, deduplication and expiry against synthetic mail.
+intercepts all network requests, and verifies Gmail and Google Messages injection,
+native badge and alarm APIs, popup navigation, deduplication and expiry against
+synthetic mail and texts.
 
 The `kostkohratky-password` scenario reproduces the supplied Czech registration
 form without live tokens. It runs production detection, classification validation,
@@ -127,6 +138,10 @@ debug app, launch the demo intent with `--ei tab 1`, capture the master view, ta
 the non-master view. Demo transfers change only synthetic in-memory state.
 `DeviceManagementTest` checks confirmation/cancellation, badge placement, busy
 controls, and non-master/unknown/stale-role restrictions in production Compose.
+
+The Android gallery includes `android-sms-relay-settings.png`, captured from the
+debug demo intent with `--ei tab 2` after scrolling to **SMS codes to browsers** and
+turning it on (demo mode needs no SMS permission and sends nothing).
 
 The Android gallery includes `android-unlock-settings.png` and
 `android-fingerprint-unlock.png`. Capture the production Compose screens with the

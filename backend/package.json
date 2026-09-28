@@ -98,6 +98,7 @@
     "api:generate": "bun scripts/generateOpenApi.ts",
     "api:check": "bun scripts/generateOpenApi.ts --check",
     "api:smoke": "NODE_ENV=test bun scripts/smokeRunner.ts",
-    "api:verify-native": "bun scripts/verifyNativeInterop.ts"
+    "api:verify-native": "bun scripts/verifyNativeInterop.ts",
+    "api:verify-sms-relay": "bun scripts/verifySmsRelay.ts"
   }
 }

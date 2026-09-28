@@ -1,4 +1,4 @@
-export const emailCodeFingerprint = async (value: string): Promise<string> => {
+export const codeFingerprint = async (value: string): Promise<string> => {
   const bytes = await crypto.subtle.digest(
     'SHA-256',
     new TextEncoder().encode(value)
