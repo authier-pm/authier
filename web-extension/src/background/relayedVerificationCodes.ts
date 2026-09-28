@@ -1,7 +1,11 @@
 import debug from 'debug'
 import { relayedCodePayloadSchema } from '@shared/relayedVerificationCode'
 import { apolloClient } from '@src/apollo/apolloClient'
+<<<<<<< HEAD
 import { device, deviceInitialization } from './ExtensionDevice'
+=======
+import { device } from './ExtensionDevice'
+>>>>>>> 0aede066 (Relay SMS verification codes to the browser extension (#104))
 import type { RelayedVerificationCode } from './verificationCodes'
 import {
   RelayedVerificationCodesDocument,
@@ -15,7 +19,10 @@ const log = debug('au:relayedVerificationCodes')
 export const fetchRelayedVerificationCodes = async (): Promise<
   RelayedVerificationCode[]
 > => {
+<<<<<<< HEAD
   await deviceInitialization
+=======
+>>>>>>> 0aede066 (Relay SMS verification codes to the browser extension (#104))
   const state = device.state
   if (!state) return []
   const { data } = await apolloClient.query<
@@ -34,8 +41,11 @@ export const fetchRelayedVerificationCodes = async (): Promise<
       expiresAt: Date.parse(relayed.expiresAt)
     }))
   )
+<<<<<<< HEAD
   // Decryption is asynchronous too; discard results if locked/switched meanwhile.
   if (device.state !== state) return []
+=======
+>>>>>>> 0aede066 (Relay SMS verification codes to the browser extension (#104))
   // A code relayed before a master password change cannot be decrypted with
   // the new key; it expires on the server within minutes. Show the others.
   return decrypted.flatMap((result) => {

@@ -5,12 +5,18 @@ import {
   VERIFICATION_CODE_LIFETIME_MS,
   VERIFICATION_CODE_EXPIRY_ALARM,
   VERIFICATION_CODE_STORAGE_KEY,
+<<<<<<< HEAD
   VERIFICATION_CODE_RELAY_ALARM,
   VERIFICATION_CODE_RELAY_PERIOD_MINUTES,
   CodeMessageKind,
   GOOGLE_MESSAGES_URL,
   verificationCodesSchema,
   verificationCodeSuggestionsSchema
+=======
+  CodeMessageKind,
+  GOOGLE_MESSAGES_URL,
+  verificationCodesSchema
+>>>>>>> 0aede066 (Relay SMS verification codes to the browser extension (#104))
 } from '../verification-codes/verificationCodeProtocol'
 import {
   handleVerificationCodeMessage,
@@ -22,7 +28,10 @@ import {
 const setBadgeText = vi.fn().mockResolvedValue(undefined)
 const createAlarm = vi.fn().mockResolvedValue(undefined)
 const clearAlarm = vi.fn().mockResolvedValue(true)
+<<<<<<< HEAD
 const getAlarm = vi.fn().mockResolvedValue(undefined)
+=======
+>>>>>>> 0aede066 (Relay SMS verification codes to the browser extension (#104))
 const updateTab = vi.fn().mockResolvedValue(undefined)
 const updateWindow = vi.fn().mockResolvedValue(undefined)
 const createWindow = vi.fn().mockResolvedValue(undefined)
@@ -83,7 +92,10 @@ beforeEach(() => {
     alarms: {
       create: createAlarm,
       clear: clearAlarm,
+<<<<<<< HEAD
       get: getAlarm,
+=======
+>>>>>>> 0aede066 (Relay SMS verification codes to the browser extension (#104))
       onAlarm: { addListener: vi.fn() }
     }
   })
@@ -95,6 +107,7 @@ beforeEach(() => {
     Object.assign(storage, structuredClone(items))
   })
 })
+<<<<<<< HEAD
 
 describe('background phone relay polling', () => {
   const fetchRelayedCodes = vi.fn<() => Promise<RelayedVerificationCode[]>>()
@@ -208,6 +221,8 @@ describe('background phone relay polling', () => {
     expect(fetchRelayedCodes).toHaveBeenCalledTimes(2)
   })
 })
+=======
+>>>>>>> 0aede066 (Relay SMS verification codes to the browser extension (#104))
 afterEach(() => {
   vi.useRealTimers()
 })
@@ -514,6 +529,7 @@ describe('verification code background messages', () => {
   })
 })
 
+<<<<<<< HEAD
 describe('inline verification code selection', () => {
   const pageSender: browser.Runtime.MessageSender = {
     ...gmailSender,
@@ -726,6 +742,8 @@ describe('inline verification code selection', () => {
   })
 })
 
+=======
+>>>>>>> 0aede066 (Relay SMS verification codes to the browser extension (#104))
 const messagesSender: browser.Runtime.MessageSender = {
   ...gmailSender,
   url: 'https://messages.google.com/web/conversations/42',

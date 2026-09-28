@@ -4,17 +4,23 @@ import type { RelayedCodePayload } from '@shared/relayedVerificationCode'
 import { codeFingerprint } from '../verification-codes/codeFingerprint'
 import { openCodeSource } from './openCodeSource'
 import {
+<<<<<<< HEAD
   getVerificationCodePage,
   isVerificationCodeForPage,
   toVerificationCodeSuggestion
 } from './verificationCodesForPage'
 import {
+=======
+>>>>>>> 0aede066 (Relay SMS verification codes to the browser extension (#104))
   CODE_MESSAGE_PREFIX,
   VERIFICATION_CODE_LIFETIME_MS,
   VERIFICATION_CODE_EXPIRY_ALARM,
   VERIFICATION_CODE_STORAGE_KEY,
+<<<<<<< HEAD
   VERIFICATION_CODE_RELAY_ALARM,
   VERIFICATION_CODE_RELAY_PERIOD_MINUTES,
+=======
+>>>>>>> 0aede066 (Relay SMS verification codes to the browser extension (#104))
   CodeMessageKind,
   codeMessageSchema,
   getGmailAccountScope,
@@ -22,7 +28,10 @@ import {
   verificationCodeSchema,
   verificationCodesSchema,
   type VerificationCode,
+<<<<<<< HEAD
   type VerificationCodeSuggestion,
+=======
+>>>>>>> 0aede066 (Relay SMS verification codes to the browser extension (#104))
   type WebCodeProvider
 } from '../verification-codes/verificationCodeProtocol'
 
@@ -164,7 +173,11 @@ const addRelayedCodes = async (
 }
 
 const syncRelayedCodes = () => {
+<<<<<<< HEAD
   // Background alarms, popup and inline polls share a single backend request.
+=======
+  // The popup polls; never stack requests while the backend is slow.
+>>>>>>> 0aede066 (Relay SMS verification codes to the browser extension (#104))
   relaySync ??= fetchRelayedCodes()
     .then((relayedCodes) =>
       updateState((state) => addRelayedCodes(state, relayedCodes))
@@ -181,6 +194,7 @@ export const refreshVerificationCodes = () => updateState()
 export const handleVerificationCodeMessage = (
   message: unknown,
   sender: browser.Runtime.MessageSender
+<<<<<<< HEAD
 ):
   | Promise<
       | VerificationCode[]
@@ -190,6 +204,9 @@ export const handleVerificationCodeMessage = (
       | null
     >
   | undefined => {
+=======
+): Promise<VerificationCode[] | boolean | null> | undefined => {
+>>>>>>> 0aede066 (Relay SMS verification codes to the browser extension (#104))
   if (
     typeof message !== 'object' ||
     message === null ||
@@ -251,6 +268,7 @@ export const handleVerificationCodeMessage = (
     }).then(() => true)
   }
 
+<<<<<<< HEAD
   if (
     request.kind === CodeMessageKind.LIST_FOR_PAGE ||
     request.kind === CodeMessageKind.GET_FOR_PAGE ||
@@ -282,6 +300,8 @@ export const handleVerificationCodeMessage = (
     })
   }
 
+=======
+>>>>>>> 0aede066 (Relay SMS verification codes to the browser extension (#104))
   // Only our own extension pages may read codes. The popup router changes its
   // pathname via history.pushState, so checking just /js/popup.html breaks copying.
   if (!sender.url?.startsWith(browser.runtime.getURL('')))
@@ -304,6 +324,7 @@ export const handleVerificationCodeMessage = (
 }
 
 export const initializeVerificationCodes = (
+<<<<<<< HEAD
   options: {
     fetchRelayedCodes?: FetchRelayedCodes
     pollRelayedInBackground?: boolean
@@ -334,6 +355,18 @@ export const initializeVerificationCodes = (
     )
       void syncInBackground()
     if (
+=======
+  options: { fetchRelayedCodes?: FetchRelayedCodes } = {}
+) => {
+  if (options.fetchRelayedCodes) fetchRelayedCodes = options.fetchRelayedCodes
+  browser.alarms.onAlarm.addListener((alarm) => {
+    if (alarm.name === VERIFICATION_CODE_EXPIRY_ALARM)
+      void refreshVerificationCodes()
+  })
+  browser.storage.onChanged.addListener((changes, area) => {
+    if (
+      area === 'session' &&
+>>>>>>> 0aede066 (Relay SMS verification codes to the browser extension (#104))
       VERIFICATION_CODE_STORAGE_KEY in changes &&
       changes[VERIFICATION_CODE_STORAGE_KEY].newValue === undefined
     ) {
@@ -341,6 +374,7 @@ export const initializeVerificationCodes = (
     }
   })
   void refreshVerificationCodes()
+<<<<<<< HEAD
   if (!options.pollRelayedInBackground) return Promise.resolve()
   // Alarms can disappear on restart/update. Do not reset an existing schedule
   // each time Chrome wakes the service worker for an event.
@@ -353,4 +387,6 @@ export const initializeVerificationCodes = (
         })
       await syncInBackground()
     })
+=======
+>>>>>>> 0aede066 (Relay SMS verification codes to the browser extension (#104))
 }

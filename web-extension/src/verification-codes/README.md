@@ -3,6 +3,7 @@
 The popup lists temporary codes from three sources: Gmail (**From your email**),
 and Google Messages for Web plus Authier for Android (**From your phone**). All of
 them share one protocol (`verificationCodeProtocol.ts`), background store
+<<<<<<< HEAD
 (`src/background/verificationCodes.ts`), popup UI and inline code picker.
 
 ## Inline filling
@@ -21,6 +22,9 @@ verified fill. Every request checks the sender again. `fillOtpInputs.ts` fills
 the whole segmented widget, including partially entered digits, and verifies
 its values after the page renders. Late-mounted forms, scrolling and resizing
 update the trigger; replacing the fields discards the old dropdown.
+=======
+(`src/background/verificationCodes.ts`) and popup UI.
+>>>>>>> 0aede066 (Relay SMS verification codes to the browser extension (#104))
 
 ## Extraction
 
@@ -73,6 +77,7 @@ Authier for Android can relay codes from incoming SMS (see `android-app/README.m
 The phone encrypts `{ v: 1, code, sender, receivedAt }`
 (`shared/relayedVerificationCode.ts`) with the vault key and uploads only ciphertext
 to `/api/v1/verificationCodes/relay`. The server deletes it 10 minutes later.
+<<<<<<< HEAD
 While the extension vault is unlocked, the background checks for relayed codes
 on startup, on unlock and every 30 seconds through a browser alarm (GraphQL
 `me.relayedVerificationCodes`). New phone codes update the same red toolbar badge
@@ -80,6 +85,10 @@ as email codes, including while the popup is closed. Browser alarms wake a
 suspended Chrome service worker; the schedule is restored if missing on startup.
 Alarms may be delayed during sleep or by the browser. Opening the popup or inline
 dropdown adds faster checks every 4 seconds.
+=======
+While the popup is open and the vault is unlocked, it asks the background to
+check for relayed codes every 4 seconds (GraphQL `me.relayedVerificationCodes`).
+>>>>>>> 0aede066 (Relay SMS verification codes to the browser extension (#104))
 The background decrypts them with the unlocked vault key. A code that cannot be
 decrypted, for example one encrypted before a master password change, is skipped.
 Polls never overlap. A locked extension leaves codes encrypted on the server.
@@ -89,10 +98,16 @@ Polls never overlap. A locked extension leaves codes encrypted on the server.
 Only senders and candidate codes leave a content script. The background checks the
 extension ID, the web app's HTTPS origin and the top-level frame before accepting a
 report, and accepts only codes of the app that reported them: Gmail cannot report
+<<<<<<< HEAD
 SMS codes or vice versa. Full lists, copy acknowledgements, opening the source
 and dismissal are restricted to the extension's own pages. The separate inline
 requests authorize only masked suggestions and a selected code as described
 above. These messages are handled before the legacy tab relay.
+=======
+SMS codes or vice versa. Listing, polling, copy acknowledgements, opening the source
+and dismissal are restricted to the extension's own pages. These messages are
+handled before the legacy tab relay.
+>>>>>>> 0aede066 (Relay SMS verification codes to the browser extension (#104))
 
 Codes live in `storage.session`, never the vault, local or sync storage. They
 expire 10 minutes after detection (relayed codes: at the server's expiry, capped

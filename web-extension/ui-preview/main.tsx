@@ -22,7 +22,10 @@ import { KostkohratkyPasswordPreview } from './scenarios/KostkohratkyPasswordPre
 import { PasskeyApprovalPreview } from './scenarios/PasskeyApprovalPreview'
 import { PasskeyVaultPreview } from './scenarios/PasskeyVaultPreview'
 import { EmailVerificationCodesPreview } from './scenarios/EmailVerificationCodesPreview'
+<<<<<<< HEAD
 import { InlineVerificationCodesPreview } from './scenarios/InlineVerificationCodesPreview'
+=======
+>>>>>>> 0aede066 (Relay SMS verification codes to the browser extension (#104))
 import { SmsVerificationCodesPreview } from './scenarios/SmsVerificationCodesPreview'
 import { NewDevicePolicyPreview } from './scenarios/NewDevicePolicyPreview'
 import { TotpLabelsPreview } from './scenarios/TotpLabelsPreview'
@@ -38,7 +41,10 @@ const scenarios: Record<string, ComponentType> = {
   'passkey-vault': PasskeyVaultPreview,
   'passkey-approval': PasskeyApprovalPreview,
   'email-verification-codes': EmailVerificationCodesPreview,
+<<<<<<< HEAD
   'inline-verification-codes': InlineVerificationCodesPreview,
+=======
+>>>>>>> 0aede066 (Relay SMS verification codes to the browser extension (#104))
   'sms-verification-codes': SmsVerificationCodesPreview,
   'android-vault': AndroidVaultPreview,
   'android-notifications': AndroidNotificationsPreview,
@@ -71,7 +77,10 @@ document.body.classList.toggle(
     requestedScenario !== 'vault-scrolling' &&
     requestedScenario !== 'kostkohratky-password' &&
     requestedScenario !== 'email-verification-codes' &&
+<<<<<<< HEAD
     requestedScenario !== 'inline-verification-codes' &&
+=======
+>>>>>>> 0aede066 (Relay SMS verification codes to the browser extension (#104))
     requestedScenario !== 'sms-verification-codes' &&
     requestedScenario !== 'september-release-blog' &&
     !requestedScenario.startsWith('passkey-')

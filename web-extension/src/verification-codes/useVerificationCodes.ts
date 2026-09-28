@@ -7,7 +7,11 @@ import {
   type VerificationCode
 } from './verificationCodeProtocol'
 
+<<<<<<< HEAD
 // Faster checks while open supplement the background alarm's 30-second checks.
+=======
+// Phones relay a code within seconds; check while the popup is open.
+>>>>>>> 0aede066 (Relay SMS verification codes to the browser extension (#104))
 const RELAY_POLL_MS = 4000
 
 export const useVerificationCodes = () => {

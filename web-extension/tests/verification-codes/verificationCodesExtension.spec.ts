@@ -2,6 +2,7 @@ import { chromium, expect, test, type TestInfo } from '@playwright/test'
 import { resolve } from 'node:path'
 import { gmailVerificationEmail } from '../../ui-preview/fixtures/gmailVerificationEmail'
 import { googleMessagesInbox } from '../../ui-preview/fixtures/googleMessagesConversation'
+<<<<<<< HEAD
 import { createOfflineVaultSnapshot } from '../../ui-preview/scenarios/offlineVault'
 import {
   abToCryptoKey,
@@ -12,6 +13,11 @@ import {
   VERIFICATION_CODE_STORAGE_KEY,
   VERIFICATION_CODE_EXPIRY_ALARM,
   VERIFICATION_CODE_RELAY_ALARM,
+=======
+import {
+  VERIFICATION_CODE_STORAGE_KEY,
+  VERIFICATION_CODE_EXPIRY_ALARM,
+>>>>>>> 0aede066 (Relay SMS verification codes to the browser extension (#104))
   CodeMessageKind,
   verificationCodesSchema
 } from '../../src/verification-codes/verificationCodeProtocol'
@@ -173,6 +179,7 @@ test('built extension reads unread SMS codes from Google Messages for Web', asyn
     await context.close()
   }
 })
+<<<<<<< HEAD
 
 test('built extension badges an encrypted phone relay while the popup is closed', async ({}, testInfo) => {
   const { context, worker, popup } = await launchExtension(testInfo)
@@ -273,3 +280,5 @@ test('built extension badges an encrypted phone relay while the popup is closed'
     await context.close()
   }
 })
+=======
+>>>>>>> 0aede066 (Relay SMS verification codes to the browser extension (#104))

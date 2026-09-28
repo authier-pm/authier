@@ -85,11 +85,16 @@ let inputsUrl: string
 
 const tcProcedure = tc.procedure.use(loggerMiddleware)
 
+<<<<<<< HEAD
 void initializeVerificationCodes({
   fetchRelayedCodes: fetchRelayedVerificationCodes,
   pollRelayedInBackground: true
 }).catch((error: unknown) => {
   console.error('Failed to initialize verification code polling', error)
+=======
+initializeVerificationCodes({
+  fetchRelayedCodes: fetchRelayedVerificationCodes
+>>>>>>> 0aede066 (Relay SMS verification codes to the browser extension (#104))
 })
 
 void loginSessionManager.initialize().catch((error: unknown) => {

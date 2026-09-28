@@ -42,13 +42,19 @@ export const CodePopupToolbar = ({ badgeLabel }: { badgeLabel: string }) => {
 export const useCodePreviewBackground = ({
   reportUrl,
   reportTabId,
+<<<<<<< HEAD
   pageUrl,
+=======
+>>>>>>> 0aede066 (Relay SMS verification codes to the browser extension (#104))
   observe,
   fetchRelayedCodes
 }: {
   reportUrl: string
   reportTabId: number
+<<<<<<< HEAD
   pageUrl?: string
+=======
+>>>>>>> 0aede066 (Relay SMS verification codes to the browser extension (#104))
   observe: (
     document: Document,
     report: (candidates: VerificationCodeCandidate[]) => Promise<unknown>
@@ -63,6 +69,7 @@ export const useCodePreviewBackground = ({
         message !== null &&
         'kind' in message &&
         message.kind === CodeMessageKind.REPORT
+<<<<<<< HEAD
       const isPageRequest =
         typeof message === 'object' &&
         message !== null &&
@@ -81,6 +88,13 @@ export const useCodePreviewBackground = ({
             : browser.runtime.getURL('js/popup.html'),
         frameId: 0,
         ...(isReport || isPageRequest
+=======
+      return handleVerificationCodeMessage(message, {
+        id: browser.runtime.id,
+        url: isReport ? reportUrl : browser.runtime.getURL('js/popup.html'),
+        frameId: 0,
+        ...(isReport
+>>>>>>> 0aede066 (Relay SMS verification codes to the browser extension (#104))
           ? {
               tab: {
                 id: reportTabId,
@@ -95,10 +109,14 @@ export const useCodePreviewBackground = ({
           : {})
       })
     })
+<<<<<<< HEAD
     void initializeVerificationCodes({
       fetchRelayedCodes,
       pollRelayedInBackground: !!fetchRelayedCodes
     })
+=======
+    initializeVerificationCodes({ fetchRelayedCodes })
+>>>>>>> 0aede066 (Relay SMS verification codes to the browser extension (#104))
     const stop = observe(document, (candidates) =>
       browser.runtime.sendMessage({ kind: CodeMessageKind.REPORT, candidates })
     )

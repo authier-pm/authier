@@ -29,6 +29,7 @@ badge for a new code. The favicon response is a deterministic fixture.
 It captures `docs/screenshots/email-verification-codes.png` and
 `docs/screenshots/email-verification-codes-copied.png`.
 
+<<<<<<< HEAD
 The `inline-verification-codes` scenario recreates Shopify's six separate code
 inputs with React-controlled values and runs the production inline picker, fill
 helper, and background handler. The Authier logo opens masked choices on click;
@@ -42,6 +43,8 @@ script-generated clicks, and mobile positioning. It captures
 `docs/screenshots/inline-verification-codes-mobile.png`.
 Use `&single=1` or `&late=1` for those scenario variants.
 
+=======
+>>>>>>> 0aede066 (Relay SMS verification codes to the browser extension (#104))
 The `sms-verification-codes` scenario runs the production Google Messages for Web
 observer against a sanitized Messages DOM (`fixtures/googleMessagesConversation.ts`),
 and feeds the background an already-decrypted code relayed by an Android phone.
@@ -52,12 +55,15 @@ while the popup is open, and opening the Messages tab without copying. It captur
 `docs/screenshots/sms-verification-codes.png` and
 `docs/screenshots/sms-verification-codes-copied.png`.
 
+<<<<<<< HEAD
 Add `&phone-only=1` to the `sms-verification-codes` scenario to start with the
 popup closed and no web-app codes. The same Playwright suite advances the mock
 browser alarm, verifies that a phone SMS raises the toolbar badge without a popup,
 then opens and copies it to clear the badge. It captures
 `docs/screenshots/sms-background-badge.png`.
 
+=======
+>>>>>>> 0aede066 (Relay SMS verification codes to the browser extension (#104))
 For a real Chromium extension smoke test, run `bun scripts/generateExtensionManifest.ts`,
 `bun run prodBuild`, then `bunx playwright test --config playwrightVerificationCodes.config.ts`
 from `web-extension`. It loads the production build into a disposable profile,

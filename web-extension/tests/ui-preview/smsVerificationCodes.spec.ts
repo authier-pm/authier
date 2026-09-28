@@ -61,6 +61,7 @@ test('picks up a code the phone relays while the popup is open', async ({
   expect(await page.evaluate(() => navigator.clipboard.readText())).toBe('4827')
 })
 
+<<<<<<< HEAD
 test('badges a phone relay with the popup closed and shows it on opening', async ({
   page
 }) => {
@@ -90,6 +91,8 @@ test('badges a phone relay with the popup closed and shows it on opening', async
   expect(await page.evaluate(() => navigator.clipboard.readText())).toBe('4827')
 })
 
+=======
+>>>>>>> 0aede066 (Relay SMS verification codes to the browser extension (#104))
 test('opens Google Messages from the SMS icon without copying the code', async ({
   page
 }) => {

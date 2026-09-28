@@ -7,8 +7,11 @@ import {
 export const VERIFICATION_CODE_STORAGE_KEY = 'verificationCodes'
 export const VERIFICATION_CODE_LIFETIME_MS = 10 * 60 * 1000
 export const VERIFICATION_CODE_EXPIRY_ALARM = 'expireVerificationCodes'
+<<<<<<< HEAD
 export const VERIFICATION_CODE_RELAY_ALARM = 'pollRelayedVerificationCodes'
 export const VERIFICATION_CODE_RELAY_PERIOD_MINUTES = 0.5
+=======
+>>>>>>> 0aede066 (Relay SMS verification codes to the browser extension (#104))
 export const GOOGLE_MESSAGES_URL =
   'https://messages.google.com/web/conversations'
 
@@ -17,9 +20,12 @@ export const CodeMessageKind = {
   LIST: 'authierVerificationCodeList',
   SYNC_RELAYED: 'authierVerificationCodeSyncRelayed',
   COPIED: 'authierVerificationCodeCopied',
+<<<<<<< HEAD
   LIST_FOR_PAGE: 'authierVerificationCodeListForPage',
   GET_FOR_PAGE: 'authierVerificationCodeGetForPage',
   FILLED_FOR_PAGE: 'authierVerificationCodeFilledForPage',
+=======
+>>>>>>> 0aede066 (Relay SMS verification codes to the browser extension (#104))
   OPEN_SOURCE: 'authierVerificationCodeOpenSource',
   DISMISS: 'authierVerificationCodeDismiss'
 } as const
@@ -85,6 +91,7 @@ export const verificationCodeSchema = z.discriminatedUnion('provider', [
 export const verificationCodesSchema = z.array(verificationCodeSchema)
 export type VerificationCode = z.infer<typeof verificationCodeSchema>
 
+<<<<<<< HEAD
 /** Only masked suggestions cross into a page before the user chooses a code. */
 export const verificationCodeSuggestionSchema = z.object({
   id: entryFields.id,
@@ -106,6 +113,8 @@ export const pageVerificationCodeSchema = z.object({
   expiresAt: entryFields.expiresAt
 })
 
+=======
+>>>>>>> 0aede066 (Relay SMS verification codes to the browser extension (#104))
 const idMessage = <Kind extends string>(kind: Kind) =>
   z.object({ kind: z.literal(kind), id: z.string().uuid() })
 
@@ -116,9 +125,12 @@ export const codeMessageSchema = z.discriminatedUnion('kind', [
   }),
   z.object({ kind: z.literal(CodeMessageKind.LIST) }),
   z.object({ kind: z.literal(CodeMessageKind.SYNC_RELAYED) }),
+<<<<<<< HEAD
   z.object({ kind: z.literal(CodeMessageKind.LIST_FOR_PAGE) }),
   idMessage(CodeMessageKind.GET_FOR_PAGE),
   idMessage(CodeMessageKind.FILLED_FOR_PAGE),
+=======
+>>>>>>> 0aede066 (Relay SMS verification codes to the browser extension (#104))
   idMessage(CodeMessageKind.COPIED),
   idMessage(CodeMessageKind.DISMISS),
   idMessage(CodeMessageKind.OPEN_SOURCE)
