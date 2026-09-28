@@ -40,6 +40,8 @@ data class VaultSnapshot(
     val outbox: List<PendingWrite> = emptyList(),
     val lockTimeoutSeconds: Int = 300,
     val lastSyncAt: Long? = null,
+    /** Per-phone opt-in to send SMS verification codes to the account's browsers. */
+    val relaySmsCodes: Boolean = false,
 )
 
 @Serializable

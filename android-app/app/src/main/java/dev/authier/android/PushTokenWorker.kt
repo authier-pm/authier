@@ -10,30 +10,10 @@ import kotlinx.coroutines.tasks.await
 class PushTokenWorker(context: Context, params: WorkerParameters) : CoroutineWorker(context, params) {
     override suspend fun doWork(): Result {
         val store = VaultStore(applicationContext)
-        val snapshot = store.read()
-        if (snapshot.sealedTokens.isBlank()) return Result.success()
+        if (store.read().sealedTokens.isBlank()) return Result.success()
         return try {
             val token = FirebaseMessaging.getInstance().token.await()
-            val tokens = store.openTokens(snapshot.sealedTokens) ?: return Result.success()
-            val api = ApiFacade(snapshot.serverUrl, snapshot.deviceId).apply { accessToken = tokens.accessToken }
-            try {
-                api.updatePushToken(token)
-            } catch (error: ApiFailure) {
-                if (error.status != 401) throw error
-                val refreshed = api.refresh(tokens.refreshToken)
-                val sealed = store.sealTokens(refreshed)
-                // Merge only token changes. Never restore a logged-out account or overwrite
-                // ciphertext/outbox writes that happened while the request was in flight.
-                val current = store.update { latest ->
-                    if (latest.deviceId == snapshot.deviceId && latest.serverUrl == snapshot.serverUrl &&
-                        latest.email == snapshot.email && latest.sealedTokens == snapshot.sealedTokens)
-                        latest.copy(sealedTokens = sealed)
-                    else latest
-                }
-                if (current.sealedTokens != sealed) return Result.retry()
-                api.accessToken = refreshed.accessToken
-                api.updatePushToken(token)
-            }
+            withSavedSession(store) { api -> api.updatePushToken(token) }
             Result.success()
         } catch (cancelled: CancellationException) {
             throw cancelled

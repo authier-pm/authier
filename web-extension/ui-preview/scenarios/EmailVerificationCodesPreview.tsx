@@ -1,91 +1,25 @@
-import { useEffect, useState, useSyncExternalStore } from 'react'
+import { useSyncExternalStore } from 'react'
 import { IoMailOutline } from 'react-icons/io5'
-import { EmailVerificationCodes } from '@src/email-codes/EmailVerificationCodes'
-import { EmailCodeMessageKind } from '@src/email-codes/emailCodeProtocol'
-import { observeGmailCodes } from '@src/email-codes/readGmailCodes'
-import {
-  handleEmailVerificationCodeMessage,
-  initializeEmailVerificationCodes
-} from '@src/background/emailVerificationCodes'
+import { VerificationCodes } from '@src/verification-codes/VerificationCodes'
+import { observeGmailCodes } from '@src/verification-codes/readGmailCodes'
 import { PopupPreview } from '../PopupPreview'
-import browser, {
-  getPreviewActiveTabId,
-  getPreviewBadgeText,
-  setPreviewMessageHandler,
-  subscribePreviewBadge,
-  subscribePreviewTab
-} from '../browserMock'
+import { getPreviewActiveTabId, subscribePreviewTab } from '../browserMock'
 import { gmailVerificationEmail } from '../fixtures/gmailVerificationEmail'
-
-const PreviewToolbar = () => {
-  const badge = useSyncExternalStore(subscribePreviewBadge, getPreviewBadgeText)
-  return (
-    <div className="mb-3 flex items-center justify-between text-xs text-[color:var(--color-muted)]">
-      <span>Authier · extension popup</span>
-      <div className="relative rounded-lg border border-[color:var(--color-border)] bg-[color:var(--color-card)] p-2">
-        <img
-          src={new URL('../../../shared/imgs/logo.svg', import.meta.url).href}
-          alt="Authier"
-          className="size-6"
-        />
-        {badge ? (
-          <span
-            aria-label="New email verification code"
-            className="absolute -right-1 -top-1 size-3 rounded-full border-2 border-[color:var(--color-background)] bg-red-500"
-          />
-        ) : null}
-      </div>
-    </div>
-  )
-}
+import {
+  CodePopupToolbar,
+  useCodePreviewBackground
+} from './codePreviewBackground'
 
 export const EmailVerificationCodesPreview = () => {
-  const [ready, setReady] = useState(false)
+  const ready = useCodePreviewBackground({
+    reportUrl: 'https://mail.google.com/mail/u/0/#inbox',
+    reportTabId: 42,
+    observe: observeGmailCodes
+  })
   const activeTabId = useSyncExternalStore(
     subscribePreviewTab,
     getPreviewActiveTabId
   )
-  useEffect(() => {
-    setPreviewMessageHandler((message) => {
-      const isReport =
-        typeof message === 'object' &&
-        message !== null &&
-        'kind' in message &&
-        message.kind === EmailCodeMessageKind.REPORT
-      return handleEmailVerificationCodeMessage(message, {
-        id: browser.runtime.id,
-        url: isReport
-          ? 'https://mail.google.com/mail/u/0/#inbox'
-          : browser.runtime.getURL('js/popup.html'),
-        frameId: 0,
-        ...(isReport
-          ? {
-              tab: {
-                id: 42,
-                windowId: 7,
-                index: 0,
-                highlighted: false,
-                active: false,
-                pinned: false,
-                incognito: false
-              }
-            }
-          : {})
-      })
-    })
-    initializeEmailVerificationCodes()
-    const stop = observeGmailCodes(document, (candidates) =>
-      browser.runtime.sendMessage({
-        kind: EmailCodeMessageKind.REPORT,
-        candidates
-      })
-    )
-    setReady(true)
-    return () => {
-      stop()
-      setPreviewMessageHandler(undefined)
-    }
-  }, [])
 
   return (
     <div className="mx-auto min-h-screen max-w-[920px] p-8" data-ui-preview>
@@ -114,14 +48,12 @@ export const EmailVerificationCodesPreview = () => {
           </p>
         </div>
         <div>
-          <PreviewToolbar />
+          <CodePopupToolbar badgeLabel="New email verification code" />
           <div
             className="overflow-hidden rounded-2xl border border-[color:var(--color-border)] shadow-xl"
             data-preview-popup
           >
-            <PopupPreview>
-              {ready ? <EmailVerificationCodes /> : null}
-            </PopupPreview>
+            <PopupPreview>{ready ? <VerificationCodes /> : null}</PopupPreview>
           </div>
         </div>
       </div>

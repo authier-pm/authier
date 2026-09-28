@@ -41,6 +41,7 @@ data class VaultUiState(
     val lockTimeoutSeconds: Int = 300,
     val lockGeneration: Int = 0,
     val biometricEnabled: Boolean = false,
+    val smsRelayEnabled: Boolean = false,
 ) {
     val isCurrentDeviceMaster: Boolean
         get() = devices.any { it.isCurrent && it.id == security.masterDeviceId }
@@ -59,7 +60,7 @@ class VaultViewModel(application: Application) : AndroidViewModel(application) {
     private var automaticBiometricAttempted = false
     private val state = MutableStateFlow(VaultUiState(email = snapshot.email, serverUrl = snapshot.serverUrl,
         remembered = snapshot.authSecretEncrypted.isNotBlank(), pendingWrites = snapshot.outbox.size,
-        lastSyncAt = snapshot.lastSyncAt, lockTimeoutSeconds = snapshot.lockTimeoutSeconds))
+        lastSyncAt = snapshot.lastSyncAt, lockTimeoutSeconds = snapshot.lockTimeoutSeconds, smsRelayEnabled = snapshot.relaySmsCodes))
     val ui = state.asStateFlow()
 
     init {
@@ -94,7 +95,7 @@ class VaultViewModel(application: Application) : AndroidViewModel(application) {
         action {
             snapshot = withContext(Dispatchers.IO) { store.read() }
             state.value = state.value.copy(biometricEnabled = unlockStore.biometricEnabled(snapshot),
-                lockTimeoutSeconds = snapshot.lockTimeoutSeconds)
+                lockTimeoutSeconds = snapshot.lockTimeoutSeconds, smsRelayEnabled = snapshot.relaySmsCodes)
             val key = masterKey ?: unlockStore.restore(snapshot)
             if (key == null) {
                 // Once per foreground visit: dismissal leaves password entry available,
@@ -180,7 +181,8 @@ class VaultViewModel(application: Application) : AndroidViewModel(application) {
     private suspend fun persist(next: VaultSnapshot) {
         check(!state.value.demo) { "Demo mode never writes to a real vault." }
         snapshot = withContext(Dispatchers.IO) { store.compareAndWrite(snapshot, next) }
-        state.value = state.value.copy(pendingWrites = next.outbox.size, writes = next.outbox, lastSyncAt = next.lastSyncAt, lockTimeoutSeconds = next.lockTimeoutSeconds)
+        state.value = state.value.copy(pendingWrites = next.outbox.size, writes = next.outbox, lastSyncAt = next.lastSyncAt,
+            lockTimeoutSeconds = next.lockTimeoutSeconds, smsRelayEnabled = next.relaySmsCodes)
     }
 
     private suspend fun rebuildItems() {
@@ -426,6 +428,12 @@ class VaultViewModel(application: Application) : AndroidViewModel(application) {
             persist(snapshot.copy(lockTimeoutSeconds = seconds))
             masterKey?.let { unlockStore.remember(snapshot, it) }
         } else state.value = state.value.copy(lockTimeoutSeconds = seconds)
+    }
+
+    fun setSmsRelay(enabled: Boolean) = action {
+        if (state.value.demo) state.value = state.value.copy(smsRelayEnabled = enabled)
+        // A per-phone preference: it must work offline, like the lock timeout.
+        else persist(snapshot.copy(relaySmsCodes = enabled))
     }
 
     fun signOut() = action {

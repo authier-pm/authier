@@ -128,6 +128,20 @@ API code, or use a coordinated maintenance deployment: an older server instance
 can otherwise write without the new API change tracking after the backfill. Deployment commands already run migrations first.
 No migration or code in this change has been deployed to production.
 
+## Relayed verification codes
+
+`/verificationCodes/relay` accepts `{ id, encrypted }` from an authenticated phone.
+`encrypted` is the standard vault envelope of `{ v: 1, code, sender, receivedAt }`
+(`shared/relayedVerificationCode.ts`), so the server never sees the code or sender.
+Use a client-generated UUID and reuse it on retries; a repeated id is accepted
+without creating another row. Each code expires 10 minutes after upload, and its
+ciphertext is deleted within about a minute of expiry: the Worker's per-minute cron
+(`worker.ts`) purges expired rows, and every upload does the same, which also
+covers servers without the cron. At most 20 unexpired codes may wait per account
+(`TOO_MANY_REQUESTS`, HTTP 429). The account's browsers read them through
+GraphQL `me.relayedVerificationCodes`, newest first, with the relaying device's name.
+Rows are deleted with their account or relaying device.
+
 ## Contract compatibility
 
 Keep `/api/v1` stable for shipped Android versions. Add optional input and output
@@ -160,3 +174,12 @@ expected synthetic item. The CLI rejects remote hosts and prints verification
 booleans and item identifiers, never tokens or passwords. If it requests device
 approval, approve the named smoke device and rerun. Set `AUTHIER_SMOKE_DEVICE_ID`
 when testing another account with the same ephemeral server.
+
+`api:verify-sms-relay` checks the Android SMS relay end to end. With the same
+`AUTHIER_SMOKE_EMAIL`/`AUTHIER_SMOKE_PASSWORD`, it registers the synthetic account as
+a browser device (or signs in to it again), then prints each relayed code after
+decrypting it. Set `AUTHIER_SMOKE_EXPECT_CODE` to exit once that code arrives;
+without it, the script watches for `AUTHIER_SMOKE_TIMEOUT_MS` (for example while
+the phone is locked, when nothing may arrive). Sign in on the emulator with the same
+credentials and server `http://127.0.0.1:5052`, enable **SMS codes to browsers**, and
+send a text with `adb emu sms send 22000 "G-482913 is your Google verification code."`.

@@ -116,6 +116,16 @@ CREATE TABLE "MasterDeviceResetRequest" (
 	"userId" uuid NOT NULL
 );
 --> statement-breakpoint
+CREATE TABLE "RelayedVerificationCode" (
+	"userId" uuid,
+	"id" uuid,
+	"deviceId" text NOT NULL,
+	"encrypted" text NOT NULL,
+	"createdAt" timestamp(3) DEFAULT CURRENT_TIMESTAMP NOT NULL,
+	"expiresAt" timestamp(3) NOT NULL,
+	CONSTRAINT "RelayedVerificationCode_pkey" PRIMARY KEY("userId","id")
+);
+--> statement-breakpoint
 CREATE TABLE "SecretUsageEvent" (
 	"id" bigserial PRIMARY KEY,
 	"kind" text NOT NULL,
@@ -235,6 +245,10 @@ ALTER TABLE "MasterDeviceResetRequest" ADD CONSTRAINT "MasterDeviceResetRequest_
 --> statement-breakpoint
 ALTER TABLE "MasterDeviceResetRequest" ADD CONSTRAINT "MasterDeviceResetRequest_userId_User_id_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 --> statement-breakpoint
+ALTER TABLE "RelayedVerificationCode" ADD CONSTRAINT "RelayedVerificationCode_userId_User_id_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+--> statement-breakpoint
+ALTER TABLE "RelayedVerificationCode" ADD CONSTRAINT "RelayedVerificationCode_deviceId_Device_id_fkey" FOREIGN KEY ("deviceId") REFERENCES "Device"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+--> statement-breakpoint
 ALTER TABLE "SecretUsageEvent" ADD CONSTRAINT "SecretUsageEvent_userId_User_id_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 --> statement-breakpoint
 ALTER TABLE "SecretUsageEvent" ADD CONSTRAINT "SecretUsageEvent_deviceId_Device_id_fkey" FOREIGN KEY ("deviceId") REFERENCES "Device"("id") ON DELETE CASCADE ON UPDATE CASCADE;
@@ -300,6 +314,8 @@ CREATE INDEX "MasterDeviceResetRequest_userId_idx" ON "MasterDeviceResetRequest"
 CREATE INDEX "MasterDeviceResetRequest_processAt_idx" ON "MasterDeviceResetRequest" ("processAt");
 --> statement-breakpoint
 CREATE INDEX "MasterDeviceResetRequest_expiresAt_idx" ON "MasterDeviceResetRequest" ("expiresAt");
+--> statement-breakpoint
+CREATE INDEX "RelayedVerificationCode_expiresAt_idx" ON "RelayedVerificationCode" ("expiresAt");
 --> statement-breakpoint
 CREATE INDEX "SecretUsageEvent_secretId_idx" ON "SecretUsageEvent" ("secretId");
 --> statement-breakpoint

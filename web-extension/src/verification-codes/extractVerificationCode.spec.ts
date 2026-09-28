@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest'
-import { extractVerificationCode } from './extractVerificationCode'
+import smsVectors from '../../../shared/smsVerificationCodeVectors.json'
+import {
+  extractSmsVerificationCode,
+  extractVerificationCode
+} from './extractVerificationCode'
 
 describe('extractVerificationCode', () => {
   it.each([
@@ -102,5 +106,22 @@ describe('extractVerificationCode', () => {
     expect(
       extractVerificationCode('123456 verification code 654321')
     ).toBeNull()
+  })
+})
+
+describe('extractSmsVerificationCode', () => {
+  // The Kotlin SMS extractor is tested against the same vectors.
+  it.each(smsVectors)('extracts $code from $text', ({ text, code }) => {
+    expect(extractSmsVerificationCode(text)).toBe(code)
+  })
+
+  it('keeps the stricter email rules for short and letter-only codes', () => {
+    expect(extractVerificationCode('Your Uber code: 1234.')).toBeNull()
+    expect(extractVerificationCode('Your code: PLATBA', 'Sign in')).toBe(
+      'PLATBA'
+    )
+    expect(
+      extractVerificationCode('G-123456 is your Google verification code.')
+    ).toBe('G123456')
   })
 })

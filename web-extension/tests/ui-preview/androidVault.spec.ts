@@ -18,6 +18,7 @@ test('renders captured native Android vault, authenticator and autofill screens'
     'Confirm master transfer',
     'After master transfer',
     'Unlock settings',
+    'SMS codes to browsers',
     'Automatic fingerprint prompt',
     'Master password fallback',
     'Fingerprint unlock',

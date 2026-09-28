@@ -10,6 +10,8 @@
     "node_modules/*",
     "*.snap",
     "**/*.codegen.*",
+    "shared/openapi/authier.json",
+    "backend/drizzle/migrations/**",
     "landing-page/public/research/autofill-safety-corpus-v1.json",
     "pnpm-lock.yaml"
   ]
