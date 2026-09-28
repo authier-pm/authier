@@ -1,11 +1,8 @@
-import { h } from 'preact'
+/** @jsxImportSource preact */
 import { useState } from 'preact/hooks'
 
 import { popupDiv } from '../renderItemPopup'
 import { trpc } from '../connectTRPC'
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const nano = h
 
 export const PromptItemPopup = ({ inputEvents }: { inputEvents: any }) => {
   const [username, setUsername] = useState('')

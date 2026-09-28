@@ -1,8 +1,6 @@
-import { h, render } from 'preact'
+/** @jsxImportSource preact */
+import { render } from 'preact'
 import { Toast } from './components/Toast'
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const nano = h
 
 export let recordDiv: HTMLDivElement | null
 

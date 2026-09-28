@@ -4,7 +4,7 @@ import type {
 } from '../../lib/createLegacyHttpAdapters'
 import type Stripe from 'stripe'
 import type { db } from '../../prisma/prismaClient'
-import * as dbSchema from '../../drizzle/schema'
+import type * as dbSchema from '../../drizzle/schema'
 import type { InferSelectModel } from 'drizzle-orm'
 export type Device = InferSelectModel<typeof dbSchema.device>
 

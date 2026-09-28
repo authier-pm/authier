@@ -5,4 +5,4 @@ describe('authMiddleware', () => {
   it.todo('should NOT call next if user is not authenticated')
 })
 
-export {}
+

@@ -18,8 +18,6 @@ import type { IContext } from './models/types/ContextTypes'
 import debug from 'debug'
 import { healthReportHandler } from './healthReportRoute'
 import { webhookHandler } from './stripeWebhook'
-import * as schema from './drizzle/schema'
-import { eq } from 'drizzle-orm'
 import { confirmReset } from './lib/masterDeviceReset'
 import {
   type LegacyElysiaContext,

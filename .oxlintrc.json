@@ -1,0 +1,64 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": ["typescript", "react", "unicorn", "oxc", "import", "vitest"],
+  "categories": {
+    "correctness": "error"
+  },
+  "env": {
+    "builtin": true,
+    "browser": true,
+    "node": true
+  },
+  "ignorePatterns": [
+    ".pnpm-patches/**",
+    "**/generated/**",
+    "**/*.codegen.tsx",
+    "web-extension/src/locale/**/messages.ts"
+  ],
+  "rules": {
+    "no-unused-vars": [
+      "error",
+      {
+        "argsIgnorePattern": "^_",
+        "varsIgnorePattern": "^_",
+        "caughtErrorsIgnorePattern": "^_"
+      }
+    ],
+    "prefer-const": [
+      "error",
+      {
+        "ignoreReadBeforeAssign": true
+      }
+    ],
+    "no-var": "error",
+    "array-callback-return": "error",
+    "getter-return": "error",
+    "vitest/valid-expect": [
+      "error",
+      {
+        "maxArgs": 2
+      }
+    ],
+    "vitest/require-mock-type-parameters": "off",
+    "vitest/warn-todo": "off",
+    "vitest/require-to-throw-message": "off",
+    "react-hooks/exhaustive-deps": "warn",
+    "react/set-state-in-effect": "warn",
+    "react/immutability": "warn",
+    "react/incompatible-library": "warn"
+  },
+  "overrides": [
+    {
+      "files": ["backend/**"],
+      "rules": {
+        "typescript/consistent-type-imports": "error"
+      }
+    },
+    {
+      "files": ["web-extension/tests/**"],
+      "rules": {
+        "no-empty-pattern": "off"
+      }
+    }
+  ]
+}

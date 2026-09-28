@@ -1,9 +1,7 @@
-import { h, render } from 'preact'
+/** @jsxImportSource preact */
+import { render } from 'preact'
 import { PromptItemPopup } from './components/PromptItemPopup'
 import { trpc } from './connectTRPC'
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const nano = h
 
 export let popupDiv: HTMLDivElement | null
 

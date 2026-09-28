@@ -1,7 +1,7 @@
 import { updateResetConfig, getResetStatus } from '../lib/masterDeviceReset'
 import type { MasterDeviceResetConfig } from '../../shared/masterDeviceResetConfig'
 import { implement, ORPCError } from '@orpc/server'
-import { and, desc, eq, sql } from 'drizzle-orm'
+import { and, eq, sql } from 'drizzle-orm'
 import { verify } from 'jsonwebtoken'
 import {
   DecryptionChallengeApproved,
@@ -15,7 +15,6 @@ import {
 } from '../models/Device'
 import { UserMutation } from '../models/UserMutation'
 import { UserQuery } from '../models/UserQuery'
-import type { IContext } from '../models/types/ContextTypes'
 import type { jwtPayloadRefreshToken } from '../userAuth'
 import { setNewAccessTokenIntoCookie, setNewRefreshToken } from '../userAuth'
 import { RootResolver } from '../schemas/RootResolver'
@@ -25,7 +24,7 @@ import { vaultApiContract } from '@shared/orpc/contract'
 import type { OrpcContext } from './context'
 import { requireAuthContext } from './context'
 import { EncryptedSecretTypeGQL } from '../models/types/EncryptedSecretType'
-import { UserNewDevicePolicyGQL } from '../models/types/UserNewDevicePolicy'
+import type { UserNewDevicePolicyGQL } from '../models/types/UserNewDevicePolicy'
 import { runVaultTransaction } from '../vault/vaultWrites'
 import { syncVault, writeVaultSecret } from './mobileVault'
 

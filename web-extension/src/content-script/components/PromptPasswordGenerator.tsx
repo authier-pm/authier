@@ -1,4 +1,4 @@
-import { h } from 'preact'
+/** @jsxImportSource preact */
 import { useEffect, useState } from 'preact/hooks'
 import browser from 'webextension-polyfill'
 
@@ -9,9 +9,6 @@ import {
   resolveLiveGeneratedPasswordInput
 } from '../autofill'
 import { removePasswordGenerator } from '../renderPasswordGenerator'
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const nano = h
 
 const TRIGGER_SIZE = 36
 const FIELD_INSET = 6

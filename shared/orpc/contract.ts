@@ -12,7 +12,6 @@ import {
   mobileSecretRecordSchema,
   vaultSyncInputSchema,
   vaultSyncResultSchema,
-  addNewDeviceInputSchema,
   authenticatedSessionSchema,
   currentDeviceSchema,
   challengeActionInputSchema,

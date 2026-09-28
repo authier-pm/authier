@@ -205,6 +205,7 @@ describe('main-world autofill fallback', () => {
       <input id="password" type="password" autocomplete="current-password" />
     </form>`
     const serializedFunction = mainWorldAutofillFunction.toString()
+    // oxlint-disable-next-line no-eval -- the function must work when re-created from its source, like executeScript does
     const executeSerialized: typeof mainWorldAutofillFunction = window.eval(
       `(${serializedFunction})`
     )

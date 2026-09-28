@@ -66,7 +66,7 @@ export const getContentScriptInitialState = async (
     decrypted = []
   }
 
-  let webInputs = getWebInputsForUrl(tabUrl)
+  const webInputs = getWebInputsForUrl(tabUrl)
   const [isPausedForPage, autofillCredentialsEnabled] = await Promise.all([
     isAutofillPausedForPage(currentTabId, tabUrl),
     getAutofillCredentialsEnabled()

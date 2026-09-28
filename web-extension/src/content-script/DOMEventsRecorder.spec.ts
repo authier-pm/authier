@@ -5,10 +5,8 @@ import {
 } from './DOMEventsRecorder'
 
 describe('DOMEventsRecorder', () => {
-  it('should only add event once per input', async () => {
-    // TODO
-    // multiple events from single input must remove the previous ones stored in the recorder
-  })
+  // multiple events from single input must remove the previous ones stored in the recorder
+  it.todo('should only add event once per input')
 
   describe('getUsername', () => {
     it('should skip unknown input before password when kind is null', async () => {

@@ -8,6 +8,7 @@
     "target": "ES2022",
     "module": "ESNext",
     "noEmit": true,
+    "allowImportingTsExtensions": true,
     "moduleResolution": "bundler",
     "rootDir": "..",
     "outDir": "dist/js",
@@ -31,5 +32,11 @@
     "**/*.spec.*",
     "../shared/**/*.spec.*"
   ],
-  "include": ["./src/**/*", "../shared/**/*"]
+  "include": [
+    "./src/**/*",
+    "../shared/**/*",
+    "./vite/**/*",
+    "./scripts/buildExtension.mts",
+    "./scripts/devExtension.mts"
+  ]
 }

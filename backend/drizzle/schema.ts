@@ -15,7 +15,6 @@ import {
   boolean,
   index,
   uniqueIndex,
-  foreignKey,
   type AnyPgColumn,
   primaryKey
 } from 'drizzle-orm/pg-core'
@@ -25,6 +24,7 @@ import {
   type MasterDeviceResetConfig
 } from '../../shared/masterDeviceResetConfig'
 import type { CachedPasswordFormClassification } from '../../shared/passwordFormClassification'
+import type { MobileSecretRecord } from '../../shared/orpc/schemas'
 
 export const tokenType = pgEnum('TokenType', ['EMAIL', 'API'])
 export const encryptedSecretType = pgEnum('EncryptedSecretType', [
@@ -263,8 +263,7 @@ export const vaultOperation = pgTable(
       .references(() => user.id, { onDelete: 'cascade' }),
     operationId: uuid().notNull(),
     requestHash: text().notNull(),
-    response:
-      jsonb().$type<import('../../shared/orpc/schemas').MobileSecretRecord>(),
+    response: jsonb().$type<MobileSecretRecord>(),
     createdAt: timestamp({ precision: 3 }).defaultNow().notNull()
   },
   (table) => [primaryKey({ columns: [table.userId, table.operationId] })]

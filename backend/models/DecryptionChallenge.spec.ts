@@ -70,7 +70,6 @@ describe('DecryptionChallenge', () => {
 
   describe('addNewDeviceForUser', () => {
     const fakeCtx = {
-      // eslint-disable-next-line @typescript-eslint/no-empty-function
       reply: { setCookie: () => {} },
       request: { headers: {} },
       db,
@@ -193,7 +192,6 @@ describe('DecryptionChallenge', () => {
     }
     it('should approve challenge', async () => {
       const fakeCtx = {
-        // eslint-disable-next-line @typescript-eslint/no-empty-function
         reply: { setCookie: () => {} },
         request: { headers: {} },
         db,

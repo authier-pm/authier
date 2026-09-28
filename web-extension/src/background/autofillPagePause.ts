@@ -81,16 +81,14 @@ export const refreshAutofillForDomain = async (url: string): Promise<void> => {
   await Promise.all(
     tabs
       .filter((tab) => getAutofillPauseHostname(tab.url ?? '') === hostname)
-      .map((tab) => {
-        if (typeof tab.id !== 'number') {
-          return
-        }
-
+      .map((tab) => tab.id)
+      .filter((tabId) => typeof tabId === 'number')
+      .map((tabId) =>
         // Tabs without a content script (or closed during the query) cannot receive it.
-        return browser.tabs
-          .sendMessage(tab.id, { kind: AutofillPagePauseMessageKind.REFRESH })
+        browser.tabs
+          .sendMessage(tabId, { kind: AutofillPagePauseMessageKind.REFRESH })
           .catch(() => undefined)
-      })
+      )
   )
 }
 

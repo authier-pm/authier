@@ -18,16 +18,12 @@ import { trpc } from './connectTRPC'
 import { selectLoginForPage } from './selectLoginForPage'
 import { renderSaveCredentialsForm } from './renderSaveCredentialsForm'
 
-import browser from 'webextension-polyfill'
 import {
   generateQuerySelectorForOrphanedElement,
   getSelectorForElement
 } from './cssSelectorGenerators'
 import { notyf } from './notyf'
-import {
-  WebInputForAutofill,
-  WebInputsArrayClientSide
-} from '../background/WebInputForAutofill'
+import { WebInputsArrayClientSide } from '../background/WebInputForAutofill'
 import { wait } from './wait'
 import {
   filterUselessInputs,
@@ -444,12 +440,13 @@ export const fillStringIntoInput = ({
     inputTypesFilledForThisPage.add(inputType)
   }
 
-  el &&
+  if (el) {
     notyf.success(
       `Autofilled password for ${
         loginCredential.username
       } into element ${generateQuerySelectorForOrphanedElement(el)}`
     )
+  }
 
   return el
 }
@@ -462,7 +459,7 @@ export const getElementCoordinates = (el: HTMLElement) => {
   }
 }
 
-let onInputAddedHandler = (inputEl: any) => {}
+let onInputAddedHandler = (_inputEl: any) => {}
 
 /**
  * tracks which input types have been autofilled for this page, so we don't autofill them again
@@ -666,7 +663,9 @@ export const autofill = (
             inputType: webInputGql.kind
           })
 
-          el && filledElements.add(el)
+          if (el) {
+            filledElements.add(el)
+          }
         } else if (
           [
             WebInputType.EMAIL,
@@ -681,7 +680,9 @@ export const autofill = (
             inputEl,
             firstLoginCred.loginCredentials.username
           )
-          el && filledElements.add(el)
+          if (el) {
+            filledElements.add(el)
+          }
         } else if (webInputGql.kind === WebInputType.TOTP) {
           if (!totpSecret) {
             log('no totp secret')

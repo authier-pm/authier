@@ -12,9 +12,6 @@ import { QRCode } from '@src/pages/QRcode'
 
 import Devices from '@src/pages/Devices'
 
-import debug from 'debug'
-const log = debug('au:Popup')
-
 i18n.activate('en')
 
 export const Popup: FunctionComponent = () => {

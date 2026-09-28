@@ -5,19 +5,10 @@ vi.mock('@shared/rememberedVault', () => ({
 }))
 import { mockDate, unmockDate } from 'proxy-date'
 import { beforeAll, afterAll, vi } from 'vitest'
-// Import mockzilla dynamically to avoid ES module vs CommonJS conflicts
-// import { deepMock } from 'mockzilla'
 
-// Mock browser extension API
-import type { Browser } from 'webextension-polyfill'
-
-// We'll set these variables later when we dynamically import mockzilla
-let browser: any
-let mockBrowser: any
-let mockBrowserNode: any
 // Mock chromeLink TODO figure out why vitest has issues with importing chromeLink
 vi.mock('@capaj/trpc-browser/link', () => ({
-  chromeLink: vi.fn((options) => {
+  chromeLink: vi.fn(() => {
     return () => ({
       subscribe: vi.fn(),
       unsubscribe: vi.fn()
@@ -27,7 +18,7 @@ vi.mock('@capaj/trpc-browser/link', () => ({
 
 // Mock BroadcastChannel
 // @ts-expect-error
-window.BroadcastChannel = function BroadcastChannel(name) {}
+window.BroadcastChannel = function BroadcastChannel() {}
 
 // Mock location object for browser extension environment
 // This is needed because location.href is read-only in jsdom

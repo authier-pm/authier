@@ -2,7 +2,6 @@ import type { LegacyRequest } from './lib/createLegacyHttpAdapters'
 import { db } from './prisma/prismaClient'
 import { createStripeClientGetter } from './stripeClient'
 
-import { GraphQLError } from 'graphql'
 import type Stripe from 'stripe'
 import debug from 'debug'
 import { and, eq, sql } from 'drizzle-orm'
@@ -29,7 +28,9 @@ export const endpointSecret = process.env.STRIPE_ENDPOINT as string
 const CREDS_SUBSCRIPTION_INCREASE = 250
 const TOTP_SUBSCRIPTION_INCREASE = 100
 
-const knownProductIds = new Set(Object.values(stripeProducts.test).concat(Object.values(stripeProducts.live)))
+const knownProductIds = new Set(
+  Object.values(stripeProducts.test).concat(Object.values(stripeProducts.live))
+)
 
 interface WebhookReply {
   status: (code: number) => {
@@ -45,8 +46,6 @@ export const webhookHandler = async (
   const stripeClient = createStripeClientGetter()()
   const sig = req.headers['stripe-signature']
 
-  let event: Stripe.Event
-
   if (!sig) {
     reply.status(400).send('Webhook Error: Missing stripe-signature header')
     return
@@ -59,17 +58,13 @@ export const webhookHandler = async (
     return
   }
 
-  event = (() => {
+  const event = ((): Stripe.Event | null => {
     try {
-      return stripeClient.webhooks.constructEvent(
-        rawBody,
-        sig,
-        endpointSecret
-      )
+      return stripeClient.webhooks.constructEvent(rawBody, sig, endpointSecret)
     } catch (error) {
       log('Webhook signature verification failed', error)
       reply.status(400).send('Webhook Error: Invalid signature')
-      return null as unknown as Stripe.Event
+      return null
     }
   })()
   if (!event) return
@@ -219,8 +214,7 @@ export const webhookHandler = async (
     const items = subscription.items?.data ?? []
     for (const item of items) {
       const product = item.price?.product
-      const productId =
-        typeof product === 'string' ? product : product?.id
+      const productId = typeof product === 'string' ? product : product?.id
       if (productId && knownProductIds.has(productId)) {
         productIds.add(productId)
       }

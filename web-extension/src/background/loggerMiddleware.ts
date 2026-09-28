@@ -8,6 +8,6 @@ export const loggerMiddleware = tc.middleware(async ({ path, type, next }) => {
   const result = await next()
   const durationMs = Date.now() - start
 
-  result.ok ? log({ path, type, durationMs }) : log({ path, type, durationMs })
+  log({ path, type, durationMs, ok: result.ok })
   return result
 })

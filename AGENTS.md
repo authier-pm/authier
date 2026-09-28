@@ -4,6 +4,7 @@
 - runtime is Bun
 - create a new abstraction when you find yourself repeating code, keep the code DRY
 - The `gh` CLI is installed, use it
+- lint with oxlint: `pnpm lint` (or `pnpm lint:fix`) from the repo root, configured in `.oxlintrc.json`. Do not add eslint. Keep `pnpm lint` free of errors; CI and the pre-commit hook run it
   = whenever adding a user-visible UI feature, add or update a checked-in scenario in `web-extension/ui-preview`, render the updated UI, and include a newly captured screenshot in your response. Include it in github PR too if you create one
 
 ### File naming

@@ -1,9 +1,7 @@
-import { h, render } from 'preact'
+/** @jsxImportSource preact */
+import { render } from 'preact'
 import { PromptPasswordGenerator } from './components/PromptPasswordGenerator'
 import { authierOverlayBaseStyles } from './components/authierOverlayStyles'
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const nano = h
 
 export let generatorDiv: HTMLDivElement | null
 let generatorContainer: HTMLDivElement | null = null

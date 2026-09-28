@@ -1,15 +1,12 @@
-import { h } from 'preact'
+/** @jsxImportSource preact */
+import type { ComponentChildren } from 'preact'
 import { useState } from 'preact/hooks'
-import type { ReactNode } from 'react'
 import browser from 'webextension-polyfill'
 
 import { ICapturedInput } from '../../background/backgroundPage'
 import { trpc } from '../connectTRPC'
 import { loginPrompt } from '../renderSaveCredentialsForm'
 import { authierOverlayBaseStyles } from './authierOverlayStyles'
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const nano = h
 
 const savePromptStyles = `
   ${authierOverlayBaseStyles}
@@ -154,7 +151,7 @@ const CredentialRow = ({
   password,
   value
 }: {
-  action?: ReactNode
+  action?: ComponentChildren
   label: string
   password?: boolean
   value: string

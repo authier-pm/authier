@@ -35,7 +35,7 @@ export const getAllInputsIncludingShadowDom = (
 
     let currentNode = walker.currentNode
     while (currentNode) {
-      let shadowRoot = (currentNode as Element).shadowRoot
+      const shadowRoot = (currentNode as Element).shadowRoot
       if (shadowRoot) {
         // console.log('currentNode11', currentNode)
         searchNode(shadowRoot)
@@ -316,19 +316,13 @@ export function mainWorldAutofillFunction(
       input.autocomplete?.includes('username') ||
       input.autocomplete?.includes('email')
     ) {
-      const autofilledElUsername = autofillValueIntoInput(
-        input,
-        recentlyUsedLogin.username
-      )
+      autofillValueIntoInput(input, recentlyUsedLogin.username)
       autofilledInputs.push({
         webInputType: 'USERNAME',
         username: recentlyUsedLogin.username
       })
     } else if (input === storedPasswordTarget) {
-      const autofilledElPassword = autofillValueIntoInput(
-        input,
-        recentlyUsedLogin.password
-      )
+      autofillValueIntoInput(input, recentlyUsedLogin.password)
       autofilledInputs.push({
         webInputType: 'PASSWORD',
         username: recentlyUsedLogin.username

@@ -11,7 +11,6 @@ import {
   type ReactNode,
   type SelectHTMLAttributes
 } from 'react'
-import { cn } from '@src/lib/cn'
 import { Button as UIButton } from './button'
 import { Input as UIInput } from './input'
 import { Tooltip as UITooltip } from './tooltip'
@@ -486,7 +485,7 @@ export function FormErrorMessage({ children }: { children?: ReactNode }) {
   ) : null
 }
 
-export function Spinner({ size }: { size?: string } = {}) {
+export function Spinner() {
   return (
     <div className="size-8 animate-spin rounded-full border-2 border-[color:var(--color-border)] border-t-[color:var(--color-primary)]" />
   )

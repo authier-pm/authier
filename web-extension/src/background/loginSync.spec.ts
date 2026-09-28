@@ -102,7 +102,7 @@ beforeEach(async () => {
     const changes = Object.fromEntries(
       Object.entries(values).map(([name, newValue]) => [name, { newValue }])
     )
-    for (const listener of [...listeners]) listener(changes, 'session')
+    for (const listener of Array.from(listeners)) listener(changes, 'session')
   })
   device.state = null
   device.lockedState = null

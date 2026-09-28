@@ -24,7 +24,7 @@ export default defineConfig({
       {
         find: /^crypto$/,
         replacement: fileURLToPath(
-          new URL('./cryptoBrowser.ts', import.meta.url)
+          new URL('../src/lib/cryptoBrowser.ts', import.meta.url)
         )
       },
       {

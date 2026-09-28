@@ -6,7 +6,6 @@ import {
   FiCheckCircle,
   FiEdit3,
   FiGlobe,
-  FiKey,
   FiLock,
   FiLogOut,
   FiMonitor,

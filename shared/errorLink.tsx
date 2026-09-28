@@ -13,7 +13,7 @@ export const errorLink = new ErrorLink(({ error, operation }) => {
       //Here just logout the user
       device.clearAndReload()
     }
-    graphQLErrors.map(({ message, path }) => {
+    graphQLErrors.forEach(({ message, path }) => {
       console.error(
         `[GraphQL error]: Message: ${message}, operation: ${operation.operationName}, Path: ${path}`
       )

@@ -1,6 +1,6 @@
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import type { PGlite } from '@electric-sql/pglite'
-import { and, eq } from 'drizzle-orm'
+import { eq } from 'drizzle-orm'
 import { sign } from 'jsonwebtoken'
 import { db, setDb } from './prisma/prismaClient'
 import { setupTestDb, testDb } from './tests/testEnv'
@@ -356,14 +356,15 @@ describe('versioned JSON mobile API', () => {
       expectedVersion: secret.version,
       encrypted: 'edited'
     }
-    const responses = await Promise.all([
-      request('vault/update', update),
-      request('vault/update', {
-        ...update,
-        operationId: crypto.randomUUID(),
-        encrypted: 'competing-edit'
-      })
-    ])
+    const competingUpdate = {
+      ...update,
+      operationId: crypto.randomUUID(),
+      encrypted: 'competing-edit'
+    }
+    const updateInputs = [update, competingUpdate]
+    const responses = await Promise.all(
+      updateInputs.map((input) => request('vault/update', input))
+    )
     expect(responses.map((response) => response.status).sort()).toEqual([
       200, 409
     ])
@@ -374,13 +375,11 @@ describe('versioned JSON mobile API', () => {
       await responses[winnerIndex].json()
     )
     expect(winner.version).toBe(2)
-    const retryInput = winnerIndex === 0 ? update : null
-    if (retryInput)
-      expect(
-        mobileSecretRecordSchema.parse(
-          await (await request('vault/update', retryInput)).json()
-        )
-      ).toEqual(winner)
+    expect(
+      mobileSecretRecordSchema.parse(
+        await (await request('vault/update', updateInputs[winnerIndex])).json()
+      )
+    ).toEqual(winner)
     const deletion = {
       operationId: crypto.randomUUID(),
       id: secret.id,
@@ -622,7 +621,7 @@ describe('versioned JSON mobile API', () => {
     )
     const complete = await snapshot()
     const missingVersions = prepare(complete).map(
-      ({ expectedVersion, ...record }) => record
+      ({ expectedVersion: _expectedVersion, ...record }) => record
     )
     expect((await rotate(missingVersions)).errors[0].message).toContain(
       'Update your Authier app'
@@ -698,12 +697,15 @@ describe('versioned JSON mobile API', () => {
         }
       ])
     })
-    const rejected = expect(queued).rejects.toMatchObject({
-      code: 'UNAUTHORIZED'
-    })
+    // Settle-tracking starts before release so the rejection is never unhandled.
+    const queuedOutcome = Promise.allSettled([queued])
     release.resolve()
     await rotating
-    await rejected
+    const [outcome] = await queuedOutcome
+    expect(outcome).toMatchObject({
+      status: 'rejected',
+      reason: { code: 'UNAUTHORIZED' }
+    })
     expect(attemptedWrite).toBe(false)
   })
 })
