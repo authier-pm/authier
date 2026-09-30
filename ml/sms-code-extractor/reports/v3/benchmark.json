@@ -1,0 +1,20 @@
+{
+  "platform": "Linux x86_64, AMD Ryzen 9 9900X, ONNX CPU, 4 threads",
+  "androidMeasured": false,
+  "modelLoadSeconds": 0.39146969001740217,
+  "messages": 300,
+  "batchSize": 1,
+  "dataDirectory": "/home/capaj/work-repos/authier-repos/authier2/ml/sms-code-extractor/data/generated/v3-targeted",
+  "p50InferenceMs": 2.781284012598917,
+  "p95InferenceMs": 3.8662486796965823,
+  "peakProcessRssBytes": 635973632,
+  "residentProcessRssBytes": 635973632,
+  "memoryMethod": "Linux /proc/self/status VmHWM and VmRSS in a fresh process",
+  "medianTokens": 24.0,
+  "maxTokens": 57,
+  "caveats": [
+    "Desktop measurement, not a 4 GB Android device.",
+    "Model load may benefit from the OS disk cache.",
+    "Latency excludes tokenization and decoding; RSS includes tokenizer and runtime."
+  ]
+}

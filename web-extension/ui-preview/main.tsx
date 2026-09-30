@@ -25,6 +25,7 @@ import { EmailVerificationCodesPreview } from './scenarios/EmailVerificationCode
 import { SmsVerificationCodesPreview } from './scenarios/SmsVerificationCodesPreview'
 import { NewDevicePolicyPreview } from './scenarios/NewDevicePolicyPreview'
 import { TotpLabelsPreview } from './scenarios/TotpLabelsPreview'
+import { VaultScrollingPreview } from './scenarios/VaultScrollingPreview'
 
 const DEFAULT_SCENARIO = 'autofill-controls'
 const scenarios: Record<string, ComponentType> = {
@@ -46,6 +47,7 @@ const scenarios: Record<string, ComponentType> = {
   'android-landing': AndroidLandingPreview,
   'bitfinex-totp': BitfinexTotpPreview,
   'totp-labels': TotpLabelsPreview,
+  'vault-scrolling': VaultScrollingPreview,
   'kostkohratky-password': KostkohratkyPasswordPreview
 }
 const requestedScenario =
@@ -64,6 +66,7 @@ document.body.classList.toggle(
     !requestedScenario.startsWith('android-') &&
     requestedScenario !== 'bitfinex-totp' &&
     requestedScenario !== 'totp-labels' &&
+    requestedScenario !== 'vault-scrolling' &&
     requestedScenario !== 'kostkohratky-password' &&
     requestedScenario !== 'email-verification-codes' &&
     requestedScenario !== 'sms-verification-codes' &&

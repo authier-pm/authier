@@ -1,0 +1,122 @@
+{
+  "en": [
+    "A device wants to join your account. Give it the secret {code} to allow pairing.",
+    "{code}\nKeep this temporary credential for restoring access to your profile.",
+    "Show that you own this phone by typing {code} into the verification screen.",
+    "Use the current key {code} for access. The replaced key {old} must be ignored.",
+    "Wondering where your parcel is? Follow its journey with {other} on the courier website.",
+    "See your shipment's progress using {other}; your profile settings stay as they are.",
+    "Need help getting into your profile? Quote {other} to the support agent handling the case.",
+    "The help desk has opened an access problem case. Use {other} to follow its progress."
+  ],
+  "hu": [
+    "Egy eszköz csatlakozni szeretne a fiókodhoz. A párosítás engedélyezéséhez add meg neki ezt a titkos értéket: {code}.",
+    "{code}\nŐrizd meg ezt az ideiglenes hitelesítő adatot a profilodhoz való hozzáférés helyreállításához.",
+    "Igazold, hogy ez a telefon a tiéd: írd be a {code} értéket az ellenőrző képernyőn.",
+    "A hozzáféréshez az aktuális {code} kulcsot használd. A lecserélt {old} kulcsot hagyd figyelmen kívül.",
+    "Kíváncsi vagy, hol jár a csomagod? Kövesd az útját a futár weboldalán ezzel: {other}.",
+    "A küldemény útját a {other} segítségével nézheted meg; a profilod beállításai ugyanazok maradnak.",
+    "Segítség kell a profilod eléréséhez? Mondd meg a {other} hivatkozást az ügyet kezelő munkatársnak.",
+    "Az ügyfélszolgálat ügyet nyitott a hozzáférési problémáról. A {other} segítségével követheted az állapotát."
+  ],
+  "lv": [
+    "Ierīce vēlas pievienoties jūsu kontam. Lai atļautu savienošanu pārī, ievadiet tajā slepeno vērtību {code}.",
+    "{code}\nSaglabājiet šo pagaidu akreditācijas informāciju, lai atjaunotu piekļuvi savam profilam.",
+    "Pierādiet, ka šis tālrunis pieder jums, pārbaudes ekrānā ierakstot {code}.",
+    "Piekļuvei izmantojiet pašreizējo atslēgu {code}. Aizstāto atslēgu {old} ignorējiet.",
+    "Vai vēlaties zināt, kur ir jūsu paka? Kurjera vietnē sekojiet tās ceļam ar {other}.",
+    "Apskatiet sūtījuma virzību, izmantojot {other}; jūsu profila iestatījumi paliek tādi paši.",
+    "Vajadzīga palīdzība piekļuvei profilam? Nosauciet {other} atbalsta darbiniekam, kurš risina šo lietu.",
+    "Palīdzības dienests ir atvēris lietu par piekļuves problēmu. Izmantojiet {other}, lai sekotu tās virzībai."
+  ],
+  "et": [
+    "Seade soovib teie kontoga liituda. Sidumise lubamiseks sisestage seadmesse salajane väärtus {code}.",
+    "{code}\nHoidke seda ajutist pääsutunnust oma profiilile juurdepääsu taastamiseks.",
+    "Tõendage, et telefon kuulub teile, sisestades kinnitusekraanile {code}.",
+    "Juurdepääsuks kasutage praegust võtit {code}. Asendatud võtit {old} tuleb eirata.",
+    "Kas soovite teada, kus teie pakk on? Jälgige selle teekonda kulleri veebilehel väärtusega {other}.",
+    "Vaadake saadetise liikumist, kasutades {other}; teie profiili seaded jäävad samaks.",
+    "Kas vajate abi profiilile pääsemisel? Öelge juhtumit lahendavale kasutajatoe töötajale {other}.",
+    "Kasutajatugi avas pöördumise juurdepääsuprobleemi kohta. Selle edenemise jälgimiseks kasutage {other}."
+  ],
+  "el": [
+    "Μια συσκευή θέλει να συνδεθεί στον λογαριασμό σας. Δώστε της τη μυστική τιμή {code} για να επιτρέψετε τη σύζευξη.",
+    "{code}\nΚρατήστε αυτό το προσωρινό διαπιστευτήριο για την ανάκτηση πρόσβασης στο προφίλ σας.",
+    "Αποδείξτε ότι το τηλέφωνο σας ανήκει πληκτρολογώντας {code} στην οθόνη επαλήθευσης.",
+    "Για πρόσβαση χρησιμοποιήστε το τρέχον κλειδί {code}. Αγνοήστε το παλιό κλειδί {old} που αντικαταστάθηκε.",
+    "Αναρωτιέστε πού είναι το δέμα σας; Παρακολουθήστε τη διαδρομή του με {other} στον ιστότοπο του μεταφορέα.",
+    "Δείτε την πορεία της αποστολής χρησιμοποιώντας {other}· οι ρυθμίσεις του προφίλ σας παραμένουν ίδιες.",
+    "Χρειάζεστε βοήθεια για πρόσβαση στο προφίλ; Αναφέρετε {other} στον υπάλληλο υποστήριξης που χειρίζεται την υπόθεση.",
+    "Η υποστήριξη άνοιξε υπόθεση για πρόβλημα πρόσβασης. Χρησιμοποιήστε {other} για να παρακολουθείτε την πορεία της."
+  ],
+  "zh": [
+    "一台设备希望加入您的账户。请在该设备上输入密钥 {code} 以允许配对。",
+    "{code}\n请保留此临时凭据，用于恢复个人资料的访问权限。",
+    "请在验证页面输入 {code}，证明您拥有这部手机。",
+    "请使用当前密钥 {code} 获取访问权限。已被替换的旧密钥 {old} 无需理会。",
+    "想知道包裹到哪里了吗？请在快递网站使用 {other} 追踪运输路线。",
+    "通过 {other} 查看货件运输进度；您的个人资料设置保持原样。",
+    "无法进入个人资料，需要帮助吗？请向处理此问题的客服人员提供 {other}。",
+    "服务台已为访问问题创建工单。请使用 {other} 跟进处理进度。"
+  ],
+  "bn": [
+    "একটি ডিভাইস আপনার অ্যাকাউন্টে যুক্ত হতে চায়। জোড়া লাগানোর অনুমতি দিতে ডিভাইসে গোপন মান {code} লিখুন।",
+    "{code}\nআপনার প্রোফাইলে প্রবেশাধিকার পুনরুদ্ধারের জন্য এই অস্থায়ী পরিচয়পত্রটি রাখুন।",
+    "এই ফোনটি আপনার তা প্রমাণ করতে যাচাইকরণ পর্দায় {code} লিখুন।",
+    "প্রবেশের জন্য বর্তমান চাবি {code} ব্যবহার করুন। বদলে দেওয়া পুরোনো চাবি {old} উপেক্ষা করুন।",
+    "আপনার পার্সেল কোথায় জানতে চান? কুরিয়ারের ওয়েবসাইটে {other} দিয়ে সেটির যাত্রাপথ অনুসরণ করুন।",
+    "{other} ব্যবহার করে চালানের অগ্রগতি দেখুন; আপনার প্রোফাইলের সেটিংস একই থাকবে।",
+    "প্রোফাইলে ঢুকতে সাহায্য দরকার? বিষয়টি দেখছেন এমন সহায়তা কর্মীকে {other} জানান।",
+    "প্রবেশের সমস্যা নিয়ে সহায়তা বিভাগ একটি অভিযোগ খুলেছে। এর অগ্রগতি জানতে {other} ব্যবহার করুন।"
+  ],
+  "cs": [
+    "Zařízení se chce připojit k vašemu účtu. Pro povolení párování do něj zadejte tajnou hodnotu {code}.",
+    "{code}\nUschovejte tento dočasný přihlašovací údaj pro obnovení přístupu ke svému profilu.",
+    "Dokažte, že vám tento telefon patří, zadáním {code} na ověřovací obrazovce.",
+    "Pro přístup použijte aktuální klíč {code}. Nahrazený klíč {old} ignorujte.",
+    "Zajímá vás, kde je váš balík? Na webu dopravce sledujte jeho cestu pomocí {other}.",
+    "Průběh přepravy zásilky zobrazíte pomocí {other}; nastavení vašeho profilu zůstává stejné.",
+    "Potřebujete pomoc s přístupem k profilu? Pracovníkovi podpory, který případ řeší, sdělte {other}.",
+    "Podpora založila případ kvůli problému s přístupem. Pomocí {other} sledujte průběh jeho řešení."
+  ],
+  "fr": [
+    "Un appareil souhaite rejoindre votre compte. Saisissez-y la valeur secrète {code} pour autoriser l'association.",
+    "{code}\nConservez cet identifiant temporaire pour rétablir l'accès à votre profil.",
+    "Prouvez que ce téléphone vous appartient en saisissant {code} sur l'écran de vérification.",
+    "Utilisez la clé actuelle {code} pour accéder au compte. Ignorez la clé remplacée {old}.",
+    "Vous voulez savoir où se trouve votre colis ? Suivez son trajet avec {other} sur le site du transporteur.",
+    "Consultez l'avancement de votre envoi avec {other} ; les paramètres de votre profil restent les mêmes.",
+    "Besoin d'aide pour accéder à votre profil ? Indiquez {other} au conseiller chargé de votre dossier.",
+    "L'assistance a ouvert un dossier pour un problème d'accès. Utilisez {other} pour suivre son avancement."
+  ],
+  "ga": [
+    "Ba mhaith le gléas ceangal le do chuntas. Cuir an luach rúnda {code} isteach ann chun an phéireáil a cheadú.",
+    "{code}\nCoinnigh an dintiúr sealadach seo chun rochtain ar do phróifíl a athbhunú.",
+    "Cruthaigh gur leatsa an fón seo trí {code} a chur isteach ar an scáileán fíoraithe.",
+    "Úsáid an eochair reatha {code} le haghaidh rochtana. Déan neamhaird den eochair {old} a athraíodh.",
+    "Ar mhaith leat a fháil amach cá bhfuil do bheartán? Lean a thuras le {other} ar shuíomh an chúiréara.",
+    "Féach ar dhul chun cinn do lastais le {other}; fanann socruithe do phróifíle mar atá siad.",
+    "Cabhair uait chun dul isteach i do phróifíl? Luaigh {other} leis an ngníomhaire tacaíochta atá ag plé leis an gcás.",
+    "D'oscail an deasc chabhrach cás faoi fhadhb rochtana. Úsáid {other} chun dul chun cinn an cháis a leanúint."
+  ],
+  "mt": [
+    "Apparat irid jingħaqad mal-kont tiegħek. Daħħal fih il-valur sigriet {code} biex tippermetti t-tqabbil.",
+    "{code}\nŻomm din il-kredenzjali temporanja biex terġa' tikseb aċċess għall-profil tiegħek.",
+    "Uri li dan it-telefon huwa tiegħek billi ddaħħal {code} fl-iskrin tal-verifika.",
+    "Uża ċ-ċavetta attwali {code} għall-aċċess. Injora ċ-ċavetta {old} li ġiet sostitwita.",
+    "Trid tkun taf fejn jinsab il-pakkett tiegħek? Segwi l-vjaġġ tiegħu b'{other} fuq is-sit tal-kurrier.",
+    "Ara l-progress tal-kunsinna permezz ta' {other}; is-settings tal-profil tiegħek jibqgħu l-istess.",
+    "Għandek bżonn għajnuna biex tidħol fil-profil? Għid {other} lill-aġent tal-appoġġ li qed jieħu ħsieb il-każ.",
+    "L-appoġġ fetaħ każ dwar problema ta' aċċess. Uża {other} biex issegwi l-progress tiegħu."
+  ],
+  "hi": [
+    "एक डिवाइस आपके खाते से जुड़ना चाहता है। पेयरिंग की अनुमति देने के लिए उसमें गुप्त मान {code} दर्ज करें।",
+    "{code}\nअपनी प्रोफ़ाइल तक पहुँच वापस पाने के लिए यह अस्थायी प्रवेश प्रमाण संभालकर रखें।",
+    "सत्यापन स्क्रीन पर {code} लिखकर साबित करें कि यह फ़ोन आपका है।",
+    "पहुँच के लिए मौजूदा कुंजी {code} का उपयोग करें। बदली जा चुकी पुरानी कुंजी {old} को अनदेखा करें।",
+    "जानना चाहते हैं कि आपका पार्सल कहाँ है? कुरियर की वेबसाइट पर {other} से उसकी यात्रा देखें।",
+    "{other} का उपयोग करके खेप की प्रगति देखें; आपकी प्रोफ़ाइल की सेटिंग वही रहेंगी।",
+    "प्रोफ़ाइल में प्रवेश करने में मदद चाहिए? मामला देख रहे सहायता कर्मी को {other} बताएँ।",
+    "सहायता विभाग ने पहुँच की समस्या पर एक मामला खोला है। उसकी प्रगति देखने के लिए {other} का उपयोग करें।"
+  ]
+}

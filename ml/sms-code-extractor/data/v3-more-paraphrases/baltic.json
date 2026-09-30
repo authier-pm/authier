@@ -1,0 +1,38 @@
+{
+  "lv": [
+    "Apstipriniet piekļuves pieprasījumu, ievadot {code}.",
+    "Ievadiet {code}, kad vietne lūdz apstiprināt jūsu identitāti.",
+    "Pierakstīšanās {brand} kontā\n{code}\nIerakstiet šo apstiprinājuma ekrānā.",
+    "Piekļuve kontam tiks atbloķēta pēc {code} nosūtīšanas.",
+    "Tikai šai sesijai nepieciešamā paroles frāze ir {code}.",
+    "Summas {amount} EUR apstiprināšanai nepieciešams {code}; kvīts atsauce {other}.",
+    "Jūsu atjauninātā verifikācijas vērtība: {code}. Ignorējiet visas iepriekšējās ziņas.",
+    "Ierīce gaida apstiprinājumu. Ievadiet {code}, lai to atļautu.",
+    "Atrodiet savu sūtījumu ar izsekošanas identifikatoru {other}.",
+    "Izmantojiet {other}, lai skatītu piegādes statusu mūsu vietnē.",
+    "Pakas meklēšanas vērtība ir {other}. Varat pierakstīties kā parasti.",
+    "Pierakstīšanās problēmas gadījumā, sazinoties ar mums, norādiet atbalsta atsauci {other}.",
+    "Piekļuves problēmu reģistrējām pieteikumā {other}. Darbinieks atbildēs.",
+    "Jūsu pierakstīšanās incidenta atsauce ir {other}. Saglabājiet to palīdzības dienestam.",
+    "Rezervācijas atsauce {other}: parādiet to reģistratūrā.",
+    "Jūsu konta pārskats ir gatavs. Dokumenta identifikators {other}; pierakstīšanās apstiprinājums nav nepieciešams."
+  ],
+  "lt": [
+    "Patvirtinkite prieigos užklausą įvesdami {code}.",
+    "Įveskite {code}, kai svetainė prašo patvirtinti jūsų tapatybę.",
+    "Prisijungimas prie {brand} paskyros\n{code}\nĮrašykite tai patvirtinimo ekrane.",
+    "Prieiga prie paskyros bus atrakinta pateikus {code}.",
+    "Tik šiam seansui reikalinga slaptažodžio frazė yra {code}.",
+    "Sumos {amount} EUR patvirtinimui reikia {code}; kvito nuoroda {other}.",
+    "Jūsų atnaujinta patvirtinimo reikšmė: {code}. Nepaisykite visų ankstesnių žinučių.",
+    "Įrenginys laukia patvirtinimo. Įveskite {code}, kad jį leistumėte.",
+    "Raskite siuntą pagal sekimo identifikatorių {other}.",
+    "Naudokite {other}, kad mūsų svetainėje pamatytumėte pristatymo būseną.",
+    "Siuntinio paieškos reikšmė yra {other}. Galite prisijungti kaip įprastai.",
+    "Kilus prisijungimo problemai, kreipdamiesi į mus nurodykite pagalbos užklausos nuorodą {other}.",
+    "Prieigos problemą užregistravome užklausoje {other}. Darbuotojas atsakys.",
+    "Jūsų prisijungimo incidento nuoroda yra {other}. Išsaugokite ją pagalbos tarnybai.",
+    "Rezervacijos nuoroda {other}: parodykite ją registratūroje.",
+    "Jūsų paskyros ataskaita parengta. Dokumento identifikatorius {other}; prisijungimo patvirtinimo nereikia."
+  ]
+}

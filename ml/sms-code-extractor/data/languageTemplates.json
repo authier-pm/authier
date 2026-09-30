@@ -1,0 +1,402 @@
+{
+  "en": {
+    "name": "English",
+    "train": [
+      "Your verification code is {code}. Do not share it.",
+      "{code} is your one-time password to sign in to {brand}.",
+      "Confirm your phone number with {code}. Valid for {minutes} minutes.",
+      "To authorize a payment of {amount} EUR, enter {code}. Card ending {card}.",
+      "Previous code: {old}. Your new login code is {code}.",
+      "{brand}: use the security code {code} to reset your password.",
+      "Use coupon {other} for {percent}% off at {brand}.",
+      "Order {id} has shipped. Tracking number: {other}.",
+      "Your balance is {amount} EUR. Your card ends in {card}.",
+      "Your verification code expires in {duration} seconds.",
+      "Your old verification code {old} has expired. Request a new one.",
+      "Call me at {phone} tomorrow. See you at {time}.",
+      "Login codes: {old} or {other}. It is unclear which is current.",
+      "Follow this verification link: https://example.invalid/verify?code={other}"
+    ],
+    "validation": [
+      "[{brand}] Enter {code} to finish creating your account.",
+      "Keep {code} secret. This code approves the sign-in you requested.",
+      "Do not use {old}; verify your identity with {code} instead.",
+      "The verification request expires after {duration} seconds. No code has been issued.",
+      "Collection reference {other}: your parcel is waiting at the depot.",
+      "Special offer! Promotional code {other} saves you {percent}%.",
+      "Meet me at {time} and bring ticket {id}.",
+      "Two different verification codes, {old} and {other}; neither is marked as current."
+    ],
+    "test": [
+      "Someone is accessing your {brand} account. If this was you, type {code} on the verification screen.",
+      "Authentication required: {code}. This passphrase is single-use.",
+      "Approve the transfer of {amount} EUR from card **{card} with {code}.",
+      "{code}\nCopy these characters into the field to confirm your email address. Expires after {minutes} minutes.",
+      "Security check scheduled for {date}. Your support reference is {id}.",
+      "Shipment tracking code: {other}. It is not a login password.",
+      "Verification service unavailable. Try again after {duration} seconds.",
+      "A payment of {amount} EUR was charged to card **{card}.",
+      "Error {id}: the verification message could not be delivered."
+    ]
+  },
+  "zh": {
+    "name": "Mandarin Chinese",
+    "train": [
+      "您的验证码是{code}，请勿告诉他人。",
+      "{code}是您登录{brand}的一次性密码。",
+      "请输入{code}确认您的手机号码，有效期{minutes}分钟。",
+      "支付{amount}欧元，请输入授权码{code}。银行卡尾号{card}。",
+      "旧验证码：{old}。新的登录验证码：{code}。",
+      "{brand}：请使用安全码{code}重置密码。",
+      "在{brand}使用优惠码{other}，可享{percent}%优惠。",
+      "订单{id}已发货，运单号为{other}。",
+      "您的余额为{amount}欧元，银行卡尾号{card}。",
+      "您的验证码将在{duration}秒后过期。",
+      "您的旧验证码{old}已过期，请重新申请。",
+      "明天请拨打{phone}联系我，{time}见。",
+      "登录验证码为{old}或{other}，无法确定哪一个有效。",
+      "请打开验证链接：https://example.invalid/verify?code={other}"
+    ],
+    "validation": [
+      "【{brand}】输入{code}完成账号注册。",
+      "请保密：{code}。该代码用于批准您刚才的登录请求。",
+      "请勿使用{old}，改用{code}验证身份。",
+      "验证请求将在{duration}秒后失效，尚未发送验证码。",
+      "取件编号{other}：您的包裹正在仓库等待领取。",
+      "特价活动！优惠码{other}可节省{percent}%。",
+      "请于{time}见面，并带上编号{id}的票。",
+      "有两个不同的验证码{old}和{other}，均未标明是否有效。"
+    ],
+    "test": [
+      "有人正在访问您的{brand}账号。如果是您本人，请在验证页面输入{code}。",
+      "需要身份认证：{code}。此口令仅可使用一次。",
+      "请用{code}批准从尾号{card}的银行卡转账{amount}欧元。",
+      "{code}\n将这些字符复制到输入框以确认您的电子邮箱，{minutes}分钟后失效。",
+      "安全检查安排在{date}，客服参考编号为{id}。",
+      "包裹追踪码：{other}。这不是登录密码。",
+      "验证服务暂不可用，请在{duration}秒后重试。",
+      "尾号{card}的银行卡已扣款{amount}欧元。",
+      "错误{id}：验证短信未能送达。"
+    ]
+  },
+  "hi": {
+    "name": "Hindi",
+    "train": [
+      "आपका सत्यापन कोड {code} है। इसे किसी से साझा न करें।",
+      "{brand} में लॉग इन करने के लिए आपका एक बार उपयोग होने वाला पासवर्ड {code} है।",
+      "{code} से अपना फ़ोन नंबर सत्यापित करें। यह {minutes} मिनट तक मान्य है।",
+      "{amount} EUR का भुगतान अधिकृत करने के लिए {code} दर्ज करें। कार्ड के अंतिम अंक {card} हैं।",
+      "पुराना कोड: {old}। आपका नया लॉगिन कोड {code} है।",
+      "{brand}: पासवर्ड रीसेट करने के लिए सुरक्षा कोड {code} का उपयोग करें।",
+      "{brand} पर {percent}% छूट के लिए कूपन {other} इस्तेमाल करें।",
+      "ऑर्डर {id} भेज दिया गया है। ट्रैकिंग नंबर: {other}।",
+      "आपका शेष {amount} EUR है। कार्ड के अंतिम अंक {card} हैं।",
+      "आपका सत्यापन कोड {duration} सेकंड में समाप्त हो जाएगा।",
+      "आपका पुराना सत्यापन कोड {old} समाप्त हो चुका है। नया कोड माँगें।",
+      "कल मुझे {phone} पर कॉल करें। {time} बजे मिलते हैं।",
+      "लॉगिन कोड {old} या {other} है। कौन सा अभी मान्य है, स्पष्ट नहीं है।",
+      "इस सत्यापन लिंक को खोलें: https://example.invalid/verify?code={other}"
+    ],
+    "validation": [
+      "[{brand}] खाता बनाना पूरा करने के लिए {code} दर्ज करें।",
+      "{code} को गोपनीय रखें। यह कोड आपके अनुरोधित लॉगिन को मंज़ूरी देता है।",
+      "{old} का उपयोग न करें; पहचान सत्यापित करने के लिए {code} इस्तेमाल करें।",
+      "सत्यापन अनुरोध {duration} सेकंड बाद समाप्त होगा। कोई कोड जारी नहीं हुआ है।",
+      "प्राप्ति संदर्भ {other}: आपका पार्सल गोदाम में प्रतीक्षा कर रहा है।",
+      "विशेष ऑफ़र! प्रचार कोड {other} से {percent}% बचाएँ।",
+      "{time} बजे मिलें और टिकट {id} साथ लाएँ।",
+      "दो अलग सत्यापन कोड {old} और {other} हैं; किसी को वर्तमान नहीं बताया गया है।"
+    ],
+    "test": [
+      "कोई आपके {brand} खाते में प्रवेश कर रहा है। यदि यह आप हैं, तो सत्यापन स्क्रीन पर {code} लिखें।",
+      "प्रमाणीकरण आवश्यक है: {code}। यह गुप्त शब्द केवल एक बार उपयोग किया जा सकता है।",
+      "अंतिम अंक {card} वाले कार्ड से {amount} EUR का हस्तांतरण {code} से स्वीकार करें।",
+      "{code}\nईमेल पते की पुष्टि के लिए ये अक्षर फ़ील्ड में कॉपी करें। {minutes} मिनट बाद समाप्त होगा।",
+      "सुरक्षा जाँच {date} को निर्धारित है। सहायता संदर्भ {id} है।",
+      "पार्सल ट्रैकिंग कोड: {other}। यह लॉगिन पासवर्ड नहीं है।",
+      "सत्यापन सेवा उपलब्ध नहीं है। {duration} सेकंड बाद दोबारा प्रयास करें।",
+      "कार्ड **{card} से {amount} EUR का भुगतान काटा गया है।",
+      "त्रुटि {id}: सत्यापन संदेश पहुँचाया नहीं जा सका।"
+    ]
+  },
+  "es": {
+    "name": "Spanish",
+    "train": [
+      "Tu código de verificación es {code}. No lo compartas.",
+      "{code} es tu contraseña de un solo uso para iniciar sesión en {brand}.",
+      "Confirma tu número de teléfono con {code}. Válido durante {minutes} minutos.",
+      "Para autorizar un pago de {amount} EUR, introduce {code}. Tarjeta terminada en {card}.",
+      "Código anterior: {old}. Tu nuevo código de acceso es {code}.",
+      "{brand}: usa el código de seguridad {code} para restablecer tu contraseña.",
+      "Usa el cupón {other} para obtener un {percent}% de descuento en {brand}.",
+      "El pedido {id} ha sido enviado. Número de seguimiento: {other}.",
+      "Tu saldo es de {amount} EUR. Tu tarjeta termina en {card}.",
+      "Tu código de verificación caduca en {duration} segundos.",
+      "Tu antiguo código de verificación {old} ha caducado. Solicita uno nuevo.",
+      "Llámame mañana al {phone}. Nos vemos a las {time}.",
+      "Códigos de acceso: {old} o {other}. No está claro cuál es el actual.",
+      "Abre este enlace de verificación: https://example.invalid/verify?code={other}"
+    ],
+    "validation": [
+      "[{brand}] Introduce {code} para terminar de crear tu cuenta.",
+      "Mantén {code} en secreto. Este código aprueba el inicio de sesión solicitado.",
+      "No uses {old}; verifica tu identidad con {code} en su lugar.",
+      "La solicitud de verificación caduca en {duration} segundos. No se ha emitido ningún código.",
+      "Referencia de recogida {other}: tu paquete espera en el almacén.",
+      "¡Oferta especial! El código promocional {other} te ahorra un {percent}%.",
+      "Nos vemos a las {time}; trae la entrada {id}.",
+      "Hay dos códigos de verificación distintos, {old} y {other}; ninguno está marcado como vigente."
+    ],
+    "test": [
+      "Alguien está accediendo a tu cuenta de {brand}. Si eres tú, escribe {code} en la pantalla de verificación.",
+      "Se requiere autenticación: {code}. Esta clave solo se puede usar una vez.",
+      "Aprueba la transferencia de {amount} EUR desde la tarjeta **{card} con {code}.",
+      "{code}\nCopia estos caracteres en el campo para confirmar tu correo electrónico. Caduca en {minutes} minutos.",
+      "Revisión de seguridad programada para {date}. Tu referencia de asistencia es {id}.",
+      "Código de seguimiento del envío: {other}. No es una contraseña de acceso.",
+      "Servicio de verificación no disponible. Inténtalo de nuevo dentro de {duration} segundos.",
+      "Se ha cargado un pago de {amount} EUR a la tarjeta **{card}.",
+      "Error {id}: no se pudo entregar el mensaje de verificación."
+    ]
+  },
+  "ar": {
+    "name": "Modern Standard Arabic",
+    "train": [
+      "رمز التحقق الخاص بك هو {code}. لا تشاركه مع أي شخص.",
+      "{code} هي كلمة المرور لمرة واحدة لتسجيل الدخول إلى {brand}.",
+      "أكد رقم هاتفك باستخدام {code}. صالح لمدة {minutes} دقائق.",
+      "للموافقة على دفع {amount} يورو، أدخل {code}. البطاقة تنتهي بالأرقام {card}.",
+      "الرمز السابق: {old}. رمز تسجيل الدخول الجديد هو {code}.",
+      "{brand}: استخدم رمز الأمان {code} لإعادة تعيين كلمة المرور.",
+      "استخدم القسيمة {other} للحصول على خصم {percent}% لدى {brand}.",
+      "تم شحن الطلب {id}. رقم التتبع: {other}.",
+      "رصيدك هو {amount} يورو. بطاقتك تنتهي بالأرقام {card}.",
+      "تنتهي صلاحية رمز التحقق خلال {duration} ثانية.",
+      "انتهت صلاحية رمز التحقق السابق {old}. اطلب رمزًا جديدًا.",
+      "اتصل بي غدًا على {phone}. نلتقي الساعة {time}.",
+      "رمزا تسجيل الدخول هما {old} أو {other}. ليس واضحًا أيهما صالح الآن.",
+      "افتح رابط التحقق هذا: https://example.invalid/verify?code={other}"
+    ],
+    "validation": [
+      "[{brand}] أدخل {code} لإكمال إنشاء حسابك.",
+      "احتفظ بالرمز {code} سرًا. يوافق هذا الرمز على تسجيل الدخول الذي طلبته.",
+      "لا تستخدم {old}؛ تحقق من هويتك باستخدام {code} بدلًا منه.",
+      "تنتهي صلاحية طلب التحقق بعد {duration} ثانية. لم يتم إصدار أي رمز.",
+      "مرجع الاستلام {other}: طردك ينتظر في المستودع.",
+      "عرض خاص! يوفر لك الرمز الترويجي {other} خصمًا بنسبة {percent}%.",
+      "قابلني الساعة {time} وأحضر التذكرة {id}.",
+      "يوجد رمزا تحقق مختلفان، {old} و{other}؛ ولم يُحدد أيهما الحالي."
+    ],
+    "test": [
+      "يحاول شخص الدخول إلى حسابك في {brand}. إذا كنت أنت، فاكتب {code} في شاشة التحقق.",
+      "المصادقة مطلوبة: {code}. تستخدم كلمة السر هذه مرة واحدة فقط.",
+      "وافق على تحويل {amount} يورو من البطاقة **{card} باستخدام {code}.",
+      "{code}\nانسخ هذه الأحرف في الحقل لتأكيد بريدك الإلكتروني. تنتهي الصلاحية بعد {minutes} دقائق.",
+      "فحص الأمان مقرر في {date}. رقم مرجع الدعم هو {id}.",
+      "رمز تتبع الشحنة: {other}. ليس كلمة مرور لتسجيل الدخول.",
+      "خدمة التحقق غير متاحة. حاول مجددًا بعد {duration} ثانية.",
+      "تم خصم دفعة بقيمة {amount} يورو من البطاقة **{card}.",
+      "خطأ {id}: تعذر تسليم رسالة التحقق."
+    ]
+  },
+  "fr": {
+    "name": "French",
+    "train": [
+      "Votre code de vérification est {code}. Ne le partagez pas.",
+      "{code} est votre mot de passe à usage unique pour vous connecter à {brand}.",
+      "Confirmez votre numéro de téléphone avec {code}. Valable {minutes} minutes.",
+      "Pour autoriser un paiement de {amount} EUR, saisissez {code}. Carte se terminant par {card}.",
+      "Ancien code : {old}. Votre nouveau code de connexion est {code}.",
+      "{brand} : utilisez le code de sécurité {code} pour réinitialiser votre mot de passe.",
+      "Utilisez le coupon {other} pour obtenir {percent}% de réduction chez {brand}.",
+      "La commande {id} a été expédiée. Numéro de suivi : {other}.",
+      "Votre solde est de {amount} EUR. Votre carte se termine par {card}.",
+      "Votre code de vérification expire dans {duration} secondes.",
+      "Votre ancien code de vérification {old} a expiré. Demandez-en un nouveau.",
+      "Appelez-moi demain au {phone}. À {time}.",
+      "Codes de connexion : {old} ou {other}. On ne sait pas lequel est actuel.",
+      "Ouvrez ce lien de vérification : https://example.invalid/verify?code={other}"
+    ],
+    "validation": [
+      "[{brand}] Saisissez {code} pour terminer la création de votre compte.",
+      "Gardez {code} secret. Ce code approuve la connexion que vous avez demandée.",
+      "N'utilisez pas {old} ; vérifiez plutôt votre identité avec {code}.",
+      "La demande de vérification expire dans {duration} secondes. Aucun code n'a été émis.",
+      "Référence de retrait {other} : votre colis vous attend au dépôt.",
+      "Offre spéciale ! Le code promotionnel {other} vous fait économiser {percent}%.",
+      "Retrouvez-moi à {time} et apportez le billet {id}.",
+      "Deux codes de vérification différents, {old} et {other} ; aucun n'est indiqué comme actuel."
+    ],
+    "test": [
+      "Quelqu'un accède à votre compte {brand}. Si c'est vous, tapez {code} sur l'écran de vérification.",
+      "Authentification requise : {code}. Ce mot secret ne peut être utilisé qu'une fois.",
+      "Approuvez le virement de {amount} EUR depuis la carte **{card} avec {code}.",
+      "{code}\nCopiez ces caractères dans le champ pour confirmer votre adresse e-mail. Expiration dans {minutes} minutes.",
+      "Contrôle de sécurité prévu le {date}. Votre référence d'assistance est {id}.",
+      "Code de suivi de l'envoi : {other}. Ce n'est pas un mot de passe de connexion.",
+      "Service de vérification indisponible. Réessayez dans {duration} secondes.",
+      "Un paiement de {amount} EUR a été débité de la carte **{card}.",
+      "Erreur {id} : le message de vérification n'a pas pu être livré."
+    ]
+  },
+  "bn": {
+    "name": "Bengali",
+    "train": [
+      "আপনার যাচাইকরণ কোড {code}। এটি কারও সঙ্গে শেয়ার করবেন না।",
+      "{brand}-এ লগইন করার জন্য আপনার একবার ব্যবহারযোগ্য পাসওয়ার্ড {code}।",
+      "{code} দিয়ে আপনার ফোন নম্বর নিশ্চিত করুন। {minutes} মিনিট পর্যন্ত বৈধ।",
+      "{amount} EUR পেমেন্ট অনুমোদন করতে {code} লিখুন। কার্ডের শেষ সংখ্যা {card}।",
+      "আগের কোড: {old}। আপনার নতুন লগইন কোড {code}।",
+      "{brand}: পাসওয়ার্ড রিসেট করতে নিরাপত্তা কোড {code} ব্যবহার করুন।",
+      "{brand}-এ {percent}% ছাড় পেতে কুপন {other} ব্যবহার করুন।",
+      "অর্ডার {id} পাঠানো হয়েছে। ট্র্যাকিং নম্বর: {other}।",
+      "আপনার ব্যালেন্স {amount} EUR। আপনার কার্ডের শেষ সংখ্যা {card}।",
+      "আপনার যাচাইকরণ কোডের মেয়াদ {duration} সেকেন্ড পরে শেষ হবে।",
+      "আপনার পুরোনো যাচাইকরণ কোড {old}-এর মেয়াদ শেষ। নতুন কোড চান।",
+      "আগামীকাল {phone} নম্বরে ফোন করুন। {time}-এ দেখা হবে।",
+      "লগইন কোড {old} অথবা {other}। কোনটি বর্তমানে বৈধ তা স্পষ্ট নয়।",
+      "এই যাচাইকরণ লিংক খুলুন: https://example.invalid/verify?code={other}"
+    ],
+    "validation": [
+      "[{brand}] অ্যাকাউন্ট তৈরি শেষ করতে {code} লিখুন।",
+      "{code} গোপন রাখুন। এই কোড আপনার অনুরোধ করা লগইন অনুমোদন করে।",
+      "{old} ব্যবহার করবেন না; পরিবর্তে {code} দিয়ে পরিচয় যাচাই করুন।",
+      "যাচাইকরণের অনুরোধ {duration} সেকেন্ড পরে শেষ হবে। কোনো কোড দেওয়া হয়নি।",
+      "সংগ্রহের রেফারেন্স {other}: আপনার পার্সেল গুদামে অপেক্ষা করছে।",
+      "বিশেষ অফার! প্রচার কোড {other} দিয়ে {percent}% সাশ্রয় করুন।",
+      "{time}-এ দেখা করুন এবং টিকিট {id} নিয়ে আসুন।",
+      "দুটি আলাদা যাচাইকরণ কোড {old} এবং {other}; কোনোটিকেই বর্তমান বলা হয়নি।"
+    ],
+    "test": [
+      "কেউ আপনার {brand} অ্যাকাউন্টে প্রবেশ করছে। এটি আপনি হলে যাচাইকরণ পর্দায় {code} লিখুন।",
+      "পরিচয় প্রমাণ করা প্রয়োজন: {code}। এই গোপন শব্দ কেবল একবার ব্যবহার করা যাবে।",
+      "কার্ড **{card} থেকে {amount} EUR স্থানান্তর {code} দিয়ে অনুমোদন করুন।",
+      "{code}\nইমেইল ঠিকানা নিশ্চিত করতে এই অক্ষরগুলি ঘরে কপি করুন। {minutes} মিনিট পরে মেয়াদ শেষ হবে।",
+      "নিরাপত্তা পরীক্ষা {date}-এ নির্ধারিত। আপনার সহায়তা রেফারেন্স {id}।",
+      "পার্সেলের ট্র্যাকিং কোড: {other}। এটি লগইন পাসওয়ার্ড নয়।",
+      "যাচাইকরণ সেবা উপলব্ধ নয়। {duration} সেকেন্ড পরে আবার চেষ্টা করুন।",
+      "কার্ড **{card} থেকে {amount} EUR পেমেন্ট কাটা হয়েছে।",
+      "ত্রুটি {id}: যাচাইকরণ বার্তা পৌঁছানো যায়নি।"
+    ]
+  },
+  "pt": {
+    "name": "Portuguese",
+    "train": [
+      "O seu código de verificação é {code}. Não o partilhe.",
+      "{code} é a sua senha de uso único para entrar em {brand}.",
+      "Confirme o seu número de telefone com {code}. Válido por {minutes} minutos.",
+      "Para autorizar um pagamento de {amount} EUR, introduza {code}. Cartão terminado em {card}.",
+      "Código anterior: {old}. O seu novo código de acesso é {code}.",
+      "{brand}: utilize o código de segurança {code} para redefinir a sua senha.",
+      "Use o cupão {other} para obter {percent}% de desconto em {brand}.",
+      "A encomenda {id} foi enviada. Número de rastreio: {other}.",
+      "O seu saldo é {amount} EUR. O seu cartão termina em {card}.",
+      "O seu código de verificação expira em {duration} segundos.",
+      "O seu antigo código de verificação {old} expirou. Peça um novo.",
+      "Ligue-me amanhã para {phone}. Encontramo-nos às {time}.",
+      "Códigos de acesso: {old} ou {other}. Não é claro qual é o atual.",
+      "Abra esta ligação de verificação: https://example.invalid/verify?code={other}"
+    ],
+    "validation": [
+      "[{brand}] Insira {code} para concluir a criação da conta.",
+      "Mantenha {code} em segredo. Este código aprova o início de sessão que pediu.",
+      "Não use {old}; confirme a sua identidade com {code} em vez disso.",
+      "O pedido de verificação expira após {duration} segundos. Nenhum código foi emitido.",
+      "Referência de recolha {other}: a sua encomenda espera no depósito.",
+      "Oferta especial! O código promocional {other} permite poupar {percent}%.",
+      "Encontre-me às {time} e traga o bilhete {id}.",
+      "Dois códigos de verificação diferentes, {old} e {other}; nenhum está marcado como atual."
+    ],
+    "test": [
+      "Alguém está a aceder à sua conta {brand}. Se foi você, escreva {code} no ecrã de verificação.",
+      "Autenticação necessária: {code}. Esta palavra-passe só pode ser utilizada uma vez.",
+      "Aprove a transferência de {amount} EUR do cartão **{card} com {code}.",
+      "{code}\nCopie estes caracteres para o campo para confirmar o endereço de e-mail. Expira em {minutes} minutos.",
+      "Verificação de segurança agendada para {date}. A referência de apoio é {id}.",
+      "Código de rastreio da remessa: {other}. Não é uma senha de acesso.",
+      "Serviço de verificação indisponível. Tente novamente após {duration} segundos.",
+      "Foi cobrado um pagamento de {amount} EUR no cartão **{card}.",
+      "Erro {id}: não foi possível entregar a mensagem de verificação."
+    ]
+  },
+  "id": {
+    "name": "Indonesian",
+    "train": [
+      "Kode verifikasi Anda adalah {code}. Jangan bagikan kepada siapa pun.",
+      "{code} adalah kata sandi sekali pakai untuk masuk ke {brand}.",
+      "Konfirmasikan nomor telepon Anda dengan {code}. Berlaku selama {minutes} menit.",
+      "Untuk mengizinkan pembayaran {amount} EUR, masukkan {code}. Nomor akhir kartu {card}.",
+      "Kode sebelumnya: {old}. Kode masuk baru Anda adalah {code}.",
+      "{brand}: gunakan kode keamanan {code} untuk mengatur ulang kata sandi.",
+      "Gunakan kupon {other} untuk diskon {percent}% di {brand}.",
+      "Pesanan {id} telah dikirim. Nomor pelacakan: {other}.",
+      "Saldo Anda {amount} EUR. Nomor kartu Anda berakhir dengan {card}.",
+      "Kode verifikasi Anda kedaluwarsa dalam {duration} detik.",
+      "Kode verifikasi lama {old} sudah kedaluwarsa. Minta yang baru.",
+      "Telepon saya besok di {phone}. Sampai jumpa pukul {time}.",
+      "Kode masuk: {old} atau {other}. Tidak jelas mana yang masih berlaku.",
+      "Buka tautan verifikasi ini: https://example.invalid/verify?code={other}"
+    ],
+    "validation": [
+      "[{brand}] Masukkan {code} untuk menyelesaikan pembuatan akun.",
+      "Rahasiakan {code}. Kode ini menyetujui permintaan masuk Anda.",
+      "Jangan gunakan {old}; verifikasikan identitas Anda dengan {code} sebagai gantinya.",
+      "Permintaan verifikasi berakhir setelah {duration} detik. Belum ada kode yang diterbitkan.",
+      "Referensi pengambilan {other}: paket Anda menunggu di gudang.",
+      "Penawaran khusus! Kode promosi {other} menghemat {percent}%.",
+      "Temui saya pukul {time} dan bawa tiket {id}.",
+      "Dua kode verifikasi berbeda, {old} dan {other}; tidak ada yang ditandai sebagai kode terbaru."
+    ],
+    "test": [
+      "Seseorang mengakses akun {brand} Anda. Jika itu Anda, ketik {code} pada layar verifikasi.",
+      "Autentikasi diperlukan: {code}. Kata sandi ini hanya dapat digunakan sekali.",
+      "Setujui transfer {amount} EUR dari kartu **{card} dengan {code}.",
+      "{code}\nSalin karakter ini ke kolom untuk mengonfirmasi alamat email. Kedaluwarsa setelah {minutes} menit.",
+      "Pemeriksaan keamanan dijadwalkan pada {date}. Referensi bantuan Anda adalah {id}.",
+      "Kode pelacakan kiriman: {other}. Ini bukan kata sandi masuk.",
+      "Layanan verifikasi tidak tersedia. Coba lagi setelah {duration} detik.",
+      "Pembayaran {amount} EUR telah dibebankan ke kartu **{card}.",
+      "Kesalahan {id}: pesan verifikasi tidak dapat dikirimkan."
+    ]
+  },
+  "ur": {
+    "name": "Urdu",
+    "train": [
+      "آپ کا تصدیقی کوڈ {code} ہے۔ اسے کسی کے ساتھ شیئر نہ کریں۔",
+      "{brand} میں لاگ ان کرنے کے لیے آپ کا ایک بار استعمال ہونے والا پاس ورڈ {code} ہے۔",
+      "{code} سے اپنے فون نمبر کی تصدیق کریں۔ یہ {minutes} منٹ تک کارآمد ہے۔",
+      "{amount} EUR کی ادائیگی کی اجازت دینے کے لیے {code} درج کریں۔ کارڈ کے آخری ہندسے {card} ہیں۔",
+      "پرانا کوڈ: {old}۔ آپ کا نیا لاگ ان کوڈ {code} ہے۔",
+      "{brand}: پاس ورڈ دوبارہ مقرر کرنے کے لیے حفاظتی کوڈ {code} استعمال کریں۔",
+      "{brand} پر {percent}% رعایت کے لیے کوپن {other} استعمال کریں۔",
+      "آرڈر {id} بھیج دیا گیا ہے۔ ٹریکنگ نمبر: {other}۔",
+      "آپ کا بیلنس {amount} EUR ہے۔ کارڈ کے آخری ہندسے {card} ہیں۔",
+      "آپ کے تصدیقی کوڈ کی مدت {duration} سیکنڈ میں ختم ہو جائے گی۔",
+      "آپ کے پرانے تصدیقی کوڈ {old} کی مدت ختم ہو گئی ہے۔ نیا کوڈ طلب کریں۔",
+      "کل مجھے {phone} پر کال کریں۔ {time} بجے ملتے ہیں۔",
+      "لاگ ان کوڈ {old} یا {other} ہے۔ واضح نہیں کہ کون سا ابھی درست ہے۔",
+      "یہ تصدیقی لنک کھولیں: https://example.invalid/verify?code={other}"
+    ],
+    "validation": [
+      "[{brand}] اکاؤنٹ بنانا مکمل کرنے کے لیے {code} درج کریں۔",
+      "{code} کو خفیہ رکھیں۔ یہ کوڈ آپ کی درخواست کردہ لاگ ان کی منظوری دیتا ہے۔",
+      "{old} استعمال نہ کریں؛ اس کے بجائے {code} سے اپنی شناخت کی تصدیق کریں۔",
+      "تصدیق کی درخواست {duration} سیکنڈ بعد ختم ہو جائے گی۔ کوئی کوڈ جاری نہیں ہوا۔",
+      "وصولی کا حوالہ {other}: آپ کا پارسل گودام میں منتظر ہے۔",
+      "خصوصی پیشکش! پروموشنل کوڈ {other} سے {percent}% بچائیں۔",
+      "{time} بجے ملیں اور ٹکٹ {id} ساتھ لائیں۔",
+      "دو مختلف تصدیقی کوڈ {old} اور {other} ہیں؛ کسی کو موجودہ نہیں بتایا گیا۔"
+    ],
+    "test": [
+      "کوئی آپ کے {brand} اکاؤنٹ تک رسائی حاصل کر رہا ہے۔ اگر یہ آپ ہیں تو تصدیقی اسکرین پر {code} لکھیں۔",
+      "شناخت کی توثیق ضروری ہے: {code}۔ یہ خفیہ لفظ صرف ایک بار استعمال ہو سکتا ہے۔",
+      "کارڈ **{card} سے {amount} EUR کی منتقلی {code} کے ذریعے منظور کریں۔",
+      "{code}\nای میل پتے کی تصدیق کے لیے یہ حروف خانے میں نقل کریں۔ {minutes} منٹ بعد مدت ختم ہو گی۔",
+      "حفاظتی جانچ {date} کو مقرر ہے۔ معاونت کا حوالہ {id} ہے۔",
+      "پارسل کا ٹریکنگ کوڈ: {other}۔ یہ لاگ ان کا پاس ورڈ نہیں ہے۔",
+      "تصدیقی خدمت دستیاب نہیں۔ {duration} سیکنڈ بعد دوبارہ کوشش کریں۔",
+      "کارڈ **{card} سے {amount} EUR کی ادائیگی کاٹی گئی ہے۔",
+      "خرابی {id}: تصدیقی پیغام پہنچایا نہیں جا سکا۔"
+    ]
+  }
+}

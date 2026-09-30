@@ -1,0 +1,1062 @@
+<!doctype html>
+<html lang="en">
+  <meta charset="utf-8" /><meta
+    name="viewport"
+    content="width=device-width,initial-scale=1"
+  />
+  <title>Authier · MiniLM SMS extraction evaluation</title>
+  <style>
+    :root {
+      color-scheme: light dark;
+      font:
+        16px/1.55 system-ui,
+        sans-serif;
+      background: #0d1919;
+      color: #e7f0ed;
+    }
+    body {
+      max-width: 1150px;
+      margin: 40px auto;
+      padding: 0 24px;
+    }
+    h1 {
+      font-size: 34px;
+      letter-spacing: -0.7px;
+      line-height: 1.2;
+    }
+    h2 {
+      margin-top: 38px;
+      font-size: 23px;
+    }
+    p {
+      max-width: 900px;
+      color: #bed0ca;
+    }
+    small {
+      color: #94aaa3;
+      margin-left: 8px;
+    }
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+      gap: 12px;
+      margin: 25px 0;
+    }
+    .card {
+      padding: 18px;
+      background: #182c29;
+      border: 1px solid #304b43;
+      border-radius: 12px;
+    }
+    .card strong {
+      display: block;
+      font-size: 27px;
+      color: #9bd2b6;
+    }
+    .note {
+      padding: 16px 20px;
+      border-left: 4px solid #dab776;
+      background: #302b20;
+      color: #eddec5;
+    }
+    .table {
+      overflow: auto;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+    th,
+    td {
+      text-align: left;
+      padding: 10px 12px;
+      border-bottom: 1px solid #29403a;
+    }
+    thead th {
+      color: #9bd2b6;
+      background: #142622;
+    }
+    tbody th {
+      font-weight: 500;
+    }
+    td {
+      font-variant-numeric: tabular-nums;
+    }
+    code {
+      font-size: 13px;
+      overflow-wrap: anywhere;
+    }
+    li {
+      color: #bed0ca;
+    }
+    a {
+      color: #9bd2b6;
+    }
+    summary {
+      cursor: pointer;
+      margin: 18px 0;
+    }
+  </style>
+  <body>
+    <p>AUTHIER · LOCAL MODEL EXPERIMENT</p>
+    <h1>MiniLM SMS extraction<br />30-language evaluation</h1>
+    <p>
+      Selected epoch 3. The final test set was held out from training,
+      checkpoint selection, and abstention-threshold calibration. Both FP32 and
+      compact versions were evaluated. Final compact evaluation uses one
+      unpadded SMS per inference, matching the local extraction command.
+    </p>
+    <div class="note">
+      <strong
+        >Letters-only recovery exceeds 95%. The 99.5% precision target is not
+        met.</strong
+      >
+      Held-out extraction precision is 93.56%; 6.55% of messages without a
+      verification code incorrectly produce one. Synthetic results do not
+      establish real-world accuracy or performance on a 4 GB Android phone.
+    </div>
+    <div class="cards">
+      <div class="card"><strong>16,800</strong>held-out messages</div>
+      <div class="card">
+        <strong>95.42%</strong>correct code recovery · compact
+      </div>
+      <div class="card">
+        <strong>93.56%</strong>extraction precision · compact
+      </div>
+      <div class="card">
+        <strong>95.67%</strong>letters-only recovery · compact
+      </div>
+      <div class="card"><strong>140.4 MB</strong>compact model weights</div>
+    </div>
+    <h2>What was trained and tested</h2>
+    <p>
+      28,350 training messages, 7,560 validation messages, and 16,800 test
+      messages. Translated template families, synthetic brands and generated
+      codes are split globally. Repeating a template with different codes
+      creates correlated examples, not independent evidence of language
+      understanding.
+    </p>
+    <p>
+      Codes contain 4–10 characters: digits, random
+      uppercase/lowercase/mixed-case Latin letters, mixtures of letters and
+      digits, and separated characters. Unicode decimal digits are normalized.
+      Case and leading zeroes are preserved. Each language has 280 code-bearing
+      and 280 no-code test messages, including 120 letters-only cases.
+      Letters-only recovery exceeds 95% in 22 of 30 languages.
+    </p>
+    <h2>Every supported language</h2>
+    <p>
+      Recovery means the exact code was returned. Precision counts a wrong code
+      as an error, including choosing an obsolete code. False positives are
+      codes returned for messages with no valid verification code.
+    </p>
+    <div class="table">
+      <table>
+        <thead>
+          <tr>
+            <th>Language</th>
+            <th>Cases</th>
+            <th>FP32 recovery</th>
+            <th>Compact recovery</th>
+            <th>Compact precision</th>
+            <th>Letters-only recovery</th>
+            <th>False positives</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th>Bengali <small>bn</small></th>
+            <td>560</td>
+            <td>83.21%</td>
+            <td>83.57%</td>
+            <td>87.64%</td>
+            <td>85.00%</td>
+            <td>33 / 280</td>
+          </tr>
+          <tr>
+            <th>Bulgarian <small>bg</small></th>
+            <td>560</td>
+            <td>100.00%</td>
+            <td>100.00%</td>
+            <td>97.22%</td>
+            <td>100.00%</td>
+            <td>8 / 280</td>
+          </tr>
+          <tr>
+            <th>Croatian <small>hr</small></th>
+            <td>560</td>
+            <td>97.14%</td>
+            <td>97.14%</td>
+            <td>88.31%</td>
+            <td>96.67%</td>
+            <td>36 / 280</td>
+          </tr>
+          <tr>
+            <th>Czech <small>cs</small></th>
+            <td>560</td>
+            <td>99.64%</td>
+            <td>99.64%</td>
+            <td>100.00%</td>
+            <td>99.17%</td>
+            <td>0 / 280</td>
+          </tr>
+          <tr>
+            <th>Danish <small>da</small></th>
+            <td>560</td>
+            <td>100.00%</td>
+            <td>100.00%</td>
+            <td>93.96%</td>
+            <td>100.00%</td>
+            <td>18 / 280</td>
+          </tr>
+          <tr>
+            <th>Dutch <small>nl</small></th>
+            <td>560</td>
+            <td>99.64%</td>
+            <td>99.64%</td>
+            <td>99.64%</td>
+            <td>100.00%</td>
+            <td>1 / 280</td>
+          </tr>
+          <tr>
+            <th>English <small>en</small></th>
+            <td>560</td>
+            <td>91.07%</td>
+            <td>91.07%</td>
+            <td>100.00%</td>
+            <td>91.67%</td>
+            <td>0 / 280</td>
+          </tr>
+          <tr>
+            <th>Estonian <small>et</small></th>
+            <td>560</td>
+            <td>97.14%</td>
+            <td>97.14%</td>
+            <td>88.60%</td>
+            <td>96.67%</td>
+            <td>35 / 280</td>
+          </tr>
+          <tr>
+            <th>Finnish <small>fi</small></th>
+            <td>560</td>
+            <td>98.57%</td>
+            <td>98.57%</td>
+            <td>98.22%</td>
+            <td>99.17%</td>
+            <td>5 / 280</td>
+          </tr>
+          <tr>
+            <th>French <small>fr</small></th>
+            <td>560</td>
+            <td>98.93%</td>
+            <td>99.29%</td>
+            <td>88.82%</td>
+            <td>99.17%</td>
+            <td>35 / 280</td>
+          </tr>
+          <tr>
+            <th>German <small>de</small></th>
+            <td>560</td>
+            <td>100.00%</td>
+            <td>100.00%</td>
+            <td>99.64%</td>
+            <td>100.00%</td>
+            <td>1 / 280</td>
+          </tr>
+          <tr>
+            <th>Greek <small>el</small></th>
+            <td>560</td>
+            <td>87.50%</td>
+            <td>87.50%</td>
+            <td>91.42%</td>
+            <td>87.50%</td>
+            <td>23 / 280</td>
+          </tr>
+          <tr>
+            <th>Hindi <small>hi</small></th>
+            <td>560</td>
+            <td>87.50%</td>
+            <td>87.50%</td>
+            <td>87.81%</td>
+            <td>87.50%</td>
+            <td>34 / 280</td>
+          </tr>
+          <tr>
+            <th>Hungarian <small>hu</small></th>
+            <td>560</td>
+            <td>99.64%</td>
+            <td>99.64%</td>
+            <td>88.57%</td>
+            <td>100.00%</td>
+            <td>35 / 280</td>
+          </tr>
+          <tr>
+            <th>Indonesian <small>id</small></th>
+            <td>560</td>
+            <td>97.14%</td>
+            <td>97.14%</td>
+            <td>100.00%</td>
+            <td>98.33%</td>
+            <td>0 / 280</td>
+          </tr>
+          <tr>
+            <th>Irish <small>ga</small></th>
+            <td>560</td>
+            <td>97.14%</td>
+            <td>97.50%</td>
+            <td>88.64%</td>
+            <td>99.17%</td>
+            <td>35 / 280</td>
+          </tr>
+          <tr>
+            <th>Italian <small>it</small></th>
+            <td>560</td>
+            <td>100.00%</td>
+            <td>100.00%</td>
+            <td>99.64%</td>
+            <td>100.00%</td>
+            <td>1 / 280</td>
+          </tr>
+          <tr>
+            <th>Latvian <small>lv</small></th>
+            <td>560</td>
+            <td>100.00%</td>
+            <td>100.00%</td>
+            <td>100.00%</td>
+            <td>100.00%</td>
+            <td>0 / 280</td>
+          </tr>
+          <tr>
+            <th>Lithuanian <small>lt</small></th>
+            <td>560</td>
+            <td>99.64%</td>
+            <td>99.64%</td>
+            <td>100.00%</td>
+            <td>99.17%</td>
+            <td>0 / 280</td>
+          </tr>
+          <tr>
+            <th>Maltese <small>mt</small></th>
+            <td>560</td>
+            <td>75.36%</td>
+            <td>76.07%</td>
+            <td>85.20%</td>
+            <td>75.00%</td>
+            <td>37 / 280</td>
+          </tr>
+          <tr>
+            <th>Mandarin Chinese <small>zh</small></th>
+            <td>560</td>
+            <td>95.71%</td>
+            <td>96.07%</td>
+            <td>99.63%</td>
+            <td>98.33%</td>
+            <td>0 / 280</td>
+          </tr>
+          <tr>
+            <th>Modern Standard Arabic <small>ar</small></th>
+            <td>560</td>
+            <td>79.64%</td>
+            <td>79.64%</td>
+            <td>84.79%</td>
+            <td>81.67%</td>
+            <td>40 / 280</td>
+          </tr>
+          <tr>
+            <th>Polish <small>pl</small></th>
+            <td>560</td>
+            <td>100.00%</td>
+            <td>100.00%</td>
+            <td>91.80%</td>
+            <td>100.00%</td>
+            <td>25 / 280</td>
+          </tr>
+          <tr>
+            <th>Portuguese <small>pt</small></th>
+            <td>560</td>
+            <td>100.00%</td>
+            <td>100.00%</td>
+            <td>95.24%</td>
+            <td>100.00%</td>
+            <td>14 / 280</td>
+          </tr>
+          <tr>
+            <th>Romanian <small>ro</small></th>
+            <td>560</td>
+            <td>89.64%</td>
+            <td>90.00%</td>
+            <td>92.31%</td>
+            <td>90.00%</td>
+            <td>21 / 280</td>
+          </tr>
+          <tr>
+            <th>Slovak <small>sk</small></th>
+            <td>560</td>
+            <td>99.64%</td>
+            <td>99.64%</td>
+            <td>100.00%</td>
+            <td>100.00%</td>
+            <td>0 / 280</td>
+          </tr>
+          <tr>
+            <th>Slovenian <small>sl</small></th>
+            <td>560</td>
+            <td>98.93%</td>
+            <td>98.93%</td>
+            <td>88.50%</td>
+            <td>99.17%</td>
+            <td>36 / 280</td>
+          </tr>
+          <tr>
+            <th>Spanish <small>es</small></th>
+            <td>560</td>
+            <td>97.86%</td>
+            <td>97.86%</td>
+            <td>89.25%</td>
+            <td>97.50%</td>
+            <td>33 / 280</td>
+          </tr>
+          <tr>
+            <th>Swedish <small>sv</small></th>
+            <td>560</td>
+            <td>100.00%</td>
+            <td>100.00%</td>
+            <td>97.22%</td>
+            <td>100.00%</td>
+            <td>8 / 280</td>
+          </tr>
+          <tr>
+            <th>Urdu <small>ur</small></th>
+            <td>560</td>
+            <td>89.29%</td>
+            <td>89.29%</td>
+            <td>87.41%</td>
+            <td>89.17%</td>
+            <td>36 / 280</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <h2>Code categories · compact</h2>
+    <div class="table">
+      <table>
+        <thead>
+          <tr>
+            <th>Category</th>
+            <th>Cases</th>
+            <th>Exact match</th>
+            <th>Correct codes / code-bearing cases</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th>alphanumeric</th>
+            <td>1200</td>
+            <td>95.83%</td>
+            <td>1150 / 1200</td>
+          </tr>
+          <tr>
+            <th>lettersLower</th>
+            <td>1200</td>
+            <td>95.00%</td>
+            <td>1140 / 1200</td>
+          </tr>
+          <tr>
+            <th>lettersMixed</th>
+            <td>1200</td>
+            <td>95.67%</td>
+            <td>1148 / 1200</td>
+          </tr>
+          <tr>
+            <th>lettersUpper</th>
+            <td>1200</td>
+            <td>96.33%</td>
+            <td>1156 / 1200</td>
+          </tr>
+          <tr>
+            <th>noCode</th>
+            <td>8400</td>
+            <td>93.45%</td>
+            <td>0 / 0</td>
+          </tr>
+          <tr>
+            <th>numeric</th>
+            <td>1200</td>
+            <td>95.50%</td>
+            <td>1146 / 1200</td>
+          </tr>
+          <tr>
+            <th>separated</th>
+            <td>1200</td>
+            <td>93.58%</td>
+            <td>1123 / 1200</td>
+          </tr>
+          <tr>
+            <th>unicodeDigits</th>
+            <td>1200</td>
+            <td>96.00%</td>
+            <td>1152 / 1200</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <h2>Previous checkpoint versus this revision</h2>
+    <p>
+      Both checkpoints use the same new frozen test set and batch-one ONNX
+      inference. Each decoder is calibrated on the same new validation set;
+      baseline weights stay unchanged. The older checkpoint met the validation
+      precision target only by abstaining on almost every message, so its
+      recovery at this operating point is near zero. Its earlier 90%
+      letters-only result used a different test set and decoder, and is not
+      directly comparable to these scores. Baseline letters-only recovery:
+      0.17%; new revision: 95.67%. Baseline precision: 100.00%; new revision:
+      93.56%.
+    </p>
+    <div class="table">
+      <table>
+        <thead>
+          <tr>
+            <th>Language</th>
+            <th>Previous letters recovery</th>
+            <th>New letters recovery</th>
+            <th>Previous precision</th>
+            <th>New precision</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th>Bengali</th>
+            <td>0.00%</td>
+            <td>85.00%</td>
+            <td>0.00%</td>
+            <td>87.64%</td>
+          </tr>
+          <tr>
+            <th>Bulgarian</th>
+            <td>0.00%</td>
+            <td>100.00%</td>
+            <td>0.00%</td>
+            <td>97.22%</td>
+          </tr>
+          <tr>
+            <th>Croatian</th>
+            <td>0.00%</td>
+            <td>96.67%</td>
+            <td>100.00%</td>
+            <td>88.31%</td>
+          </tr>
+          <tr>
+            <th>Czech</th>
+            <td>0.00%</td>
+            <td>99.17%</td>
+            <td>0.00%</td>
+            <td>100.00%</td>
+          </tr>
+          <tr>
+            <th>Danish</th>
+            <td>0.00%</td>
+            <td>100.00%</td>
+            <td>100.00%</td>
+            <td>93.96%</td>
+          </tr>
+          <tr>
+            <th>Dutch</th>
+            <td>0.00%</td>
+            <td>100.00%</td>
+            <td>100.00%</td>
+            <td>99.64%</td>
+          </tr>
+          <tr>
+            <th>English</th>
+            <td>0.00%</td>
+            <td>91.67%</td>
+            <td>0.00%</td>
+            <td>100.00%</td>
+          </tr>
+          <tr>
+            <th>Estonian</th>
+            <td>0.00%</td>
+            <td>96.67%</td>
+            <td>100.00%</td>
+            <td>88.60%</td>
+          </tr>
+          <tr>
+            <th>Finnish</th>
+            <td>0.00%</td>
+            <td>99.17%</td>
+            <td>0.00%</td>
+            <td>98.22%</td>
+          </tr>
+          <tr>
+            <th>French</th>
+            <td>0.83%</td>
+            <td>99.17%</td>
+            <td>100.00%</td>
+            <td>88.82%</td>
+          </tr>
+          <tr>
+            <th>German</th>
+            <td>0.00%</td>
+            <td>100.00%</td>
+            <td>100.00%</td>
+            <td>99.64%</td>
+          </tr>
+          <tr>
+            <th>Greek</th>
+            <td>0.83%</td>
+            <td>87.50%</td>
+            <td>100.00%</td>
+            <td>91.42%</td>
+          </tr>
+          <tr>
+            <th>Hindi</th>
+            <td>0.00%</td>
+            <td>87.50%</td>
+            <td>100.00%</td>
+            <td>87.81%</td>
+          </tr>
+          <tr>
+            <th>Hungarian</th>
+            <td>0.00%</td>
+            <td>100.00%</td>
+            <td>100.00%</td>
+            <td>88.57%</td>
+          </tr>
+          <tr>
+            <th>Indonesian</th>
+            <td>0.00%</td>
+            <td>98.33%</td>
+            <td>0.00%</td>
+            <td>100.00%</td>
+          </tr>
+          <tr>
+            <th>Irish</th>
+            <td>0.00%</td>
+            <td>99.17%</td>
+            <td>0.00%</td>
+            <td>88.64%</td>
+          </tr>
+          <tr>
+            <th>Italian</th>
+            <td>0.00%</td>
+            <td>100.00%</td>
+            <td>100.00%</td>
+            <td>99.64%</td>
+          </tr>
+          <tr>
+            <th>Latvian</th>
+            <td>0.00%</td>
+            <td>100.00%</td>
+            <td>100.00%</td>
+            <td>100.00%</td>
+          </tr>
+          <tr>
+            <th>Lithuanian</th>
+            <td>0.00%</td>
+            <td>99.17%</td>
+            <td>0.00%</td>
+            <td>100.00%</td>
+          </tr>
+          <tr>
+            <th>Maltese</th>
+            <td>0.00%</td>
+            <td>75.00%</td>
+            <td>0.00%</td>
+            <td>85.20%</td>
+          </tr>
+          <tr>
+            <th>Mandarin Chinese</th>
+            <td>0.00%</td>
+            <td>98.33%</td>
+            <td>0.00%</td>
+            <td>99.63%</td>
+          </tr>
+          <tr>
+            <th>Modern Standard Arabic</th>
+            <td>0.00%</td>
+            <td>81.67%</td>
+            <td>100.00%</td>
+            <td>84.79%</td>
+          </tr>
+          <tr>
+            <th>Polish</th>
+            <td>0.00%</td>
+            <td>100.00%</td>
+            <td>100.00%</td>
+            <td>91.80%</td>
+          </tr>
+          <tr>
+            <th>Portuguese</th>
+            <td>0.00%</td>
+            <td>100.00%</td>
+            <td>100.00%</td>
+            <td>95.24%</td>
+          </tr>
+          <tr>
+            <th>Romanian</th>
+            <td>0.00%</td>
+            <td>90.00%</td>
+            <td>100.00%</td>
+            <td>92.31%</td>
+          </tr>
+          <tr>
+            <th>Slovak</th>
+            <td>0.00%</td>
+            <td>100.00%</td>
+            <td>0.00%</td>
+            <td>100.00%</td>
+          </tr>
+          <tr>
+            <th>Slovenian</th>
+            <td>2.50%</td>
+            <td>99.17%</td>
+            <td>100.00%</td>
+            <td>88.50%</td>
+          </tr>
+          <tr>
+            <th>Spanish</th>
+            <td>0.83%</td>
+            <td>97.50%</td>
+            <td>100.00%</td>
+            <td>89.25%</td>
+          </tr>
+          <tr>
+            <th>Swedish</th>
+            <td>0.00%</td>
+            <td>100.00%</td>
+            <td>100.00%</td>
+            <td>97.22%</td>
+          </tr>
+          <tr>
+            <th>Urdu</th>
+            <td>0.00%</td>
+            <td>89.17%</td>
+            <td>100.00%</td>
+            <td>87.41%</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <h2>Model storage and computation</h2>
+    <p>
+      Per-row INT8 word embeddings, FP16 encoder matrix storage with FP32
+      computation. Constant casts may be expanded to FP32 on loading.. The
+      reported file size is distinct from working memory, measured below.
+    </p>
+    <h2>Desktop measurements</h2>
+    <p>
+      Linux x86_64, AMD Ryzen 9 9900X, ONNX CPU, 4 threads. Batch size one, 300
+      validation messages. Median inference 2.8 ms; p95 3.9 ms. Median input 24
+      tokens; longest 57 tokens. Peak process RSS 636.0 MB; resident RSS after
+      inference 636.0 MB. Memory is measured from Linux /proc/self/status in a
+      fresh process. Model load 0.39 s. Latency excludes tokenization and span
+      decoding. Disk caching can reduce load time. These are not Android
+      measurements.
+    </p>
+    <h2>Limits and outstanding validation</h2>
+    <ul>
+      <li>Synthetic data only; no real-world accuracy claim.</li>
+      <li>Translations have not been reviewed by native speakers.</li>
+      <li>
+        Cases sharing a template are correlated; counts are not independent
+        language samples.
+      </li>
+      <li>
+        Codes support 4–10 ASCII letters/digits after Unicode digit and NFKC
+        normalization.
+      </li>
+      <li>No Android integration or 4 GB device benchmark yet.</li>
+    </ul>
+    <details>
+      <summary>Example failures, at most one per language</summary>
+      <div class="table">
+        <table>
+          <thead>
+            <tr>
+              <th>Language</th>
+              <th>Synthetic SMS</th>
+              <th>Expected</th>
+              <th>Returned</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th>mt</th>
+              <td dir="auto">
+                0743 u 4454131 huma t-tnejn passwords tad-dħul pendenti. Ma
+                nistgħux niddeterminaw liema waħda għandek tuża.
+              </td>
+              <td><code>None</code></td>
+              <td><code>4454131</code></td>
+            </tr>
+            <tr>
+              <th>et</th>
+              <td dir="auto">
+                Hinna 6431.76 EUR saamiseks nimeta vautšer ZL HH VX; see ei anna
+                kontole juurdepääsu.
+              </td>
+              <td><code>None</code></td>
+              <td><code>ZLHHVX</code></td>
+            </tr>
+            <tr>
+              <th>hi</th>
+              <td dir="auto">
+                1196.48 EUR की कीमत के लिए वाउचर 514708 बताएं; इससे खाते की
+                पहुंच नहीं मिलती।
+              </td>
+              <td><code>None</code></td>
+              <td><code>514708</code></td>
+            </tr>
+            <tr>
+              <th>ur</th>
+              <td dir="auto">
+                یہ راز فراہم کرنے کے بعد آپ کا Selva پروفائل کھلے گا: SKd 8Uj۔
+              </td>
+              <td><code>SKd8Uj</code></td>
+              <td><code>None</code></td>
+            </tr>
+            <tr>
+              <th>es</th>
+              <td dir="auto">
+                Tenemos retenida una transferencia de 3106.58 EUR. Libérala
+                introduciendo V T O U S M R K K. Tarjeta terminada en 5772.
+              </td>
+              <td><code>VTOUSMRKK</code></td>
+              <td><code>None</code></td>
+            </tr>
+            <tr>
+              <th>zh</th>
+              <td dir="auto">
+                提供这个秘密口令后,您的Oriole个人资料将打开:y1AKMXh1。
+              </td>
+              <td><code>y1AKMXh1</code></td>
+              <td><code>None</code></td>
+            </tr>
+            <tr>
+              <th>ga</th>
+              <td dir="auto">
+                Chun praghas 4982.95 EUR a fháil, luaigh dearbhán Hkj-6LA; ní
+                thugann sé rochtain ar chuntas.
+              </td>
+              <td><code>None</code></td>
+              <td><code>Hkj6LA</code></td>
+            </tr>
+            <tr>
+              <th>ro</th>
+              <td dir="auto">
+                [Oriole: Referință 0324696290. Plătești 4047.34 EUR? Tastează
+                4100 pentru a încheia cumpărarea.
+              </td>
+              <td><code>4100</code></td>
+              <td><code>None</code></td>
+            </tr>
+            <tr>
+              <th>pt</th>
+              <td dir="auto">
+                nnkvksxf e eskld são ambas palavras-passe de início de sessão
+                pendentes. Não podemos determinar qual deve usar.
+              </td>
+              <td><code>None</code></td>
+              <td><code>eskld</code></td>
+            </tr>
+            <tr>
+              <th>sl</th>
+              <td dir="auto">
+                Za ceno 6621.95 EUR navedite bon f2h068AlU; ta ne omogoča
+                dostopa do računa.
+              </td>
+              <td><code>None</code></td>
+              <td><code>f2h068AlU</code></td>
+            </tr>
+            <tr>
+              <th>hu</th>
+              <td dir="auto">
+                Oriole A 1147.43 EUR árhoz add meg a 00220024 utalványt; ez nem
+                biztosít fiókhozzáférést.
+              </td>
+              <td><code>None</code></td>
+              <td><code>00220024</code></td>
+            </tr>
+            <tr>
+              <th>ar</th>
+              <td dir="auto">
+                حالة الشحن: WZPH. يحدد هذا طردك، وليس طلب مصادقة.
+              </td>
+              <td><code>None</code></td>
+              <td><code>WZPH</code></td>
+            </tr>
+            <tr>
+              <th>pl</th>
+              <td dir="auto">
+                MGTVX i SPAWVCHCDD to dwa oczekujące hasła logowania. Nie możemy
+                określić, którego należy użyć.
+              </td>
+              <td><code>None</code></td>
+              <td><code>SPAWVCHCDD</code></td>
+            </tr>
+            <tr>
+              <th>el</th>
+              <td dir="auto">
+                Κρατάμε μεταφορά 5378.11 EUR σε αναμονή. Αποδεσμεύστε την
+                εισάγοντας GZSD. Κάρτα με τέλος 5596.
+              </td>
+              <td><code>GZSD</code></td>
+              <td><code>None</code></td>
+            </tr>
+            <tr>
+              <th>da</th>
+              <td dir="auto">
+                Selva: l·R·s·j og W K F T J B V Q er begge ventende
+                loginadgangskoder. Vi kan ikke afgøre, hvilken du skal bruge.
+              </td>
+              <td><code>None</code></td>
+              <td><code>WKFTJBVQ</code></td>
+            </tr>
+            <tr>
+              <th>bn</th>
+              <td dir="auto">
+                [Selva] এই গোপন তথ্য দেওয়ার পর আপনার Selva প্রোফাইল খুলবে:
+                d2JDb5g।
+              </td>
+              <td><code>d2JDb5g</code></td>
+              <td><code>None</code></td>
+            </tr>
+            <tr>
+              <th>fr</th>
+              <td dir="auto">
+                NOGOQUHV et JOHSR sont deux mots de passe de connexion en
+                attente. Nous ne pouvons pas déterminer lequel utiliser.
+              </td>
+              <td><code>None</code></td>
+              <td><code>JOHSR</code></td>
+            </tr>
+            <tr>
+              <th>hr</th>
+              <td dir="auto">
+                Caldera: Za cijenu 4748.23 EUR navedite vaučer 5254743744; on ne
+                omogućuje pristup računu.
+              </td>
+              <td><code>None</code></td>
+              <td><code>5254743744</code></td>
+            </tr>
+            <tr>
+              <th>sv</th>
+              <td dir="auto">
+                9456 och 159566 är båda väntande inloggningslösenord. Vi kan
+                inte avgöra vilket du ska använda.
+              </td>
+              <td><code>None</code></td>
+              <td><code>159566</code></td>
+            </tr>
+            <tr>
+              <th>en</th>
+              <td dir="auto">
+                We are holding a transfer of 237.59 EUR. Release it by entering
+                07702640. Card ending 0434.
+              </td>
+              <td><code>07702640</code></td>
+              <td><code>None</code></td>
+            </tr>
+            <tr>
+              <th>id</th>
+              <td dir="auto">
+                Oriole] Pasangkan ponsel ini dengan akun Anda. Ketik quqdpx pada
+                perangkat lain.
+              </td>
+              <td><code>quqdpx</code></td>
+              <td><code>None</code></td>
+            </tr>
+            <tr>
+              <th>fi</th>
+              <td dir="auto">
+                Pääsyn tarkistus J2MRWpBso Pidä tämä kertakäyttöinen tunniste
+                omana tietonasi.
+              </td>
+              <td><code>J2MRWpBso</code></td>
+              <td><code>None</code></td>
+            </tr>
+            <tr>
+              <th>sk</th>
+              <td dir="auto">
+                Prevod 2619.43 EUR čaká na vybavenie. Uvoľnite ho zadaním do CG
+                v. Karta končiaca 9883.
+              </td>
+              <td><code>doCGv</code></td>
+              <td><code>None</code></td>
+            </tr>
+            <tr>
+              <th>bg</th>
+              <td dir="auto">
+                rcdtdj и zwboeb са две чакащи пароли за влизане. Не можем да
+                определим коя трябва да използвате.
+              </td>
+              <td><code>None</code></td>
+              <td><code>zwboeb</code></td>
+            </tr>
+            <tr>
+              <th>it</th>
+              <td dir="auto">
+                nqcv e mfgjcpu sono entrambe password di accesso in attesa. Non
+                possiamo determinare quale usare.
+              </td>
+              <td><code>None</code></td>
+              <td><code>mfgjcpu</code></td>
+            </tr>
+            <tr>
+              <th>nl</th>
+              <td dir="auto">
+                [Selva Koppel deze telefoon aan je account. Typ ZZ KN GO VB LX
+                op het andere apparaat.
+              </td>
+              <td><code>ZZKNGOVBLX</code></td>
+              <td><code>None</code></td>
+            </tr>
+            <tr>
+              <th>lt</th>
+              <td dir="auto">
+                Prieigos patikra stpitac Šį vienkartinį prisijungimo duomenį
+                pasilikite sau.
+              </td>
+              <td><code>stpitac</code></td>
+              <td><code>None</code></td>
+            </tr>
+            <tr>
+              <th>de</th>
+              <td dir="auto">
+                FE Jl und Q t z d sind beide ausstehende Anmeldepasswörter. Wir
+                können nicht bestimmen, welches du verwenden sollst.
+              </td>
+              <td><code>None</code></td>
+              <td><code>Qtzd</code></td>
+            </tr>
+            <tr>
+              <th>cs</th>
+              <td dir="auto">
+                Žádali jste o obnovu účtu? Znaky snik tuto žádost potvrdí během
+                příštích 10 minut.
+              </td>
+              <td><code>snik</code></td>
+              <td><code>None</code></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </details>
+    <h2>Reproducibility</h2>
+    <p>
+      Training and evaluation scripts, seed, language templates, dependency
+      versions and data hashes are checked in beside this report. Large weights
+      and generated message files remain local in the ignored artifacts and
+      data/generated directories.
+    </p>
+    <p>
+      Base:
+      <a href="https://huggingface.co/microsoft/Multilingual-MiniLM-L12-H384"
+        >Microsoft Multilingual MiniLM L12 H384</a
+      >, revision <code>6e8c1ec6b4ec4e3fc6eb7d2cd834fcd582b61daf</code>.
+      Selected weights, decoder thresholds and ONNX SHA-256 checksums accompany
+      the local model.
+    </p>
+  </body>
+</html>

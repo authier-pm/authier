@@ -8,7 +8,9 @@ import { Tooltip } from '@src/components/ui/tooltip'
 import { cn } from '@src/lib/cn'
 import { useAppToast } from '@src/ExtensionProviders'
 
-export function RefreshSecretsButton() {
+export function RefreshSecretsButton({
+  onSynced
+}: { onSynced?: () => Promise<unknown> } = {}) {
   const [isSyncing, setIsSyncing] = useState(false)
   const toast = useAppToast()
 
@@ -25,6 +27,7 @@ export function RefreshSecretsButton() {
 
           try {
             res = await device.state?.backendSync()
+            await onSynced?.()
           } catch {
             setIsSyncing(false)
             return

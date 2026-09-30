@@ -1,5 +1,6 @@
 import { webcrypto } from 'node:crypto'
 import { act, cleanup, renderHook, waitFor } from '@testing-library/react'
+import { CombinedGraphQLErrors } from '@apollo/client/errors'
 import { afterEach, beforeAll, beforeEach, expect, it, vi } from 'vitest'
 import browser from 'webextension-polyfill'
 import {
@@ -256,7 +257,9 @@ it('keeps locally saved items when session renewal returns no items and sync fai
   })
   query.mockReset().mockRejectedValue(new Error('Database unavailable'))
   await act(async () => {
-    await expect(device.state?.backendSync()).rejects.toThrow('Database unavailable')
+    await expect(device.state?.backendSync()).rejects.toThrow(
+      'Database unavailable'
+    )
   })
 
   expect(device.state?.secrets).toEqual(snapshot.secrets)
@@ -268,4 +271,74 @@ it('keeps locally saved items when session renewal returns no items and sync fai
     secrets: snapshot.secrets,
     decryptedSecrets: []
   })
+
+  // A later successful sync still applies explicit deletions.
+  query
+    .mockReset()
+    .mockResolvedValueOnce({
+      data: {
+        currentDevice: {
+          encryptedSecretsToSync: [
+            { ...snapshot.secrets[0], deletedAt: '2026-09-30T00:00:00.000Z' }
+          ]
+        }
+      }
+    })
+    .mockResolvedValueOnce({ data: { webInputs: [] } })
+  await act(async () => {
+    await device.state?.backendSync()
+  })
+  await waitFor(() => expect(result.current.searchSecrets('')).toEqual([]))
+  expect(device.state?.secrets).toEqual([])
+})
+
+it('treats a database error during remembered-session renewal as retryable and retains items', async () => {
+  await device.save(snapshot)
+  const previousState = device.state
+  loginMutation.mockReset().mockRejectedValueOnce(
+    new CombinedGraphQLErrors({
+      errors: [{ message: 'Database unavailable' }]
+    })
+  )
+  await expect(resumeRememberedDevice()).rejects.toMatchObject({
+    retryable: true
+  })
+  expect(device.state).toBe(previousState)
+  expect(device.state?.secrets).toEqual(snapshot.secrets)
+})
+
+it('does not restore a remembered session that was locked while renewal was in flight', async () => {
+  await device.save(snapshot)
+  const { result } = renderHook(useDeviceState)
+  let finishRenewal!: () => void
+  const pending = new Promise<void>((resolve) => {
+    finishRenewal = resolve
+  })
+  const setToken = browser.storage.session.set
+  loginMutation.mockReset().mockImplementationOnce(async () => {
+    await pending
+    return {
+      data: {
+        deviceDecryptionChallenge: {
+          __typename: 'DecryptionChallengeApproved',
+          id: 42,
+          addDeviceSecretEncrypted: enrollmentCiphertext,
+          encryptionSalt: snapshot.encryptionSalt,
+          userId: snapshot.userId
+        }
+      }
+    }
+  })
+  const resumed = resumeRememberedDevice()
+  await act(async () => {
+    await device.lock()
+    finishRenewal()
+    await expect(resumed).rejects.toMatchObject({ retryable: true })
+  })
+  expect(result.current.deviceState).toBeNull()
+  expect(setToken).not.toHaveBeenCalledWith(
+    expect.objectContaining({
+      'access-token': expect.any(String)
+    })
+  )
 })

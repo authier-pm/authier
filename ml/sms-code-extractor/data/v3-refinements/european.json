@@ -1,0 +1,141 @@
+{
+  "ro": {
+    "train": [
+      "Pentru conectare, introdu {code} în aplicație.",
+      "Confirmarea solicitată: {code}. Continuă pe site.",
+      "Codul tău actual de acces este {code}. Starea contului nu s-a schimbat.",
+      "Confirmă plata tastând {code}. Păstrează această valoare secretă.",
+      "Pentru a urmări livrarea, introdu {other} pe pagina de urmărire.",
+      "Contul tău este activ. Referința expedierii este {other}.",
+      "Cererea de ajutor pentru conectare {other} așteaptă răspuns. Nu include un cod.",
+      "Chitanță de plată {other}. Autentificarea s-a încheiat deja."
+    ],
+    "noise": ["Contul tău este încă activ.", "Parola ta nu s-a schimbat."]
+  },
+  "hu": {
+    "train": [
+      "A bejelentkezéshez írd be az alkalmazásba: {code}.",
+      "A kért megerősítés: {code}. Folytasd a weboldalon.",
+      "A jelenlegi hozzáférési kódod: {code}. A fiók állapota változatlan.",
+      "A fizetés megerősítéséhez gépeld be: {code}. Tartsd titokban ezt az értéket.",
+      "A kézbesítés követéséhez írd be a követési oldalon: {other}.",
+      "A fiókod aktív. A szállítási hivatkozás: {other}.",
+      "A {other} bejelentkezési segítségkérés válaszra vár. Nem tartalmaz kódot.",
+      "Fizetési nyugta {other}. A hitelesítés már befejeződött."
+    ],
+    "noise": ["A fiókod továbbra is aktív.", "A jelszavad nem változott."]
+  },
+  "da": {
+    "train": [
+      "Indtast {code} i appen for at logge ind.",
+      "Den ønskede bekræftelse: {code}. Fortsæt på hjemmesiden.",
+      "Din aktuelle adgangskode er {code}. Din kontostatus er uændret.",
+      "Bekræft betalingen ved at skrive {code}. Hold denne værdi privat.",
+      "Indtast {other} på sporingssiden for at følge leveringen.",
+      "Din konto er aktiv. Forsendelsesreferencen er {other}.",
+      "Anmodning om loginhjælp {other} afventer svar. Ingen kode er inkluderet.",
+      "Betalingskvittering {other}. Godkendelsen er allerede afsluttet."
+    ],
+    "noise": ["Din konto er stadig aktiv.", "Din adgangskode er ikke ændret."]
+  },
+  "sv": {
+    "train": [
+      "Ange {code} i appen för att logga in.",
+      "Den begärda bekräftelsen: {code}. Fortsätt på webbplatsen.",
+      "Din aktuella åtkomstkod är {code}. Din kontostatus är oförändrad.",
+      "Bekräfta betalningen genom att skriva {code}. Håll detta värde privat.",
+      "Ange {other} på spårningssidan för att följa leveransen.",
+      "Ditt konto är aktivt. Fraktreferensen är {other}.",
+      "Begäran om inloggningshjälp {other} väntar på svar. Ingen kod ingår.",
+      "Betalningskvitto {other}. Autentiseringen är redan klar."
+    ],
+    "noise": [
+      "Ditt konto är fortfarande aktivt.",
+      "Ditt lösenord har inte ändrats."
+    ]
+  },
+  "fi": {
+    "train": [
+      "Kirjaudu sisään syöttämällä {code} sovellukseen.",
+      "Pyydetty vahvistus: {code}. Jatka verkkosivulla.",
+      "Nykyinen pääsykoodisi on {code}. Tilisi tila ei ole muuttunut.",
+      "Vahvista maksu kirjoittamalla {code}. Pidä tämä arvo salassa.",
+      "Seuraa toimitusta syöttämällä {other} seurantasivulle.",
+      "Tilisi on aktiivinen. Lähetyksen viite on {other}.",
+      "Kirjautumisapupyyntö {other} odottaa vastausta. Se ei sisällä koodia.",
+      "Maksukuitti {other}. Todennus on jo valmis."
+    ],
+    "noise": ["Tilisi on edelleen aktiivinen.", "Salasanasi ei ole muuttunut."]
+  },
+  "et": {
+    "train": [
+      "Sisselogimiseks sisesta rakendusse {code}.",
+      "Soovitud kinnitus: {code}. Jätka veebilehel.",
+      "Sinu praegune pääsukood on {code}. Konto olek ei ole muutunud.",
+      "Kinnita makse, kirjutades {code}. Hoia see väärtus saladuses.",
+      "Tarne jälgimiseks sisesta jälgimislehel {other}.",
+      "Sinu konto on aktiivne. Saadetise viide on {other}.",
+      "Sisselogimisabi taotlus {other} ootab vastust. Koodi pole lisatud.",
+      "Makse kviitung {other}. Autentimine on juba lõppenud."
+    ],
+    "noise": [
+      "Sinu konto on endiselt aktiivne.",
+      "Sinu parool ei ole muutunud."
+    ]
+  },
+  "lv": {
+    "train": [
+      "Lai pieteiktos, lietotnē ievadiet {code}.",
+      "Pieprasītais apstiprinājums: {code}. Turpiniet tīmekļa vietnē.",
+      "Jūsu pašreizējais piekļuves kods ir {code}. Konta statuss nav mainījies.",
+      "Apstipriniet maksājumu, ierakstot {code}. Paturiet šo vērtību slepenībā.",
+      "Lai sekotu piegādei, izsekošanas lapā ievadiet {other}.",
+      "Jūsu konts ir aktīvs. Piegādes atsauce ir {other}.",
+      "Pieteikšanās palīdzības pieprasījums {other} gaida atbildi. Kods nav iekļauts.",
+      "Maksājuma kvīts {other}. Autentifikācija jau pabeigta."
+    ],
+    "noise": ["Jūsu konts joprojām ir aktīvs.", "Jūsu parole nav mainījusies."]
+  },
+  "lt": {
+    "train": [
+      "Norėdami prisijungti, programėlėje įveskite {code}.",
+      "Prašytas patvirtinimas: {code}. Tęskite svetainėje.",
+      "Dabartinis prieigos kodas yra {code}. Paskyros būsena nepasikeitė.",
+      "Patvirtinkite mokėjimą įrašydami {code}. Laikykite šią reikšmę paslaptyje.",
+      "Norėdami sekti pristatymą, sekimo puslapyje įveskite {other}.",
+      "Jūsų paskyra aktyvi. Siuntimo nuoroda yra {other}.",
+      "Prisijungimo pagalbos užklausa {other} laukia atsakymo. Kodo nėra.",
+      "Mokėjimo kvitas {other}. Autentifikavimas jau baigtas."
+    ],
+    "noise": ["Jūsų paskyra vis dar aktyvi.", "Jūsų slaptažodis nepasikeitė."]
+  },
+  "bg": {
+    "train": [
+      "За да влезете, въведете {code} в приложението.",
+      "Поисканото потвърждение: {code}. Продължете на сайта.",
+      "Текущият ви код за достъп е {code}. Състоянието на акаунта е непроменено.",
+      "Потвърдете плащането, като напишете {code}. Запазете тази стойност в тайна.",
+      "За да следите доставката, въведете {other} на страницата за проследяване.",
+      "Акаунтът ви е активен. Референцията на пратката е {other}.",
+      "Заявка {other} за помощ с влизането чака отговор. Не е включен код.",
+      "Разписка за плащане {other}. Удостоверяването вече приключи."
+    ],
+    "noise": ["Акаунтът ви все още е активен.", "Паролата ви не е променена."]
+  },
+  "hr": {
+    "train": [
+      "Za prijavu unesite {code} u aplikaciju.",
+      "Zatražena potvrda: {code}. Nastavite na mrežnoj stranici.",
+      "Vaš trenutačni pristupni kod je {code}. Status računa nije promijenjen.",
+      "Potvrdite plaćanje upisivanjem {code}. Ovu vrijednost čuvajte u tajnosti.",
+      "Za praćenje dostave unesite {other} na stranicu za praćenje.",
+      "Vaš račun je aktivan. Referenca pošiljke je {other}.",
+      "Zahtjev {other} za pomoć s prijavom čeka odgovor. Kod nije uključen.",
+      "Potvrda plaćanja {other}. Autentifikacija je već završila."
+    ],
+    "noise": [
+      "Vaš račun je i dalje aktivan.",
+      "Vaša lozinka nije promijenjena."
+    ]
+  }
+}

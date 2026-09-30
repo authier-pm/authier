@@ -1,0 +1,15 @@
+{
+  "revision": "v3e",
+  "seed": 2026093007,
+  "epochs": 3,
+  "batchSize": 48,
+  "learningRate": 0.00002,
+  "headLearningRate": 0.0001,
+  "warmupFraction": 0.06,
+  "freezeWordEmbeddings": true,
+  "presenceHead": true,
+  "tokenHead": true,
+  "validationTargetPrecision": 0.995,
+  "initialCheckpoint": "artifacts/minilm-v3d/checkpoint",
+  "provenance": "Synthetic assistant-authored translations. Added 16 new main-message paraphrase families in every language to address tracking/support errors seen on validation, retaining frozen v3 validation/test bytes. Old v2 evaluation families are now training/development material. No private SMS or native-speaker review."
+}

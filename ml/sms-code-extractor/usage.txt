@@ -1,0 +1,97 @@
+Authier MiniLM SMS extraction experiment
+
+Latest experiment: usageV3.txt and reports/v3/evaluation.html. The v3g compact
+model reached 95.67% letters-only recovery on a fresh synthetic test, but precision
+was 93.56%, below the 99.5% target. It remains a research prototype. The original
+v2 setup and results are retained below for reproducibility.
+
+This directory contains offline Python/PyTorch training tools. It does not change
+the Bun application runtime or the current Android SMS extractor.
+
+Model: microsoft/Multilingual-MiniLM-L12-H384 (BERT encoder, XLM-R tokenizer).
+Base revision is pinned in experiment.json. The 96M vocabulary embeddings stay
+frozen; 21,492,482 encoder/head parameters are trained. The span head selects text
+from the message or abstains. It cannot invent a code. Letter case and leading
+zeroes are preserved. Codes are 4–10 ASCII letters/digits after NFKC and Unicode
+decimal-digit normalization; spaces, hyphens and middle-dot separators are removed.
+Random uppercase, lowercase and mixed-case letters-only codes are included.
+
+Data: 30 languages (world top ten by total speakers, plus 24 official EU languages).
+Synthetic, assistant-authored translations; no private SMS or external SMS corpus.
+No native-speaker review. Entire translated template families, brands and code
+values are separated across splits. Repeated templates make examples correlated.
+The extra training families were added after inspecting validation failures.
+Validation and test content remained byte-for-byte unchanged (hashes are tested).
+The test split is not used for checkpoint, threshold, or quantization selection.
+
+Setup from this directory (uv installs a dedicated Python; no system changes):
+  uv venv --python 3.12 .venv
+  uv pip install --python .venv/bin/python torch==2.10.0 --index-url https://download.pytorch.org/whl/cpu
+  uv pip install --python .venv/bin/python -r requirements.txt
+
+For the Radeon RX 9070 workstation, use the rocm7.1 wheel index instead of cpu:
+  uv pip install --python .venv/bin/python torch==2.10.0 --index-url https://download.pytorch.org/whl/rocm7.1
+  export HIP_VISIBLE_DEVICES=0
+This excludes the integrated GPU, which did not pass its matrix-multiplication check.
+The exact environment from the completed experiment is in environment.txt.
+
+Reproduce (choose a fresh output path; existing training runs are protected):
+  .venv/bin/python smsData.py
+  .venv/bin/python -m pytest testSmsModel.py -q
+  .venv/bin/python trainModel.py --output artifacts/my-run --epochs 4
+  .venv/bin/python evaluateModel.py --run artifacts/my-run --split validation
+  .venv/bin/python exportModel.py --run artifacts/my-run
+  .venv/bin/python evaluateModel.py --run artifacts/my-run --backend torch
+  .venv/bin/python evaluateModel.py --run artifacts/my-run --backend onnx
+  .venv/bin/python benchmarkModel.py --run artifacts/my-run
+  .venv/bin/python renderReport.py --run artifacts/my-run
+  .venv/bin/python packageModel.py --run artifacts/my-run
+
+Checkpoint selection maximizes validation F1 with a null-score threshold at the
+configured precision target. After weight selection, validation also calibrates
+the runner-up margin. INT8 is calibrated separately on validation with the same
+target. A precision target is not a guarantee on unseen traffic. Metrics count
+wrongly chosen codes as errors; letters are compared case-sensitively.
+Final ONNX evaluation uses one unpadded message at a time and the serialized
+tokenizer, matching the lightweight inference command. The earlier batched ONNX
+evaluation is retained locally as test.onnxBatch24.json for comparison.
+
+The completed selected run is artifacts/minilm-v2. The initial experiment is kept
+locally as artifacts/minilm-v1; it used only the base training families. Its test
+split was never evaluated. The current generator reproduces the expanded v2 data.
+Training is seeded, but GPU kernels and different hardware may not be bit-identical.
+
+Outcome: the INT8 checkpoint recovered 85.29% of actual codes, including 90.00%
+of letters-only codes. Extraction precision was only 75.38%; 1,170 of 5,250 no-code
+test messages produced a false code. Support references and tracking notifications
+caused most failures. The validation precision target did not generalize to test.
+This checkpoint is NOT ready for app integration. It needs more varied labeled
+messages, especially no-code messages, and a new untouched evaluation set before
+any further iteration can establish progress beyond this benchmark.
+
+Try the selected local INT8 model (no model download or network call is required):
+  .venv/bin/python extractCode.py --text 'Your verification code is qXaBpL.'
+Alternatively pipe an SMS body on stdin. Only the result (a JSON string or null) is
+printed. Long messages use overlapping windows and conflicting answers abstain.
+The lightweight inference command needs numpy, tokenizers and onnxruntime, not
+PyTorch or Transformers. Training/evaluation additionally need those libraries.
+Install only the inference dependencies with -r inferenceRequirements.txt.
+
+ONNX quantizes MatMul AND Gather, including the otherwise large embedding table.
+ONNX FP32 parity is checked; INT8 exact-match accuracy is evaluated independently.
+reports/evaluation.html contains all 30 per-language results and code categories.
+reports/*.json contains the corresponding machine-readable measurements and hashes.
+Large weights, generated examples and the Python environment are ignored by Git.
+The package command creates a ZIP with INT8 weights, tokenizer, calibrated decoder,
+licenses, per-language metrics and a local inference command with setup instructions.
+
+This is a trained prototype, not a production rollout. Accuracy here is synthetic
+benchmark accuracy. Android integration, real customer-template validation,
+native-speaker review and memory/latency on a physical 4 GB handset are outstanding.
+Desktop benchmark numbers must not be presented as phone measurements.
+
+References:
+  https://huggingface.co/microsoft/Multilingual-MiniLM-L12-H384
+  https://huggingface.co/docs/transformers/tasks/question_answering
+  https://onnxruntime.ai/docs/performance/model-optimizations/quantization.html
+  https://european-union.europa.eu/principles-countries-history/languages_en

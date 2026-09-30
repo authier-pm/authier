@@ -13,6 +13,7 @@
     "shared/openapi/authier.json",
     "backend/drizzle/migrations/**",
     "landing-page/public/research/autofill-safety-corpus-v1.json",
+    "ml/sms-code-extractor/data/v3/*.json",
     "pnpm-lock.yaml"
   ]
 }

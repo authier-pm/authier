@@ -1,6 +1,7 @@
 import react from '@vitejs/plugin-react'
 import { defineConfig } from 'vitest/config'
 import { fileURLToPath } from 'node:url'
+import { linguiBabelTransform } from '../vite/linguiBabelTransform.mts'
 
 const previewDirectory = fileURLToPath(new URL('.', import.meta.url))
 const extensionDirectory = fileURLToPath(new URL('..', import.meta.url))
@@ -11,10 +12,14 @@ export default defineConfig({
   cacheDir: fileURLToPath(
     new URL('../node_modules/.vite/ui-preview', import.meta.url)
   ),
-  plugins: [react()],
+  plugins: [linguiBabelTransform(), react()],
   resolve: {
     dedupe: ['react', 'react-dom'],
     alias: [
+      {
+        find: /^@src\/(?:ExtensionProviders|background\/ExtensionDevice|util\/useDeviceState)$/,
+        replacement: fileURLToPath(new URL('./vaultMocks.ts', import.meta.url))
+      },
       {
         find: /^(?:\.\.?\/connectTRPC|.*\/src\/content-script\/connectTRPC)(?:\.ts)?$/,
         replacement: fileURLToPath(

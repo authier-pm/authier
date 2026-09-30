@@ -1,32 +1,38 @@
-import { useEffect, useMemo, useState, type RefObject } from 'react'
+import { useCallback, useMemo, useState, type UIEvent } from 'react'
 
-type Size = {
+type ScrollContainerState = {
   width: number
   height: number
+  scrollTop: number
 }
 
-export function useElementSize<T extends HTMLElement>(
-  ref: RefObject<T | null>
-): Size {
-  const [size, setSize] = useState<Size>({ height: 0, width: 0 })
+export function useScrollContainer<T extends HTMLElement>() {
+  const [size, setSize] = useState<ScrollContainerState>({
+    height: 0,
+    width: 0,
+    scrollTop: 0
+  })
 
-  useEffect(() => {
-    const element = ref.current
-
+  // Attach when the scroll container mounts, including after an empty result.
+  const ref = useCallback((element: T | null) => {
     if (!element) {
       return
     }
 
+    element.scrollTop = 0
+
     const updateSize = () => {
       const nextSize = {
         height: element.clientHeight,
-        width: element.clientWidth
+        width: element.clientWidth,
+        scrollTop: element.scrollTop
       }
 
       setSize((currentValue) => {
         if (
           currentValue.height === nextSize.height &&
-          currentValue.width === nextSize.width
+          currentValue.width === nextSize.width &&
+          currentValue.scrollTop === nextSize.scrollTop
         ) {
           return currentValue
         }
@@ -46,9 +52,14 @@ export function useElementSize<T extends HTMLElement>(
     return () => {
       observer.disconnect()
     }
-  }, [ref])
+  }, [])
 
-  return size
+  const onScroll = useCallback((event: UIEvent<T>) => {
+    const scrollTop = event.currentTarget.scrollTop
+    setSize((currentValue) => ({ ...currentValue, scrollTop }))
+  }, [])
+
+  return { ...size, ref, onScroll }
 }
 
 export function useVirtualWindow({
