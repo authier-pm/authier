@@ -145,8 +145,8 @@ export const VaultList = ({ tableView }: { tableView: boolean }) => {
         </CardContent>
       </Card>
 
-      <Card className="min-h-0 flex-1 overflow-hidden border-white/10 extension-surface">
-        <CardContent className="flex h-full min-h-0 flex-1 flex-col p-0">
+      <Card className="flex min-h-0 flex-1 flex-col overflow-hidden border-white/10 extension-surface">
+        <CardContent className="flex min-h-0 flex-1 flex-col p-0">
           {tableView ? (
             <TableList filter={filterBy} />
           ) : (

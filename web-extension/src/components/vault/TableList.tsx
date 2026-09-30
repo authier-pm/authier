@@ -1,4 +1,4 @@
-import { useContext, useMemo, useRef, useState } from 'react'
+import { useContext, useMemo, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { Trans } from '@lingui/react/macro'
 import { t } from '@lingui/core/macro'
@@ -29,7 +29,7 @@ import {
 } from './secretUtils'
 import { SecretItemIcon } from '@src/components/SecretItemIcon'
 import type { SecretTypeUnion } from '@src/background/ExtensionDevice'
-import { useElementSize, useVirtualWindow } from './useVirtualWindow'
+import { useScrollContainer, useVirtualWindow } from './useVirtualWindow'
 
 const tableGridStyle = {
   gridTemplateColumns:
@@ -51,9 +51,12 @@ export function TableList({ filter }: { filter: string }) {
   )
   const showBulkActions = selectedItems.length > 0
   const [showAllSecrets, setShowAllSecrets] = useState(false)
-  const parentRef = useRef<HTMLDivElement | null>(null)
-  const [scrollTop, setScrollTop] = useState(0)
-  const { height: containerHeight } = useElementSize(parentRef)
+  const {
+    height: containerHeight,
+    scrollTop,
+    onScroll,
+    ref: parentRef
+  } = useScrollContainer<HTMLDivElement>()
   const bodyViewportHeight = Math.max(containerHeight - TABLE_HEADER_HEIGHT, 0)
   const virtualWindow = useVirtualWindow({
     itemCount: data.length,
@@ -88,7 +91,7 @@ export function TableList({ filter }: { filter: string }) {
   }
 
   return (
-    <div className="flex h-full min-h-0 flex-col">
+    <div className="flex min-h-0 flex-1 flex-col">
       <div className="border-b border-[color:var(--color-border)] px-4 py-3">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="text-sm text-[color:var(--color-muted)]">
@@ -127,9 +130,7 @@ export function TableList({ filter }: { filter: string }) {
 
       <div
         className="extension-scrollbar min-h-0 flex-1 overflow-auto"
-        onScroll={(event) => {
-          setScrollTop(event.currentTarget.scrollTop)
-        }}
+        onScroll={onScroll}
         ref={parentRef}
       >
         <div className="min-w-[940px]">
