@@ -257,9 +257,13 @@ it('keeps locally saved items when session renewal returns no items and sync fai
   })
   query.mockReset().mockRejectedValue(new Error('Database unavailable'))
   await act(async () => {
+<<<<<<< HEAD
     await expect(device.state?.backendSync()).rejects.toThrow(
       'Database unavailable'
     )
+=======
+    await expect(device.state?.backendSync()).rejects.toThrow('Database unavailable')
+>>>>>>> dbc82009 (Preserve vault data during session renewal failures)
   })
 
   expect(device.state?.secrets).toEqual(snapshot.secrets)
@@ -271,6 +275,7 @@ it('keeps locally saved items when session renewal returns no items and sync fai
     secrets: snapshot.secrets,
     decryptedSecrets: []
   })
+<<<<<<< HEAD
 
   // A later successful sync still applies explicit deletions.
   query
@@ -341,4 +346,6 @@ it('does not restore a remembered session that was locked while renewal was in f
       'access-token': expect.any(String)
     })
   )
+=======
+>>>>>>> dbc82009 (Preserve vault data during session renewal failures)
 })

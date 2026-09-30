@@ -17,6 +17,7 @@ import { Input } from '@src/components/ui/input'
 import { Tooltip } from '@src/components/ui/tooltip'
 
 export const VaultList = ({ tableView }: { tableView: boolean }) => {
+<<<<<<< HEAD
   const {
     deviceState,
     loginCredentials,
@@ -24,11 +25,19 @@ export const VaultList = ({ tableView }: { tableView: boolean }) => {
     passkeys,
     setSecuritySettings
   } = useContext(DeviceStateContext)
+=======
+  const { deviceState, loginCredentials, TOTPSecrets, passkeys, setSecuritySettings } =
+    useContext(DeviceStateContext)
+>>>>>>> dbc82009 (Preserve vault data during session renewal failures)
   const autofillCredentialsEnabled =
     deviceState?.autofillCredentialsEnabled ?? true
   const isDeviceStateReady = deviceState !== null
   const navigate = useNavigate()
+<<<<<<< HEAD
   const { data, error, refetch } = useSyncSettingsQuery()
+=======
+  const { data, error } = useSyncSettingsQuery()
+>>>>>>> dbc82009 (Preserve vault data during session renewal failures)
   const [filterBy, setFilterBy] = useQueryParam(
     'filterBy',
     withDefault(StringParam, '')
@@ -57,16 +66,24 @@ export const VaultList = ({ tableView }: { tableView: boolean }) => {
     setSecuritySettings
   ])
 
+<<<<<<< HEAD
   const secretCount =
     loginCredentials.length + TOTPSecrets.length + passkeys.length
+=======
+  const secretCount = loginCredentials.length + TOTPSecrets.length + passkeys.length
+>>>>>>> dbc82009 (Preserve vault data during session renewal failures)
 
   return (
     <div className="flex h-full min-h-0 flex-col gap-4">
       {error ? (
+<<<<<<< HEAD
         <div
           role="status"
           className="rounded-xl border border-amber-400/30 bg-amber-500/10 px-4 py-3 text-sm"
         >
+=======
+        <div role="status" className="rounded-xl border border-amber-400/30 bg-amber-500/10 px-4 py-3 text-sm">
+>>>>>>> dbc82009 (Preserve vault data during session renewal failures)
           {t`Unable to connect to Authier. Your saved items are still available. Sync will be available when the connection is restored.`}
         </div>
       ) : null}
