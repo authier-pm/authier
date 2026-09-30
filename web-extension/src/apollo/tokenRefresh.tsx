@@ -30,12 +30,18 @@ const fetchAndApplyNewToken = async (): Promise<void> => {
   const response = await fetch(url, { method: 'POST', credentials: 'include' })
   if (response.status >= 500 || response.status === 429) {
 <<<<<<< HEAD
+<<<<<<< HEAD
     throw new Error(
       `Unable to refresh the Authier session (${response.status})`
     )
 =======
     throw new Error(`Unable to refresh the Authier session (${response.status})`)
 >>>>>>> dbc82009 (Preserve vault data during session renewal failures)
+=======
+    throw new Error(
+      `Unable to refresh the Authier session (${response.status})`
+    )
+>>>>>>> 65b78314 (Harden offline vault behavior and add multilingual SMS model experiments)
   }
   const data = await response.json()
   if (response.ok && typeof data.accessToken === 'string') {

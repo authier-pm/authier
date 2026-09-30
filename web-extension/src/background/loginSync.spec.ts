@@ -258,12 +258,18 @@ it('keeps locally saved items when session renewal returns no items and sync fai
   query.mockReset().mockRejectedValue(new Error('Database unavailable'))
   await act(async () => {
 <<<<<<< HEAD
+<<<<<<< HEAD
     await expect(device.state?.backendSync()).rejects.toThrow(
       'Database unavailable'
     )
 =======
     await expect(device.state?.backendSync()).rejects.toThrow('Database unavailable')
 >>>>>>> dbc82009 (Preserve vault data during session renewal failures)
+=======
+    await expect(device.state?.backendSync()).rejects.toThrow(
+      'Database unavailable'
+    )
+>>>>>>> 65b78314 (Harden offline vault behavior and add multilingual SMS model experiments)
   })
 
   expect(device.state?.secrets).toEqual(snapshot.secrets)
@@ -276,6 +282,9 @@ it('keeps locally saved items when session renewal returns no items and sync fai
     decryptedSecrets: []
   })
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 65b78314 (Harden offline vault behavior and add multilingual SMS model experiments)
 
   // A later successful sync still applies explicit deletions.
   query
@@ -346,6 +355,9 @@ it('does not restore a remembered session that was locked while renewal was in f
       'access-token': expect.any(String)
     })
   )
+<<<<<<< HEAD
 =======
 >>>>>>> dbc82009 (Preserve vault data during session renewal failures)
+=======
+>>>>>>> 65b78314 (Harden offline vault behavior and add multilingual SMS model experiments)
 })
