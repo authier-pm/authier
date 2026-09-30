@@ -501,6 +501,16 @@ export type QueryWebInputsArgs = {
   hosts?: InputMaybe<Array<Scalars['String']['input']>>
 }
 
+export type RelayedVerificationCodeGql = {
+  __typename?: 'RelayedVerificationCodeGQL'
+  createdAt: Scalars['DateTime']['output']
+  /** Name of the phone that relayed it */
+  deviceName: Scalars['String']['output']
+  encrypted: Scalars['String']['output']
+  expiresAt: Scalars['DateTime']['output']
+  id: Scalars['ID']['output']
+}
+
 export type RegisterNewAccountInput = {
   addDeviceSecret: Scalars['NonEmptyString']['input']
   addDeviceSecretEncrypted: Scalars['NonEmptyString']['input']
@@ -795,6 +805,8 @@ export type UserQuery = {
   notificationOnWrongPasswordAttempts: Scalars['Int']['output']
   primaryEmailVerification?: Maybe<EmailVerificationGqlScalars>
   recoveryDecryptionChallenge?: Maybe<DecryptionChallengeGql>
+  /** Unexpired codes relayed from phones, newest first */
+  relayedVerificationCodes: Array<RelayedVerificationCodeGql>
   tokenVersion: Scalars['Int']['output']
   uiLanguage: Scalars['String']['output']
   updatedAt?: Maybe<Scalars['DateTime']['output']>

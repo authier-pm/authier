@@ -1,0 +1,277 @@
+import browser from 'webextension-polyfill'
+import { z } from 'zod'
+import type { RelayedCodePayload } from '@shared/relayedVerificationCode'
+import { codeFingerprint } from '../verification-codes/codeFingerprint'
+import { openCodeSource } from './openCodeSource'
+import {
+  CODE_MESSAGE_PREFIX,
+  VERIFICATION_CODE_LIFETIME_MS,
+  VERIFICATION_CODE_EXPIRY_ALARM,
+  VERIFICATION_CODE_STORAGE_KEY,
+  CodeMessageKind,
+  codeMessageSchema,
+  getGmailAccountScope,
+  isGoogleMessagesUrl,
+  verificationCodeSchema,
+  verificationCodesSchema,
+  type VerificationCode,
+  type WebCodeProvider
+} from '../verification-codes/verificationCodeProtocol'
+
+const stateSchema = z.object({
+  entries: verificationCodesSchema,
+  // Fingerprints prevent a dismissed/expired code from reappearing after a tab
+  // reload or the next poll of phone-relayed codes.
+  seen: z.array(z.string()).max(500)
+})
+type CodeState = z.infer<typeof stateSchema>
+
+/** A phone-relayed code, already decrypted with the unlocked vault key. */
+export type RelayedVerificationCode = RelayedCodePayload & {
+  id: string
+  deviceName: string
+  expiresAt: number
+}
+type FetchRelayedCodes = () => Promise<RelayedVerificationCode[]>
+
+let pending: Promise<unknown> = Promise.resolve()
+let fetchRelayedCodes: FetchRelayedCodes = async () => []
+let relaySync: Promise<VerificationCode[]> | null = null
+
+const GOOGLE_MESSAGES_SCOPE = 'https://messages.google.com/web/'
+
+const updateBadge = async (entries: VerificationCode[]) => {
+  const action = browser.action ?? browser.browserAction
+  const hasUnreadCode = entries.some((entry) => !entry.copied)
+  await action.setBadgeBackgroundColor({ color: '#ef4444' })
+  await action.setBadgeText({ text: hasUnreadCode ? '•' : '' })
+  await action.setTitle({
+    title: hasUnreadCode ? 'Authier — verification code available' : 'Authier'
+  })
+  if (entries.length) {
+    await browser.alarms.create(VERIFICATION_CODE_EXPIRY_ALARM, {
+      when: Math.min(...entries.map((entry) => entry.expiresAt))
+    })
+  } else {
+    await browser.alarms.clear(VERIFICATION_CODE_EXPIRY_ALARM)
+  }
+}
+
+const updateState = (
+  change: (state: CodeState) => void | Promise<void> = () => undefined
+): Promise<VerificationCode[]> => {
+  // Multiple web app tabs, relay polls and popup actions must not overwrite each other.
+  const operation = pending.then(async () => {
+    const stored = await browser.storage.session.get(
+      VERIFICATION_CODE_STORAGE_KEY
+    )
+    const state = stateSchema.parse(
+      stored[VERIFICATION_CODE_STORAGE_KEY] ?? { entries: [], seen: [] }
+    )
+    const before = JSON.stringify(state)
+    state.entries = state.entries.filter(
+      (entry) => entry.expiresAt > Date.now()
+    )
+    await change(state)
+    state.entries = state.entries.slice(0, 20)
+    state.seen = state.seen.slice(-500)
+    if (JSON.stringify(state) !== before) {
+      await browser.storage.session.set({
+        [VERIFICATION_CODE_STORAGE_KEY]: state
+      })
+    }
+    await updateBadge(state.entries)
+    return state.entries
+  })
+  // Let callers receive the original error while keeping subsequent operations usable.
+  pending = operation.then(
+    () => undefined,
+    () => undefined
+  )
+  return operation
+}
+
+type ReportOrigin = {
+  provider: WebCodeProvider
+  scope: string
+  source: { tabId: number; incognito: boolean; accountUrl?: string }
+}
+
+/** Which web app sent a report; codes are only accepted from their own app. */
+const getReportOrigin = (
+  sender: browser.Runtime.MessageSender
+): ReportOrigin | null => {
+  const tabId = sender.tab?.id
+  if (tabId === undefined || sender.frameId !== 0) return null
+  const url = sender.url ?? ''
+  const incognito = sender.tab?.incognito ?? false
+  const accountUrl = getGmailAccountScope(url)
+  if (accountUrl)
+    return {
+      provider: 'Gmail',
+      scope: accountUrl,
+      source: { tabId, accountUrl, incognito }
+    }
+  if (isGoogleMessagesUrl(url))
+    return {
+      provider: 'Google Messages',
+      scope: GOOGLE_MESSAGES_SCOPE,
+      source: { tabId, incognito }
+    }
+  return null
+}
+
+const getEntryScope = (entry: VerificationCode) => {
+  if (entry.provider === 'Gmail') return entry.source?.accountUrl
+  if (entry.provider === 'Google Messages') return GOOGLE_MESSAGES_SCOPE
+  return undefined
+}
+
+const addRelayedCodes = async (
+  state: CodeState,
+  relayedCodes: RelayedVerificationCode[]
+) => {
+  for (const relayed of relayedCodes) {
+    const key = await codeFingerprint(JSON.stringify(['Android', relayed.id]))
+    if (state.seen.includes(key)) continue
+    state.seen.push(key)
+    const detectedAt = Date.now()
+    state.entries.unshift(
+      verificationCodeSchema.parse({
+        provider: 'Android',
+        sender: relayed.sender,
+        code: relayed.code,
+        deviceName: relayed.deviceName,
+        id: crypto.randomUUID(),
+        detectedAt,
+        // Bound by local time too, in case this computer's clock lags the server.
+        expiresAt: Math.min(
+          relayed.expiresAt,
+          detectedAt + VERIFICATION_CODE_LIFETIME_MS
+        ),
+        copied: false
+      })
+    )
+  }
+}
+
+const syncRelayedCodes = () => {
+  // The popup polls; never stack requests while the backend is slow.
+  relaySync ??= fetchRelayedCodes()
+    .then((relayedCodes) =>
+      updateState((state) => addRelayedCodes(state, relayedCodes))
+    )
+    .finally(() => {
+      relaySync = null
+    })
+  return relaySync
+}
+
+export const refreshVerificationCodes = () => updateState()
+
+/** Handle this namespace before the legacy relay: codes must never reach other tabs. */
+export const handleVerificationCodeMessage = (
+  message: unknown,
+  sender: browser.Runtime.MessageSender
+): Promise<VerificationCode[] | boolean | null> | undefined => {
+  if (
+    typeof message !== 'object' ||
+    message === null ||
+    !('kind' in message) ||
+    typeof message.kind !== 'string' ||
+    !message.kind.startsWith(CODE_MESSAGE_PREFIX)
+  )
+    return
+  const parsed = codeMessageSchema.safeParse(message)
+  if (!parsed.success || sender.id !== browser.runtime.id)
+    return Promise.resolve(null)
+  const request = parsed.data
+
+  if (request.kind === CodeMessageKind.REPORT) {
+    const origin = getReportOrigin(sender)
+    if (!origin) return Promise.resolve(null)
+    const { incognito } = origin.source
+    return updateState(async (state) => {
+      for (const candidate of request.candidates) {
+        // A content script can only report codes from the app it runs in.
+        if (candidate.provider !== origin.provider) continue
+        const sameCode = (entry: VerificationCode) =>
+          entry.provider === candidate.provider &&
+          getEntryScope(entry) === origin.scope &&
+          'source' in entry &&
+          entry.source?.incognito === incognito &&
+          entry.code === candidate.code &&
+          entry.sender.toLowerCase() === candidate.sender.toLowerCase()
+        const key = await codeFingerprint(
+          JSON.stringify([
+            origin.scope,
+            incognito,
+            candidate.sender.toLowerCase(),
+            candidate.code
+          ])
+        )
+        if (state.seen.includes(key)) {
+          const index = state.entries.findIndex(sameCode)
+          if (index !== -1)
+            state.entries[index] = verificationCodeSchema.parse({
+              ...state.entries[index],
+              source: origin.source
+            })
+          continue
+        }
+        const detectedAt = Date.now()
+        state.seen.push(key)
+        state.entries.unshift(
+          verificationCodeSchema.parse({
+            ...candidate,
+            id: crypto.randomUUID(),
+            detectedAt,
+            expiresAt: detectedAt + VERIFICATION_CODE_LIFETIME_MS,
+            copied: false,
+            source: origin.source
+          })
+        )
+      }
+    }).then(() => true)
+  }
+
+  // Only our own extension pages may read codes. The popup router changes its
+  // pathname via history.pushState, so checking just /js/popup.html breaks copying.
+  if (!sender.url?.startsWith(browser.runtime.getURL('')))
+    return Promise.resolve(null)
+  if (request.kind === CodeMessageKind.SYNC_RELAYED) return syncRelayedCodes()
+  if (request.kind === CodeMessageKind.OPEN_SOURCE) {
+    return updateState().then((entries) => {
+      const entry = entries.find((entry) => entry.id === request.id)
+      return entry ? openCodeSource(entry) : false
+    })
+  }
+  return updateState((state) => {
+    if (request.kind === CodeMessageKind.DISMISS) {
+      state.entries = state.entries.filter((entry) => entry.id !== request.id)
+    } else if (request.kind === CodeMessageKind.COPIED) {
+      const entry = state.entries.find((entry) => entry.id === request.id)
+      if (entry) entry.copied = true
+    }
+  })
+}
+
+export const initializeVerificationCodes = (
+  options: { fetchRelayedCodes?: FetchRelayedCodes } = {}
+) => {
+  if (options.fetchRelayedCodes) fetchRelayedCodes = options.fetchRelayedCodes
+  browser.alarms.onAlarm.addListener((alarm) => {
+    if (alarm.name === VERIFICATION_CODE_EXPIRY_ALARM)
+      void refreshVerificationCodes()
+  })
+  browser.storage.onChanged.addListener((changes, area) => {
+    if (
+      area === 'session' &&
+      VERIFICATION_CODE_STORAGE_KEY in changes &&
+      changes[VERIFICATION_CODE_STORAGE_KEY].newValue === undefined
+    ) {
+      void refreshVerificationCodes()
+    }
+  })
+  void refreshVerificationCodes()
+}

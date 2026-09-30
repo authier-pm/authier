@@ -2,16 +2,19 @@ import { webcrypto } from 'node:crypto'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import browser from 'webextension-polyfill'
 import {
-  EMAIL_CODE_LIFETIME_MS,
-  EMAIL_CODE_EXPIRY_ALARM,
-  EMAIL_CODE_STORAGE_KEY,
-  EmailCodeMessageKind,
-  emailVerificationCodesSchema
-} from '../email-codes/emailCodeProtocol'
+  VERIFICATION_CODE_LIFETIME_MS,
+  VERIFICATION_CODE_EXPIRY_ALARM,
+  VERIFICATION_CODE_STORAGE_KEY,
+  CodeMessageKind,
+  GOOGLE_MESSAGES_URL,
+  verificationCodesSchema
+} from '../verification-codes/verificationCodeProtocol'
 import {
-  handleEmailVerificationCodeMessage,
-  refreshEmailVerificationCodes
-} from './emailVerificationCodes'
+  handleVerificationCodeMessage,
+  initializeVerificationCodes,
+  refreshVerificationCodes,
+  type RelayedVerificationCode
+} from './verificationCodes'
 
 const setBadgeText = vi.fn().mockResolvedValue(undefined)
 const createAlarm = vi.fn().mockResolvedValue(undefined)
@@ -43,14 +46,14 @@ const candidate = {
   code: '213456'
 }
 const report = (code = candidate.code, sender = gmailSender) =>
-  handleEmailVerificationCodeMessage(
-    { kind: EmailCodeMessageKind.REPORT, candidates: [{ ...candidate, code }] },
+  handleVerificationCodeMessage(
+    { kind: CodeMessageKind.REPORT, candidates: [{ ...candidate, code }] },
     sender
   )
 const list = async () =>
-  emailVerificationCodesSchema.parse(
-    await handleEmailVerificationCodeMessage(
-      { kind: EmailCodeMessageKind.LIST },
+  verificationCodesSchema.parse(
+    await handleVerificationCodeMessage(
+      { kind: CodeMessageKind.LIST },
       popupSender
     )
   )
@@ -73,7 +76,11 @@ beforeEach(() => {
       setBadgeBackgroundColor: vi.fn().mockResolvedValue(undefined),
       setTitle: vi.fn().mockResolvedValue(undefined)
     },
-    alarms: { create: createAlarm, clear: clearAlarm }
+    alarms: {
+      create: createAlarm,
+      clear: clearAlarm,
+      onAlarm: { addListener: vi.fn() }
+    }
   })
   for (const key of Object.keys(storage)) delete storage[key]
   vi.mocked(browser.storage.session.get).mockImplementation(async () =>
@@ -87,7 +94,7 @@ afterEach(() => {
   vi.useRealTimers()
 })
 
-describe('email verification background messages', () => {
+describe('verification code background messages', () => {
   it('accepts a background Gmail tab, badges it, and returns only acknowledgement to the content script', async () => {
     expect(await report()).toBe(true)
     const entries = await list()
@@ -102,9 +109,12 @@ describe('email verification background messages', () => {
       }
     })
     expect(setBadgeText).toHaveBeenLastCalledWith({ text: '•' })
-    expect(createAlarm).toHaveBeenLastCalledWith(EMAIL_CODE_EXPIRY_ALARM, {
-      when: Date.now() + EMAIL_CODE_LIFETIME_MS
-    })
+    expect(createAlarm).toHaveBeenLastCalledWith(
+      VERIFICATION_CODE_EXPIRY_ALARM,
+      {
+        when: Date.now() + VERIFICATION_CODE_LIFETIME_MS
+      }
+    )
     expect(browser.storage.local.set).not.toHaveBeenCalled()
   })
 
@@ -123,13 +133,13 @@ describe('email verification background messages', () => {
   it('does not disclose codes to Gmail or ordinary content scripts', async () => {
     await report()
     for (const kind of [
-      EmailCodeMessageKind.LIST,
-      EmailCodeMessageKind.COPIED,
-      EmailCodeMessageKind.DISMISS,
-      EmailCodeMessageKind.OPEN_SOURCE
+      CodeMessageKind.LIST,
+      CodeMessageKind.COPIED,
+      CodeMessageKind.DISMISS,
+      CodeMessageKind.OPEN_SOURCE
     ]) {
       expect(
-        await handleEmailVerificationCodeMessage(
+        await handleVerificationCodeMessage(
           { kind, id: (await list())[0].id },
           gmailSender
         )
@@ -142,14 +152,14 @@ describe('email verification background messages', () => {
   it('allows popup actions after client-side routing changes its URL', async () => {
     await report()
     const [entry] = await list()
-    await handleEmailVerificationCodeMessage(
-      { kind: EmailCodeMessageKind.COPIED, id: entry.id },
+    await handleVerificationCodeMessage(
+      { kind: CodeMessageKind.COPIED, id: entry.id },
       { ...popupSender, url: 'chrome-extension://mock-extension-id/' }
     )
     expect((await list())[0].copied).toBe(true)
     expect(
-      await handleEmailVerificationCodeMessage(
-        { kind: EmailCodeMessageKind.LIST },
+      await handleVerificationCodeMessage(
+        { kind: CodeMessageKind.LIST },
         {
           ...popupSender,
           url: 'chrome-extension://mock-extension-id.evil/js/popup.html'
@@ -160,22 +170,22 @@ describe('email verification background messages', () => {
 
   it('swallows malformed namespaced messages instead of allowing legacy relay', async () => {
     expect(
-      await handleEmailVerificationCodeMessage(
+      await handleVerificationCodeMessage(
         {
-          kind: EmailCodeMessageKind.REPORT,
+          kind: CodeMessageKind.REPORT,
           candidates: [{ ...candidate, code: '<script>' }]
         },
         gmailSender
       )
     ).toBeNull()
     expect(
-      await handleEmailVerificationCodeMessage(
-        { kind: 'authierEmailCodeUnknown' },
+      await handleVerificationCodeMessage(
+        { kind: 'authierVerificationCodeUnknown' },
         gmailSender
       )
     ).toBeNull()
     expect(
-      handleEmailVerificationCodeMessage({ kind: 'unrelated' }, gmailSender)
+      handleVerificationCodeMessage({ kind: 'unrelated' }, gmailSender)
     ).toBeUndefined()
   })
 
@@ -207,8 +217,8 @@ describe('email verification background messages', () => {
   it('refreshes the source tab on duplicate reports without extending expiry or resetting copied state', async () => {
     await report()
     const [entry] = await list()
-    await handleEmailVerificationCodeMessage(
-      { kind: EmailCodeMessageKind.COPIED, id: entry.id },
+    await handleVerificationCodeMessage(
+      { kind: CodeMessageKind.COPIED, id: entry.id },
       popupSender
     )
     vi.setSystemTime(Date.now() + 1000)
@@ -229,8 +239,8 @@ describe('email verification background messages', () => {
       { ...gmailSender.tab!, windowId: 12, url: gmailSender.url }
     ])
     expect(
-      await handleEmailVerificationCodeMessage(
-        { kind: EmailCodeMessageKind.OPEN_SOURCE, id: entry.id },
+      await handleVerificationCodeMessage(
+        { kind: CodeMessageKind.OPEN_SOURCE, id: entry.id },
         popupSender
       )
     ).toBe(true)
@@ -259,8 +269,8 @@ describe('email verification background messages', () => {
       },
       { ...gmailSender.tab!, id: 9, windowId: 3, url: gmailSender.url }
     ])
-    await handleEmailVerificationCodeMessage(
-      { kind: EmailCodeMessageKind.OPEN_SOURCE, id: entry.id },
+    await handleVerificationCodeMessage(
+      { kind: CodeMessageKind.OPEN_SOURCE, id: entry.id },
       popupSender
     )
     expect(updateTab).toHaveBeenCalledWith(9, { active: true })
@@ -277,8 +287,8 @@ describe('email verification background messages', () => {
       { ...gmailSender.tab!, url: 'https://example.com/' },
       { ...gmailSender.tab!, id: 8, url: gmailSender.url }
     ])
-    await handleEmailVerificationCodeMessage(
-      { kind: EmailCodeMessageKind.OPEN_SOURCE, id: entry.id },
+    await handleVerificationCodeMessage(
+      { kind: CodeMessageKind.OPEN_SOURCE, id: entry.id },
       popupSender
     )
     expect(browser.tabs.create).toHaveBeenCalledWith({
@@ -294,8 +304,8 @@ describe('email verification background messages', () => {
       tab: { ...gmailSender.tab!, incognito: true }
     })
     const [entry] = await list()
-    await handleEmailVerificationCodeMessage(
-      { kind: EmailCodeMessageKind.OPEN_SOURCE, id: entry.id },
+    await handleVerificationCodeMessage(
+      { kind: CodeMessageKind.OPEN_SOURCE, id: entry.id },
       popupSender
     )
     expect(createWindow).toHaveBeenCalledWith({
@@ -309,16 +319,16 @@ describe('email verification background messages', () => {
   it('does not navigate for an expired or missing code', async () => {
     await report()
     const [entry] = await list()
-    vi.setSystemTime(Date.now() + EMAIL_CODE_LIFETIME_MS + 1)
+    vi.setSystemTime(Date.now() + VERIFICATION_CODE_LIFETIME_MS + 1)
     expect(
-      await handleEmailVerificationCodeMessage(
-        { kind: EmailCodeMessageKind.OPEN_SOURCE, id: entry.id },
+      await handleVerificationCodeMessage(
+        { kind: CodeMessageKind.OPEN_SOURCE, id: entry.id },
         popupSender
       )
     ).toBe(false)
     expect(
-      await handleEmailVerificationCodeMessage(
-        { kind: EmailCodeMessageKind.OPEN_SOURCE, id: crypto.randomUUID() },
+      await handleVerificationCodeMessage(
+        { kind: CodeMessageKind.OPEN_SOURCE, id: crypto.randomUUID() },
         popupSender
       )
     ).toBe(false)
@@ -329,8 +339,8 @@ describe('email verification background messages', () => {
   it('clears the badge after copying and does not notify again for the same email', async () => {
     await report()
     const [entry] = await list()
-    await handleEmailVerificationCodeMessage(
-      { kind: EmailCodeMessageKind.COPIED, id: entry.id },
+    await handleVerificationCodeMessage(
+      { kind: CodeMessageKind.COPIED, id: entry.id },
       popupSender
     )
     expect(setBadgeText).toHaveBeenLastCalledWith({ text: '' })
@@ -343,8 +353,8 @@ describe('email verification background messages', () => {
     await report()
     await report('A1B2C3')
     const [entry] = await list()
-    await handleEmailVerificationCodeMessage(
-      { kind: EmailCodeMessageKind.COPIED, id: entry.id },
+    await handleVerificationCodeMessage(
+      { kind: CodeMessageKind.COPIED, id: entry.id },
       popupSender
     )
     expect(setBadgeText).toHaveBeenLastCalledWith({ text: '•' })
@@ -353,8 +363,8 @@ describe('email verification background messages', () => {
   it('dismisses a code without resurrecting it on a mail tab reload', async () => {
     await report()
     const [entry] = await list()
-    await handleEmailVerificationCodeMessage(
-      { kind: EmailCodeMessageKind.DISMISS, id: entry.id },
+    await handleVerificationCodeMessage(
+      { kind: CodeMessageKind.DISMISS, id: entry.id },
       popupSender
     )
     await report()
@@ -364,24 +374,203 @@ describe('email verification background messages', () => {
 
   it('expires code values and clears the badge and alarm', async () => {
     await report()
-    vi.setSystemTime(Date.now() + EMAIL_CODE_LIFETIME_MS + 1)
-    await refreshEmailVerificationCodes()
+    vi.setSystemTime(Date.now() + VERIFICATION_CODE_LIFETIME_MS + 1)
+    await refreshVerificationCodes()
     expect(await list()).toEqual([])
-    expect(JSON.stringify(storage[EMAIL_CODE_STORAGE_KEY])).not.toContain(
-      candidate.code
-    )
+    expect(
+      JSON.stringify(storage[VERIFICATION_CODE_STORAGE_KEY])
+    ).not.toContain(candidate.code)
     expect(setBadgeText).toHaveBeenLastCalledWith({ text: '' })
-    expect(clearAlarm).toHaveBeenLastCalledWith(EMAIL_CODE_EXPIRY_ALARM)
+    expect(clearAlarm).toHaveBeenLastCalledWith(VERIFICATION_CODE_EXPIRY_ALARM)
     await report()
     expect(await list()).toEqual([])
   })
 
   it('restores badge state from session storage after a worker wake and clears it when session storage is cleared', async () => {
     await report()
-    await refreshEmailVerificationCodes()
+    await refreshVerificationCodes()
     expect(setBadgeText).toHaveBeenLastCalledWith({ text: '•' })
-    delete storage[EMAIL_CODE_STORAGE_KEY]
-    await refreshEmailVerificationCodes()
+    delete storage[VERIFICATION_CODE_STORAGE_KEY]
+    await refreshVerificationCodes()
     expect(setBadgeText).toHaveBeenLastCalledWith({ text: '' })
+  })
+})
+
+const messagesSender: browser.Runtime.MessageSender = {
+  ...gmailSender,
+  url: 'https://messages.google.com/web/conversations/42',
+  tab: { ...gmailSender.tab!, id: 11 }
+}
+const smsCandidate = {
+  provider: 'Google Messages',
+  sender: 'AirBank',
+  code: '4742'
+}
+const reportSms = (sender = messagesSender, candidates = [smsCandidate]) =>
+  handleVerificationCodeMessage(
+    { kind: CodeMessageKind.REPORT, candidates },
+    sender
+  )
+
+describe('SMS codes from Google Messages for Web', () => {
+  it('accepts a Messages tab report and opens that tab without copying', async () => {
+    expect(await reportSms()).toBe(true)
+    const [entry] = await list()
+    expect(entry).toMatchObject({
+      ...smsCandidate,
+      copied: false,
+      source: { tabId: 11, incognito: false }
+    })
+    expect(setBadgeText).toHaveBeenLastCalledWith({ text: '•' })
+    vi.mocked(browser.tabs.query).mockResolvedValue([
+      { ...messagesSender.tab!, windowId: 4, url: messagesSender.url }
+    ])
+    await handleVerificationCodeMessage(
+      { kind: CodeMessageKind.OPEN_SOURCE, id: entry.id },
+      popupSender
+    )
+    expect(browser.tabs.query).toHaveBeenCalledWith({
+      url: 'https://messages.google.com/web/*'
+    })
+    expect(updateTab).toHaveBeenCalledWith(11, { active: true })
+    expect(updateWindow).toHaveBeenCalledWith(4, { focused: true })
+    expect((await list())[0].copied).toBe(false)
+  })
+
+  it('reopens Google Messages when its tab has closed', async () => {
+    await reportSms()
+    const [entry] = await list()
+    await handleVerificationCodeMessage(
+      { kind: CodeMessageKind.OPEN_SOURCE, id: entry.id },
+      popupSender
+    )
+    expect(browser.tabs.create).toHaveBeenCalledWith({
+      url: GOOGLE_MESSAGES_URL,
+      active: true
+    })
+  })
+
+  it('never lets one web app report codes on behalf of another', async () => {
+    await reportSms(gmailSender)
+    await report('213456', messagesSender)
+    await reportSms({
+      ...messagesSender,
+      url: 'https://messages.google.com.evil.test/web/conversations'
+    })
+    await reportSms({ ...messagesSender, url: 'https://messages.google.com/' })
+    expect(await list()).toEqual([])
+  })
+
+  it('does not notify twice for the same SMS after Messages rerenders', async () => {
+    await reportSms()
+    await reportSms()
+    expect(await list()).toHaveLength(1)
+  })
+})
+
+const relayed = (
+  overrides: Partial<RelayedVerificationCode> = {}
+): RelayedVerificationCode => ({
+  v: 1,
+  id: '5c0f8c1e-6f2a-4d6e-9b1a-3f7e2d9c4b10',
+  code: '474230',
+  sender: 'AirBank',
+  receivedAt: Date.now(),
+  deviceName: 'Pixel 9',
+  expiresAt: Date.now() + VERIFICATION_CODE_LIFETIME_MS,
+  ...overrides
+})
+
+describe('codes relayed from Android phones', () => {
+  const fetchRelayedCodes = vi.fn<() => Promise<RelayedVerificationCode[]>>()
+  const sync = (sender = popupSender) =>
+    handleVerificationCodeMessage(
+      { kind: CodeMessageKind.SYNC_RELAYED },
+      sender
+    )
+  beforeEach(() => {
+    fetchRelayedCodes.mockReset()
+    initializeVerificationCodes({ fetchRelayedCodes })
+  })
+
+  it('adds a decrypted relay once, even when the popup keeps polling', async () => {
+    fetchRelayedCodes.mockResolvedValue([relayed()])
+    await sync()
+    await sync()
+    const entries = await list()
+    expect(entries).toEqual([
+      expect.objectContaining({
+        provider: 'Android',
+        code: '474230',
+        sender: 'AirBank',
+        deviceName: 'Pixel 9',
+        copied: false
+      })
+    ])
+    expect(setBadgeText).toHaveBeenLastCalledWith({ text: '•' })
+    expect(
+      await handleVerificationCodeMessage(
+        { kind: CodeMessageKind.OPEN_SOURCE, id: entries[0].id },
+        popupSender
+      )
+    ).toBe(false)
+  })
+
+  it('only lets extension pages poll, and never stacks backend requests', async () => {
+    let resolve: (codes: RelayedVerificationCode[]) => void = () => undefined
+    fetchRelayedCodes.mockReturnValue(
+      new Promise((resolver) => {
+        resolve = resolver
+      })
+    )
+    expect(await sync(gmailSender)).toBeNull()
+    const polls = [sync(), sync()]
+    resolve([relayed()])
+    await Promise.all(polls)
+    expect(fetchRelayedCodes).toHaveBeenCalledTimes(1)
+    expect(await list()).toHaveLength(1)
+  })
+
+  it('does not resurrect a dismissed relay on the next poll', async () => {
+    fetchRelayedCodes.mockResolvedValue([relayed()])
+    await sync()
+    const [entry] = await list()
+    await handleVerificationCodeMessage(
+      { kind: CodeMessageKind.DISMISS, id: entry.id },
+      popupSender
+    )
+    await sync()
+    expect(await list()).toEqual([])
+    expect(JSON.stringify(storage)).not.toContain('474230')
+  })
+
+  it('expires with the server, and within the lifetime if clocks disagree', async () => {
+    fetchRelayedCodes.mockResolvedValue([
+      relayed({ expiresAt: Date.now() + 60_000 }),
+      relayed({
+        id: '7d1f2c3b-0a4e-4b5c-8d6e-9f0a1b2c3d4e',
+        code: '1234',
+        expiresAt: Date.now() + 3 * VERIFICATION_CODE_LIFETIME_MS
+      }),
+      relayed({
+        id: '2b3c4d5e-6f70-4812-9a3b-4c5d6e7f8091',
+        code: '9999',
+        expiresAt: Date.now() - 1
+      })
+    ])
+    await sync()
+    const entries = await list()
+    expect(entries.map(({ code, expiresAt }) => [code, expiresAt])).toEqual([
+      ['1234', Date.now() + VERIFICATION_CODE_LIFETIME_MS],
+      ['474230', Date.now() + 60_000]
+    ])
+  })
+
+  it('reports a failed poll to the popup without dropping existing codes', async () => {
+    fetchRelayedCodes.mockResolvedValueOnce([relayed()])
+    await sync()
+    fetchRelayedCodes.mockRejectedValueOnce(new Error('offline'))
+    await expect(sync()).rejects.toThrow('offline')
+    expect(await list()).toHaveLength(1)
   })
 })

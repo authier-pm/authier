@@ -54,6 +54,11 @@ type UserQuery {
   primaryEmailVerification: EmailVerificationGQLScalars
   emailVerifications: [EmailVerificationGQLScalars!]!
   encryptedSecrets: [EncryptedSecretQuery!]!
+
+  """
+  Unexpired codes relayed from phones, newest first
+  """
+  relayedVerificationCodes: [RelayedVerificationCodeGQL!]!
   decryptionChallengesWaiting: [DecryptionChallengeForApproval!]!
 }
 
@@ -355,6 +360,18 @@ type EmailVerificationGQLScalars {
 enum EmailVerificationType {
   PRIMARY
   CONTACT
+}
+
+type RelayedVerificationCodeGQL {
+  id: ID!
+  encrypted: String!
+  createdAt: DateTime!
+  expiresAt: DateTime!
+
+  """
+  Name of the phone that relayed it
+  """
+  deviceName: String!
 }
 
 type DecryptionChallengeForApproval {

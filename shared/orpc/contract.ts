@@ -42,7 +42,8 @@ import {
   updateRecoveryCooldownInputSchema,
   updateVaultLockTimeoutInputSchema,
   initiateMasterDeviceResetInputSchema,
-  completeDeviceLoginInputSchema
+  completeDeviceLoginInputSchema,
+  relayVerificationCodeInputSchema
 } from './schemas'
 
 const mobileProcedure = oc.errors({
@@ -209,6 +210,18 @@ export const vaultApiContract = {
     deleteSecret: oc
       .input(deleteEncryptedSecretInputSchema)
       .output(deleteResultSchema)
+  },
+  verificationCodes: {
+    relay: oc
+      .errors({ TOO_MANY_REQUESTS: { status: 429 } })
+      .route({
+        method: 'POST',
+        path: '/verificationCodes/relay',
+        operationId: 'verificationCodesRelay',
+        tags: ['verificationCodes']
+      })
+      .input(relayVerificationCodeInputSchema)
+      .output(okResultSchema)
   },
   devices: {
     list: oc

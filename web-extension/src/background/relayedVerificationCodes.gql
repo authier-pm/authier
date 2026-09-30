@@ -1,0 +1,11 @@
+query relayedVerificationCodes {
+  me {
+    id
+    relayedVerificationCodes {
+      id
+      encrypted
+      expiresAt
+      deviceName
+    }
+  }
+}

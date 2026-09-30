@@ -24,6 +24,7 @@ const namedSchemas = {
   CreateVaultSecretInput: schemas.createVaultSecretInputSchema,
   UpdateVaultSecretInput: schemas.updateVaultSecretInputSchema,
   DeleteVaultSecretInput: schemas.deleteVaultSecretInputSchema,
+  RelayVerificationCodeInput: schemas.relayVerificationCodeInputSchema,
   ApprovedChallenge: schemas.approvedChallengeSchema,
   PendingChallenge: schemas.pendingChallengeResultSchema,
   DeviceChallenge: schemas.requestDeviceChallengeResultSchema,

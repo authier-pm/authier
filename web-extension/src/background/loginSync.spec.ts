@@ -10,7 +10,7 @@ import {
 } from '@shared/cryptoUtils'
 import { EncryptedSecretType } from '@shared/generated/graphqlBaseTypes'
 import { device, deviceInitialization, DeviceState } from './ExtensionDevice'
-import { loginSessionManager } from './loginSession'
+import { loginSessionManager, resumeRememberedDevice } from './loginSession'
 import { useDeviceState } from '@src/util/useDeviceState'
 import type { IBackgroundStateSerializable } from './backgroundPage'
 
@@ -244,4 +244,28 @@ it('keeps a successful login when the initial synchronization is offline', async
     'Failed to synchronize the vault after login',
     failure
   )
+})
+
+it('keeps locally saved items when session renewal returns no items and sync fails', async () => {
+  await device.save(snapshot)
+  const { result } = renderHook(useDeviceState)
+  await waitFor(() => expect(result.current.loginCredentials).toHaveLength(1))
+
+  await act(async () => {
+    await resumeRememberedDevice()
+  })
+  query.mockReset().mockRejectedValue(new Error('Database unavailable'))
+  await act(async () => {
+    await expect(device.state?.backendSync()).rejects.toThrow('Database unavailable')
+  })
+
+  expect(device.state?.secrets).toEqual(snapshot.secrets)
+  expect(result.current.searchSecrets('')).toHaveLength(1)
+  expect(result.current.loginCredentials[0].loginCredentials.password).toBe(
+    'saved-password-value'
+  )
+  expect(sessionStorage.backgroundState).toMatchObject({
+    secrets: snapshot.secrets,
+    decryptedSecrets: []
+  })
 })

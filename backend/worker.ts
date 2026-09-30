@@ -2,6 +2,7 @@ import { Elysia } from 'elysia'
 import { CloudflareAdapter } from 'elysia/adapter/cloudflare-worker'
 import { buildApp } from './app'
 import { processPendingMasterDeviceResets } from './lib/processPendingMasterDeviceResets'
+import { purgeExpiredRelayedCodes } from './lib/relayedVerificationCodes'
 
 const workerApp = buildApp(
   new Elysia({
@@ -12,7 +13,14 @@ const workerApp = buildApp(
 export default {
   fetch: workerApp.fetch,
   scheduled: async () => {
-    const result = await processPendingMasterDeviceResets()
-    console.log('master device reset cron', result)
+    const [resets, expiredRelayedCodes] = await Promise.all([
+      processPendingMasterDeviceResets(),
+      purgeExpiredRelayedCodes()
+    ])
+    console.log('master device reset cron', resets)
+    console.log(
+      'expired relayed verification codes deleted',
+      expiredRelayedCodes
+    )
   }
 }
