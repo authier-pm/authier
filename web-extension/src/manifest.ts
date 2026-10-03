@@ -110,7 +110,7 @@ function getFirefoxManifestV2(
         strict_min_version: '128.0'
       }
     },
-    web_accessible_resources: ['icon-16.png'],
+    web_accessible_resources: ['icon-16.png', 'icon-128.png'],
     content_security_policy: `script-src ${scriptSources}; https://www.googleapis.com https://js.stripe.com/v3 https://*.firebaseio.com; object-src 'self'`
   }
 }

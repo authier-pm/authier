@@ -4,7 +4,8 @@ import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 
 /** Plain metadata keeps field selection and origin boundaries testable on the JVM. */
 data class NativeAutofillNode(
-    val hints: List<String> = emptyList(),
+    // Android's framework hint arrays can contain null entries.
+    val hints: List<String?> = emptyList(),
     val passwordInput: Boolean = false,
     val emailInput: Boolean = false,
     val webContent: Boolean = false,
@@ -60,7 +61,7 @@ object NativeAutofillTarget {
             node.hasAutofillId && node.editable && node.visible && node.webOrigin == origin &&
                 (origin == null || node.webContent)
         }
-        fun hints(index: Int) = nodes[index].hints.map(String::lowercase).toSet()
+        fun hints(index: Int) = nodes[index].hints.mapNotNull { it?.lowercase() }.toSet()
         val passwords = eligible.filter { nodes[it].passwordInput || hints(it).any { hint -> hint in newHints || hint in setOf("password", "current-password") } }
         if (passwords.any { "current-password" in hints(it) && hints(it).any(newHints::contains) }) return null
         val newPasswords = passwords.filter { hints(it).any(newHints::contains) }

@@ -29,6 +29,19 @@ badge for a new code. The favicon response is a deterministic fixture.
 It captures `docs/screenshots/email-verification-codes.png` and
 `docs/screenshots/email-verification-codes-copied.png`.
 
+The `inline-verification-codes` scenario recreates Shopify's six separate code
+inputs with React-controlled values and runs the production inline picker, fill
+helper, and background handler. The Authier logo opens masked choices on click;
+email suggestions match the current site's registrable domain. SMS codes are
+explicit choices because phone sender IDs cannot reliably identify a website.
+Run `pnpm playwright:ui-preview inlineVerificationCodes.spec.ts` to check filling,
+single-field entry, late-mounted/replaced forms, keyboard dismissal, blocked
+script-generated clicks, and mobile positioning. It captures
+`docs/screenshots/inline-verification-codes.png`,
+`docs/screenshots/inline-verification-codes-filled.png`, and
+`docs/screenshots/inline-verification-codes-mobile.png`.
+Use `&single=1` or `&late=1` for those scenario variants.
+
 The `sms-verification-codes` scenario runs the production Google Messages for Web
 observer against a sanitized Messages DOM (`fixtures/googleMessagesConversation.ts`),
 and feeds the background an already-decrypted code relayed by an Android phone.

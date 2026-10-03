@@ -17,6 +17,9 @@ export const CodeMessageKind = {
   LIST: 'authierVerificationCodeList',
   SYNC_RELAYED: 'authierVerificationCodeSyncRelayed',
   COPIED: 'authierVerificationCodeCopied',
+  LIST_FOR_PAGE: 'authierVerificationCodeListForPage',
+  GET_FOR_PAGE: 'authierVerificationCodeGetForPage',
+  FILLED_FOR_PAGE: 'authierVerificationCodeFilledForPage',
   OPEN_SOURCE: 'authierVerificationCodeOpenSource',
   DISMISS: 'authierVerificationCodeDismiss'
 } as const
@@ -82,6 +85,27 @@ export const verificationCodeSchema = z.discriminatedUnion('provider', [
 export const verificationCodesSchema = z.array(verificationCodeSchema)
 export type VerificationCode = z.infer<typeof verificationCodeSchema>
 
+/** Only masked suggestions cross into a page before the user chooses a code. */
+export const verificationCodeSuggestionSchema = z.object({
+  id: entryFields.id,
+  provider: z.enum(['Gmail', 'Google Messages', 'Android']),
+  sender: z.string(),
+  maskedCode: z.string(),
+  codeLength: z.number().int().min(4).max(8),
+  numeric: z.boolean(),
+  expiresAt: entryFields.expiresAt
+})
+export const verificationCodeSuggestionsSchema = z.array(
+  verificationCodeSuggestionSchema
+)
+export type VerificationCodeSuggestion = z.infer<
+  typeof verificationCodeSuggestionSchema
+>
+export const pageVerificationCodeSchema = z.object({
+  code: relayedCodeSchema,
+  expiresAt: entryFields.expiresAt
+})
+
 const idMessage = <Kind extends string>(kind: Kind) =>
   z.object({ kind: z.literal(kind), id: z.string().uuid() })
 
@@ -92,6 +116,9 @@ export const codeMessageSchema = z.discriminatedUnion('kind', [
   }),
   z.object({ kind: z.literal(CodeMessageKind.LIST) }),
   z.object({ kind: z.literal(CodeMessageKind.SYNC_RELAYED) }),
+  z.object({ kind: z.literal(CodeMessageKind.LIST_FOR_PAGE) }),
+  idMessage(CodeMessageKind.GET_FOR_PAGE),
+  idMessage(CodeMessageKind.FILLED_FOR_PAGE),
   idMessage(CodeMessageKind.COPIED),
   idMessage(CodeMessageKind.DISMISS),
   idMessage(CodeMessageKind.OPEN_SOURCE)
