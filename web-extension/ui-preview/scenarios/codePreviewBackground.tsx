@@ -42,11 +42,13 @@ export const CodePopupToolbar = ({ badgeLabel }: { badgeLabel: string }) => {
 export const useCodePreviewBackground = ({
   reportUrl,
   reportTabId,
+  pageUrl,
   observe,
   fetchRelayedCodes
 }: {
   reportUrl: string
   reportTabId: number
+  pageUrl?: string
   observe: (
     document: Document,
     report: (candidates: VerificationCodeCandidate[]) => Promise<unknown>
@@ -61,11 +63,24 @@ export const useCodePreviewBackground = ({
         message !== null &&
         'kind' in message &&
         message.kind === CodeMessageKind.REPORT
+      const isPageRequest =
+        typeof message === 'object' &&
+        message !== null &&
+        'kind' in message &&
+        [
+          CodeMessageKind.LIST_FOR_PAGE,
+          CodeMessageKind.GET_FOR_PAGE,
+          CodeMessageKind.FILLED_FOR_PAGE
+        ].some((kind) => kind === message.kind)
+      const contentUrl = isReport ? reportUrl : pageUrl
       return handleVerificationCodeMessage(message, {
         id: browser.runtime.id,
-        url: isReport ? reportUrl : browser.runtime.getURL('js/popup.html'),
+        url:
+          isReport || isPageRequest
+            ? contentUrl
+            : browser.runtime.getURL('js/popup.html'),
         frameId: 0,
-        ...(isReport
+        ...(isReport || isPageRequest
           ? {
               tab: {
                 id: reportTabId,

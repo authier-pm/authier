@@ -3,7 +3,24 @@
 The popup lists temporary codes from three sources: Gmail (**From your email**),
 and Google Messages for Web plus Authier for Android (**From your phone**). All of
 them share one protocol (`verificationCodeProtocol.ts`), background store
-(`src/background/verificationCodes.ts`) and popup UI.
+(`src/background/verificationCodes.ts`), popup UI and inline code picker.
+
+## Inline filling
+
+On a top-level HTTPS page with autofill enabled and Authier unlocked, the Authier
+logo appears beside a detected code field or group of 4–8 digit inputs. Clicking
+it opens masked suggestions. Email senders must share the site's registrable
+domain, including private suffix boundaries; SMS senders have no reliable domain
+association and appear as explicit choices. Private and normal windows remain
+separate. Choices must fit the input length and numeric restrictions.
+
+The picker uses a closed shadow root and accepts only trusted user clicks.
+`LIST_FOR_PAGE` returns masked metadata, `GET_FOR_PAGE` releases only the selected,
+unexpired code, and `FILLED_FOR_PAGE` acknowledges its notification after a
+verified fill. Every request checks the sender again. `fillOtpInputs.ts` fills
+the whole segmented widget, including partially entered digits, and verifies
+its values after the page renders. Late-mounted forms, scrolling and resizing
+update the trigger; replacing the fields discards the old dropdown.
 
 ## Extraction
 
@@ -61,7 +78,8 @@ on startup, on unlock and every 30 seconds through a browser alarm (GraphQL
 `me.relayedVerificationCodes`). New phone codes update the same red toolbar badge
 as email codes, including while the popup is closed. Browser alarms wake a
 suspended Chrome service worker; the schedule is restored if missing on startup.
-Alarms may be delayed during sleep or by the browser. Opening the popup adds faster checks every 4 seconds.
+Alarms may be delayed during sleep or by the browser. Opening the popup or inline
+dropdown adds faster checks every 4 seconds.
 The background decrypts them with the unlocked vault key. A code that cannot be
 decrypted, for example one encrypted before a master password change, is skipped.
 Polls never overlap. A locked extension leaves codes encrypted on the server.
@@ -71,9 +89,10 @@ Polls never overlap. A locked extension leaves codes encrypted on the server.
 Only senders and candidate codes leave a content script. The background checks the
 extension ID, the web app's HTTPS origin and the top-level frame before accepting a
 report, and accepts only codes of the app that reported them: Gmail cannot report
-SMS codes or vice versa. Listing, polling, copy acknowledgements, opening the source
-and dismissal are restricted to the extension's own pages. These messages are
-handled before the legacy tab relay.
+SMS codes or vice versa. Full lists, copy acknowledgements, opening the source
+and dismissal are restricted to the extension's own pages. The separate inline
+requests authorize only masked suggestions and a selected code as described
+above. These messages are handled before the legacy tab relay.
 
 Codes live in `storage.session`, never the vault, local or sync storage. They
 expire 10 minutes after detection (relayed codes: at the server's expiry, capped

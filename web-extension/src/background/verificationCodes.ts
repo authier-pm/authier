@@ -4,6 +4,11 @@ import type { RelayedCodePayload } from '@shared/relayedVerificationCode'
 import { codeFingerprint } from '../verification-codes/codeFingerprint'
 import { openCodeSource } from './openCodeSource'
 import {
+  getVerificationCodePage,
+  isVerificationCodeForPage,
+  toVerificationCodeSuggestion
+} from './verificationCodesForPage'
+import {
   CODE_MESSAGE_PREFIX,
   VERIFICATION_CODE_LIFETIME_MS,
   VERIFICATION_CODE_EXPIRY_ALARM,
@@ -17,6 +22,7 @@ import {
   verificationCodeSchema,
   verificationCodesSchema,
   type VerificationCode,
+  type VerificationCodeSuggestion,
   type WebCodeProvider
 } from '../verification-codes/verificationCodeProtocol'
 
@@ -175,7 +181,15 @@ export const refreshVerificationCodes = () => updateState()
 export const handleVerificationCodeMessage = (
   message: unknown,
   sender: browser.Runtime.MessageSender
-): Promise<VerificationCode[] | boolean | null> | undefined => {
+):
+  | Promise<
+      | VerificationCode[]
+      | VerificationCodeSuggestion[]
+      | { code: string; expiresAt: number }
+      | boolean
+      | null
+    >
+  | undefined => {
   if (
     typeof message !== 'object' ||
     message === null ||
@@ -235,6 +249,37 @@ export const handleVerificationCodeMessage = (
         )
       }
     }).then(() => true)
+  }
+
+  if (
+    request.kind === CodeMessageKind.LIST_FOR_PAGE ||
+    request.kind === CodeMessageKind.GET_FOR_PAGE ||
+    request.kind === CodeMessageKind.FILLED_FOR_PAGE
+  ) {
+    const page = getVerificationCodePage(sender)
+    if (!page) return Promise.resolve(null)
+    const acknowledgeFill = (state: CodeState) => {
+      if (request.kind !== CodeMessageKind.FILLED_FOR_PAGE) return
+      const entry = state.entries.find(
+        (entry) =>
+          entry.id === request.id && isVerificationCodeForPage(entry, page)
+      )
+      if (entry) entry.copied = true
+    }
+    // Keep cached choices immediate even when the phone relay is slow. A new
+    // relay appears on the next dropdown poll; offline checks are retried then.
+    if (request.kind === CodeMessageKind.LIST_FOR_PAGE)
+      void syncRelayedCodes().then(undefined, () => undefined)
+    return updateState(acknowledgeFill).then((entries) => {
+      const matching = entries.filter((entry) =>
+        isVerificationCodeForPage(entry, page)
+      )
+      if (request.kind === CodeMessageKind.LIST_FOR_PAGE)
+        return matching.map(toVerificationCodeSuggestion)
+      const entry = matching.find((entry) => entry.id === request.id)
+      if (request.kind === CodeMessageKind.FILLED_FOR_PAGE) return !!entry
+      return entry ? { code: entry.code, expiresAt: entry.expiresAt } : null
+    })
   }
 
   // Only our own extension pages may read codes. The popup router changes its

@@ -9,7 +9,8 @@ import {
   VERIFICATION_CODE_RELAY_PERIOD_MINUTES,
   CodeMessageKind,
   GOOGLE_MESSAGES_URL,
-  verificationCodesSchema
+  verificationCodesSchema,
+  verificationCodeSuggestionsSchema
 } from '../verification-codes/verificationCodeProtocol'
 import {
   handleVerificationCodeMessage,
@@ -510,6 +511,218 @@ describe('verification code background messages', () => {
     delete storage[VERIFICATION_CODE_STORAGE_KEY]
     await refreshVerificationCodes()
     expect(setBadgeText).toHaveBeenLastCalledWith({ text: '' })
+  })
+})
+
+describe('inline verification code selection', () => {
+  const pageSender: browser.Runtime.MessageSender = {
+    ...gmailSender,
+    url: 'https://accounts.example.com/verify',
+    tab: { ...gmailSender.tab!, id: 19 }
+  }
+  const suggestions = async (sender = pageSender) =>
+    verificationCodeSuggestionsSchema.parse(
+      await handleVerificationCodeMessage(
+        { kind: CodeMessageKind.LIST_FOR_PAGE },
+        sender
+      )
+    )
+  const getCode = (id: string, sender = pageSender) =>
+    handleVerificationCodeMessage(
+      { kind: CodeMessageKind.GET_FOR_PAGE, id },
+      sender
+    )
+
+  beforeEach(() => {
+    initializeVerificationCodes({ fetchRelayedCodes: async () => [] })
+  })
+
+  it('offers only masked email suggestions for the same registrable domain', async () => {
+    await report()
+    await handleVerificationCodeMessage(
+      {
+        kind: CodeMessageKind.REPORT,
+        candidates: [
+          { ...candidate, sender: 'mailer@other.test', code: '987654' }
+        ]
+      },
+      gmailSender
+    )
+    const result = await suggestions()
+    expect(result).toEqual([
+      {
+        id: (await list()).find((entry) => entry.sender === candidate.sender)!
+          .id,
+        provider: 'Gmail',
+        sender: candidate.sender,
+        maskedCode: '213***',
+        codeLength: 6,
+        numeric: true,
+        expiresAt: Date.now() + VERIFICATION_CODE_LIFETIME_MS
+      }
+    ])
+    expect(JSON.stringify(result)).not.toContain(candidate.code)
+    expect((await list()).every((entry) => !entry.copied)).toBe(true)
+  })
+
+  it.each([
+    { ...pageSender, url: 'http://accounts.example.com/verify' },
+    { ...pageSender, url: 'https://accounts.example.com/verify', frameId: 2 },
+    { ...pageSender, tab: undefined },
+    { ...pageSender, id: 'another-extension' },
+    { ...pageSender, url: 'chrome-extension://mock-extension-id/js/popup.html' }
+  ])(
+    'rejects inline requests outside our top-level HTTPS content script',
+    async (sender) => {
+      await report()
+      const [entry] = await list()
+      for (const kind of [
+        CodeMessageKind.LIST_FOR_PAGE,
+        CodeMessageKind.GET_FOR_PAGE,
+        CodeMessageKind.FILLED_FOR_PAGE
+      ])
+        expect(
+          await handleVerificationCodeMessage({ kind, id: entry.id }, sender)
+        ).toBeNull()
+      expect((await list())[0].copied).toBe(false)
+    }
+  )
+
+  it('releases only the chosen matching code, then acknowledges a successful fill separately', async () => {
+    await report()
+    const [entry] = await list()
+    expect(await getCode(entry.id)).toEqual({
+      code: candidate.code,
+      expiresAt: entry.expiresAt
+    })
+    expect((await list())[0].copied).toBe(false)
+    expect(
+      await handleVerificationCodeMessage(
+        { kind: CodeMessageKind.FILLED_FOR_PAGE, id: entry.id },
+        pageSender
+      )
+    ).toBe(true)
+    expect((await list())[0].copied).toBe(true)
+    expect(setBadgeText).toHaveBeenLastCalledWith({ text: '' })
+  })
+
+  it('rejects a chosen email code from another site, including lookalike domains', async () => {
+    await report()
+    const [entry] = await list()
+    for (const url of [
+      'https://other.test/',
+      'https://example.com.evil.test/'
+    ]) {
+      const sender = { ...pageSender, url }
+      expect(await suggestions(sender)).toEqual([])
+      expect(await getCode(entry.id, sender)).toBeNull()
+      expect(
+        await handleVerificationCodeMessage(
+          { kind: CodeMessageKind.FILLED_FOR_PAGE, id: entry.id },
+          sender
+        )
+      ).toBe(false)
+    }
+    expect((await list())[0].copied).toBe(false)
+  })
+
+  it('keeps tenants on private suffixes separate', async () => {
+    await handleVerificationCodeMessage(
+      {
+        kind: CodeMessageKind.REPORT,
+        candidates: [{ ...candidate, sender: 'mail@alice.github.io' }]
+      },
+      gmailSender
+    )
+    expect(
+      await suggestions({ ...pageSender, url: 'https://bob.github.io/verify' })
+    ).toEqual([])
+    expect(
+      await suggestions({
+        ...pageSender,
+        url: 'https://alice.github.io/verify'
+      })
+    ).toHaveLength(1)
+  })
+
+  it('keeps private-window suggestions and selection separate', async () => {
+    await report()
+    const [entry] = await list()
+    const privateSender = {
+      ...pageSender,
+      tab: { ...pageSender.tab!, incognito: true }
+    }
+    expect(await suggestions(privateSender)).toEqual([])
+    expect(await getCode(entry.id, privateSender)).toBeNull()
+    await report('987654', {
+      ...gmailSender,
+      tab: { ...gmailSender.tab!, incognito: true }
+    })
+    expect((await suggestions()).map((entry) => entry.maskedCode)).toEqual([
+      '213***'
+    ])
+    expect(
+      (await suggestions(privateSender)).map((entry) => entry.maskedCode)
+    ).toEqual(['987***'])
+  })
+
+  it('rejects an expired or dismissed code selected from a stale dropdown', async () => {
+    await report()
+    const [entry] = await list()
+    vi.setSystemTime(Date.now() + VERIFICATION_CODE_LIFETIME_MS + 1)
+    expect(await getCode(entry.id)).toBeNull()
+    expect(await suggestions()).toEqual([])
+    await report('987654')
+    const [next] = await list()
+    await handleVerificationCodeMessage(
+      { kind: CodeMessageKind.DISMISS, id: next.id },
+      popupSender
+    )
+    expect(await getCode(next.id)).toBeNull()
+  })
+
+  it('checks phone relays while offering masked SMS choices and tolerates offline polling', async () => {
+    const fetchRelayedCodes = vi.fn<() => Promise<RelayedVerificationCode[]>>()
+    fetchRelayedCodes.mockResolvedValue([
+      {
+        v: 1,
+        id: crypto.randomUUID(),
+        sender: 'Shopify',
+        code: '474230',
+        receivedAt: Date.now(),
+        deviceName: 'Pixel 9',
+        expiresAt: Date.now() + VERIFICATION_CODE_LIFETIME_MS
+      }
+    ])
+    initializeVerificationCodes({ fetchRelayedCodes })
+    await suggestions()
+    await refreshVerificationCodes()
+    const [sms] = await suggestions()
+    expect(sms).toMatchObject({
+      provider: 'Android',
+      sender: 'Shopify',
+      maskedCode: '474***'
+    })
+    expect(await getCode(sms.id)).toMatchObject({ code: '474230' })
+    fetchRelayedCodes.mockRejectedValueOnce(new Error('offline'))
+    expect(await suggestions()).toHaveLength(1)
+  })
+
+  it('returns cached choices immediately while a slow phone relay check runs', async () => {
+    await report()
+    let finishSync: (codes: RelayedVerificationCode[]) => void = () => undefined
+    const fetchRelayedCodes = vi.fn<() => Promise<RelayedVerificationCode[]>>()
+    fetchRelayedCodes.mockReturnValue(
+      new Promise((resolve) => {
+        finishSync = resolve
+      })
+    )
+    initializeVerificationCodes({ fetchRelayedCodes })
+    expect(await suggestions()).toHaveLength(1)
+    expect(await suggestions()).toHaveLength(1)
+    expect(fetchRelayedCodes).toHaveBeenCalledTimes(1)
+    finishSync([])
+    await refreshVerificationCodes()
   })
 })
 
