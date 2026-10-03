@@ -1,0 +1,164 @@
+{
+  "config": {
+    "baseModel": "microsoft/Multilingual-MiniLM-L12-H384",
+    "baseRevision": "6e8c1ec6b4ec4e3fc6eb7d2cd834fcd582b61daf",
+    "languages": [
+      "en",
+      "zh",
+      "hi",
+      "es",
+      "ar",
+      "fr",
+      "bn",
+      "pt",
+      "id",
+      "ur",
+      "bg",
+      "hr",
+      "cs",
+      "da",
+      "nl",
+      "et",
+      "fi",
+      "de",
+      "el",
+      "hu",
+      "ga",
+      "it",
+      "lv",
+      "lt",
+      "mt",
+      "pl",
+      "ro",
+      "sk",
+      "sl",
+      "sv"
+    ],
+    "seed": 20260930,
+    "codeKinds": [
+      "numeric",
+      "lettersUpper",
+      "lettersLower",
+      "lettersMixed",
+      "alphanumeric",
+      "separated",
+      "unicodeDigits"
+    ],
+    "codeLengths": [4, 5, 6, 7, 8, 9, 10],
+    "examplesPerTemplateAndKind": {
+      "train": 10,
+      "validation": 3,
+      "test": 5
+    },
+    "maxTokens": 192,
+    "epochs": 6,
+    "batchSize": 24,
+    "learningRate": 4e-5,
+    "headLearningRate": 0.0003,
+    "warmupFraction": 0.08,
+    "freezeWordEmbeddings": true,
+    "validationTargetPrecision": 0.995,
+    "provenance": "Synthetic templates authored and translated for this experiment. No private SMS data. No native-speaker review. Translated template families, brands and generated codes are partitioned globally before generation.",
+    "scope": "Train and evaluate a local SMS extractor. This experiment does not replace the Android production extractor or establish real-device memory, latency, or real-world accuracy."
+  },
+  "epochs": 4,
+  "batchSize": 24,
+  "device": "cuda",
+  "hardware": "AMD Radeon Graphics",
+  "torchVersion": "2.10.0+rocm7.1",
+  "trainableParameters": 21492482,
+  "dataset": {
+    "train": {
+      "examples": 46200,
+      "sha256": "42b9e5889e23aeb2cfff7f319ce202fe05aa890b8102efa7f7f1ed7feeee96d4"
+    },
+    "validation": {
+      "examples": 5040,
+      "sha256": "f0b6013501298476a589bb7e95c1a0cd253f42369b9209ab5f9c5449e1b0e021"
+    },
+    "test": {
+      "examples": 9450,
+      "sha256": "63f573c9647e1153ab444f0e88ca1515a237edc52604a2e3434f5ebe4c8367b5"
+    }
+  },
+  "history": [
+    {
+      "epoch": 1,
+      "loss": 0.40595893490518287,
+      "nullThreshold": 20.90440417694092,
+      "validation": {
+        "examples": 5040,
+        "positives": 1890,
+        "negatives": 3150,
+        "correctCodes": 1337,
+        "returnedCodes": 1343,
+        "falsePositives": 3,
+        "exactMatch": 0.8896825396825396,
+        "precision": 0.9955323901712584,
+        "recall": 0.7074074074074074,
+        "f1": 0.8270955768635941,
+        "falsePositiveRate": 0.0009523809523809524
+      },
+      "elapsedSeconds": 107.57009595498675
+    },
+    {
+      "epoch": 2,
+      "loss": 0.006426499087844262,
+      "nullThreshold": 23.911765588989258,
+      "validation": {
+        "examples": 5040,
+        "positives": 1890,
+        "negatives": 3150,
+        "correctCodes": 1064,
+        "returnedCodes": 1069,
+        "falsePositives": 5,
+        "exactMatch": 0.8351190476190476,
+        "precision": 0.9953227315247896,
+        "recall": 0.562962962962963,
+        "f1": 0.7191618790131802,
+        "falsePositiveRate": 0.0015873015873015873
+      },
+      "elapsedSeconds": 216.82931079500122
+    },
+    {
+      "epoch": 3,
+      "loss": 0.0026973269026055206,
+      "nullThreshold": 19.680387033691407,
+      "validation": {
+        "examples": 5040,
+        "positives": 1890,
+        "negatives": 3150,
+        "correctCodes": 1368,
+        "returnedCodes": 1374,
+        "falsePositives": 0,
+        "exactMatch": 0.8964285714285715,
+        "precision": 0.9956331877729258,
+        "recall": 0.7238095238095238,
+        "f1": 0.8382352941176471,
+        "falsePositiveRate": 0.0
+      },
+      "elapsedSeconds": 323.70563874195796
+    },
+    {
+      "epoch": 4,
+      "loss": 0.00048276319973777025,
+      "nullThreshold": 20.773941530456543,
+      "validation": {
+        "examples": 5040,
+        "positives": 1890,
+        "negatives": 3150,
+        "correctCodes": 1381,
+        "returnedCodes": 1387,
+        "falsePositives": 1,
+        "exactMatch": 0.8988095238095238,
+        "precision": 0.9956741167988464,
+        "recall": 0.7306878306878307,
+        "f1": 0.8428440646933171,
+        "falsePositiveRate": 0.00031746031746031746
+      },
+      "elapsedSeconds": 432.19675666297553
+    }
+  ],
+  "peakGpuBytes": 1525248000,
+  "testUsedForSelection": false
+}

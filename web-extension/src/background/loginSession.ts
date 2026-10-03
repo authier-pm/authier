@@ -15,7 +15,11 @@ import {
 } from '@shared/graphql/Login.codegen'
 import { apolloClientWithoutTokenRefresh } from '@src/apollo/apolloClient'
 import type { IBackgroundStateSerializable } from './backgroundPage'
-import { device, deviceInitialization, type DeviceState } from './ExtensionDevice'
+import {
+  device,
+  deviceInitialization,
+  type DeviceState
+} from './ExtensionDevice'
 import {
   getUserFromToken,
   setAccessToken
@@ -595,8 +599,8 @@ const completeLogin = async (
   const deviceState: IBackgroundStateSerializable = {
     masterEncryptionKey: await cryptoKeyToString(masterEncryptionKey),
     userId: input.challenge.userId,
-    // Login responses can omit already-synced items. Only vault sync may apply
-    // additions, updates and explicit deletions to an existing local vault.
+    // Login is not an authoritative vault snapshot. Keep local items until
+    // vault sync supplies additions, updates and explicit deletions.
     secrets: rememberedSession?.state.secrets ?? user.EncryptedSecrets,
     email: input.session.email,
     encryptionSalt: input.challenge.encryptionSalt,
@@ -615,7 +619,7 @@ const completeLogin = async (
     theme: user.defaultDeviceSettings.theme
   }
 
-  if (input.session.password === '' && !device.state) return
+  if (rememberedSession && device.state !== rememberedSession.state) return
   await device.save(deviceState)
 }
 
@@ -634,7 +638,11 @@ export const resumeRememberedDevice = async () => {
   }).catch((error: unknown) => {
     // A failed request (including a GraphQL database error) is not evidence
     // that this device was revoked. Keep the local vault available for retry.
-    throw new LoginSessionError('Unable to resume the Authier session. Please retry.', true, error)
+    throw new LoginSessionError(
+      'Unable to resume the Authier session. Please retry.',
+      true,
+      error
+    )
   })
   if (challenge?.type !== 'approved' || challenge.userId !== state.userId) {
     throw new LoginSessionError(
@@ -642,9 +650,9 @@ export const resumeRememberedDevice = async () => {
       false
     )
   }
-  const key = await abToCryptoKey(base64ToBuffer(state.masterEncryptionKey))
   if (device.state !== state)
     throw new LoginSessionError('Vault was locked', true)
+  const key = await abToCryptoKey(base64ToBuffer(state.masterEncryptionKey))
   await completeLogin(
     {
       session: { ...createEmptyLoginSession(), email: state.email },

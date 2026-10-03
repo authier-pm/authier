@@ -1,0 +1,14 @@
+{
+  "revision": "v3c",
+  "seed": 2026093005,
+  "epochs": 3,
+  "batchSize": 24,
+  "learningRate": 0.00002,
+  "headLearningRate": 0.00015,
+  "warmupFraction": 0.06,
+  "freezeWordEmbeddings": true,
+  "presenceHead": true,
+  "validationTargetPrecision": 0.995,
+  "initialCheckpoint": "artifacts/minilm-v3b/checkpoint",
+  "provenance": "Synthetic assistant-authored translations and compositions. Account-access distractors and contrastive compositions were informed by v3 validation errors. Old v2 validation/test sentence families are development/training material; only the newly frozen v3 test is held out. No private SMS or native-speaker review."
+}

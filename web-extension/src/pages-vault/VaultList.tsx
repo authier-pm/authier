@@ -17,13 +17,18 @@ import { Input } from '@src/components/ui/input'
 import { Tooltip } from '@src/components/ui/tooltip'
 
 export const VaultList = ({ tableView }: { tableView: boolean }) => {
-  const { deviceState, loginCredentials, TOTPSecrets, passkeys, setSecuritySettings } =
-    useContext(DeviceStateContext)
+  const {
+    deviceState,
+    loginCredentials,
+    TOTPSecrets,
+    passkeys,
+    setSecuritySettings
+  } = useContext(DeviceStateContext)
   const autofillCredentialsEnabled =
     deviceState?.autofillCredentialsEnabled ?? true
   const isDeviceStateReady = deviceState !== null
   const navigate = useNavigate()
-  const { data, error } = useSyncSettingsQuery()
+  const { data, error, refetch } = useSyncSettingsQuery()
   const [filterBy, setFilterBy] = useQueryParam(
     'filterBy',
     withDefault(StringParam, '')
@@ -52,12 +57,16 @@ export const VaultList = ({ tableView }: { tableView: boolean }) => {
     setSecuritySettings
   ])
 
-  const secretCount = loginCredentials.length + TOTPSecrets.length + passkeys.length
+  const secretCount =
+    loginCredentials.length + TOTPSecrets.length + passkeys.length
 
   return (
     <div className="flex h-full min-h-0 flex-col gap-4">
       {error ? (
-        <div role="status" className="rounded-xl border border-amber-400/30 bg-amber-500/10 px-4 py-3 text-sm">
+        <div
+          role="status"
+          className="rounded-xl border border-amber-400/30 bg-amber-500/10 px-4 py-3 text-sm"
+        >
           {t`Unable to connect to Authier. Your saved items are still available. Sync will be available when the connection is restored.`}
         </div>
       ) : null}
@@ -92,7 +101,7 @@ export const VaultList = ({ tableView }: { tableView: boolean }) => {
               <div className="rounded-full border border-[color:var(--color-border)] bg-[color:var(--color-surface-muted)] px-4 py-2 text-sm font-medium">
                 {secretCount} {t`secrets`}
               </div>
-              <RefreshSecretsButton />
+              <RefreshSecretsButton onSynced={refetch} />
               <Tooltip
                 content={tableView ? t`Show card view` : t`Show table view`}
               >
@@ -140,8 +149,8 @@ export const VaultList = ({ tableView }: { tableView: boolean }) => {
         </CardContent>
       </Card>
 
-      <Card className="min-h-0 flex-1 overflow-hidden border-white/10 extension-surface">
-        <CardContent className="flex h-full min-h-0 flex-1 flex-col p-0">
+      <Card className="flex min-h-0 flex-1 flex-col overflow-hidden border-white/10 extension-surface">
+        <CardContent className="flex min-h-0 flex-1 flex-col p-0">
           {tableView ? (
             <TableList filter={filterBy} />
           ) : (

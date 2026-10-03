@@ -1,0 +1,16 @@
+{
+  "revision": "v3g",
+  "seed": 2026093009,
+  "epochs": 3,
+  "batchSize": 48,
+  "learningRate": 0.00001,
+  "headLearningRate": 0.00008,
+  "warmupFraction": 0.06,
+  "freezeWordEmbeddings": true,
+  "presenceHead": true,
+  "tokenHead": true,
+  "selectWithMargin": true,
+  "validationTargetPrecision": 0.995,
+  "initialCheckpoint": "artifacts/minilm-v3f/checkpoint",
+  "provenance": "Synthetic assistant-authored translations. Additional paired examples address validation failures in tracking/support instructions, device pairing and account recovery in 12 languages. Replay covers all 30 supported languages. Validation also exposed a decoder boundary-token punctuation bug, now fixed. Frozen v3 validation/test bytes remain unchanged. No private SMS or native-speaker review."
+}

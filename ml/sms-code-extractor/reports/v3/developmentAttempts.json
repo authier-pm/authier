@@ -1,0 +1,826 @@
+[
+  {
+    "run": "minilm-v3",
+    "status": {
+      "status": "stopped_after_validation_failure",
+      "reason": "Validation at required precision collapsed; inspect validation only and revise training data and presence decision before spending more epochs. No new test inference was run.",
+      "testEvaluated": false
+    },
+    "config": {
+      "baseModel": "microsoft/Multilingual-MiniLM-L12-H384",
+      "baseRevision": "6e8c1ec6b4ec4e3fc6eb7d2cd834fcd582b61daf",
+      "languages": [
+        "en",
+        "zh",
+        "hi",
+        "es",
+        "ar",
+        "fr",
+        "bn",
+        "pt",
+        "id",
+        "ur",
+        "bg",
+        "hr",
+        "cs",
+        "da",
+        "nl",
+        "et",
+        "fi",
+        "de",
+        "el",
+        "hu",
+        "ga",
+        "it",
+        "lv",
+        "lt",
+        "mt",
+        "pl",
+        "ro",
+        "sk",
+        "sl",
+        "sv"
+      ],
+      "seed": 2026093003,
+      "codeKinds": [
+        "numeric",
+        "lettersUpper",
+        "lettersLower",
+        "lettersMixed",
+        "alphanumeric",
+        "separated",
+        "unicodeDigits"
+      ],
+      "codeLengths": [4, 5, 6, 7, 8, 9, 10],
+      "examplesPerTemplateAndKind": {
+        "train": 8,
+        "validation": 3,
+        "test": 5
+      },
+      "maxTokens": 192,
+      "epochs": 4,
+      "batchSize": 24,
+      "learningRate": 2e-5,
+      "headLearningRate": 8e-5,
+      "warmupFraction": 0.06,
+      "freezeWordEmbeddings": true,
+      "validationTargetPrecision": 0.995,
+      "provenance": "Synthetic assistant-authored translations and compositions; no private SMS. New translated template families, code values and brands are held out globally. No native-speaker review. The old test informed the categories of new training examples but its messages are not added to training.",
+      "scope": "Train and evaluate a local SMS extractor. This experiment does not replace the Android production extractor or establish real-device memory, latency, or real-world accuracy.",
+      "revision": "v3",
+      "initialCheckpoint": "artifacts/minilm-v2/checkpoint",
+      "trainCompositionProbability": 0.65,
+      "selectionPolicy": "Select weights and decoder exclusively on validation; open the newly frozen test split after selecting the deployment candidate. Compare the previous checkpoint on that same test split afterward."
+    },
+    "data": {
+      "test": {
+        "examples": 16800,
+        "sha256": "732f352b33e462740f567a2a76a28f27aaf20ae08c2342cadcafa463130b5868"
+      },
+      "validation": {
+        "examples": 7560,
+        "sha256": "a3722a0e82bdfc785f1bb30f266d844f4781b962b13ce9ca794f5aab94a3e8f8"
+      },
+      "train": {
+        "examples": 63840,
+        "sha256": "18e60973712f7e21e1e31a360ccd444ac8641038efe62b528babae60bdbb077a"
+      }
+    },
+    "history": [
+      {
+        "epoch": 1,
+        "loss": 0.08366712260173419,
+        "nullThreshold": 28.025390161743164,
+        "validation": {
+          "examples": 7560,
+          "positives": 3780,
+          "negatives": 3780,
+          "correctCodes": 13,
+          "returnedCodes": 13,
+          "falsePositives": 0,
+          "exactMatch": 0.5017195767195767,
+          "precision": 1.0,
+          "recall": 0.0034391534391534392,
+          "f1": 0.006854732401792777,
+          "falsePositiveRate": 0.0,
+          "minimumMargin": 0.0
+        },
+        "elapsedSeconds": 248.84293214103673
+      },
+      {
+        "epoch": 2,
+        "loss": 0.005401130821829932,
+        "nullThreshold": 28.47600890563965,
+        "validation": {
+          "examples": 7560,
+          "positives": 3780,
+          "negatives": 3780,
+          "correctCodes": 2,
+          "returnedCodes": 2,
+          "falsePositives": 0,
+          "exactMatch": 0.5002645502645503,
+          "precision": 1.0,
+          "recall": 0.0005291005291005291,
+          "f1": 0.0010576414595452142,
+          "falsePositiveRate": 0.0,
+          "minimumMargin": 0.0
+        },
+        "elapsedSeconds": 498.747091140016
+      }
+    ]
+  },
+  {
+    "run": "minilm-v3b",
+    "status": {
+      "status": "stopped_after_validation_failure",
+      "completedEpochs": 2,
+      "testEvaluated": false,
+      "reason": "High-confidence false positives on unrelated messages mentioning account access; no validation threshold met 99.5% precision with useful recall."
+    },
+    "config": {
+      "baseModel": "microsoft/Multilingual-MiniLM-L12-H384",
+      "baseRevision": "6e8c1ec6b4ec4e3fc6eb7d2cd834fcd582b61daf",
+      "languages": [
+        "en",
+        "zh",
+        "hi",
+        "es",
+        "ar",
+        "fr",
+        "bn",
+        "pt",
+        "id",
+        "ur",
+        "bg",
+        "hr",
+        "cs",
+        "da",
+        "nl",
+        "et",
+        "fi",
+        "de",
+        "el",
+        "hu",
+        "ga",
+        "it",
+        "lv",
+        "lt",
+        "mt",
+        "pl",
+        "ro",
+        "sk",
+        "sl",
+        "sv"
+      ],
+      "seed": 2026093004,
+      "codeKinds": [
+        "numeric",
+        "lettersUpper",
+        "lettersLower",
+        "lettersMixed",
+        "alphanumeric",
+        "separated",
+        "unicodeDigits"
+      ],
+      "codeLengths": [4, 5, 6, 7, 8, 9, 10],
+      "examplesPerTemplateAndKind": {
+        "train": 10,
+        "validation": 3,
+        "test": 5
+      },
+      "maxTokens": 192,
+      "epochs": 3,
+      "batchSize": 24,
+      "learningRate": 1e-5,
+      "headLearningRate": 0.00015,
+      "warmupFraction": 0.06,
+      "freezeWordEmbeddings": true,
+      "validationTargetPrecision": 0.995,
+      "provenance": "Synthetic assistant-authored translations and compositions. Training refinements were informed by v3 validation errors. Old v2 validation/test sentence families now form development/training material; only the newly frozen v3 test is held out. No private SMS or native-speaker review.",
+      "scope": "Train and evaluate a local SMS extractor. This experiment does not replace the Android production extractor or establish real-device memory, latency, or real-world accuracy.",
+      "revision": "v3b",
+      "presenceHead": true,
+      "initialCheckpoint": "artifacts/minilm-v2/checkpoint"
+    },
+    "data": {
+      "test": {
+        "examples": 16800,
+        "sha256": "732f352b33e462740f567a2a76a28f27aaf20ae08c2342cadcafa463130b5868"
+      },
+      "validation": {
+        "examples": 7560,
+        "sha256": "a3722a0e82bdfc785f1bb30f266d844f4781b962b13ce9ca794f5aab94a3e8f8"
+      },
+      "train": {
+        "examples": 52920,
+        "sha256": "c2c3a5f6d5b44955fdfb30570d8d1bd539182c3183de271fef2134e1c86d51ce"
+      }
+    },
+    "history": [
+      {
+        "epoch": 1,
+        "loss": 0.21428274759817384,
+        "nullThreshold": 1000000.0,
+        "validation": {
+          "examples": 7560,
+          "positives": 3780,
+          "negatives": 3780,
+          "correctCodes": 0,
+          "returnedCodes": 0,
+          "falsePositives": 0,
+          "exactMatch": 0.5,
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "falsePositiveRate": 0.0,
+          "minimumMargin": 0.0
+        },
+        "elapsedSeconds": 203.1974042300135
+      },
+      {
+        "epoch": 2,
+        "loss": 0.020135651830419616,
+        "nullThreshold": 1000000.0,
+        "validation": {
+          "examples": 7560,
+          "positives": 3780,
+          "negatives": 3780,
+          "correctCodes": 0,
+          "returnedCodes": 0,
+          "falsePositives": 0,
+          "exactMatch": 0.5,
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "falsePositiveRate": 0.0,
+          "minimumMargin": 0.0
+        },
+        "elapsedSeconds": 459.827532108
+      }
+    ]
+  },
+  {
+    "run": "minilm-v3c",
+    "status": {
+      "status": "stopped_after_validation_failure",
+      "completedEpochs": 1,
+      "testEvaluated": false,
+      "reason": "Before abstention: 97.4% raw span recall, but no useful recall at target precision. Testing token-level validity supervision next."
+    },
+    "config": {
+      "baseModel": "microsoft/Multilingual-MiniLM-L12-H384",
+      "baseRevision": "6e8c1ec6b4ec4e3fc6eb7d2cd834fcd582b61daf",
+      "languages": [
+        "en",
+        "zh",
+        "hi",
+        "es",
+        "ar",
+        "fr",
+        "bn",
+        "pt",
+        "id",
+        "ur",
+        "bg",
+        "hr",
+        "cs",
+        "da",
+        "nl",
+        "et",
+        "fi",
+        "de",
+        "el",
+        "hu",
+        "ga",
+        "it",
+        "lv",
+        "lt",
+        "mt",
+        "pl",
+        "ro",
+        "sk",
+        "sl",
+        "sv"
+      ],
+      "seed": 2026093005,
+      "codeKinds": [
+        "numeric",
+        "lettersUpper",
+        "lettersLower",
+        "lettersMixed",
+        "alphanumeric",
+        "separated",
+        "unicodeDigits"
+      ],
+      "codeLengths": [4, 5, 6, 7, 8, 9, 10],
+      "examplesPerTemplateAndKind": {
+        "train": 10,
+        "validation": 3,
+        "test": 5
+      },
+      "maxTokens": 192,
+      "epochs": 3,
+      "batchSize": 24,
+      "learningRate": 2e-5,
+      "headLearningRate": 0.00015,
+      "warmupFraction": 0.06,
+      "freezeWordEmbeddings": true,
+      "validationTargetPrecision": 0.995,
+      "provenance": "Synthetic assistant-authored translations and compositions. Account-access distractors and contrastive compositions were informed by v3 validation errors. Old v2 validation/test sentence families are development/training material; only the newly frozen v3 test is held out. No private SMS or native-speaker review.",
+      "scope": "Train and evaluate a local SMS extractor. This experiment does not replace the Android production extractor or establish real-device memory, latency, or real-world accuracy.",
+      "revision": "v3c",
+      "presenceHead": true,
+      "initialCheckpoint": "artifacts/minilm-v3b/checkpoint"
+    },
+    "data": {
+      "test": {
+        "examples": 16800,
+        "sha256": "732f352b33e462740f567a2a76a28f27aaf20ae08c2342cadcafa463130b5868"
+      },
+      "validation": {
+        "examples": 7560,
+        "sha256": "a3722a0e82bdfc785f1bb30f266d844f4781b962b13ce9ca794f5aab94a3e8f8"
+      },
+      "train": {
+        "examples": 52920,
+        "sha256": "dab53dcea181d7ba493ddf226800eeb023cb021362afa40f5e0532fa0afcae04"
+      }
+    },
+    "history": [
+      {
+        "epoch": 1,
+        "loss": 0.04176479784512505,
+        "nullThreshold": 9.681903375854493,
+        "validation": {
+          "examples": 7560,
+          "positives": 3780,
+          "negatives": 3780,
+          "correctCodes": 14,
+          "returnedCodes": 14,
+          "falsePositives": 0,
+          "exactMatch": 0.5018518518518519,
+          "precision": 1.0,
+          "recall": 0.003703703703703704,
+          "f1": 0.007380073800738007,
+          "falsePositiveRate": 0.0,
+          "minimumMargin": 0.0
+        },
+        "elapsedSeconds": 284.1875578110339
+      }
+    ]
+  },
+  {
+    "run": "minilm-v3d",
+    "status": {
+      "status": "completed_validation_failed",
+      "completedEpochs": 3,
+      "testEvaluated": false,
+      "reason": "Token validity and full-parameter training alone did not solve tracking/support generalization. More distinct message paraphrases are needed."
+    },
+    "config": {
+      "baseModel": "microsoft/Multilingual-MiniLM-L12-H384",
+      "baseRevision": "6e8c1ec6b4ec4e3fc6eb7d2cd834fcd582b61daf",
+      "languages": [
+        "en",
+        "zh",
+        "hi",
+        "es",
+        "ar",
+        "fr",
+        "bn",
+        "pt",
+        "id",
+        "ur",
+        "bg",
+        "hr",
+        "cs",
+        "da",
+        "nl",
+        "et",
+        "fi",
+        "de",
+        "el",
+        "hu",
+        "ga",
+        "it",
+        "lv",
+        "lt",
+        "mt",
+        "pl",
+        "ro",
+        "sk",
+        "sl",
+        "sv"
+      ],
+      "seed": 2026093006,
+      "codeKinds": [
+        "numeric",
+        "lettersUpper",
+        "lettersLower",
+        "lettersMixed",
+        "alphanumeric",
+        "separated",
+        "unicodeDigits"
+      ],
+      "codeLengths": [4, 5, 6, 7, 8, 9, 10],
+      "examplesPerTemplateAndKind": {
+        "train": 10,
+        "validation": 3,
+        "test": 5
+      },
+      "maxTokens": 192,
+      "epochs": 3,
+      "batchSize": 48,
+      "learningRate": 1e-5,
+      "headLearningRate": 0.0002,
+      "warmupFraction": 0.06,
+      "freezeWordEmbeddings": false,
+      "validationTargetPrecision": 0.995,
+      "provenance": "Synthetic assistant-authored translations and compositions. Token-level validity supervision and full-parameter fine-tuning were chosen after v3 validation failures. Old v2 evaluation families are development/training material; only the frozen v3 test is held out. No private SMS or native-speaker review.",
+      "scope": "Train and evaluate a local SMS extractor. This experiment does not replace the Android production extractor or establish real-device memory, latency, or real-world accuracy.",
+      "revision": "v3d",
+      "presenceHead": true,
+      "tokenHead": true,
+      "initialCheckpoint": "artifacts/minilm-v3c/checkpoint"
+    },
+    "data": {
+      "test": {
+        "examples": 16800,
+        "sha256": "732f352b33e462740f567a2a76a28f27aaf20ae08c2342cadcafa463130b5868"
+      },
+      "validation": {
+        "examples": 7560,
+        "sha256": "a3722a0e82bdfc785f1bb30f266d844f4781b962b13ce9ca794f5aab94a3e8f8"
+      },
+      "train": {
+        "examples": 52920,
+        "sha256": "dab53dcea181d7ba493ddf226800eeb023cb021362afa40f5e0532fa0afcae04"
+      }
+    },
+    "history": [
+      {
+        "epoch": 1,
+        "loss": 0.10171582082502632,
+        "nullThreshold": 1000000.0,
+        "validation": {
+          "examples": 7560,
+          "positives": 3780,
+          "negatives": 3780,
+          "correctCodes": 0,
+          "returnedCodes": 0,
+          "falsePositives": 0,
+          "exactMatch": 0.5,
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "falsePositiveRate": 0.0,
+          "minimumMargin": 0.0
+        },
+        "elapsedSeconds": 331.17990038904827
+      },
+      {
+        "epoch": 2,
+        "loss": 0.005537293072881097,
+        "nullThreshold": 1000000.0,
+        "validation": {
+          "examples": 7560,
+          "positives": 3780,
+          "negatives": 3780,
+          "correctCodes": 0,
+          "returnedCodes": 0,
+          "falsePositives": 0,
+          "exactMatch": 0.5,
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "falsePositiveRate": 0.0,
+          "minimumMargin": 0.0
+        },
+        "elapsedSeconds": 700.0409194780514
+      },
+      {
+        "epoch": 3,
+        "loss": 0.002171636621445816,
+        "nullThreshold": 1000000.0,
+        "validation": {
+          "examples": 7560,
+          "positives": 3780,
+          "negatives": 3780,
+          "correctCodes": 0,
+          "returnedCodes": 0,
+          "falsePositives": 0,
+          "exactMatch": 0.5,
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "falsePositiveRate": 0.0,
+          "minimumMargin": 0.0
+        },
+        "elapsedSeconds": 1013.2695198800066
+      }
+    ]
+  },
+  {
+    "run": "minilm-v3e",
+    "status": {
+      "status": "completed_validation_failed",
+      "completedEpochs": 3,
+      "testEvaluated": false,
+      "reason": "Counterfactual validation diagnostics isolated bare instruction syntax as a false-positive shortcut, independent of the extra account sentence. Matched positive/negative instructions are the next training refinement."
+    },
+    "config": {
+      "baseModel": "microsoft/Multilingual-MiniLM-L12-H384",
+      "baseRevision": "6e8c1ec6b4ec4e3fc6eb7d2cd834fcd582b61daf",
+      "languages": [
+        "en",
+        "zh",
+        "hi",
+        "es",
+        "ar",
+        "fr",
+        "bn",
+        "pt",
+        "id",
+        "ur",
+        "bg",
+        "hr",
+        "cs",
+        "da",
+        "nl",
+        "et",
+        "fi",
+        "de",
+        "el",
+        "hu",
+        "ga",
+        "it",
+        "lv",
+        "lt",
+        "mt",
+        "pl",
+        "ro",
+        "sk",
+        "sl",
+        "sv"
+      ],
+      "seed": 2026093007,
+      "codeKinds": [
+        "numeric",
+        "lettersUpper",
+        "lettersLower",
+        "lettersMixed",
+        "alphanumeric",
+        "separated",
+        "unicodeDigits"
+      ],
+      "codeLengths": [4, 5, 6, 7, 8, 9, 10],
+      "examplesPerTemplateAndKind": {
+        "train": 10,
+        "validation": 3,
+        "test": 5
+      },
+      "maxTokens": 192,
+      "epochs": 3,
+      "batchSize": 48,
+      "learningRate": 2e-5,
+      "headLearningRate": 0.0001,
+      "warmupFraction": 0.06,
+      "freezeWordEmbeddings": true,
+      "validationTargetPrecision": 0.995,
+      "provenance": "Synthetic assistant-authored translations. Added 16 new main-message paraphrase families in every language to address tracking/support errors seen on validation, retaining frozen v3 validation/test bytes. Old v2 evaluation families are now training/development material. No private SMS or native-speaker review.",
+      "scope": "Train and evaluate a local SMS extractor. This experiment does not replace the Android production extractor or establish real-device memory, latency, or real-world accuracy.",
+      "revision": "v3e",
+      "presenceHead": true,
+      "tokenHead": true,
+      "initialCheckpoint": "artifacts/minilm-v3d/checkpoint"
+    },
+    "data": {
+      "test": {
+        "examples": 16800,
+        "sha256": "732f352b33e462740f567a2a76a28f27aaf20ae08c2342cadcafa463130b5868"
+      },
+      "validation": {
+        "examples": 7560,
+        "sha256": "a3722a0e82bdfc785f1bb30f266d844f4781b962b13ce9ca794f5aab94a3e8f8"
+      },
+      "train": {
+        "examples": 49770,
+        "sha256": "eb5df32c32e1f59d6d0db17e4827705b63254acf097e846be910a6caf7a98b08"
+      }
+    },
+    "history": [
+      {
+        "epoch": 1,
+        "loss": 0.03626066738400692,
+        "nullThreshold": 7.957858576049805,
+        "validation": {
+          "examples": 7560,
+          "positives": 3780,
+          "negatives": 3780,
+          "correctCodes": 5,
+          "returnedCodes": 5,
+          "falsePositives": 0,
+          "exactMatch": 0.5006613756613757,
+          "precision": 1.0,
+          "recall": 0.0013227513227513227,
+          "f1": 0.0026420079260237777,
+          "falsePositiveRate": 0.0,
+          "minimumMargin": 0.0
+        },
+        "elapsedSeconds": 270.8381942990236
+      },
+      {
+        "epoch": 2,
+        "loss": 0.0038779480931198217,
+        "nullThreshold": 1000000.0,
+        "validation": {
+          "examples": 7560,
+          "positives": 3780,
+          "negatives": 3780,
+          "correctCodes": 0,
+          "returnedCodes": 0,
+          "falsePositives": 0,
+          "exactMatch": 0.5,
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "falsePositiveRate": 0.0,
+          "minimumMargin": 0.0
+        },
+        "elapsedSeconds": 544.543329126027
+      },
+      {
+        "epoch": 3,
+        "loss": 0.0019458317990679063,
+        "nullThreshold": 9.216072572937012,
+        "validation": {
+          "examples": 7560,
+          "positives": 3780,
+          "negatives": 3780,
+          "correctCodes": 1,
+          "returnedCodes": 1,
+          "falsePositives": 0,
+          "exactMatch": 0.5001322751322751,
+          "precision": 1.0,
+          "recall": 0.00026455026455026457,
+          "f1": 0.0005289605924358636,
+          "falsePositiveRate": 0.0,
+          "minimumMargin": 0.0
+        },
+        "elapsedSeconds": 832.207366415998
+      }
+    ]
+  },
+  {
+    "run": "minilm-v3f",
+    "status": {
+      "status": "superseded_after_validation",
+      "completedEpochs": 3,
+      "testEvaluated": false,
+      "reason": "Punctuation-corrected selected checkpoint recovers 90.08% at 99.50% precision on frozen validation. Continue with paired examples for residual language/context gaps. Six confidence combinations were inspected on validation only; none exceeded 95% recovery."
+    },
+    "config": {
+      "baseModel": "microsoft/Multilingual-MiniLM-L12-H384",
+      "baseRevision": "6e8c1ec6b4ec4e3fc6eb7d2cd834fcd582b61daf",
+      "languages": [
+        "en",
+        "zh",
+        "hi",
+        "es",
+        "ar",
+        "fr",
+        "bn",
+        "pt",
+        "id",
+        "ur",
+        "bg",
+        "hr",
+        "cs",
+        "da",
+        "nl",
+        "et",
+        "fi",
+        "de",
+        "el",
+        "hu",
+        "ga",
+        "it",
+        "lv",
+        "lt",
+        "mt",
+        "pl",
+        "ro",
+        "sk",
+        "sl",
+        "sv"
+      ],
+      "seed": 2026093008,
+      "codeKinds": [
+        "numeric",
+        "lettersUpper",
+        "lettersLower",
+        "lettersMixed",
+        "alphanumeric",
+        "separated",
+        "unicodeDigits"
+      ],
+      "codeLengths": [4, 5, 6, 7, 8, 9, 10],
+      "examplesPerTemplateAndKind": {
+        "train": 10,
+        "validation": 3,
+        "test": 5
+      },
+      "maxTokens": 192,
+      "epochs": 3,
+      "batchSize": 48,
+      "learningRate": 2e-5,
+      "headLearningRate": 0.0001,
+      "warmupFraction": 0.06,
+      "freezeWordEmbeddings": true,
+      "validationTargetPrecision": 0.995,
+      "provenance": "Synthetic assistant-authored translations. Validation interventions revealed a sentence-format shortcut: bare delivery instructions were treated as codes while labelled tracking references were rejected. Added matched instruction pairs across all 30 languages, with replay of earlier families. Frozen v3 validation/test bytes remain identical. No private SMS or native-speaker review.",
+      "scope": "Train and evaluate a local SMS extractor. This experiment does not replace the Android production extractor or establish real-device memory, latency, or real-world accuracy.",
+      "revision": "v3f",
+      "presenceHead": true,
+      "tokenHead": true,
+      "selectWithMargin": true,
+      "initialCheckpoint": "artifacts/minilm-v3e/checkpoint"
+    },
+    "data": {
+      "test": {
+        "examples": 16800,
+        "sha256": "732f352b33e462740f567a2a76a28f27aaf20ae08c2342cadcafa463130b5868"
+      },
+      "validation": {
+        "examples": 7560,
+        "sha256": "a3722a0e82bdfc785f1bb30f266d844f4781b962b13ce9ca794f5aab94a3e8f8"
+      },
+      "train": {
+        "examples": 36750,
+        "sha256": "c3eecdc93a445534f734d0491d61d4f109c037d1de988fcbdbe715c128039163"
+      }
+    },
+    "history": [
+      {
+        "epoch": 1,
+        "loss": 0.07105765362249963,
+        "nullThreshold": 8.287498010864258,
+        "validation": {
+          "examples": 7560,
+          "positives": 3780,
+          "negatives": 3780,
+          "correctCodes": 1013,
+          "returnedCodes": 1018,
+          "falsePositives": 1,
+          "exactMatch": 0.6338624338624339,
+          "precision": 0.9950884086444007,
+          "recall": 0.267989417989418,
+          "f1": 0.42225927469779073,
+          "falsePositiveRate": 0.00026455026455026457,
+          "minimumMargin": 2.0
+        },
+        "elapsedSeconds": 191.65848519699648
+      },
+      {
+        "epoch": 2,
+        "loss": 0.005211533226973107,
+        "nullThreshold": 7.997007860412598,
+        "validation": {
+          "examples": 7560,
+          "positives": 3780,
+          "negatives": 3780,
+          "correctCodes": 3208,
+          "returnedCodes": 3224,
+          "falsePositives": 8,
+          "exactMatch": 0.9232804232804233,
+          "precision": 0.9950372208436724,
+          "recall": 0.8486772486772487,
+          "f1": 0.9160479725870931,
+          "falsePositiveRate": 0.0021164021164021165,
+          "minimumMargin": 4.0
+        },
+        "elapsedSeconds": 383.6821626420133
+      },
+      {
+        "epoch": 3,
+        "loss": 0.002144314637418299,
+        "nullThreshold": 8.548491014709473,
+        "validation": {
+          "examples": 7560,
+          "positives": 3780,
+          "negatives": 3780,
+          "correctCodes": 2963,
+          "returnedCodes": 2977,
+          "falsePositives": 7,
+          "exactMatch": 0.891005291005291,
+          "precision": 0.9952972791400739,
+          "recall": 0.7838624338624338,
+          "f1": 0.8770164274086133,
+          "falsePositiveRate": 0.001851851851851852,
+          "minimumMargin": 4.0
+        },
+        "elapsedSeconds": 581.7545018320088
+      }
+    ]
+  }
+]

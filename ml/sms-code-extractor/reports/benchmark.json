@@ -1,0 +1,19 @@
+{
+  "platform": "Linux x86_64, AMD Ryzen 9 9900X, ONNX CPU, 4 threads",
+  "androidMeasured": false,
+  "modelLoadSeconds": 0.3743145050248131,
+  "messages": 300,
+  "batchSize": 1,
+  "p50InferenceMs": 1.2536555004771799,
+  "p95InferenceMs": 2.173034058068879,
+  "peakProcessRssBytes": 570269696,
+  "residentProcessRssBytes": 502951936,
+  "memoryMethod": "Linux /proc/self/status VmHWM and VmRSS in a fresh process",
+  "medianTokens": 24.0,
+  "maxTokens": 44,
+  "caveats": [
+    "Desktop measurement, not a 4 GB Android device.",
+    "Model load may benefit from the OS disk cache.",
+    "Latency excludes tokenization and decoding; RSS includes tokenizer and runtime."
+  ]
+}

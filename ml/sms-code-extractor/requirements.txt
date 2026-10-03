@@ -1,0 +1,6 @@
+-r inferenceRequirements.txt
+transformers==4.57.6
+sentencepiece==0.2.1
+onnx==1.20.1
+pytest==9.0.2
+ruff==0.15.4

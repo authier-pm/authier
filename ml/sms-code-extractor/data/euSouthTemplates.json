@@ -1,0 +1,202 @@
+{
+  "it": {
+    "name": "Italian",
+    "train": [
+      "Il tuo codice di verifica è {code}. Non condividerlo.",
+      "{code} è la tua password monouso per accedere a {brand}.",
+      "Conferma il tuo numero di telefono con {code}. Valido per {minutes} minuti.",
+      "Per autorizzare un pagamento di {amount} EUR, inserisci {code}. Carta che termina con {card}.",
+      "Codice precedente: {old}. Il tuo nuovo codice di accesso è {code}.",
+      "{brand}: usa il codice di sicurezza {code} per reimpostare la password.",
+      "Usa il buono {other} per uno sconto del {percent}% su {brand}.",
+      "L'ordine {id} è stato spedito. Numero di tracciamento: {other}.",
+      "Il tuo saldo è di {amount} EUR. La tua carta termina con {card}.",
+      "Il tuo codice di verifica scade tra {duration} secondi.",
+      "Il tuo vecchio codice di verifica {old} è scaduto. Richiedine uno nuovo.",
+      "Chiamami domani al {phone}. Ci vediamo alle {time}.",
+      "Codici di accesso: {old} oppure {other}. Non è chiaro quale sia quello attuale.",
+      "Apri questo link di verifica: https://example.invalid/verify?code={other}"
+    ],
+    "validation": [
+      "[{brand}] Inserisci {code} per completare la creazione dell'account.",
+      "Mantieni {code} segreto. Questo codice approva l'accesso che hai richiesto.",
+      "Non usare {old}; verifica invece la tua identità con {code}.",
+      "La richiesta di verifica scade dopo {duration} secondi. Non è stato emesso alcun codice.",
+      "Riferimento di ritiro {other}: il tuo pacco ti aspetta al deposito.",
+      "Offerta speciale! Il codice promozionale {other} ti fa risparmiare il {percent}%.",
+      "Incontriamoci alle {time}, porta il biglietto {id}.",
+      "Due codici di verifica diversi, {old} e {other}; nessuno è indicato come attuale."
+    ],
+    "test": [
+      "Qualcuno sta accedendo al tuo account {brand}. Se sei tu, digita {code} nella schermata di verifica.",
+      "Autenticazione richiesta: {code}. Questa parola d'ordine si può usare una sola volta.",
+      "Approva il trasferimento di {amount} EUR dalla carta **{card} con {code}.",
+      "{code}\nCopia questi caratteri nel campo per confermare il tuo indirizzo email. Scade dopo {minutes} minuti.",
+      "Controllo di sicurezza previsto per {date}. Il tuo riferimento di assistenza è {id}.",
+      "Codice di tracciamento della spedizione: {other}. Non è una password di accesso.",
+      "Servizio di verifica non disponibile. Riprova tra {duration} secondi.",
+      "Un pagamento di {amount} EUR è stato addebitato sulla carta **{card}.",
+      "Errore {id}: impossibile consegnare il messaggio di verifica."
+    ]
+  },
+  "ro": {
+    "name": "Romanian",
+    "train": [
+      "Codul tău de verificare este {code}. Nu îl divulga.",
+      "{code} este parola ta de unică folosință pentru conectarea la {brand}.",
+      "Confirmă numărul de telefon cu {code}. Valabil {minutes} minute.",
+      "Pentru a autoriza o plată de {amount} EUR, introdu {code}. Cardul se termină cu {card}.",
+      "Cod anterior: {old}. Noul tău cod de autentificare este {code}.",
+      "{brand}: folosește codul de securitate {code} pentru a reseta parola.",
+      "Folosește cuponul {other} pentru o reducere de {percent}% la {brand}.",
+      "Comanda {id} a fost expediată. Număr de urmărire: {other}.",
+      "Soldul tău este {amount} EUR. Cardul tău se termină cu {card}.",
+      "Codul tău de verificare expiră în {duration} secunde.",
+      "Vechiul tău cod de verificare {old} a expirat. Solicită unul nou.",
+      "Sună-mă mâine la {phone}. Ne vedem la {time}.",
+      "Coduri de autentificare: {old} sau {other}. Nu este clar care este actual.",
+      "Deschide acest link de verificare: https://example.invalid/verify?code={other}"
+    ],
+    "validation": [
+      "[{brand}] Introdu {code} pentru a termina crearea contului.",
+      "Păstrează {code} secret. Acest cod aprobă conectarea pe care ai solicitat-o.",
+      "Nu folosi {old}; verifică-ți identitatea cu {code} în schimb.",
+      "Cererea de verificare expiră după {duration} secunde. Nu a fost emis niciun cod.",
+      "Referință de ridicare {other}: coletul tău așteaptă în depozit.",
+      "Ofertă specială! Codul promoțional {other} îți economisește {percent}%.",
+      "Ne întâlnim la {time}; adu biletul {id}.",
+      "Două coduri de verificare diferite, {old} și {other}; niciunul nu este marcat ca actual."
+    ],
+    "test": [
+      "Cineva îți accesează contul {brand}. Dacă ești tu, tastează {code} pe ecranul de verificare.",
+      "Este necesară autentificarea: {code}. Această parolă poate fi folosită o singură dată.",
+      "Aprobă transferul de {amount} EUR de pe cardul **{card} cu {code}.",
+      "{code}\nCopiază aceste caractere în câmp pentru a confirma adresa de e-mail. Expiră după {minutes} minute.",
+      "Verificare de securitate programată pentru {date}. Referința ta de asistență este {id}.",
+      "Cod de urmărire a expedierii: {other}. Nu este o parolă de conectare.",
+      "Serviciul de verificare nu este disponibil. Încearcă din nou după {duration} secunde.",
+      "O plată de {amount} EUR a fost debitată de pe cardul **{card}.",
+      "Eroare {id}: mesajul de verificare nu a putut fi livrat."
+    ]
+  },
+  "el": {
+    "name": "Greek",
+    "train": [
+      "Ο κωδικός επαλήθευσής σας είναι {code}. Μην τον κοινοποιήσετε.",
+      "Το {code} είναι το συνθηματικό μίας χρήσης για σύνδεση στο {brand}.",
+      "Επιβεβαιώστε τον αριθμό τηλεφώνου σας με {code}. Ισχύει για {minutes} λεπτά.",
+      "Για να εγκρίνετε πληρωμή {amount} EUR, εισαγάγετε {code}. Η κάρτα τελειώνει σε {card}.",
+      "Προηγούμενος κωδικός: {old}. Ο νέος κωδικός σύνδεσής σας είναι {code}.",
+      "{brand}: χρησιμοποιήστε τον κωδικό ασφαλείας {code} για επαναφορά του συνθηματικού σας.",
+      "Χρησιμοποιήστε το κουπόνι {other} για έκπτωση {percent}% στο {brand}.",
+      "Η παραγγελία {id} απεστάλη. Αριθμός παρακολούθησης: {other}.",
+      "Το υπόλοιπό σας είναι {amount} EUR. Η κάρτα σας τελειώνει σε {card}.",
+      "Ο κωδικός επαλήθευσής σας λήγει σε {duration} δευτερόλεπτα.",
+      "Ο παλιός κωδικός επαλήθευσης {old} έληξε. Ζητήστε νέο.",
+      "Πάρε με αύριο στο {phone}. Θα τα πούμε στις {time}.",
+      "Κωδικοί σύνδεσης: {old} ή {other}. Δεν είναι σαφές ποιος ισχύει τώρα.",
+      "Ανοίξτε αυτόν τον σύνδεσμο επαλήθευσης: https://example.invalid/verify?code={other}"
+    ],
+    "validation": [
+      "[{brand}] Εισαγάγετε {code} για να ολοκληρώσετε τη δημιουργία λογαριασμού.",
+      "Κρατήστε το {code} μυστικό. Αυτός ο κωδικός εγκρίνει τη σύνδεση που ζητήσατε.",
+      "Μη χρησιμοποιήσετε το {old}· επαληθεύστε την ταυτότητά σας με {code} αντί γι' αυτό.",
+      "Το αίτημα επαλήθευσης λήγει μετά από {duration} δευτερόλεπτα. Δεν εκδόθηκε κωδικός.",
+      "Αναφορά παραλαβής {other}: το δέμα σας περιμένει στην αποθήκη.",
+      "Ειδική προσφορά! Με τον εκπτωτικό κωδικό {other} εξοικονομείτε {percent}%.",
+      "Συνάντησέ με στις {time} και φέρε το εισιτήριο {id}.",
+      "Δύο διαφορετικοί κωδικοί επαλήθευσης, {old} και {other}· κανένας δεν έχει επισημανθεί ως τρέχων."
+    ],
+    "test": [
+      "Κάποιος αποκτά πρόσβαση στον λογαριασμό σας στο {brand}. Αν είστε εσείς, πληκτρολογήστε {code} στην οθόνη επαλήθευσης.",
+      "Απαιτείται ταυτοποίηση: {code}. Αυτό το συνθηματικό μπορεί να χρησιμοποιηθεί μόνο μία φορά.",
+      "Εγκρίνετε τη μεταφορά {amount} EUR από την κάρτα **{card} με {code}.",
+      "{code}\nΑντιγράψτε αυτούς τους χαρακτήρες στο πεδίο για επιβεβαίωση της διεύθυνσης email. Λήγει μετά από {minutes} λεπτά.",
+      "Έλεγχος ασφαλείας προγραμματισμένος για {date}. Η αναφορά υποστήριξής σας είναι {id}.",
+      "Κωδικός παρακολούθησης αποστολής: {other}. Δεν είναι συνθηματικό σύνδεσης.",
+      "Η υπηρεσία επαλήθευσης δεν είναι διαθέσιμη. Δοκιμάστε ξανά μετά από {duration} δευτερόλεπτα.",
+      "Χρεώθηκε πληρωμή {amount} EUR στην κάρτα **{card}.",
+      "Σφάλμα {id}: δεν ήταν δυνατή η παράδοση του μηνύματος επαλήθευσης."
+    ]
+  },
+  "mt": {
+    "name": "Maltese",
+    "train": [
+      "Il-kodiċi ta' verifika tiegħek huwa {code}. Taqsmux ma' ħadd.",
+      "{code} hija l-password tiegħek ta' darba biex tidħol f'{brand}.",
+      "Ikkonferma n-numru tat-telefon tiegħek b'{code}. Validu għal {minutes} minuti.",
+      "Biex tawtorizza ħlas ta' {amount} EUR, daħħal {code}. Il-karta tispiċċa b'{card}.",
+      "Kodiċi preċedenti: {old}. Il-kodiċi ġdid tiegħek għad-dħul huwa {code}.",
+      "{brand}: uża l-kodiċi tas-sigurtà {code} biex terġa' tissettja l-password tiegħek.",
+      "Uża l-kupun {other} għal skont ta' {percent}% għand {brand}.",
+      "L-ordni {id} intbagħtet. Numru tat-traċċar: {other}.",
+      "Il-bilanċ tiegħek huwa {amount} EUR. Il-karta tiegħek tispiċċa b'{card}.",
+      "Il-kodiċi ta' verifika tiegħek jiskadi fi żmien {duration} sekonda.",
+      "Il-kodiċi ta' verifika l-qadim tiegħek {old} skada. Itlob wieħed ġdid.",
+      "Ċempilli għada fuq {phone}. Narak fis-{time}.",
+      "Kodiċijiet għad-dħul: {old} jew {other}. Mhux ċar liema huwa attwali.",
+      "Iftaħ din il-link ta' verifika: https://example.invalid/verify?code={other}"
+    ],
+    "validation": [
+      "[{brand}] Daħħal {code} biex tlesti l-ħolqien tal-kont tiegħek.",
+      "Żomm {code} sigriet. Dan il-kodiċi japprova d-dħul li tlabt.",
+      "Tużax {old}; minflok ivverifika l-identità tiegħek b'{code}.",
+      "It-talba ta' verifika tiskadi wara {duration} sekonda. Ma nħareġ l-ebda kodiċi.",
+      "Referenza tal-ġbir {other}: il-pakkett tiegħek qed jistenna fil-maħżen.",
+      "Offerta speċjali! Il-kodiċi promozzjonali {other} jiffrankalek {percent}%.",
+      "Iltaqa' miegħi fis-{time} u ġib il-biljett {id}.",
+      "Żewġ kodiċijiet ta' verifika differenti, {old} u {other}; l-ebda wieħed mhu mmarkat bħala attwali."
+    ],
+    "test": [
+      "Xi ħadd qed jaċċessa l-kont tiegħek ta' {brand}. Jekk kont int, ikteb {code} fuq l-iskrin tal-verifika.",
+      "Meħtieġa awtentikazzjoni: {code}. Din il-password tista' tintuża darba biss.",
+      "Approva t-trasferiment ta' {amount} EUR mill-karta **{card} b'{code}.",
+      "{code}\nIkkopja dawn il-karattri fil-kaxxa biex tikkonferma l-indirizz tal-email tiegħek. Jiskadi wara {minutes} minuti.",
+      "Kontroll tas-sigurtà skedat għal {date}. Ir-referenza tal-appoġġ tiegħek hija {id}.",
+      "Kodiċi tat-traċċar tal-kunsinna: {other}. Mhuwiex password għad-dħul.",
+      "Is-servizz ta' verifika mhuwiex disponibbli. Erġa' pprova wara {duration} sekonda.",
+      "Ħlas ta' {amount} EUR ġie ddebitat mill-karta **{card}.",
+      "Żball {id}: il-messaġġ ta' verifika ma setax jitwassal."
+    ]
+  },
+  "hr": {
+    "name": "Croatian",
+    "train": [
+      "Vaš kod za potvrdu je {code}. Nemojte ga dijeliti.",
+      "{code} je vaša jednokratna lozinka za prijavu na {brand}.",
+      "Potvrdite svoj telefonski broj kodom {code}. Vrijedi {minutes} minuta.",
+      "Za odobrenje plaćanja od {amount} EUR unesite {code}. Kartica završava s {card}.",
+      "Prethodni kod: {old}. Vaš novi kod za prijavu je {code}.",
+      "{brand}: upotrijebite sigurnosni kod {code} za ponovno postavljanje lozinke.",
+      "Upotrijebite kupon {other} za {percent}% popusta u {brand}.",
+      "Narudžba {id} je poslana. Broj za praćenje: {other}.",
+      "Vaše stanje je {amount} EUR. Vaša kartica završava s {card}.",
+      "Vaš kod za potvrdu istječe za {duration} sekundi.",
+      "Vaš stari kod za potvrdu {old} je istekao. Zatražite novi.",
+      "Nazovi me sutra na {phone}. Vidimo se u {time}.",
+      "Kodovi za prijavu: {old} ili {other}. Nije jasno koji je trenutačno važeći.",
+      "Otvorite ovu poveznicu za potvrdu: https://example.invalid/verify?code={other}"
+    ],
+    "validation": [
+      "[{brand}] Unesite {code} kako biste dovršili izradu računa.",
+      "Čuvajte {code} u tajnosti. Ovaj kod odobrava prijavu koju ste zatražili.",
+      "Nemojte koristiti {old}; umjesto toga potvrdite identitet pomoću {code}.",
+      "Zahtjev za potvrdu istječe nakon {duration} sekundi. Nijedan kod nije izdan.",
+      "Referenca za preuzimanje {other}: vaš paket čeka u skladištu.",
+      "Posebna ponuda! Promotivni kod {other} štedi vam {percent}%.",
+      "Nađimo se u {time} i ponesi ulaznicu {id}.",
+      "Dva različita koda za potvrdu, {old} i {other}; nijedan nije označen kao aktualan."
+    ],
+    "test": [
+      "Netko pristupa vašem računu na {brand}. Ako ste to vi, upišite {code} na zaslonu za potvrdu.",
+      "Potrebna je autentifikacija: {code}. Ova lozinka može se koristiti samo jednom.",
+      "Odobrite prijenos {amount} EUR s kartice **{card} pomoću {code}.",
+      "{code}\nKopirajte ove znakove u polje kako biste potvrdili adresu e-pošte. Istječe nakon {minutes} minuta.",
+      "Sigurnosna provjera zakazana je za {date}. Vaša referenca za podršku je {id}.",
+      "Kod za praćenje pošiljke: {other}. To nije lozinka za prijavu.",
+      "Usluga potvrde nije dostupna. Pokušajte ponovno nakon {duration} sekundi.",
+      "Plaćanje od {amount} EUR naplaćeno je s kartice **{card}.",
+      "Pogreška {id}: poruka za potvrdu nije mogla biti dostavljena."
+    ]
+  }
+}

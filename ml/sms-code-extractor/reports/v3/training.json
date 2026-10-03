@@ -1,0 +1,158 @@
+{
+  "config": {
+    "baseModel": "microsoft/Multilingual-MiniLM-L12-H384",
+    "baseRevision": "6e8c1ec6b4ec4e3fc6eb7d2cd834fcd582b61daf",
+    "languages": [
+      "en",
+      "zh",
+      "hi",
+      "es",
+      "ar",
+      "fr",
+      "bn",
+      "pt",
+      "id",
+      "ur",
+      "bg",
+      "hr",
+      "cs",
+      "da",
+      "nl",
+      "et",
+      "fi",
+      "de",
+      "el",
+      "hu",
+      "ga",
+      "it",
+      "lv",
+      "lt",
+      "mt",
+      "pl",
+      "ro",
+      "sk",
+      "sl",
+      "sv"
+    ],
+    "seed": 2026093009,
+    "codeKinds": [
+      "numeric",
+      "lettersUpper",
+      "lettersLower",
+      "lettersMixed",
+      "alphanumeric",
+      "separated",
+      "unicodeDigits"
+    ],
+    "codeLengths": [4, 5, 6, 7, 8, 9, 10],
+    "examplesPerTemplateAndKind": {
+      "train": 10,
+      "validation": 3,
+      "test": 5
+    },
+    "maxTokens": 192,
+    "epochs": 3,
+    "batchSize": 48,
+    "learningRate": 1e-5,
+    "headLearningRate": 8e-5,
+    "warmupFraction": 0.06,
+    "freezeWordEmbeddings": true,
+    "validationTargetPrecision": 0.995,
+    "provenance": "Synthetic assistant-authored translations. Additional paired examples address validation failures in tracking/support instructions, device pairing and account recovery in 12 languages. Replay covers all 30 supported languages. Validation also exposed a decoder boundary-token punctuation bug, now fixed. Frozen v3 validation/test bytes remain unchanged. No private SMS or native-speaker review.",
+    "scope": "Train and evaluate a local SMS extractor. This experiment does not replace the Android production extractor or establish real-device memory, latency, or real-world accuracy.",
+    "revision": "v3g",
+    "presenceHead": true,
+    "tokenHead": true,
+    "selectWithMargin": true,
+    "initialCheckpoint": "artifacts/minilm-v3f/checkpoint"
+  },
+  "dataDirectory": "/home/capaj/work-repos/authier-repos/authier2/ml/sms-code-extractor/data/generated/v3-targeted",
+  "initialCheckpoint": "artifacts/minilm-v3f/checkpoint",
+  "epochs": 3,
+  "batchSize": 48,
+  "recoveryCheckpointEverySteps": 250,
+  "shuffle": "seed + epoch, independent generator",
+  "device": "cuda",
+  "hardware": "AMD Radeon Graphics",
+  "torchVersion": "2.10.0+rocm7.1",
+  "trainableParameters": 21493636,
+  "dataset": {
+    "test": {
+      "examples": 16800,
+      "sha256": "732f352b33e462740f567a2a76a28f27aaf20ae08c2342cadcafa463130b5868"
+    },
+    "validation": {
+      "examples": 7560,
+      "sha256": "a3722a0e82bdfc785f1bb30f266d844f4781b962b13ce9ca794f5aab94a3e8f8"
+    },
+    "train": {
+      "examples": 28350,
+      "sha256": "ad5e25d40821708f7f6be15ca992002aaa86064b3a86c38c7b6fe71624304b14"
+    }
+  },
+  "history": [
+    {
+      "epoch": 1,
+      "loss": 0.024754080173083583,
+      "nullThreshold": 4.261386408081055,
+      "validation": {
+        "examples": 7560,
+        "positives": 3780,
+        "negatives": 3780,
+        "correctCodes": 3647,
+        "returnedCodes": 3665,
+        "falsePositives": 16,
+        "exactMatch": 0.9802910052910053,
+        "precision": 0.9950886766712141,
+        "recall": 0.9648148148148148,
+        "f1": 0.9797179314976494,
+        "falsePositiveRate": 0.004232804232804233,
+        "minimumMargin": 2.0
+      },
+      "elapsedSeconds": 164.33086068398552
+    },
+    {
+      "epoch": 2,
+      "loss": 0.0055276431377099386,
+      "nullThreshold": 7.179951204528809,
+      "validation": {
+        "examples": 7560,
+        "positives": 3780,
+        "negatives": 3780,
+        "correctCodes": 3636,
+        "returnedCodes": 3654,
+        "falsePositives": 18,
+        "exactMatch": 0.9785714285714285,
+        "precision": 0.9950738916256158,
+        "recall": 0.9619047619047619,
+        "f1": 0.9782082324455206,
+        "falsePositiveRate": 0.004761904761904762,
+        "minimumMargin": 8.0
+      },
+      "elapsedSeconds": 335.21883702802006
+    },
+    {
+      "epoch": 3,
+      "loss": 0.002327524468469372,
+      "nullThreshold": 6.791217340698243,
+      "validation": {
+        "examples": 7560,
+        "positives": 3780,
+        "negatives": 3780,
+        "correctCodes": 3664,
+        "returnedCodes": 3682,
+        "falsePositives": 16,
+        "exactMatch": 0.9825396825396825,
+        "precision": 0.9951113525258012,
+        "recall": 0.9693121693121693,
+        "f1": 0.9820423478960064,
+        "falsePositiveRate": 0.004232804232804233,
+        "minimumMargin": 0.0
+      },
+      "elapsedSeconds": 501.7802316619782
+    }
+  ],
+  "peakGpuBytes": 5103785472,
+  "testUsedForSelection": false,
+  "checkpointSelection": "Validation F1 at target precision with joint score/margin calibration"
+}

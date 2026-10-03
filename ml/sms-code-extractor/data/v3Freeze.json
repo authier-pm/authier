@@ -1,0 +1,25 @@
+{
+  "frozenAtUtc": "2026-09-30T09:39:53.711371+00:00",
+  "revision": "v3",
+  "evaluation": {
+    "validation": {
+      "examples": 7560,
+      "sha256": "a3722a0e82bdfc785f1bb30f266d844f4781b962b13ce9ca794f5aab94a3e8f8"
+    },
+    "test": {
+      "examples": 16800,
+      "sha256": "732f352b33e462740f567a2a76a28f27aaf20ae08c2342cadcafa463130b5868"
+    }
+  },
+  "policy": "Select weights and decoder exclusively on validation; open the newly frozen test split after selecting the deployment candidate. Compare the previous checkpoint on that same test split afterward.",
+  "initialTemplateHashes": {
+    "data/v3/asian.json": "27022b1ba36761dfd982b64f37bad43b747e339aa7860e9e4625a5a1e36ccf6c",
+    "data/v3/central.json": "15f4d28ac80417297bef0fcbd9aec034b2718d7658dc08de9b88766ce4017558",
+    "data/v3/eastern.json": "3c217576dc66098c999d94e28f5391b03791e4e61dd07db10779bc592f623c7f",
+    "data/v3/northern.json": "269802c8bcabf43daadca469192b762cc455450a32027a9104fbf88f2846c436",
+    "data/v3/romance.json": "d553029a5ddb2388a6fb92c4b8c83b96c4e09cc5b5b25a21067c7875422bc198",
+    "data/v3/southAsian.json": "86e16878b35fae24ed749befa8b16425432955bc159e1d3c27d867e059bace0d",
+    "data/v3/southern.json": "f8351e7006a6ed06aa4a9b1bd3e625f3f95618235587c679d8b0c324620b4a39",
+    "data/v3/western.json": "5ff08d1c86fdc743bab43523dcf96fe91c3aa14767279e124a3332338c57e9b3"
+  }
+}

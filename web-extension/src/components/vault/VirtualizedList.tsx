@@ -1,4 +1,4 @@
-import { useContext, useMemo, useRef, useState } from 'react'
+import { useContext, useMemo, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { Trans } from '@lingui/react/macro'
 import { t } from '@lingui/core/macro'
@@ -30,7 +30,7 @@ import {
   isPasskeySecret
 } from './secretUtils'
 import type { SecretTypeUnion } from '@src/background/ExtensionDevice'
-import { useElementSize, useVirtualWindow } from './useVirtualWindow'
+import { useScrollContainer, useVirtualWindow } from './useVirtualWindow'
 
 const CARD_GAP = 16
 const CARD_MIN_WIDTH = 280
@@ -44,10 +44,13 @@ export const VirtualizedList = ({ filter }: { filter: string }) => {
     () => searchSecrets(debouncedSearchTerm, pathNameToTypes[pathname]),
     [debouncedSearchTerm, pathname, searchSecrets]
   )
-  const parentRef = useRef<HTMLDivElement | null>(null)
-  const [scrollTop, setScrollTop] = useState(0)
-  const { height: containerHeight, width: containerWidth } =
-    useElementSize(parentRef)
+  const {
+    height: containerHeight,
+    width: containerWidth,
+    ref: parentRef,
+    scrollTop,
+    onScroll
+  } = useScrollContainer<HTMLDivElement>()
 
   const columnCount = Math.max(
     1,
@@ -87,10 +90,8 @@ export const VirtualizedList = ({ filter }: { filter: string }) => {
 
   return (
     <div
-      className="extension-scrollbar h-full min-h-0 overflow-auto p-4"
-      onScroll={(event) => {
-        setScrollTop(event.currentTarget.scrollTop)
-      }}
+      className="extension-scrollbar min-h-0 flex-1 overflow-auto p-4"
+      onScroll={onScroll}
       ref={parentRef}
     >
       <div
