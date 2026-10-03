@@ -1,0 +1,145 @@
+MiniLM SMS extraction — revision 3
+
+Purpose: improve exact recovery of numeric and random letters-only verification
+codes while rejecting tracking references, receipts, expired credentials, support
+IDs and other non-verification messages. All 30 configured languages are covered.
+
+Final result on the new frozen test: letters-only recovery 95.67% (3,444/3,600),
+overall recovery 95.42%, precision 93.56%, and 550 false positives among 8,400
+no-code messages (6.55%). Recovery exceeded 95%; the 99.5% precision target FAILED.
+Letters-only recovery exceeded 95% in 22/30 languages. Lowercase-only recovery was
+95.00%, mixed-case 95.67%, uppercase-only 96.33%. These are synthetic results.
+
+The selected compact model is 140,352,237 bytes: per-row INT8 word embeddings and
+FP16 encoder matrix storage, with FP32 encoder computation. The constant casts
+can expand encoder weights back to FP32 when loading, so file size is not working
+memory. Standard dynamic INT8 quantization reduced validation recovery to 89.13%;
+per-row embeddings plus INT8 encoder weights reached 92.43%. Keeping floating-point
+encoder computation retained 96.90% validation recovery at 99.51% precision.
+The 140 MB export matched the 183 MB version's validation metrics and was selected.
+
+selection.json records weights, decoder, tokenizer, inference-source and dataset
+hashes BEFORE the new test was opened. Final test hashes match that selection.
+No weights, thresholds or inference code were adjusted after inspecting test
+results. The held-out failures are principally vouchers incorrectly treated as
+verification codes (397 cases) and ambiguous pairs of login codes (127 cases).
+Further training based on those failures requires another untouched test set.
+
+This revision continues fine-tuning the v2 checkpoint. The v3g run has 28,350
+training messages. It replays 87 template families across all 30 languages and
+adds eight families in 12 languages with validation gaps. The added examples
+cover device pairing, account recovery, ownership verification, obsolete keys,
+shipment tracking and support interactions. Matched instruction pairs distinguish
+commands that authorize access from commands that look up packages, reservations,
+support requests or invoices, without relying on explicit reference labels. In 80% of
+training messages, an account-access clause is included independently of the
+label. Another complete, locally scoped non-code clause is added in 60% of cases,
+and a short distractor in 30%. Sentence order and separators vary. This trains the
+model to distinguish a code's purpose even when unrelated text mentions login. Random letter strings are used for negative references
+as well as valid codes. V3d fine-tuned all parameters. Later runs continue from the selected checkpoint and
+freeze the vocabulary embeddings while fine-tuning the encoder and heads.
+
+MiniLM now shares its encoder between span extraction and a separate code-presence
+output. The presence output uses the CLS and masked mean representations and adds
+769 parameters. Its binary loss includes both positive and negative messages;
+span loss applies to positive messages. Inference still uses one encoder pass.
+V3d adds a 385-parameter token-validity output. Each token learns whether it
+belongs to the valid code, including explicit negative supervision for references
+and obsolete credentials. Inference uses the mean validity logit over the selected
+span as its acceptance score, with a validation-calibrated threshold and span
+margin. The message-presence loss remains an auxiliary training objective.
+No additional encoder pass is required.
+
+Validation revealed a separate decoder bug: SentencePiece sometimes includes the
+final digit and punctuation in one token, such as "2.". The decoder now trims
+boundary punctuation within tokens while retaining exact source character spans.
+This prevents rejecting complete numeric codes or returning shortened separated
+codes. Regression tests cover letters, leading zeroes and multilingual punctuation.
+
+The first v3 experiment used 63,840 messages and the original span/null architecture.
+It failed the validation precision/recall tradeoff and was stopped after two full
+epochs. Its artifacts remain under artifacts/minilm-v3/ with experimentStatus.json.
+No new test predictions were made for that run. The v3b run added the presence
+head but still failed validation after two epochs and was stopped. V3c continues
+from its selected epoch-one checkpoint with stronger contrastive compositions.
+V3c still rejected almost all validation messages at the precision target. Its
+raw span recall was 97.4%, but unrelated tracking and support references were too
+often accepted. V3d therefore continues from the v3c checkpoint with token-level
+validity supervision. V3d also failed the validation tradeoff after three epochs. V3e added 16 distinct message families per language but also failed validation.
+A counterfactual diagnostic showed that removing account-related boilerplate did
+not fix the error: bare instructions such as finding a shipment with a value were
+accepted, whereas explicitly labelled references were rejected. V3f targets that
+sentence-format shortcut with matched positive/negative instruction pairs.
+Its best checkpoint, with the punctuation fix, recovered 90.08% of validation codes
+at 99.50% precision. A diagnostic of six confidence-score combinations was also
+recorded; the best recovered 92.94%, still below the goal. V3g continues from those
+weights using targeted paired examples rather than selecting a weaker precision
+target. All refinements are validation-informed; the new
+test remained separate until final selection. Failed attempts remain available
+with their status and validation data.
+
+The new validation split has 7,560 messages across 12 held-out families; the new
+test split has 16,800 messages across 16 held-out families. Each test language has
+280 valid-code messages and 280 no-code messages, including 120 letters-only
+cases. The split is global across translations. Generated positive code values
+are also disjoint, including from the previous checkpoint's data.
+
+data/v3Freeze.json records evaluation hashes before training. Regenerating data
+refuses to overwrite changed validation or test content. Training reads training
+and validation only. Weight selection, threshold calibration and any choice among
+ONNX exports use validation. The final new test is evaluated only after selecting
+the candidate. Subsequent improvements informed by its errors need another new
+test set, not a claim of fresh evaluation on the same exposed examples.
+The root formatter excludes data/v3/*.json to preserve the original template
+bytes recorded in initialTemplateHashes.
+
+The earlier v2 evaluation informed which categories needed more training. Its
+sentence families are now included in v3b training with newly generated codes, so
+the old evaluation is development material and cannot demonstrate unexposed
+generalization. Comparisons between v2 and v3g must use the same NEW frozen test
+set. Both decoders are calibrated on the new validation set, with old model weights
+unchanged. Both use the corrected punctuation decoder. New validation/test bytes
+match the pre-training v3 freeze exactly.
+
+Run from this directory after following usage.txt for the isolated Python setup:
+  .venv/bin/python revisionData.py --enriched --contrastive --more-paraphrases --matched-pairs --targeted-refinements
+  HIP_VISIBLE_DEVICES=0 .venv/bin/python -m pytest testSmsModel.py testTrainingRecovery.py -q
+  HIP_VISIBLE_DEVICES=0 .venv/bin/python trainModel.py --config experimentV3g.json --data-dir data/generated/v3-targeted --initial-checkpoint artifacts/minilm-v3f/checkpoint --output artifacts/minilm-v3g --epochs 3 --save-every 250
+  HIP_VISIBLE_DEVICES=0 .venv/bin/python evaluateModel.py --run artifacts/minilm-v3g --split validation
+  .venv/bin/python exportModel.py --run artifacts/minilm-v3g --row-embeddings
+  HIP_VISIBLE_DEVICES=0 .venv/bin/python evaluateModel.py --run artifacts/minilm-v3g --backend onnx --split validation --model-name model.compact.onnx --output-tag compact
+
+The generation commands above describe the experiment and require a fresh output
+directory when repeating training. The supplied run is already frozen. Export
+creates all candidate formats; model.compact.onnx is the selected source. In the
+supplied run, its exact bytes and calibrated decoder have been copied to the
+legacy runtime filenames model.int8.onnx and decoder.json, and export.json records
+the matching checksums. The original INT8 candidate is model.standard.int8.onnx.
+The default filename does not mean all operations execute in INT8.
+
+The --save-every option saves model, optimizer, scheduler, batch position and RNG
+state atomically. If interrupted, repeat the training command with --resume to
+continue from recovery.pt. A regression test verifies that interrupted/resumed
+training reaches identical final weights and optimizer state. Recovery runs use a
+separate shuffle generator seeded by seed + epoch.
+
+These commands produced the final evaluation of the supplied selected candidate:
+  HIP_VISIBLE_DEVICES=0 .venv/bin/python evaluateModel.py --run artifacts/minilm-v3g --backend torch
+  HIP_VISIBLE_DEVICES=0 .venv/bin/python evaluateModel.py --run artifacts/minilm-v3g --backend onnx
+  HIP_VISIBLE_DEVICES=0 .venv/bin/python evaluateModel.py --run artifacts/minilm-v2 --backend onnx --comparison --data-dir data/generated/v3-targeted
+  .venv/bin/python benchmarkModel.py --run artifacts/minilm-v3g
+  .venv/bin/python renderReport.py --run artifacts/minilm-v3g --output-dir reports/v3 --baseline artifacts/minilm-v2/comparisons/v3-targeted/test.onnx.json
+  .venv/bin/python packageModel.py --run artifacts/minilm-v3g
+
+The comparison mode saves new baseline results and thresholds under comparisons/;
+it does not overwrite v2's original evaluation or its local inference decoder.
+ONNX evaluation uses one unpadded SMS per run, matching extractCode.py.
+
+Try the new selected model locally:
+  .venv/bin/python extractCode.py --run artifacts/minilm-v3g --text 'Your verification code is qXaBpL.'
+
+Limitations: the corpus is synthetic and assistant-translated, with no independent
+native-speaker review or real customer messages. Repeated templates and translated
+families make examples correlated. Passing a synthetic benchmark is not sufficient
+to establish production accuracy. Physical 4 GB Android memory and latency remain
+unmeasured. This revision does not change the Android app or publish any model.

@@ -1,5 +1,6 @@
 import { webcrypto } from 'node:crypto'
 import { act, cleanup, renderHook, waitFor } from '@testing-library/react'
+import { CombinedGraphQLErrors } from '@apollo/client/errors'
 import { afterEach, beforeAll, beforeEach, expect, it, vi } from 'vitest'
 import browser from 'webextension-polyfill'
 import {
@@ -10,7 +11,7 @@ import {
 } from '@shared/cryptoUtils'
 import { EncryptedSecretType } from '@shared/generated/graphqlBaseTypes'
 import { device, deviceInitialization, DeviceState } from './ExtensionDevice'
-import { loginSessionManager } from './loginSession'
+import { loginSessionManager, resumeRememberedDevice } from './loginSession'
 import { useDeviceState } from '@src/util/useDeviceState'
 import type { IBackgroundStateSerializable } from './backgroundPage'
 
@@ -243,5 +244,101 @@ it('keeps a successful login when the initial synchronization is offline', async
   expect(logError).toHaveBeenCalledWith(
     'Failed to synchronize the vault after login',
     failure
+  )
+})
+
+it('keeps locally saved items when session renewal returns no items and sync fails', async () => {
+  await device.save(snapshot)
+  const { result } = renderHook(useDeviceState)
+  await waitFor(() => expect(result.current.loginCredentials).toHaveLength(1))
+
+  await act(async () => {
+    await resumeRememberedDevice()
+  })
+  query.mockReset().mockRejectedValue(new Error('Database unavailable'))
+  await act(async () => {
+    await expect(device.state?.backendSync()).rejects.toThrow(
+      'Database unavailable'
+    )
+  })
+
+  expect(device.state?.secrets).toEqual(snapshot.secrets)
+  expect(result.current.searchSecrets('')).toHaveLength(1)
+  expect(result.current.loginCredentials[0].loginCredentials.password).toBe(
+    'saved-password-value'
+  )
+  expect(sessionStorage.backgroundState).toMatchObject({
+    secrets: snapshot.secrets,
+    decryptedSecrets: []
+  })
+
+  // A later successful sync still applies explicit deletions.
+  query
+    .mockReset()
+    .mockResolvedValueOnce({
+      data: {
+        currentDevice: {
+          encryptedSecretsToSync: [
+            { ...snapshot.secrets[0], deletedAt: '2026-09-30T00:00:00.000Z' }
+          ]
+        }
+      }
+    })
+    .mockResolvedValueOnce({ data: { webInputs: [] } })
+  await act(async () => {
+    await device.state?.backendSync()
+  })
+  await waitFor(() => expect(result.current.searchSecrets('')).toEqual([]))
+  expect(device.state?.secrets).toEqual([])
+})
+
+it('treats a database error during remembered-session renewal as retryable and retains items', async () => {
+  await device.save(snapshot)
+  const previousState = device.state
+  loginMutation.mockReset().mockRejectedValueOnce(
+    new CombinedGraphQLErrors({
+      errors: [{ message: 'Database unavailable' }]
+    })
+  )
+  await expect(resumeRememberedDevice()).rejects.toMatchObject({
+    retryable: true
+  })
+  expect(device.state).toBe(previousState)
+  expect(device.state?.secrets).toEqual(snapshot.secrets)
+})
+
+it('does not restore a remembered session that was locked while renewal was in flight', async () => {
+  await device.save(snapshot)
+  const { result } = renderHook(useDeviceState)
+  let finishRenewal!: () => void
+  const pending = new Promise<void>((resolve) => {
+    finishRenewal = resolve
+  })
+  const setToken = browser.storage.session.set
+  loginMutation.mockReset().mockImplementationOnce(async () => {
+    await pending
+    return {
+      data: {
+        deviceDecryptionChallenge: {
+          __typename: 'DecryptionChallengeApproved',
+          id: 42,
+          addDeviceSecretEncrypted: enrollmentCiphertext,
+          encryptionSalt: snapshot.encryptionSalt,
+          userId: snapshot.userId
+        }
+      }
+    }
+  })
+  const resumed = resumeRememberedDevice()
+  await act(async () => {
+    await device.lock()
+    finishRenewal()
+    await expect(resumed).rejects.toMatchObject({ retryable: true })
+  })
+  expect(result.current.deviceState).toBeNull()
+  expect(setToken).not.toHaveBeenCalledWith(
+    expect.objectContaining({
+      'access-token': expect.any(String)
+    })
   )
 })

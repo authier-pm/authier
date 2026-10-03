@@ -17,13 +17,18 @@ import { Input } from '@src/components/ui/input'
 import { Tooltip } from '@src/components/ui/tooltip'
 
 export const VaultList = ({ tableView }: { tableView: boolean }) => {
-  const { deviceState, loginCredentials, TOTPSecrets, setSecuritySettings } =
-    useContext(DeviceStateContext)
+  const {
+    deviceState,
+    loginCredentials,
+    TOTPSecrets,
+    passkeys,
+    setSecuritySettings
+  } = useContext(DeviceStateContext)
   const autofillCredentialsEnabled =
     deviceState?.autofillCredentialsEnabled ?? true
   const isDeviceStateReady = deviceState !== null
   const navigate = useNavigate()
-  const { data, loading, error } = useSyncSettingsQuery()
+  const { data, error, refetch } = useSyncSettingsQuery()
   const [filterBy, setFilterBy] = useQueryParam(
     'filterBy',
     withDefault(StringParam, '')
@@ -52,20 +57,19 @@ export const VaultList = ({ tableView }: { tableView: boolean }) => {
     setSecuritySettings
   ])
 
-  if (loading && !data) {
-    return (
-      <Card className="extension-surface">
-        <CardContent className="flex min-h-[320px] items-center justify-center p-6 text-sm text-[color:var(--color-muted)]">
-          Loading vault...
-        </CardContent>
-      </Card>
-    )
-  }
-
-  const secretCount = loginCredentials.length + TOTPSecrets.length
+  const secretCount =
+    loginCredentials.length + TOTPSecrets.length + passkeys.length
 
   return (
     <div className="flex h-full min-h-0 flex-col gap-4">
+      {error ? (
+        <div
+          role="status"
+          className="rounded-xl border border-amber-400/30 bg-amber-500/10 px-4 py-3 text-sm"
+        >
+          {t`Unable to connect to Authier. Your saved items are still available. Sync will be available when the connection is restored.`}
+        </div>
+      ) : null}
       <Card className="border-white/10 extension-surface">
         <CardContent className="p-4">
           <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
@@ -97,7 +101,7 @@ export const VaultList = ({ tableView }: { tableView: boolean }) => {
               <div className="rounded-full border border-[color:var(--color-border)] bg-[color:var(--color-surface-muted)] px-4 py-2 text-sm font-medium">
                 {secretCount} {t`secrets`}
               </div>
-              <RefreshSecretsButton />
+              <RefreshSecretsButton onSynced={refetch} />
               <Tooltip
                 content={tableView ? t`Show card view` : t`Show table view`}
               >
@@ -122,7 +126,7 @@ export const VaultList = ({ tableView }: { tableView: boolean }) => {
               </Tooltip>
 
               {error ? (
-                <Tooltip content={t`You have reached your limit`}>
+                <Tooltip content={t`Connect to Authier to add an item`}>
                   <span>
                     <Button disabled size="sm" variant="outline">
                       <FiPlus className="size-4" />

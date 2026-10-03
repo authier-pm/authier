@@ -61,6 +61,16 @@ The checked-in `app/src/debug/google-services.json` and `app/src/release/google-
 
 This native application does not yet implement Android Credential Provider or encrypted import/export. Device approval checks on the sign-in screen remain explicit through the sign-in button.
 
+## SMS codes to browsers
+
+Settings → **SMS codes to browsers** relays verification codes from incoming text messages to the Authier browser extension, where they appear under **From your phone** in the popup. It is off by default. Turning it on asks for the `RECEIVE_SMS` permission; Android describes the SMS permission group as "send and view SMS messages", but Authier can only receive them and never reads your inbox. Turning it off stops relaying immediately and, on Android 13+, revokes the permission when the app process ends. If Android reports the setting as restricted for a sideloaded APK, open App info → ⋮ → **Allow restricted settings**.
+
+For every incoming SMS, `SmsCodeReceiver` runs `SmsCodeExtractor` (the Kotlin port of the extension's SMS extractor, tested against `shared/smsVerificationCodeVectors.json`). Messages without a code are discarded, and multi-part texts are joined first. A code is relayed only while the vault is unlocked: a valid timed unlock provides the vault key from Android Keystore without a prompt. A locked vault, or the **When app enters background** timeout, sends nothing. Authier encrypts only the code, the sender and the time with the vault key, then an expedited WorkManager job uploads the ciphertext to `/api/v1/verificationCodes/relay`. Retries reuse the upload id and stop once the code's 10-minute lifetime has passed. The server keeps the ciphertext for 10 minutes.
+
+Android 17 withholds SMS containing a code from most apps **targeting API 37** for three hours ([behavior change](https://developer.android.com/about/versions/17/behavior-changes-17)). This app targets API 35, so it still receives them immediately. Raising `targetSdk` to 37 would silently delay relays until a supported alternative, such as the SMS User Consent API, is implemented. Android 15+ also hides codes in notifications from notification listeners, so reading the SMS app's notifications is not an alternative. Google Messages for Web in the browser is supported directly by the extension.
+
+To verify the relay end to end, see `api:verify-sms-relay` in [the API documentation](../backend/orpc/README.md). An emulator can receive a text with `adb emu sms send 22000 "G-482913 is your Google verification code."`.
+
 ## Fingerprint unlock
 
 Unlock once with your master password, then open Settings → Fingerprint unlock.

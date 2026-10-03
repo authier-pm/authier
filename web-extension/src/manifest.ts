@@ -27,6 +27,13 @@ const gmailContentScript = {
   all_frames: false
 }
 
+const googleMessagesContentScript = {
+  matches: ['https://messages.google.com/web/*'],
+  js: ['js/browser-polyfill.js', 'js/googleMessagesCodes.js'],
+  run_at: 'document_idle' as const,
+  all_frames: false
+}
+
 const passkeyContentScripts = [
   {
     matches: ['https://*/*', 'http://localhost/*', 'http://127.0.0.1/*'],
@@ -68,6 +75,7 @@ function getFirefoxManifestV2(
     content_scripts: [
       ...passkeyContentScripts,
       gmailContentScript,
+      googleMessagesContentScript,
       {
         matches: ['*://*/*'],
         js: ['js/browser-polyfill.js', 'js/contentScript.js'],
@@ -102,7 +110,7 @@ function getFirefoxManifestV2(
         strict_min_version: '128.0'
       }
     },
-    web_accessible_resources: ['icon-16.png'],
+    web_accessible_resources: ['icon-16.png', 'icon-128.png'],
     content_security_policy: `script-src ${scriptSources}; https://www.googleapis.com https://js.stripe.com/v3 https://*.firebaseio.com; object-src 'self'`
   }
 }
@@ -137,6 +145,7 @@ export async function getManifest(options: ManifestOptions = {}) {
     content_scripts: [
       ...passkeyContentScripts,
       gmailContentScript,
+      googleMessagesContentScript,
       {
         matches: ['<all_urls>'],
         all_frames: true,

@@ -11,8 +11,7 @@ import { device } from '@src/background/ExtensionDevice'
 
 const tokenRefreshBaseUrl = API_URL?.replace('/graphql', '')
 
-let isRefreshing = false
-let pendingCallbacks: Array<() => void> = []
+let pendingRefresh: Promise<void> | undefined
 
 const isTokenValid = async (): Promise<boolean> => {
   const accessToken = await getAccessToken()
@@ -29,6 +28,11 @@ const isTokenValid = async (): Promise<boolean> => {
 const fetchAndApplyNewToken = async (): Promise<void> => {
   const url = `${tokenRefreshBaseUrl}/refresh_token`
   const response = await fetch(url, { method: 'POST', credentials: 'include' })
+  if (response.status >= 500 || response.status === 429) {
+    throw new Error(
+      `Unable to refresh the Authier session (${response.status})`
+    )
+  }
   const data = await response.json()
   if (response.ok && typeof data.accessToken === 'string') {
     await setAccessToken(data.accessToken)
@@ -37,11 +41,27 @@ const fetchAndApplyNewToken = async (): Promise<void> => {
   await resumeRememberedDevice()
 }
 
+const refreshToken = () => {
+  pendingRefresh ??= fetchAndApplyNewToken()
+    .catch(async (error: unknown) => {
+      console.error('Error during token refresh:', error)
+      if (error instanceof LoginSessionError && !error.retryable) {
+        await device.clearAndReload()
+      }
+      throw error
+    })
+    .finally(() => {
+      pendingRefresh = undefined
+    })
+  return pendingRefresh
+}
+
 export const tokenRefresh = new ApolloLink((operation, forward) => {
   return new Observable((observer) => {
     let sub: { unsubscribe(): void } | undefined
 
     const proceed = () => {
+      if (observer.closed) return
       sub = forward(operation).subscribe({
         next: (v) => observer.next(v),
         error: (e) => observer.error(e),
@@ -49,34 +69,12 @@ export const tokenRefresh = new ApolloLink((operation, forward) => {
       })
     }
 
-    isTokenValid().then((valid) => {
-      if (valid) {
+    isTokenValid()
+      .then(async (valid) => {
+        if (!valid) await refreshToken()
         proceed()
-        return
-      }
-
-      if (isRefreshing) {
-        pendingCallbacks.push(proceed)
-        return
-      }
-
-      isRefreshing = true
-      fetchAndApplyNewToken()
-        .then(() => {
-          isRefreshing = false
-          pendingCallbacks.forEach((cb) => cb())
-          pendingCallbacks = []
-          proceed()
-        })
-        .catch(async (err) => {
-          isRefreshing = false
-          pendingCallbacks = []
-          console.error('Error during token refresh:', err)
-          if (err instanceof LoginSessionError && !err.retryable)
-            await device.clearAndReload()
-          observer.error(err)
-        })
-    })
+      })
+      .catch((error: unknown) => observer.error(error))
 
     return () => {
       sub?.unsubscribe()

@@ -754,3 +754,19 @@ msgstr "You have reached your limit"
 #: src/components/pages/AddTOTPSecretButton.tsx
 msgid "You have reached your password limit. Please upgrade your account to add more passwords."
 msgstr "You have reached your password limit. Please upgrade your account to add more passwords."
+
+#: src/pages-vault/VaultList.tsx
+msgid "Connect to Authier to add an item"
+msgstr "Connect to Authier to add an item"
+
+#: src/pages-vault/VaultList.tsx
+msgid "Unable to connect to Authier. Your saved items are still available. Sync will be available when the connection is restored."
+msgstr "Unable to connect to Authier. Your saved items are still available. Sync will be available when the connection is restored."
+
+#: src/components/vault/SidebarWithHeader.tsx
+msgid "Passkeys"
+msgstr "Passkeys"
+
+#: src/components/vault/TableList.tsx
+msgid "Details"
+msgstr "Details"

@@ -2,6 +2,7 @@ package dev.authier.android
 
 import org.junit.Assert.*
 import org.junit.Test
+import java.util.Arrays
 
 class NativeAutofillTargetTest {
     private val fields = listOf(NativeAutofillNode(hints = listOf("username")), NativeAutofillNode(passwordInput = true))
@@ -21,6 +22,25 @@ class NativeAutofillTargetTest {
         assertEquals(NativeAutofillSelection(0, 1, listOf(1)), select(fields))
         assertEquals(NativeAutofillSelection(null, 0, listOf(0)), select(listOf(fields[1])))
         assertEquals(NativeAutofillSelection(null, 0), select(listOf(currentPassword)))
+    }
+
+    @Test fun `null framework hints do not hide recognized login and new password hints`() {
+        val username = NativeAutofillNode(hints = Arrays.asList<String>(null, "USERNAME", null))
+        val current = NativeAutofillNode(hints = Arrays.asList<String>(null, "CURRENT-PASSWORD"))
+        val new = NativeAutofillNode(hints = Arrays.asList<String>("NEWPASSWORD", null))
+        assertEquals(NativeAutofillSelection(0, 1), select(listOf(username, current)))
+        assertEquals(NativeAutofillSelection(0, 1, listOf(2, 3)), select(listOf(username, current, new, new)))
+    }
+
+    @Test fun `null hints preserve selection by input type`() {
+        val username = NativeAutofillNode(hints = listOf(null), emailInput = true)
+        val password = NativeAutofillNode(hints = listOf(null), passwordInput = true)
+        assertEquals(NativeAutofillSelection(0, 1, listOf(1)), select(listOf(username, password)))
+    }
+
+    @Test fun `null and unrecognized hints alone cannot identify a password field`() {
+        assertNull(select(listOf(NativeAutofillNode(hints = listOf(null)))))
+        assertNull(select(listOf(NativeAutofillNode(hints = listOf(null, "", "unsupported")))))
     }
 
     @Test fun `registration fills only explicitly identified new and confirmation fields`() {
@@ -50,6 +70,7 @@ class NativeAutofillTargetTest {
         assertNull(select(fields + fields[0]))
         assertNull(select(List(3) { newPassword }))
         assertNull(select(listOf(newPassword.copy(hints = listOf("new-password", "current-password")))))
+        assertNull(select(listOf(newPassword.copy(hints = listOf(null, "new-password", "current-password")))))
         assertNull(NativeAutofillTarget.select("https://github.com", fields))
         assertNull(select(fields.map { it.copy(hasAutofillId = false) }))
         assertNull(select(fields.map { it.copy(visible = false) }))

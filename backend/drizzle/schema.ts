@@ -269,6 +269,37 @@ export const vaultOperation = pgTable(
   (table) => [primaryKey({ columns: [table.userId, table.operationId] })]
 )
 
+// Verification codes a phone read from an SMS, encrypted with the vault key
+// before upload. Rows are short-lived: expired ones are deleted on each write.
+export const relayedVerificationCode = pgTable(
+  'RelayedVerificationCode',
+  {
+    userId: uuid()
+      .notNull()
+      .references(() => user.id, { onDelete: 'cascade', onUpdate: 'cascade' }),
+    // Client-generated, so a retried upload cannot create a duplicate.
+    id: uuid().notNull(),
+    deviceId: text()
+      .notNull()
+      .references(() => device.id, {
+        onDelete: 'cascade',
+        onUpdate: 'cascade'
+      }),
+    encrypted: text().notNull(),
+    createdAt: timestamp({ precision: 3 })
+      .default(sql`CURRENT_TIMESTAMP`)
+      .notNull(),
+    expiresAt: timestamp({ precision: 3 }).notNull()
+  },
+  (table) => [
+    primaryKey({ columns: [table.userId, table.id] }),
+    index('RelayedVerificationCode_expiresAt_idx').using(
+      'btree',
+      table.expiresAt.asc().nullsLast()
+    )
+  ]
+)
+
 export const masterDeviceChange = pgTable('MasterDeviceChange', {
   id: text().primaryKey(),
   createdAt: timestamp({ precision: 3 })

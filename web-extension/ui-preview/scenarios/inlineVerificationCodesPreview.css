@@ -1,0 +1,123 @@
+.verification-preview {
+  min-height: 100vh;
+  background: #050505;
+  color: #353535;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 140px 24px 180px;
+  font-family: Arial, sans-serif;
+}
+.verification-preview__caption {
+  position: absolute;
+  top: 32px;
+  left: 32px;
+  color: #8f9999;
+  font-size: 11px;
+  letter-spacing: 2px;
+}
+.verification-preview__card {
+  background: white;
+  border-radius: 26px;
+  width: min(650px, 100%);
+  padding: 36px;
+  text-align: center;
+}
+.verification-preview__mail {
+  width: 80px;
+  height: 80px;
+  margin: 0 auto 36px;
+  padding: 22px;
+  border-radius: 50%;
+  background: #caffd1;
+  color: #008363;
+}
+.verification-preview h1 {
+  font-size: 25px;
+  font-weight: 600;
+  margin: 0 0 12px;
+}
+.verification-preview__description {
+  font-size: 22px;
+  color: #686868;
+  line-height: 1.4;
+  margin: 0 0 40px;
+}
+.verification-preview__inputs {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+}
+.verification-preview__inputs input {
+  width: 76px;
+  min-width: 0;
+  height: 76px;
+  border: 1.5px solid #e4e4e4;
+  border-radius: 13px;
+  background: white;
+  color: #353535;
+  text-align: center;
+  font-size: 32px;
+  outline: none;
+}
+.verification-preview__inputs input:focus {
+  border-color: #006bff;
+  background: #f6f6f6;
+}
+.verification-preview__inputs .verification-preview__single {
+  width: 280px;
+  letter-spacing: 8px;
+}
+.verification-preview__resend {
+  font-size: 21px;
+  color: #686868;
+  margin: 16px 0 0;
+}
+.verification-preview__resend button {
+  color: #006bde;
+  cursor: pointer;
+  font-weight: 600;
+}
+.verification-preview__status {
+  font-size: 13px;
+  color: #008363;
+  min-height: 18px;
+  margin: 10px 0 0;
+}
+.verification-preview__toggle {
+  position: absolute;
+  bottom: 24px;
+  left: 32px;
+  color: #8f9999;
+  font-size: 12px;
+  cursor: pointer;
+}
+@media (max-width: 600px) {
+  .verification-preview {
+    padding: 110px 16px 160px;
+  }
+  .verification-preview__card {
+    padding: 28px 18px;
+  }
+  .verification-preview h1 {
+    font-size: 21px;
+  }
+  .verification-preview__description {
+    font-size: 17px;
+    margin-bottom: 28px;
+  }
+  .verification-preview__break {
+    display: none;
+  }
+  .verification-preview__inputs {
+    gap: 7px;
+  }
+  .verification-preview__inputs input {
+    width: 42px;
+    height: 50px;
+    font-size: 23px;
+  }
+  .verification-preview__resend {
+    font-size: 16px;
+  }
+}

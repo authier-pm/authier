@@ -1,9 +1,10 @@
 import { handlePasskeyMessage } from '../passkeys/backgroundPasskeys'
 import { handleTotpAccountEmailMessage } from './totpAccountEmail'
 import {
-  handleEmailVerificationCodeMessage,
-  initializeEmailVerificationCodes
-} from './emailVerificationCodes'
+  handleVerificationCodeMessage,
+  initializeVerificationCodes
+} from './verificationCodes'
+import { fetchRelayedVerificationCodes } from './relayedVerificationCodes'
 import {
   appendGeneratedPasswordHistoryEntry,
   generatedPasswordHistoryEntrySchema
@@ -84,7 +85,12 @@ let inputsUrl: string
 
 const tcProcedure = tc.procedure.use(loggerMiddleware)
 
-initializeEmailVerificationCodes()
+void initializeVerificationCodes({
+  fetchRelayedCodes: fetchRelayedVerificationCodes,
+  pollRelayedInBackground: true
+}).catch((error: unknown) => {
+  console.error('Failed to initialize verification code polling', error)
+})
 
 void loginSessionManager.initialize().catch((error: unknown) => {
   console.error('Failed to initialize the background login session', error)
@@ -393,8 +399,8 @@ browser.runtime.onMessage.addListener((request: unknown, sender) => {
   const totpEmailResponse = handleTotpAccountEmailMessage(request, sender)
   if (totpEmailResponse) return totpEmailResponse
 
-  const emailCodeResponse = handleEmailVerificationCodeMessage(request, sender)
-  if (emailCodeResponse) return emailCodeResponse
+  const codeResponse = handleVerificationCodeMessage(request, sender)
+  if (codeResponse) return codeResponse
 
   const passkeyResponse = handlePasskeyMessage(request, sender)
   if (passkeyResponse) return passkeyResponse

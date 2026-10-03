@@ -1,0 +1,15 @@
+{
+  "revision": "v3d",
+  "seed": 2026093006,
+  "epochs": 3,
+  "batchSize": 48,
+  "learningRate": 0.00001,
+  "headLearningRate": 0.0002,
+  "warmupFraction": 0.06,
+  "freezeWordEmbeddings": false,
+  "presenceHead": true,
+  "tokenHead": true,
+  "validationTargetPrecision": 0.995,
+  "initialCheckpoint": "artifacts/minilm-v3c/checkpoint",
+  "provenance": "Synthetic assistant-authored translations and compositions. Token-level validity supervision and full-parameter fine-tuning were chosen after v3 validation failures. Old v2 evaluation families are development/training material; only the frozen v3 test is held out. No private SMS or native-speaker review."
+}

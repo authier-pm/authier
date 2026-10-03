@@ -1,0 +1,92 @@
+{
+  "et": [
+    "Lõpeta sisselogimine, kasutades {code}.",
+    "Kinnita see tehing, kasutades {code}.",
+    "Kinnita oma isik, kasutades {code}.",
+    "Taasta juurdepääs kontole, sisestades {code}.",
+    "Leia oma pakk, kasutades {other}.",
+    "Leia oma broneering, kasutades {other}.",
+    "Leia oma tugipöördumine, kasutades {other}.",
+    "Too oma arve esile, sisestades {other}."
+  ],
+  "lv": [
+    "Pabeidziet pierakstīšanos, izmantojot {code}.",
+    "Apstipriniet šo darījumu, izmantojot {code}.",
+    "Apstipriniet savu identitāti, izmantojot {code}.",
+    "Atjaunojiet piekļuvi kontam, ievadot {code}.",
+    "Atrodiet savu paku, izmantojot {other}.",
+    "Atrodiet savu rezervāciju, izmantojot {other}.",
+    "Atrodiet savu atbalsta pieteikumu, izmantojot {other}.",
+    "Iegūstiet savu rēķinu, ievadot {other}."
+  ],
+  "lt": [
+    "Užbaikite prisijungimą naudodami {code}.",
+    "Patvirtinkite šią operaciją naudodami {code}.",
+    "Patvirtinkite savo tapatybę naudodami {code}.",
+    "Atgaukite prieigą prie paskyros įvesdami {code}.",
+    "Raskite savo siuntinį naudodami {other}.",
+    "Raskite savo rezervaciją naudodami {other}.",
+    "Raskite savo pagalbos užklausą naudodami {other}.",
+    "Gaukite savo sąskaitą įvesdami {other}."
+  ],
+  "bg": [
+    "Завършете влизането с {code}.",
+    "Одобрете тази транзакция с {code}.",
+    "Потвърдете самоличността си с {code}.",
+    "Възстановете достъпа до акаунта, като въведете {code}.",
+    "Намерете пратката си с {other}.",
+    "Намерете резервацията си с {other}.",
+    "Намерете заявката си за поддръжка с {other}.",
+    "Изтеглете фактурата си, като въведете {other}."
+  ],
+  "hr": [
+    "Dovršite prijavu pomoću {code}.",
+    "Odobrite ovu transakciju pomoću {code}.",
+    "Potvrdite svoj identitet pomoću {code}.",
+    "Vratite pristup računu unosom {code}.",
+    "Pronađite svoj paket pomoću {other}.",
+    "Pronađite svoju rezervaciju pomoću {other}.",
+    "Pronađite svoj zahtjev za podršku pomoću {other}.",
+    "Dohvatite svoju fakturu unosom {other}."
+  ],
+  "sl": [
+    "Dokončajte prijavo z uporabo {code}.",
+    "Odobrite to transakcijo z uporabo {code}.",
+    "Potrdite svojo identiteto z uporabo {code}.",
+    "Obnovite dostop do računa z vnosom {code}.",
+    "Poiščite svoj paket z uporabo {other}.",
+    "Poiščite svojo rezervacijo z uporabo {other}.",
+    "Poiščite svoj zahtevek za podporo z uporabo {other}.",
+    "Pridobite svojo fakturo z vnosom {other}."
+  ],
+  "el": [
+    "Ολοκληρώστε τη σύνδεση με {code}.",
+    "Εγκρίνετε αυτή τη συναλλαγή με {code}.",
+    "Επιβεβαιώστε την ταυτότητά σας με {code}.",
+    "Ανακτήστε πρόσβαση στον λογαριασμό εισάγοντας {code}.",
+    "Εντοπίστε το δέμα σας με {other}.",
+    "Βρείτε την κράτησή σας με {other}.",
+    "Βρείτε το αίτημα υποστήριξής σας με {other}.",
+    "Ανακτήστε το τιμολόγιό σας εισάγοντας {other}."
+  ],
+  "ga": [
+    "Críochnaigh an logáil isteach le {code}.",
+    "Ceadaigh an t-idirbheart seo le {code}.",
+    "Deimhnigh d'aitheantas le {code}.",
+    "Faigh rochtain ar an gcuntas arís trí {code} a chur isteach.",
+    "Aimsigh do phacáiste le {other}.",
+    "Aimsigh d'áirithint le {other}.",
+    "Aimsigh d'iarratas tacaíochta le {other}.",
+    "Faigh do shonrasc trí {other} a chur isteach."
+  ],
+  "mt": [
+    "Imla d-dħul b'{code}.",
+    "Approva din it-tranżazzjoni b'{code}.",
+    "Ikkonferma l-identità tiegħek b'{code}.",
+    "Erġa' ikseb aċċess għall-kont billi ddaħħal {code}.",
+    "Sib il-pakkett tiegħek b'{other}.",
+    "Sib il-prenotazzjoni tiegħek b'{other}.",
+    "Sib it-talba tiegħek għall-appoġġ b'{other}.",
+    "Ikseb il-fattura tiegħek billi ddaħħal {other}."
+  ]
+}

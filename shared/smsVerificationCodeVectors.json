@@ -1,0 +1,70 @@
+[
+  { "text": "G-123456 is your Google verification code.", "code": "123456" },
+  { "text": "Your Uber code: 1234. Never share this code.", "code": "1234" },
+  { "text": "Telegram code: 12345", "code": "12345" },
+  { "text": "Your WhatsApp code: 123-456", "code": "123456" },
+  {
+    "text": "123456 is your Instagram code. Don't share it.",
+    "code": "123456"
+  },
+  { "text": "Your PayPal code is 482913. Don't share it.", "code": "482913" },
+  { "text": "Amazon: Your one-time password is 123456", "code": "123456" },
+  { "text": "Your verification code is 12345678", "code": "12345678" },
+  { "text": "Microsoft account security code: 1234567", "code": "1234567" },
+  { "text": "Your Steam Guard code: F7G9K", "code": "F7G9K" },
+  { "text": "FB-12345 is your Facebook confirmation code", "code": "12345" },
+  { "text": "Your code is 12 34 56", "code": "123456" },
+  {
+    "text": "Your login code:\n482 913\nIt expires in 10 minutes.",
+    "code": "482913"
+  },
+  { "text": "Your verification code: １２３４５６", "code": "123456" },
+  {
+    "note": "zero-width space between the digit groups",
+    "text": "Your verification code: 123​456",
+    "code": "123456"
+  },
+  {
+    "text": "474230 je Váš jednorázový SMS kód pro platbu 1 234,00 CZK u ALZA.CZ.",
+    "code": "474230"
+  },
+  {
+    "text": "Autorizační kód pro platbu 1 234,00 CZK u obchodníka ALZA.CZ kartou *5678 je 474230.",
+    "code": "474230"
+  },
+  { "text": "Kód pro platbu kartou *1234: 567890", "code": "567890" },
+  { "text": "VAS KOD PRO PLATBU JE 474230. VASE BANKA", "code": "474230" },
+  { "text": "Kód 1234 platí 5 minut.", "code": "1234" },
+  { "text": "Dein Bestätigungscode lautet 482913.", "code": "482913" },
+  {
+    "text": "Ihr Sicherheitscode lautet 482913. Geben Sie ihn nicht weiter.",
+    "code": "482913"
+  },
+  { "text": "Tu código de verificación es 123456", "code": "123456" },
+  { "text": "Il tuo codice di verifica è 123456", "code": "123456" },
+  { "text": "Votre code de vérification est 123456", "code": "123456" },
+  { "text": "Ваш код подтверждения: 123456", "code": "123456" },
+  { "text": "Twój kod weryfikacyjny to 123456", "code": "123456" },
+  { "text": "Jednorazové heslo: 12345678", "code": "12345678" },
+  { "text": "mTAN: 482913 für Überweisung von 250,00 EUR", "code": "482913" },
+  { "text": "Payment of EUR 1234 to SHOP. Code: 998877", "code": "998877" },
+  {
+    "text": "Card xxxx4321 payment 19.99 USD. Your one-time code is 246810",
+    "code": "246810"
+  },
+  { "text": "Use code SAVE20 for 20% off your next order", "code": null },
+  { "text": "Your package 12345678 will arrive tomorrow", "code": null },
+  { "text": "Call me at 555 1234 when you land", "code": null },
+  { "text": "Your order number is 87654321.", "code": null },
+  { "text": "See you at 10:30 tomorrow", "code": null },
+  { "text": "Your verification code: 123", "code": null },
+  { "text": "Your verification code: 123456789", "code": null },
+  {
+    "text": "Your verification code: https://example.com/?code=123456",
+    "code": null
+  },
+  { "text": "Your code: PLATBA", "code": null },
+  { "text": "Your balance is 1234 CZK. Code words are fun.", "code": null },
+  { "text": "123456 verification code 654321", "code": null },
+  { "text": "", "code": null }
+]

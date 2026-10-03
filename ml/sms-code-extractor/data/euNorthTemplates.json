@@ -1,0 +1,202 @@
+{
+  "da": {
+    "name": "Danish",
+    "train": [
+      "Din bekræftelseskode er {code}. Del den ikke med andre.",
+      "{code} er din engangsadgangskode til at logge ind på {brand}.",
+      "Bekræft dit telefonnummer med {code}. Gyldig i {minutes} minutter.",
+      "Indtast {code} for at godkende en betaling på {amount} EUR. Kortet slutter på {card}.",
+      "Tidligere kode: {old}. Din nye loginkode er {code}.",
+      "{brand}: brug sikkerhedskoden {code} til at nulstille din adgangskode.",
+      "Brug kuponen {other} og få {percent}% rabat hos {brand}.",
+      "Ordre {id} er afsendt. Sporingsnummer: {other}.",
+      "Din saldo er {amount} EUR. Dit kort slutter på {card}.",
+      "Din bekræftelseskode udløber om {duration} sekunder.",
+      "Din gamle bekræftelseskode {old} er udløbet. Bed om en ny.",
+      "Ring til mig på {phone} i morgen. Vi ses klokken {time}.",
+      "Loginkoder: {old} eller {other}. Det er uklart, hvilken der er gældende.",
+      "Åbn dette bekræftelseslink: https://example.invalid/verify?code={other}"
+    ],
+    "validation": [
+      "[{brand}] Indtast {code} for at afslutte oprettelsen af din konto.",
+      "Hold {code} hemmelig. Denne kode godkender det login, du har anmodet om.",
+      "Brug ikke {old}; bekræft i stedet din identitet med {code}.",
+      "Bekræftelsesanmodningen udløber efter {duration} sekunder. Der er ikke udstedt nogen kode.",
+      "Afhentningsreference {other}: din pakke venter på lageret.",
+      "Særtilbud! Kampagnekoden {other} sparer dig {percent}%.",
+      "Mød mig klokken {time}, og tag billet {id} med.",
+      "To forskellige bekræftelseskoder, {old} og {other}; ingen er markeret som gældende."
+    ],
+    "test": [
+      "Nogen tilgår din konto hos {brand}. Hvis det er dig, skal du skrive {code} på bekræftelsesskærmen.",
+      "Godkendelse påkrævet: {code}. Denne adgangskode kan kun bruges én gang.",
+      "Godkend overførslen på {amount} EUR fra kort **{card} med {code}.",
+      "{code}\nKopiér disse tegn til feltet for at bekræfte din e-mailadresse. Udløber efter {minutes} minutter.",
+      "Sikkerhedskontrol planlagt til {date}. Din supportreference er {id}.",
+      "Forsendelsens sporingskode: {other}. Det er ikke en adgangskode til login.",
+      "Bekræftelsestjenesten er ikke tilgængelig. Prøv igen efter {duration} sekunder.",
+      "En betaling på {amount} EUR er trukket fra kort **{card}.",
+      "Fejl {id}: bekræftelsesbeskeden kunne ikke leveres."
+    ]
+  },
+  "sv": {
+    "name": "Swedish",
+    "train": [
+      "Din verifieringskod är {code}. Dela den inte med någon.",
+      "{code} är ditt engångslösenord för att logga in på {brand}.",
+      "Bekräfta ditt telefonnummer med {code}. Giltig i {minutes} minuter.",
+      "Ange {code} för att godkänna en betalning på {amount} EUR. Kortet slutar på {card}.",
+      "Tidigare kod: {old}. Din nya inloggningskod är {code}.",
+      "{brand}: använd säkerhetskoden {code} för att återställa ditt lösenord.",
+      "Använd kupongen {other} för {percent}% rabatt hos {brand}.",
+      "Beställning {id} har skickats. Spårningsnummer: {other}.",
+      "Ditt saldo är {amount} EUR. Ditt kort slutar på {card}.",
+      "Din verifieringskod går ut om {duration} sekunder.",
+      "Din gamla verifieringskod {old} har gått ut. Begär en ny.",
+      "Ring mig i morgon på {phone}. Vi ses klockan {time}.",
+      "Inloggningskoder: {old} eller {other}. Det är oklart vilken som är aktuell.",
+      "Öppna den här verifieringslänken: https://example.invalid/verify?code={other}"
+    ],
+    "validation": [
+      "[{brand}] Ange {code} för att slutföra skapandet av ditt konto.",
+      "Håll {code} hemlig. Den här koden godkänner den inloggning du begärde.",
+      "Använd inte {old}; verifiera i stället din identitet med {code}.",
+      "Verifieringsbegäran går ut efter {duration} sekunder. Ingen kod har utfärdats.",
+      "Hämtningsreferens {other}: ditt paket väntar på lagret.",
+      "Specialerbjudande! Kampanjkoden {other} sparar dig {percent}%.",
+      "Möt mig klockan {time} och ta med biljett {id}.",
+      "Två olika verifieringskoder, {old} och {other}; ingen är markerad som aktuell."
+    ],
+    "test": [
+      "Någon öppnar ditt konto hos {brand}. Om det är du, skriv {code} på verifieringsskärmen.",
+      "Autentisering krävs: {code}. Det här lösenordet kan bara användas en gång.",
+      "Godkänn överföringen på {amount} EUR från kort **{card} med {code}.",
+      "{code}\nKopiera dessa tecken till fältet för att bekräfta din e-postadress. Går ut efter {minutes} minuter.",
+      "Säkerhetskontroll planerad till {date}. Din supportreferens är {id}.",
+      "Försändelsens spårningskod: {other}. Det är inte ett inloggningslösenord.",
+      "Verifieringstjänsten är inte tillgänglig. Försök igen efter {duration} sekunder.",
+      "En betalning på {amount} EUR har dragits från kort **{card}.",
+      "Fel {id}: verifieringsmeddelandet kunde inte levereras."
+    ]
+  },
+  "fi": {
+    "name": "Finnish",
+    "train": [
+      "Vahvistuskoodisi on {code}. Älä jaa sitä kenellekään.",
+      "{code} on kertakäyttöinen salasanasi palveluun {brand} kirjautumiseen.",
+      "Vahvista puhelinnumerosi koodilla {code}. Voimassa {minutes} minuuttia.",
+      "Hyväksy {amount} EUR maksu syöttämällä {code}. Kortin loppunumerot {card}.",
+      "Edellinen koodi: {old}. Uusi kirjautumiskoodisi on {code}.",
+      "{brand}: käytä turvakoodia {code} salasanasi nollaamiseen.",
+      "Käytä kuponkia {other} ja saat {percent}% alennusta palvelussa {brand}.",
+      "Tilaus {id} on lähetetty. Seurantanumero: {other}.",
+      "Saldosi on {amount} EUR. Korttisi loppunumerot ovat {card}.",
+      "Vahvistuskoodisi vanhenee {duration} sekunnin kuluttua.",
+      "Vanha vahvistuskoodisi {old} on vanhentunut. Pyydä uusi.",
+      "Soita minulle huomenna numeroon {phone}. Nähdään kello {time}.",
+      "Kirjautumiskoodit: {old} tai {other}. Ei ole selvää, kumpi on voimassa.",
+      "Avaa tämä vahvistuslinkki: https://example.invalid/verify?code={other}"
+    ],
+    "validation": [
+      "[{brand}] Viimeistele tilin luominen syöttämällä {code}.",
+      "Pidä {code} salassa. Tämä koodi hyväksyy pyytämäsi kirjautumisen.",
+      "Älä käytä koodia {old}; vahvista sen sijaan henkilöllisyytesi koodilla {code}.",
+      "Vahvistuspyyntö vanhenee {duration} sekunnin kuluttua. Yhtään koodia ei ole annettu.",
+      "Noutoviite {other}: pakettisi odottaa varastossa.",
+      "Erikoistarjous! Kampanjakoodilla {other} säästät {percent}%.",
+      "Tavataan kello {time}, ota lippu {id} mukaan.",
+      "Kaksi eri vahvistuskoodia, {old} ja {other}; kumpaakaan ei ole merkitty nykyiseksi."
+    ],
+    "test": [
+      "Joku käyttää tiliäsi palvelussa {brand}. Jos se olet sinä, kirjoita {code} vahvistusnäkymään.",
+      "Tunnistautuminen vaaditaan: {code}. Tätä salasanaa voi käyttää vain kerran.",
+      "Hyväksy {amount} EUR siirto kortilta **{card} koodilla {code}.",
+      "{code}\nKopioi nämä merkit kenttään vahvistaaksesi sähköpostiosoitteesi. Vanhenee {minutes} minuutin kuluttua.",
+      "Turvatarkastus on ajoitettu päivälle {date}. Tukipyyntösi viite on {id}.",
+      "Lähetyksen seurantakoodi: {other}. Se ei ole kirjautumissalasana.",
+      "Vahvistuspalvelu ei ole käytettävissä. Yritä uudelleen {duration} sekunnin kuluttua.",
+      "Kortilta **{card} on veloitettu {amount} EUR maksu.",
+      "Virhe {id}: vahvistusviestiä ei voitu toimittaa."
+    ]
+  },
+  "hu": {
+    "name": "Hungarian",
+    "train": [
+      "Az ellenőrző kódod: {code}. Ne oszd meg senkivel.",
+      "{code} az egyszer használatos jelszavad a(z) {brand} szolgáltatásba való belépéshez.",
+      "Erősítsd meg a telefonszámod a(z) {code} kóddal. {minutes} percig érvényes.",
+      "{amount} EUR fizetés engedélyezéséhez add meg: {code}. A kártya utolsó számjegyei: {card}.",
+      "Előző kód: {old}. Az új bejelentkezési kódod: {code}.",
+      "{brand}: a jelszó visszaállításához használd a(z) {code} biztonsági kódot.",
+      "Használd a(z) {other} kupont {percent}% kedvezményért a(z) {brand} üzletben.",
+      "A(z) {id} rendelést feladtuk. Nyomkövetési szám: {other}.",
+      "Az egyenleged {amount} EUR. A kártyád utolsó számjegyei: {card}.",
+      "Az ellenőrző kódod {duration} másodperc múlva lejár.",
+      "A régi ellenőrző kódod, {old}, lejárt. Kérj újat.",
+      "Hívj fel holnap a(z) {phone} számon. Találkozunk {time}-kor.",
+      "Bejelentkezési kódok: {old} vagy {other}. Nem egyértelmű, melyik érvényes.",
+      "Nyisd meg ezt az ellenőrző hivatkozást: https://example.invalid/verify?code={other}"
+    ],
+    "validation": [
+      "[{brand}] A fiók létrehozásának befejezéséhez írd be: {code}.",
+      "Tartsd titokban: {code}. Ez a kód jóváhagyja a kért bejelentkezést.",
+      "Ne használd a(z) {old} kódot; helyette a(z) {code} kóddal igazold magad.",
+      "Az ellenőrzési kérelem {duration} másodperc után lejár. Nem adtunk ki kódot.",
+      "Átvételi hivatkozás {other}: a csomagod a raktárban vár.",
+      "Különleges ajánlat! A(z) {other} promóciós kóddal {percent}% megtakarítás jár.",
+      "Találkozzunk {time}-kor, hozd el a(z) {id} jegyet.",
+      "Két különböző ellenőrző kód, {old} és {other}; egyik sincs aktuálisként megjelölve."
+    ],
+    "test": [
+      "Valaki hozzáfér a(z) {brand} fiókodhoz. Ha te vagy az, írd be a(z) {code} kódot az ellenőrző képernyőn.",
+      "Hitelesítés szükséges: {code}. Ez a jelszó csak egyszer használható.",
+      "Hagyd jóvá a(z) {amount} EUR átutalást a(z) **{card} kártyáról ezzel: {code}.",
+      "{code}\nMásold ezeket a karaktereket a mezőbe az e-mail-címed megerősítéséhez. {minutes} perc után lejár.",
+      "A biztonsági ellenőrzés időpontja: {date}. Az ügyfélszolgálati hivatkozásod: {id}.",
+      "Küldemény nyomkövetési kódja: {other}. Ez nem bejelentkezési jelszó.",
+      "Az ellenőrzési szolgáltatás nem érhető el. Próbáld újra {duration} másodperc múlva.",
+      "A(z) **{card} kártyát {amount} EUR fizetéssel terheltük meg.",
+      "Hiba {id}: az ellenőrző üzenetet nem sikerült kézbesíteni."
+    ]
+  },
+  "ga": {
+    "name": "Irish",
+    "train": [
+      "Is é {code} do chód fíorúcháin. Ná roinn le haon duine é.",
+      "Is é {code} do phasfhocal aonuaire chun logáil isteach ar {brand}.",
+      "Deimhnigh d'uimhir theileafóin le {code}. Bailí ar feadh {minutes} nóiméad.",
+      "Chun íocaíocht {amount} EUR a údarú, cuir isteach {code}. Críochnaíonn an cárta le {card}.",
+      "An cód roimhe seo: {old}. Is é {code} do chód logála isteach nua.",
+      "{brand}: úsáid an cód slándála {code} chun do phasfhocal a athshocrú.",
+      "Úsáid an cúpón {other} chun lascaine {percent}% a fháil ag {brand}.",
+      "Seoladh ordú {id}. Uimhir rianaithe: {other}.",
+      "Is é {amount} EUR d'iarmhéid. Críochnaíonn do chárta le {card}.",
+      "Rachaidh do chód fíorúcháin in éag i gceann {duration} soicind.",
+      "Tá do sheanchód fíorúcháin {old} imithe in éag. Iarr ceann nua.",
+      "Glaoigh orm amárach ar {phone}. Feicfidh mé thú ag {time}.",
+      "Cóid logála isteach: {old} nó {other}. Níl sé soiléir cé acu atá bailí anois.",
+      "Oscail an nasc fíorúcháin seo: https://example.invalid/verify?code={other}"
+    ],
+    "validation": [
+      "[{brand}] Cuir isteach {code} chun cruthú do chuntais a chríochnú.",
+      "Coinnigh {code} faoi rún. Ceadaíonn an cód seo an logáil isteach a d'iarr tú.",
+      "Ná húsáid {old}; fíoraigh d'aitheantas le {code} ina áit.",
+      "Rachaidh an t-iarratas fíorúcháin in éag tar éis {duration} soicind. Níor eisíodh cód ar bith.",
+      "Tagairt bhailithe {other}: tá do bheartán ag fanacht san iosta.",
+      "Tairiscint speisialta! Sábhálann an cód promóisin {other} {percent}% duit.",
+      "Buail liom ag {time} agus tabhair leat ticéad {id}.",
+      "Dhá chód fíorúcháin éagsúla, {old} agus {other}; níl ceachtar acu marcáilte mar an ceann reatha."
+    ],
+    "test": [
+      "Tá duine ag rochtain ar do chuntas {brand}. Más tusa atá ann, clóscríobh {code} ar an scáileán fíorúcháin.",
+      "Fíordheimhniú de dhíth: {code}. Ní féidir an pasfhocal seo a úsáid ach uair amháin.",
+      "Ceadaigh an t-aistriú {amount} EUR ón gcárta **{card} le {code}.",
+      "{code}\nCóipeáil na carachtair seo isteach sa réimse chun do sheoladh ríomhphoist a dheimhniú. Rachaidh sé in éag tar éis {minutes} nóiméad.",
+      "Seiceáil slándála socraithe don dáta {date}. Is é {id} do thagairt tacaíochta.",
+      "Cód rianaithe an lastais: {other}. Ní pasfhocal logála isteach é.",
+      "Níl an tseirbhís fíorúcháin ar fáil. Bain triail eile as tar éis {duration} soicind.",
+      "Gearradh íocaíocht {amount} EUR ar an gcárta **{card}.",
+      "Earráid {id}: níorbh fhéidir an teachtaireacht fíorúcháin a sheachadadh."
+    ]
+  }
+}

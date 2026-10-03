@@ -27,6 +27,7 @@ import { EncryptedSecretTypeGQL } from '../models/types/EncryptedSecretType'
 import type { UserNewDevicePolicyGQL } from '../models/types/UserNewDevicePolicy'
 import { runVaultTransaction } from '../vault/vaultWrites'
 import { syncVault, writeVaultSecret } from './mobileVault'
+import { relayVerificationCode } from '../lib/relayedVerificationCodes'
 
 const os = implement(vaultApiContract).$context<OrpcContext>()
 
@@ -800,6 +801,11 @@ export const vaultOrpcRouter = os.router({
           return raiseAsOrpcError(error)
         }
       }
+    )
+  },
+  verificationCodes: {
+    relay: protectedBase.verificationCodes.relay.handler(({ input, context }) =>
+      relayVerificationCode(context.authCtx, input)
     )
   },
   devices: {

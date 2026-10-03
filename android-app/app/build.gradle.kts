@@ -35,7 +35,10 @@ android {
     kotlinOptions { jvmTarget = "17" }
     testOptions {
         unitTests.isReturnDefaultValues = true
-        unitTests.all { it.systemProperty("authier.cryptoVectors", rootProject.file("../shared/cryptoTestVectors.json").absolutePath) }
+        unitTests.all {
+            it.systemProperty("authier.cryptoVectors", rootProject.file("../shared/cryptoTestVectors.json").absolutePath)
+            it.systemProperty("authier.smsCodeVectors", rootProject.file("../shared/smsVerificationCodeVectors.json").absolutePath)
+        }
     }
 }
 

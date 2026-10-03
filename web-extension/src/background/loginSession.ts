@@ -15,7 +15,11 @@ import {
 } from '@shared/graphql/Login.codegen'
 import { apolloClientWithoutTokenRefresh } from '@src/apollo/apolloClient'
 import type { IBackgroundStateSerializable } from './backgroundPage'
-import { device, deviceInitialization } from './ExtensionDevice'
+import {
+  device,
+  deviceInitialization,
+  type DeviceState
+} from './ExtensionDevice'
 import {
   getUserFromToken,
   setAccessToken
@@ -524,10 +528,10 @@ const completeLogin = async (
     challenge: LoginApprovedChallenge
     device: LoginDeviceInfo
   },
-  rememberedKey?: CryptoKey
+  rememberedSession?: { key: CryptoKey; state: DeviceState }
 ) => {
   const masterEncryptionKey =
-    rememberedKey ??
+    rememberedSession?.key ??
     (await generateEncryptionKey(
       input.session.password,
       base64ToBuffer(input.challenge.encryptionSalt)
@@ -581,6 +585,9 @@ const completeLogin = async (
     throw new Error('Missing access token after login approval')
   }
 
+  // A renewal must not reopen a vault that was locked or replaced while waiting.
+  if (rememberedSession && device.state !== rememberedSession.state) return
+
   await setAccessToken(loginResponse.accessToken)
   const decodedToken = await getUserFromToken()
 
@@ -592,7 +599,9 @@ const completeLogin = async (
   const deviceState: IBackgroundStateSerializable = {
     masterEncryptionKey: await cryptoKeyToString(masterEncryptionKey),
     userId: input.challenge.userId,
-    secrets: user.EncryptedSecrets,
+    // Login is not an authoritative vault snapshot. Keep local items until
+    // vault sync supplies additions, updates and explicit deletions.
+    secrets: rememberedSession?.state.secrets ?? user.EncryptedSecrets,
     email: input.session.email,
     encryptionSalt: input.challenge.encryptionSalt,
     deviceName: input.device.name,
@@ -610,7 +619,7 @@ const completeLogin = async (
     theme: user.defaultDeviceSettings.theme
   }
 
-  if (input.session.password === '' && !device.state) return
+  if (rememberedSession && device.state !== rememberedSession.state) return
   await device.save(deviceState)
 }
 
@@ -626,6 +635,14 @@ export const resumeRememberedDevice = async () => {
   const challenge = await requestChallenge({
     email: state.email,
     device: deviceInfo
+  }).catch((error: unknown) => {
+    // A failed request (including a GraphQL database error) is not evidence
+    // that this device was revoked. Keep the local vault available for retry.
+    throw new LoginSessionError(
+      'Unable to resume the Authier session. Please retry.',
+      true,
+      error
+    )
   })
   if (challenge?.type !== 'approved' || challenge.userId !== state.userId) {
     throw new LoginSessionError(
@@ -633,16 +650,16 @@ export const resumeRememberedDevice = async () => {
       false
     )
   }
-  const key = await abToCryptoKey(base64ToBuffer(state.masterEncryptionKey))
   if (device.state !== state)
     throw new LoginSessionError('Vault was locked', true)
+  const key = await abToCryptoKey(base64ToBuffer(state.masterEncryptionKey))
   await completeLogin(
     {
       session: { ...createEmptyLoginSession(), email: state.email },
       challenge,
       device: deviceInfo
     },
-    key
+    { key, state }
   )
 }
 

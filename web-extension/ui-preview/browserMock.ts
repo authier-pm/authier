@@ -14,9 +14,22 @@ const gmailTab = {
   url: 'https://mail.google.com/mail/u/0/#inbox',
   incognito: false
 }
+const googleMessagesTab = {
+  id: 43,
+  windowId: 7,
+  url: 'https://messages.google.com/web/conversations/6',
+  incognito: false
+}
+const previewTabs = [gmailTab, googleMessagesTab]
 let activeTabId = 17
 const alarmListeners = new Set<(alarm: { name: string }) => void>()
-const alarms = new Map<string, ReturnType<typeof setTimeout>>()
+type PreviewAlarm = {
+  name: string
+  scheduledTime: number
+  periodInMinutes?: number
+  timer: ReturnType<typeof setTimeout>
+}
+const alarms = new Map<string, PreviewAlarm>()
 let badgeText = ''
 let messageHandler:
   | ((message: unknown) => Promise<unknown> | undefined)
@@ -131,29 +144,50 @@ const browser = {
         alarmListeners.add(listener)
       }
     },
-    create: async (name: string, { when }: { when: number }) => {
-      clearTimeout(alarms.get(name))
-      alarms.set(
+    get: async (name: string) => {
+      const alarm = alarms.get(name)
+      if (!alarm) return undefined
+      return {
         name,
-        setTimeout(
+        scheduledTime: alarm.scheduledTime,
+        periodInMinutes: alarm.periodInMinutes
+      }
+    },
+    create: async (
+      name: string,
+      { when, periodInMinutes }: { when?: number; periodInMinutes?: number }
+    ) => {
+      clearTimeout(alarms.get(name)?.timer)
+      const schedule = (scheduledTime: number) => {
+        const timer = setTimeout(
           () => {
+            if (periodInMinutes) schedule(Date.now() + periodInMinutes * 60_000)
+            else alarms.delete(name)
             for (const listener of alarmListeners) listener({ name })
           },
-          Math.max(0, when - Date.now())
+          Math.max(0, scheduledTime - Date.now())
         )
-      )
+        alarms.set(name, { name, scheduledTime, periodInMinutes, timer })
+      }
+      schedule(when ?? Date.now() + (periodInMinutes ?? 0) * 60_000)
     },
     clear: async (name: string) => {
-      clearTimeout(alarms.get(name))
+      clearTimeout(alarms.get(name)?.timer)
       return alarms.delete(name)
     }
   },
   tabs: {
-    query: async () => [{ ...gmailTab, active: activeTabId === gmailTab.id }],
+    query: async ({ url }: { url?: string } = {}) =>
+      previewTabs
+        .filter((tab) => !url || tab.url.startsWith(url.replace(/\*$/, '')))
+        .map((tab) => ({ ...tab, active: activeTabId === tab.id })),
     update: async (tabId: number, _details: { active: boolean }) => {
       activeTabId = tabId
       for (const listener of tabListeners) listener()
-      return { ...gmailTab, active: true }
+      return {
+        ...previewTabs.find((tab) => tab.id === tabId),
+        active: true
+      }
     },
     create: async (_details: { url: string; active: boolean }) => undefined,
     sendMessage: async (_tabId: number, message: unknown) =>

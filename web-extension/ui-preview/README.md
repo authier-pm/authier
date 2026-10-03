@@ -29,11 +29,41 @@ badge for a new code. The favicon response is a deterministic fixture.
 It captures `docs/screenshots/email-verification-codes.png` and
 `docs/screenshots/email-verification-codes-copied.png`.
 
+The `inline-verification-codes` scenario recreates Shopify's six separate code
+inputs with React-controlled values and runs the production inline picker, fill
+helper, and background handler. The Authier logo opens masked choices on click;
+email suggestions match the current site's registrable domain. SMS codes are
+explicit choices because phone sender IDs cannot reliably identify a website.
+Run `pnpm playwright:ui-preview inlineVerificationCodes.spec.ts` to check filling,
+single-field entry, late-mounted/replaced forms, keyboard dismissal, blocked
+script-generated clicks, and mobile positioning. It captures
+`docs/screenshots/inline-verification-codes.png`,
+`docs/screenshots/inline-verification-codes-filled.png`, and
+`docs/screenshots/inline-verification-codes-mobile.png`.
+Use `&single=1` or `&late=1` for those scenario variants.
+
+The `sms-verification-codes` scenario runs the production Google Messages for Web
+observer against a sanitized Messages DOM (`fixtures/googleMessagesConversation.ts`),
+and feeds the background an already-decrypted code relayed by an Android phone.
+Run `bun run playwright:ui-preview smsVerificationCodes.spec.ts` to verify that
+unread previews and the open thread's newest code appear masked while older codes,
+amounts and card numbers do not, copying and revealing, a phone relay arriving
+while the popup is open, and opening the Messages tab without copying. It captures
+`docs/screenshots/sms-verification-codes.png` and
+`docs/screenshots/sms-verification-codes-copied.png`.
+
+Add `&phone-only=1` to the `sms-verification-codes` scenario to start with the
+popup closed and no web-app codes. The same Playwright suite advances the mock
+browser alarm, verifies that a phone SMS raises the toolbar badge without a popup,
+then opens and copies it to clear the badge. It captures
+`docs/screenshots/sms-background-badge.png`.
+
 For a real Chromium extension smoke test, run `bun scripts/generateExtensionManifest.ts`,
-`bun run prodBuild`, then `bunx playwright test --config playwrightEmailCodes.config.ts`
+`bun run prodBuild`, then `bunx playwright test --config playwrightVerificationCodes.config.ts`
 from `web-extension`. It loads the production build into a disposable profile,
-intercepts all network requests, and verifies Gmail injection, native badge and
-alarm APIs, popup navigation, deduplication and expiry against synthetic mail.
+intercepts all network requests, and verifies Gmail and Google Messages injection,
+native badge and alarm APIs, popup navigation, deduplication and expiry against
+synthetic mail and texts.
 
 The `kostkohratky-password` scenario reproduces the supplied Czech registration
 form without live tokens. It runs production detection, classification validation,
@@ -97,6 +127,23 @@ clearing an empty search restores the list, and resizing updates the visible
 items in Firefox and Chromium. Screenshots are captured under
 `docs/screenshots/vault-scrolling-{table,cards}-{firefox,chromium}.png`.
 
+The `offline-vault` scenario (`scenarios/offlineVault.ts`) renders the actual built
+extension in a disposable Chromium profile with encrypted synthetic passwords,
+a TOTP and a passkey. All network traffic is intercepted. Run from `web-extension`:
+
+```sh
+bun run prodBuild
+bunx playwright test --config playwrightOfflineVault.config.ts
+```
+
+It covers a disconnected network, HTTP 503 with an expired session, GraphQL
+database errors, and session renewal returning no items before subsequent
+requests fail. It checks that cached items render while requests are pending
+and remain visible after retry and reload, search and password reveal work,
+both card and table views remain populated, and a successful retry clears the
+offline notice. It captures
+`docs/screenshots/offline-vault.png`.
+
 The `bitfinex-totp` scenario exercises the production account picker and OTP fill
 against a synthetic Bitfinex login and its asynchronous document-level paste
 handler. Its deliberately broad saved username selector also matches the OTP
@@ -127,6 +174,10 @@ debug app, launch the demo intent with `--ei tab 1`, capture the master view, ta
 the non-master view. Demo transfers change only synthetic in-memory state.
 `DeviceManagementTest` checks confirmation/cancellation, badge placement, busy
 controls, and non-master/unknown/stale-role restrictions in production Compose.
+
+The Android gallery includes `android-sms-relay-settings.png`, captured from the
+debug demo intent with `--ei tab 2` after scrolling to **SMS codes to browsers** and
+turning it on (demo mode needs no SMS permission and sends nothing).
 
 The Android gallery includes `android-unlock-settings.png` and
 `android-fingerprint-unlock.png`. Capture the production Compose screens with the

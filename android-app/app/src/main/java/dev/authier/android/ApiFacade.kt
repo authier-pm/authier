@@ -5,6 +5,7 @@ import dev.authier.android.generated.api.DevicesApi
 import dev.authier.android.generated.api.SecurityApi
 import dev.authier.android.generated.api.SessionApi
 import dev.authier.android.generated.api.VaultApi as GeneratedVaultApi
+import dev.authier.android.generated.api.VerificationCodesApi
 import dev.authier.android.generated.model.AddNewDeviceInput
 import dev.authier.android.generated.model.AuthenticatedSession
 import dev.authier.android.generated.model.CompleteDeviceLoginInput
@@ -19,6 +20,7 @@ import dev.authier.android.generated.model.PendingDeviceApproval
 import dev.authier.android.generated.model.RefreshInput
 import dev.authier.android.generated.model.SecurityUpdateResetConfigRequest
 import dev.authier.android.generated.model.RegisterInput
+import dev.authier.android.generated.model.RelayVerificationCodeInput
 import dev.authier.android.generated.model.RequestDeviceChallengeInput
 import dev.authier.android.generated.model.SecretRecord as ApiSecret
 import dev.authier.android.generated.model.SecurityState
@@ -73,6 +75,7 @@ class ApiFacade(serverUrl: String, private var currentDeviceId: String? = null) 
     private val vault = retrofit.create(GeneratedVaultApi::class.java)
     private val device = retrofit.create(DevicesApi::class.java)
     private val settings = retrofit.create(SecurityApi::class.java)
+    private val codes = retrofit.create(VerificationCodesApi::class.java)
 
     override suspend fun register(email: String, userId: String, deviceId: String, deviceName: String, secret: DeviceSecretInput, recoveryConfig: MasterDeviceResetConfig) = request {
         val config = recoveryConfig.validated()
@@ -100,6 +103,7 @@ class ApiFacade(serverUrl: String, private var currentDeviceId: String? = null) 
 
     override suspend fun logout() { request { auth.authLogout(emptyInput) } }
     suspend fun updatePushToken(token: String?) { request { session.sessionUpdatePushToken(SessionUpdatePushTokenRequest(token)) } }
+    suspend fun relayVerificationCode(id: String, encrypted: String) { request { codes.verificationCodesRelay(RelayVerificationCodeInput(id, encrypted)) } }
     override suspend fun bootstrap() = request { session.sessionBootstrap(emptyInput).toDomain() }
     override suspend fun sync(cursor: String?) = request {
         val page = vault.vaultSync(VaultSyncInput(cursor, 200))

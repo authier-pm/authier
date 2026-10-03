@@ -47,6 +47,7 @@ fun SettingsScreen(state: VaultUiState, model: VaultViewModel) {
         item {
             UnlockSettings(state, model)
         }
+        item { SmsRelaySettings(state, model) }
 
         item {
             SettingSection("NEW DEVICE ACCESS", "Protect new sign-ins with approval from a trusted device.") {

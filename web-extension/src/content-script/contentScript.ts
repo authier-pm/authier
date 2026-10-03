@@ -38,6 +38,7 @@ import { getSelectorForElement } from './cssSelectorGenerators'
 import { WebInputsArrayClientSide } from '../background/WebInputForAutofill'
 import { isAutofillPagePauseRefreshMessage } from '../background/autofillPagePause'
 import { removeLoginCredOption } from './renderLoginCredOption'
+import { startVerificationCodePicker } from './renderVerificationCodePicker'
 
 const log = debug('au:contentScript')
 localStorage.debug = localStorage.debug || 'au:*' // enable all debug messages, TODO remove this for production
@@ -138,9 +139,7 @@ const persistCapturedInputs = () => {
   })
 }
 
-export async function initInputWatch(
-  shouldStart: () => boolean = () => true
-) {
+export async function initInputWatch(shouldStart: () => boolean = () => true) {
   const nextState = await trpc.getContentScriptInitialState.query()
 
   if (!shouldStart()) {
@@ -167,6 +166,10 @@ export async function initInputWatch(
 
   const bodyInputChangeObserver = startBodyInputChangeObserver()
   contentScriptRender(stateInitRes)
+  const stopVerificationCodePicker =
+    window === window.top && location.protocol === 'https:'
+      ? startVerificationCodePicker(autofillEventsDispatched)
+      : () => undefined
 
   const stopAutofillListener = autofill(stateInitRes)
 
@@ -294,6 +297,7 @@ export async function initInputWatch(
     debouncedAutofill.cancel()
 
     stopAutofillListener()
+    stopVerificationCodePicker()
     bodyInputChangeObserver.disconnect()
     bodyInputChangeEmitter.off('inputRemoved', onInputRemoved)
     bodyInputChangeEmitter.off('inputAdded', onInputAdded)
@@ -333,51 +337,49 @@ new MutationObserver(() => {
   }
 }).observe(document, { subtree: true, childList: true })
 
-browser.runtime.onMessage.addListener(
-  (message: unknown) => {
-    if (isAutofillPagePauseRefreshMessage(message)) {
-      void refreshInputWatch()
-      return
-    }
-
-    if (!isTotpFillOnClickMessage(message)) {
-      return
-    }
-
-    const totpMessage = message
-
-    if (totpMessage.kind === PopupActionsEnum.TOTP_FILL_ON_CLICK) {
-      async function elementSelected(event) {
-        event.preventDefault()
-        event.stopPropagation() // Stop the event from propagating further
-
-        document.removeEventListener('click', elementSelected, true) // Remove the event listener
-
-        const selectedElement = event.target // Correctly gets the clicked element
-        if (selectedElement.tagName !== 'INPUT') {
-          notyf.error('You must select an input element')
-        }
-        selectedElement.style.backgroundColor = 'yellow' // Highlight the selected element
-
-        const elementSelector = getSelectorForElement(selectedElement)
-        const webInput: WebInputElement = {
-          domPath: elementSelector.css,
-          domOrdinal: elementSelector.domOrdinal,
-          kind: WebInputType.TOTP,
-          url: location.href
-        }
-        await trpc.addTOTPInput.mutate(webInput)
-        const messageEvent = totpMessage.event
-
-        if (messageEvent?.otpCode) {
-          autofillValueIntoInput(selectedElement, messageEvent?.otpCode)
-          notyf.success(
-            `TOTP WebInput added for selector "${elementSelector.css}"`
-          )
-        }
-      }
-
-      document.addEventListener('click', elementSelected, true) // Use capturing to handle the event first
-    }
+browser.runtime.onMessage.addListener((message: unknown) => {
+  if (isAutofillPagePauseRefreshMessage(message)) {
+    void refreshInputWatch()
+    return
   }
-)
+
+  if (!isTotpFillOnClickMessage(message)) {
+    return
+  }
+
+  const totpMessage = message
+
+  if (totpMessage.kind === PopupActionsEnum.TOTP_FILL_ON_CLICK) {
+    async function elementSelected(event) {
+      event.preventDefault()
+      event.stopPropagation() // Stop the event from propagating further
+
+      document.removeEventListener('click', elementSelected, true) // Remove the event listener
+
+      const selectedElement = event.target // Correctly gets the clicked element
+      if (selectedElement.tagName !== 'INPUT') {
+        notyf.error('You must select an input element')
+      }
+      selectedElement.style.backgroundColor = 'yellow' // Highlight the selected element
+
+      const elementSelector = getSelectorForElement(selectedElement)
+      const webInput: WebInputElement = {
+        domPath: elementSelector.css,
+        domOrdinal: elementSelector.domOrdinal,
+        kind: WebInputType.TOTP,
+        url: location.href
+      }
+      await trpc.addTOTPInput.mutate(webInput)
+      const messageEvent = totpMessage.event
+
+      if (messageEvent?.otpCode) {
+        autofillValueIntoInput(selectedElement, messageEvent?.otpCode)
+        notyf.success(
+          `TOTP WebInput added for selector "${elementSelector.css}"`
+        )
+      }
+    }
+
+    document.addEventListener('click', elementSelected, true) // Use capturing to handle the event first
+  }
+})

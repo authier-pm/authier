@@ -1,0 +1,820 @@
+<!doctype html>
+<html lang="en">
+  <meta charset="utf-8" /><meta
+    name="viewport"
+    content="width=device-width,initial-scale=1"
+  />
+  <title>Authier · MiniLM SMS extraction evaluation</title>
+  <style>
+    :root {
+      color-scheme: light dark;
+      font:
+        16px/1.55 system-ui,
+        sans-serif;
+      background: #0d1919;
+      color: #e7f0ed;
+    }
+    body {
+      max-width: 1150px;
+      margin: 40px auto;
+      padding: 0 24px;
+    }
+    h1 {
+      font-size: 34px;
+      letter-spacing: -0.7px;
+      line-height: 1.2;
+    }
+    h2 {
+      margin-top: 38px;
+      font-size: 23px;
+    }
+    p {
+      max-width: 900px;
+      color: #bed0ca;
+    }
+    small {
+      color: #94aaa3;
+      margin-left: 8px;
+    }
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+      gap: 12px;
+      margin: 25px 0;
+    }
+    .card {
+      padding: 18px;
+      background: #182c29;
+      border: 1px solid #304b43;
+      border-radius: 12px;
+    }
+    .card strong {
+      display: block;
+      font-size: 27px;
+      color: #9bd2b6;
+    }
+    .note {
+      padding: 16px 20px;
+      border-left: 4px solid #dab776;
+      background: #302b20;
+      color: #eddec5;
+    }
+    .table {
+      overflow: auto;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+    th,
+    td {
+      text-align: left;
+      padding: 10px 12px;
+      border-bottom: 1px solid #29403a;
+    }
+    thead th {
+      color: #9bd2b6;
+      background: #142622;
+    }
+    tbody th {
+      font-weight: 500;
+    }
+    td {
+      font-variant-numeric: tabular-nums;
+    }
+    code {
+      font-size: 13px;
+      overflow-wrap: anywhere;
+    }
+    li {
+      color: #bed0ca;
+    }
+    a {
+      color: #9bd2b6;
+    }
+    summary {
+      cursor: pointer;
+      margin: 18px 0;
+    }
+  </style>
+  <body>
+    <p>AUTHIER · LOCAL MODEL EXPERIMENT</p>
+    <h1>MiniLM SMS extraction<br />30-language evaluation</h1>
+    <p>
+      Selected epoch 4. The final test set was held out from training,
+      checkpoint selection, and abstention-threshold calibration. Both FP32 and
+      INT8 versions were evaluated. Final INT8 evaluation uses one unpadded SMS
+      per inference, matching the local extraction command.
+    </p>
+    <div class="note">
+      <strong>Not ready for app integration.</strong> Held-out extraction
+      precision is 75.38%; 22.29% of messages without a verification code
+      incorrectly produce one. Synthetic results do not establish real-world
+      accuracy or performance on a 4 GB Android phone.
+    </div>
+    <div class="cards">
+      <div class="card"><strong>9,450</strong>held-out messages</div>
+      <div class="card">
+        <strong>85.29%</strong>correct code recovery · INT8
+      </div>
+      <div class="card"><strong>75.38%</strong>extraction precision · INT8</div>
+      <div class="card">
+        <strong>90.00%</strong>letters-only recovery · INT8
+      </div>
+      <div class="card"><strong>118.1 MB</strong>INT8 model weights</div>
+    </div>
+    <h2>What was trained and tested</h2>
+    <p>
+      46,200 training messages, 5,040 validation messages, and 9,450 test
+      messages. Translated template families, synthetic brands and generated
+      codes are split globally. Repeating a template with different codes
+      creates correlated examples, not independent evidence of language
+      understanding.
+    </p>
+    <p>
+      Codes contain 4–10 characters: digits, random
+      uppercase/lowercase/mixed-case Latin letters, mixtures of letters and
+      digits, and separated characters. Unicode decimal digits are normalized.
+      Case and leading zeroes are preserved. Each language has 140 code-bearing
+      and 175 no-code test messages, including 60 letters-only cases.
+    </p>
+    <h2>Every supported language</h2>
+    <p>
+      Recovery means the exact code was returned. Precision counts a wrong code
+      as an error, including choosing an obsolete code. False positives are
+      codes returned for messages with no valid verification code.
+    </p>
+    <div class="table">
+      <table>
+        <thead>
+          <tr>
+            <th>Language</th>
+            <th>Cases</th>
+            <th>FP32 recovery</th>
+            <th>INT8 recovery</th>
+            <th>INT8 precision</th>
+            <th>Letters-only recovery</th>
+            <th>False positives</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th>Bengali <small>bn</small></th>
+            <td>315</td>
+            <td>91.43%</td>
+            <td>83.57%</td>
+            <td>81.25%</td>
+            <td>85.00%</td>
+            <td>27 / 175</td>
+          </tr>
+          <tr>
+            <th>Bulgarian <small>bg</small></th>
+            <td>315</td>
+            <td>77.14%</td>
+            <td>77.86%</td>
+            <td>100.00%</td>
+            <td>78.33%</td>
+            <td>0 / 175</td>
+          </tr>
+          <tr>
+            <th>Croatian <small>hr</small></th>
+            <td>315</td>
+            <td>92.86%</td>
+            <td>91.43%</td>
+            <td>68.45%</td>
+            <td>95.00%</td>
+            <td>59 / 175</td>
+          </tr>
+          <tr>
+            <th>Czech <small>cs</small></th>
+            <td>315</td>
+            <td>89.29%</td>
+            <td>85.71%</td>
+            <td>71.86%</td>
+            <td>85.00%</td>
+            <td>47 / 175</td>
+          </tr>
+          <tr>
+            <th>Danish <small>da</small></th>
+            <td>315</td>
+            <td>89.29%</td>
+            <td>87.86%</td>
+            <td>78.85%</td>
+            <td>93.33%</td>
+            <td>33 / 175</td>
+          </tr>
+          <tr>
+            <th>Dutch <small>nl</small></th>
+            <td>315</td>
+            <td>94.29%</td>
+            <td>91.43%</td>
+            <td>73.99%</td>
+            <td>98.33%</td>
+            <td>45 / 175</td>
+          </tr>
+          <tr>
+            <th>English <small>en</small></th>
+            <td>315</td>
+            <td>89.29%</td>
+            <td>86.43%</td>
+            <td>77.56%</td>
+            <td>90.00%</td>
+            <td>35 / 175</td>
+          </tr>
+          <tr>
+            <th>Estonian <small>et</small></th>
+            <td>315</td>
+            <td>89.29%</td>
+            <td>89.29%</td>
+            <td>75.76%</td>
+            <td>95.00%</td>
+            <td>40 / 175</td>
+          </tr>
+          <tr>
+            <th>Finnish <small>fi</small></th>
+            <td>315</td>
+            <td>92.14%</td>
+            <td>90.00%</td>
+            <td>78.26%</td>
+            <td>100.00%</td>
+            <td>35 / 175</td>
+          </tr>
+          <tr>
+            <th>French <small>fr</small></th>
+            <td>315</td>
+            <td>95.00%</td>
+            <td>92.86%</td>
+            <td>66.33%</td>
+            <td>100.00%</td>
+            <td>66 / 175</td>
+          </tr>
+          <tr>
+            <th>German <small>de</small></th>
+            <td>315</td>
+            <td>89.29%</td>
+            <td>89.29%</td>
+            <td>79.62%</td>
+            <td>93.33%</td>
+            <td>32 / 175</td>
+          </tr>
+          <tr>
+            <th>Greek <small>el</small></th>
+            <td>315</td>
+            <td>82.86%</td>
+            <td>79.29%</td>
+            <td>68.94%</td>
+            <td>88.33%</td>
+            <td>50 / 175</td>
+          </tr>
+          <tr>
+            <th>Hindi <small>hi</small></th>
+            <td>315</td>
+            <td>88.57%</td>
+            <td>75.71%</td>
+            <td>97.25%</td>
+            <td>75.00%</td>
+            <td>3 / 175</td>
+          </tr>
+          <tr>
+            <th>Hungarian <small>hu</small></th>
+            <td>315</td>
+            <td>93.57%</td>
+            <td>90.71%</td>
+            <td>66.15%</td>
+            <td>96.67%</td>
+            <td>65 / 175</td>
+          </tr>
+          <tr>
+            <th>Indonesian <small>id</small></th>
+            <td>315</td>
+            <td>81.43%</td>
+            <td>81.43%</td>
+            <td>69.94%</td>
+            <td>83.33%</td>
+            <td>49 / 175</td>
+          </tr>
+          <tr>
+            <th>Irish <small>ga</small></th>
+            <td>315</td>
+            <td>86.43%</td>
+            <td>82.14%</td>
+            <td>76.67%</td>
+            <td>85.00%</td>
+            <td>35 / 175</td>
+          </tr>
+          <tr>
+            <th>Italian <small>it</small></th>
+            <td>315</td>
+            <td>85.71%</td>
+            <td>85.71%</td>
+            <td>64.17%</td>
+            <td>93.33%</td>
+            <td>67 / 175</td>
+          </tr>
+          <tr>
+            <th>Latvian <small>lv</small></th>
+            <td>315</td>
+            <td>80.00%</td>
+            <td>80.00%</td>
+            <td>77.78%</td>
+            <td>88.33%</td>
+            <td>32 / 175</td>
+          </tr>
+          <tr>
+            <th>Lithuanian <small>lt</small></th>
+            <td>315</td>
+            <td>95.71%</td>
+            <td>93.57%</td>
+            <td>82.91%</td>
+            <td>96.67%</td>
+            <td>27 / 175</td>
+          </tr>
+          <tr>
+            <th>Maltese <small>mt</small></th>
+            <td>315</td>
+            <td>60.71%</td>
+            <td>50.71%</td>
+            <td>56.80%</td>
+            <td>58.33%</td>
+            <td>54 / 175</td>
+          </tr>
+          <tr>
+            <th>Mandarin Chinese <small>zh</small></th>
+            <td>315</td>
+            <td>96.43%</td>
+            <td>96.43%</td>
+            <td>82.32%</td>
+            <td>100.00%</td>
+            <td>29 / 175</td>
+          </tr>
+          <tr>
+            <th>Modern Standard Arabic <small>ar</small></th>
+            <td>315</td>
+            <td>97.14%</td>
+            <td>97.14%</td>
+            <td>70.10%</td>
+            <td>100.00%</td>
+            <td>58 / 175</td>
+          </tr>
+          <tr>
+            <th>Polish <small>pl</small></th>
+            <td>315</td>
+            <td>92.14%</td>
+            <td>89.29%</td>
+            <td>99.21%</td>
+            <td>95.00%</td>
+            <td>1 / 175</td>
+          </tr>
+          <tr>
+            <th>Portuguese <small>pt</small></th>
+            <td>315</td>
+            <td>88.57%</td>
+            <td>88.57%</td>
+            <td>77.50%</td>
+            <td>96.67%</td>
+            <td>36 / 175</td>
+          </tr>
+          <tr>
+            <th>Romanian <small>ro</small></th>
+            <td>315</td>
+            <td>86.43%</td>
+            <td>86.43%</td>
+            <td>78.57%</td>
+            <td>93.33%</td>
+            <td>33 / 175</td>
+          </tr>
+          <tr>
+            <th>Slovak <small>sk</small></th>
+            <td>315</td>
+            <td>74.29%</td>
+            <td>66.43%</td>
+            <td>73.23%</td>
+            <td>71.67%</td>
+            <td>34 / 175</td>
+          </tr>
+          <tr>
+            <th>Slovenian <small>sl</small></th>
+            <td>315</td>
+            <td>82.86%</td>
+            <td>82.86%</td>
+            <td>78.91%</td>
+            <td>85.00%</td>
+            <td>31 / 175</td>
+          </tr>
+          <tr>
+            <th>Spanish <small>es</small></th>
+            <td>315</td>
+            <td>89.29%</td>
+            <td>88.57%</td>
+            <td>68.89%</td>
+            <td>95.00%</td>
+            <td>56 / 175</td>
+          </tr>
+          <tr>
+            <th>Swedish <small>sv</small></th>
+            <td>315</td>
+            <td>90.71%</td>
+            <td>88.57%</td>
+            <td>70.45%</td>
+            <td>91.67%</td>
+            <td>52 / 175</td>
+          </tr>
+          <tr>
+            <th>Urdu <small>ur</small></th>
+            <td>315</td>
+            <td>96.43%</td>
+            <td>89.29%</td>
+            <td>76.22%</td>
+            <td>93.33%</td>
+            <td>39 / 175</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <h2>Code categories · INT8</h2>
+    <div class="table">
+      <table>
+        <thead>
+          <tr>
+            <th>Category</th>
+            <th>Cases</th>
+            <th>Exact match</th>
+            <th>Correct codes / code-bearing cases</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th>alphanumeric</th>
+            <td>600</td>
+            <td>92.33%</td>
+            <td>554 / 600</td>
+          </tr>
+          <tr>
+            <th>lettersLower</th>
+            <td>600</td>
+            <td>87.83%</td>
+            <td>527 / 600</td>
+          </tr>
+          <tr>
+            <th>lettersMixed</th>
+            <td>600</td>
+            <td>92.33%</td>
+            <td>554 / 600</td>
+          </tr>
+          <tr>
+            <th>lettersUpper</th>
+            <td>600</td>
+            <td>89.83%</td>
+            <td>539 / 600</td>
+          </tr>
+          <tr>
+            <th>noCode</th>
+            <td>5250</td>
+            <td>77.71%</td>
+            <td>0 / 0</td>
+          </tr>
+          <tr>
+            <th>numeric</th>
+            <td>600</td>
+            <td>74.67%</td>
+            <td>448 / 600</td>
+          </tr>
+          <tr>
+            <th>separated</th>
+            <td>600</td>
+            <td>86.00%</td>
+            <td>516 / 600</td>
+          </tr>
+          <tr>
+            <th>unicodeDigits</th>
+            <td>600</td>
+            <td>74.00%</td>
+            <td>444 / 600</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <h2>Desktop measurements</h2>
+    <p>
+      Linux x86_64, AMD Ryzen 9 9900X, ONNX CPU, 4 threads. Batch size one, 300
+      validation messages. Median inference 1.3 ms; p95 2.2 ms. Median input 24
+      tokens; longest 44 tokens. Peak process RSS 570.3 MB; resident RSS after
+      inference 503.0 MB. Memory is measured from Linux /proc/self/status in a
+      fresh process. Model load 0.37 s. Latency excludes tokenization and span
+      decoding. Disk caching can reduce load time. These are not Android
+      measurements.
+    </p>
+    <h2>Limits and outstanding validation</h2>
+    <ul>
+      <li>Synthetic data only; no real-world accuracy claim.</li>
+      <li>Translations have not been reviewed by native speakers.</li>
+      <li>
+        Cases sharing a template are correlated; counts are not independent
+        language samples.
+      </li>
+      <li>
+        Codes support 4–10 ASCII letters/digits after Unicode digit and NFKC
+        normalization.
+      </li>
+      <li>No Android integration or 4 GB device benchmark yet.</li>
+    </ul>
+    <details>
+      <summary>Example failures, at most one per language</summary>
+      <div class="table">
+        <table>
+          <thead>
+            <tr>
+              <th>Language</th>
+              <th>Synthetic SMS</th>
+              <th>Expected</th>
+              <th>Returned</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th>fr</th>
+              <td dir="auto">
+                Code de suivi de l&#x27;envoi : YJ B3 dq VP v. Ce n&#x27;est pas
+                un mot de passe de connexion.
+              </td>
+              <td><code>None</code></td>
+              <td><code>YJB3dqVPv</code></td>
+            </tr>
+            <tr>
+              <th>nl</th>
+              <td dir="auto">
+                Traceercode van de zending: SyasS. Dit is geen inlogwachtwoord.
+              </td>
+              <td><code>None</code></td>
+              <td><code>SyasS</code></td>
+            </tr>
+            <tr>
+              <th>da</th>
+              <td dir="auto">
+                [Tern] Sikkerhedskontrol planlagt til 2026-05-01. Din
+                supportreference er 86017483.
+              </td>
+              <td><code>None</code></td>
+              <td><code>86017483</code></td>
+            </tr>
+            <tr>
+              <th>sl</th>
+              <td dir="auto">
+                Tern: Varnostni pregled je načrtovan za 2026-04-13. Referenca
+                vašega zahtevka za podporo je 29624730.
+              </td>
+              <td><code>None</code></td>
+              <td><code>29624730</code></td>
+            </tr>
+            <tr>
+              <th>pt</th>
+              <td dir="auto">
+                Cobalt] Verificação de segurança agendada para 2026-09-06. A
+                referência de apoio é 94246441.
+              </td>
+              <td><code>None</code></td>
+              <td><code>94246441</code></td>
+            </tr>
+            <tr>
+              <th>id</th>
+              <td dir="auto">
+                Pemeriksaan keamanan dijadwalkan pada 2026-06-26. Referensi
+                bantuan Anda adalah 37369801.
+              </td>
+              <td><code>None</code></td>
+              <td><code>37369801</code></td>
+            </tr>
+            <tr>
+              <th>ga</th>
+              <td dir="auto">
+                Seiceáil slándála socraithe don dáta 2026-02-07. Is é 28478369
+                do thagairt tacaíochta.
+              </td>
+              <td><code>None</code></td>
+              <td><code>28478369</code></td>
+            </tr>
+            <tr>
+              <th>sk</th>
+              <td dir="auto">
+                Bezpečnostná kontrola je naplánovaná na 2026-08-27. Číslo
+                požiadavky podpory je 2220853.
+              </td>
+              <td><code>None</code></td>
+              <td><code>2220853</code></td>
+            </tr>
+            <tr>
+              <th>en</th>
+              <td dir="auto">
+                Security check scheduled for 2026-12-11. Your support reference
+                is 15682217.
+              </td>
+              <td><code>None</code></td>
+              <td><code>15682217</code></td>
+            </tr>
+            <tr>
+              <th>it</th>
+              <td dir="auto">
+                [Tern Codice di tracciamento della spedizione: HUQQO. Non è una
+                password di accesso.
+              </td>
+              <td><code>None</code></td>
+              <td><code>HUQQO</code></td>
+            </tr>
+            <tr>
+              <th>lt</th>
+              <td dir="auto">
+                Saugumo patikra numatyta 2026-02-19. Jūsų pagalbos užklausos
+                numeris yra 37040990.
+              </td>
+              <td><code>None</code></td>
+              <td><code>20260219</code></td>
+            </tr>
+            <tr>
+              <th>fi</th>
+              <td dir="auto">
+                Turvatarkastus on ajoitettu päivälle 2026-11-07. Tukipyyntösi
+                viite on 56471541.
+              </td>
+              <td><code>None</code></td>
+              <td><code>56471541</code></td>
+            </tr>
+            <tr>
+              <th>hu</th>
+              <td dir="auto">
+                Küldemény nyomkövetési kódja: CmyakIt. Ez nem bejelentkezési
+                jelszó.
+              </td>
+              <td><code>None</code></td>
+              <td><code>CmyakIt</code></td>
+            </tr>
+            <tr>
+              <th>sv</th>
+              <td dir="auto">
+                Säkerhetskontroll planerad till 2026-05-10. Din supportreferens
+                är 19446545.
+              </td>
+              <td><code>None</code></td>
+              <td><code>19446545</code></td>
+            </tr>
+            <tr>
+              <th>mt</th>
+              <td dir="auto">
+                Kodiċi tat-traċċar tal-kunsinna: BrAPkTQcp. Mhuwiex password
+                għad-dħul.
+              </td>
+              <td><code>None</code></td>
+              <td><code>BrAPkTQcp</code></td>
+            </tr>
+            <tr>
+              <th>lv</th>
+              <td dir="auto">
+                Apstipriniet pārskaitījumu 8204.47 EUR no kartes **3978 ar
+                NPO·F.
+              </td>
+              <td><code>NPOF</code></td>
+              <td><code>None</code></td>
+            </tr>
+            <tr>
+              <th>hi</th>
+              <td dir="auto">
+                [Marula अंतिम अंक 1108 वाले कार्ड से 8482.77 EUR का हस्तांतरण
+                196·733·45 से स्वीकार करें।
+              </td>
+              <td><code>19673345</code></td>
+              <td><code>None</code></td>
+            </tr>
+            <tr>
+              <th>el</th>
+              <td dir="auto">
+                Έλεγχος ασφαλείας προγραμματισμένος για 2026-06-08. Η αναφορά
+                υποστήριξής σας είναι 76384453.
+              </td>
+              <td><code>None</code></td>
+              <td><code>76384453</code></td>
+            </tr>
+            <tr>
+              <th>bn</th>
+              <td dir="auto">
+                নিরাপত্তা পরীক্ষা 2026-06-26-এ নির্ধারিত। আপনার সহায়তা
+                রেফারেন্স 42031385।
+              </td>
+              <td><code>None</code></td>
+              <td><code>42031385</code></td>
+            </tr>
+            <tr>
+              <th>zh</th>
+              <td dir="auto">
+                安全检查安排在2026-02-11,客服参考编号为51619250。
+              </td>
+              <td><code>None</code></td>
+              <td><code>20260211</code></td>
+            </tr>
+            <tr>
+              <th>bg</th>
+              <td dir="auto">
+                Одобрете превода от 4086.89 EUR от карта **9239 с IuEktAGz.
+              </td>
+              <td><code>IuEktAGz</code></td>
+              <td><code>None</code></td>
+            </tr>
+            <tr>
+              <th>es</th>
+              <td dir="auto">
+                Cobalt] Código de seguimiento del envío: VukQaT. No es una
+                contraseña de acceso.
+              </td>
+              <td><code>None</code></td>
+              <td><code>VukQaT</code></td>
+            </tr>
+            <tr>
+              <th>cs</th>
+              <td dir="auto">
+                Kód pro sledování zásilky: y8j4kp9jfG. Nejde o přihlašovací
+                heslo.
+              </td>
+              <td><code>None</code></td>
+              <td><code>y8j4kp9jfG</code></td>
+            </tr>
+            <tr>
+              <th>ur</th>
+              <td dir="auto">
+                Cobalt پارسل کا ٹریکنگ کوڈ: WKA T۔ یہ لاگ ان کا پاس ورڈ نہیں ہے۔
+              </td>
+              <td><code>None</code></td>
+              <td><code>WKAT</code></td>
+            </tr>
+            <tr>
+              <th>ro</th>
+              <td dir="auto">
+                Verificare de securitate programată pentru 2026-07-14. Referința
+                ta de asistență este 63442784.
+              </td>
+              <td><code>None</code></td>
+              <td><code>63442784</code></td>
+            </tr>
+            <tr>
+              <th>hr</th>
+              <td dir="auto">
+                Sigurnosna provjera zakazana je za 2026-05-05. Vaša referenca za
+                podršku je 78017699.
+              </td>
+              <td><code>None</code></td>
+              <td><code>78017699</code></td>
+            </tr>
+            <tr>
+              <th>et</th>
+              <td dir="auto">
+                Keegi siseneb sinu Marula kontole. Kui see oled sina, kirjuta
+                kinnitusekraanile Kane.
+              </td>
+              <td><code>Kane</code></td>
+              <td><code>None</code></td>
+            </tr>
+            <tr>
+              <th>ar</th>
+              <td dir="auto">
+                فحص الأمان مقرر في 2026-11-28. رقم مرجع الدعم هو 45259935.
+              </td>
+              <td><code>None</code></td>
+              <td><code>45259935</code></td>
+            </tr>
+            <tr>
+              <th>de</th>
+              <td dir="auto">
+                Genehmige die Überweisung von 7757.13 EUR von Karte **5852 mit
+                9795095068.
+              </td>
+              <td><code>9795095068</code></td>
+              <td><code>None</code></td>
+            </tr>
+            <tr>
+              <th>pl</th>
+              <td dir="auto">
+                Kontrola bezpieczeństwa zaplanowana na 2026-11-02. Numer
+                zgłoszenia do pomocy to 75761344.
+              </td>
+              <td><code>None</code></td>
+              <td><code>75761344</code></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </details>
+    <h2>Reproducibility</h2>
+    <p>
+      Training and evaluation scripts, seed, language templates, dependency
+      versions and data hashes are checked in beside this report. Large weights
+      and generated message files remain local in the ignored artifacts and
+      data/generated directories.
+    </p>
+    <p>
+      Base:
+      <a href="https://huggingface.co/microsoft/Multilingual-MiniLM-L12-H384"
+        >Microsoft Multilingual MiniLM L12 H384</a
+      >, revision <code>6e8c1ec6b4ec4e3fc6eb7d2cd834fcd582b61daf</code>.
+      Selected weights, decoder thresholds and ONNX SHA-256 checksums accompany
+      the local model.
+    </p>
+  </body>
+</html>
