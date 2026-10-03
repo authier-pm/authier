@@ -7,7 +7,7 @@ import {
   type VerificationCode
 } from './verificationCodeProtocol'
 
-// Phones relay a code within seconds; check while the popup is open.
+// Faster checks while open supplement the background alarm's 30-second checks.
 const RELAY_POLL_MS = 4000
 
 export const useVerificationCodes = () => {

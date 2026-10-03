@@ -8,6 +8,8 @@ import {
   VERIFICATION_CODE_LIFETIME_MS,
   VERIFICATION_CODE_EXPIRY_ALARM,
   VERIFICATION_CODE_STORAGE_KEY,
+  VERIFICATION_CODE_RELAY_ALARM,
+  VERIFICATION_CODE_RELAY_PERIOD_MINUTES,
   CodeMessageKind,
   codeMessageSchema,
   getGmailAccountScope,
@@ -156,7 +158,7 @@ const addRelayedCodes = async (
 }
 
 const syncRelayedCodes = () => {
-  // The popup polls; never stack requests while the backend is slow.
+  // Background alarms, popup and inline polls share a single backend request.
   relaySync ??= fetchRelayedCodes()
     .then((relayedCodes) =>
       updateState((state) => addRelayedCodes(state, relayedCodes))
@@ -257,16 +259,36 @@ export const handleVerificationCodeMessage = (
 }
 
 export const initializeVerificationCodes = (
-  options: { fetchRelayedCodes?: FetchRelayedCodes } = {}
+  options: {
+    fetchRelayedCodes?: FetchRelayedCodes
+    pollRelayedInBackground?: boolean
+  } = {}
 ) => {
   if (options.fetchRelayedCodes) fetchRelayedCodes = options.fetchRelayedCodes
+  const syncInBackground = () =>
+    syncRelayedCodes().catch((error: unknown) => {
+      // Keep cached codes and retry at the next alarm when offline.
+      console.warn('Could not check for codes from your phone', error)
+    })
   browser.alarms.onAlarm.addListener((alarm) => {
     if (alarm.name === VERIFICATION_CODE_EXPIRY_ALARM)
       void refreshVerificationCodes()
+    if (
+      options.pollRelayedInBackground &&
+      alarm.name === VERIFICATION_CODE_RELAY_ALARM
+    )
+      return syncInBackground()
   })
   browser.storage.onChanged.addListener((changes, area) => {
+    if (area !== 'session') return
+    const session = changes.backgroundState
     if (
-      area === 'session' &&
+      options.pollRelayedInBackground &&
+      session?.newValue &&
+      !session.oldValue
+    )
+      void syncInBackground()
+    if (
       VERIFICATION_CODE_STORAGE_KEY in changes &&
       changes[VERIFICATION_CODE_STORAGE_KEY].newValue === undefined
     ) {
@@ -274,4 +296,16 @@ export const initializeVerificationCodes = (
     }
   })
   void refreshVerificationCodes()
+  if (!options.pollRelayedInBackground) return Promise.resolve()
+  // Alarms can disappear on restart/update. Do not reset an existing schedule
+  // each time Chrome wakes the service worker for an event.
+  return browser.alarms
+    .get(VERIFICATION_CODE_RELAY_ALARM)
+    .then(async (alarm) => {
+      if (!alarm)
+        await browser.alarms.create(VERIFICATION_CODE_RELAY_ALARM, {
+          periodInMinutes: VERIFICATION_CODE_RELAY_PERIOD_MINUTES
+        })
+      await syncInBackground()
+    })
 }

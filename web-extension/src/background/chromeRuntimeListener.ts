@@ -85,8 +85,11 @@ let inputsUrl: string
 
 const tcProcedure = tc.procedure.use(loggerMiddleware)
 
-initializeVerificationCodes({
-  fetchRelayedCodes: fetchRelayedVerificationCodes
+void initializeVerificationCodes({
+  fetchRelayedCodes: fetchRelayedVerificationCodes,
+  pollRelayedInBackground: true
+}).catch((error: unknown) => {
+  console.error('Failed to initialize verification code polling', error)
 })
 
 void loginSessionManager.initialize().catch((error: unknown) => {

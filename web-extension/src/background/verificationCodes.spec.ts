@@ -5,6 +5,8 @@ import {
   VERIFICATION_CODE_LIFETIME_MS,
   VERIFICATION_CODE_EXPIRY_ALARM,
   VERIFICATION_CODE_STORAGE_KEY,
+  VERIFICATION_CODE_RELAY_ALARM,
+  VERIFICATION_CODE_RELAY_PERIOD_MINUTES,
   CodeMessageKind,
   GOOGLE_MESSAGES_URL,
   verificationCodesSchema
@@ -19,6 +21,7 @@ import {
 const setBadgeText = vi.fn().mockResolvedValue(undefined)
 const createAlarm = vi.fn().mockResolvedValue(undefined)
 const clearAlarm = vi.fn().mockResolvedValue(true)
+const getAlarm = vi.fn().mockResolvedValue(undefined)
 const updateTab = vi.fn().mockResolvedValue(undefined)
 const updateWindow = vi.fn().mockResolvedValue(undefined)
 const createWindow = vi.fn().mockResolvedValue(undefined)
@@ -79,6 +82,7 @@ beforeEach(() => {
     alarms: {
       create: createAlarm,
       clear: clearAlarm,
+      get: getAlarm,
       onAlarm: { addListener: vi.fn() }
     }
   })
@@ -88,6 +92,119 @@ beforeEach(() => {
   )
   vi.mocked(browser.storage.session.set).mockImplementation(async (items) => {
     Object.assign(storage, structuredClone(items))
+  })
+})
+
+describe('background phone relay polling', () => {
+  const fetchRelayedCodes = vi.fn<() => Promise<RelayedVerificationCode[]>>()
+  const initialize = () =>
+    initializeVerificationCodes({
+      fetchRelayedCodes,
+      pollRelayedInBackground: true
+    })
+  const tick = () => {
+    const listener = vi
+      .mocked(browser.alarms.onAlarm.addListener)
+      .mock.calls.at(-1)![0]
+    return listener({
+      name: VERIFICATION_CODE_RELAY_ALARM,
+      scheduledTime: Date.now()
+    })
+  }
+
+  beforeEach(() => {
+    fetchRelayedCodes.mockReset().mockResolvedValue([])
+    getAlarm.mockReset().mockResolvedValue(undefined)
+  })
+
+  it('checks on startup and schedules background checks without any popup message', async () => {
+    fetchRelayedCodes.mockResolvedValue([relayed()])
+    await initialize()
+    expect(createAlarm).toHaveBeenCalledWith(VERIFICATION_CODE_RELAY_ALARM, {
+      periodInMinutes: VERIFICATION_CODE_RELAY_PERIOD_MINUTES
+    })
+    expect(fetchRelayedCodes).toHaveBeenCalledTimes(1)
+    expect(setBadgeText).toHaveBeenLastCalledWith({ text: '•' })
+  })
+
+  it('badges a later arrival from the alarm and does not notify a copied code again', async () => {
+    await initialize()
+    fetchRelayedCodes.mockResolvedValue([relayed()])
+    await tick()
+    expect(setBadgeText).toHaveBeenLastCalledWith({ text: '•' })
+    const [entry] = await list()
+    await handleVerificationCodeMessage(
+      { kind: CodeMessageKind.COPIED, id: entry.id },
+      popupSender
+    )
+    await tick()
+    expect(await list()).toHaveLength(1)
+    expect(setBadgeText).toHaveBeenLastCalledWith({ text: '' })
+  })
+
+  it('keeps an existing alarm schedule when the worker restarts and recreates a missing one', async () => {
+    getAlarm.mockResolvedValue({ name: VERIFICATION_CODE_RELAY_ALARM })
+    await initialize()
+    expect(createAlarm).not.toHaveBeenCalledWith(
+      VERIFICATION_CODE_RELAY_ALARM,
+      expect.anything()
+    )
+    getAlarm.mockResolvedValue(undefined)
+    await initialize()
+    expect(createAlarm).toHaveBeenCalledWith(VERIFICATION_CODE_RELAY_ALARM, {
+      periodInMinutes: 0.5
+    })
+  })
+
+  it('joins overlapping background and popup polls and retries after an offline failure', async () => {
+    await initialize()
+    vi.spyOn(console, 'warn').mockImplementation(() => undefined)
+    fetchRelayedCodes.mockRejectedValueOnce(new Error('offline'))
+    await tick()
+    let finish!: (codes: RelayedVerificationCode[]) => void
+    fetchRelayedCodes.mockReturnValueOnce(
+      new Promise((resolve) => {
+        finish = resolve
+      })
+    )
+    const alarm = tick()
+    const popup = handleVerificationCodeMessage(
+      { kind: CodeMessageKind.SYNC_RELAYED },
+      popupSender
+    )
+    expect(fetchRelayedCodes).toHaveBeenCalledTimes(3)
+    finish([relayed()])
+    await Promise.all([alarm, popup])
+    expect(setBadgeText).toHaveBeenLastCalledWith({ text: '•' })
+    vi.restoreAllMocks()
+  })
+
+  it('checks immediately when unlocking, but skips ordinary vault saves', async () => {
+    await initialize()
+    fetchRelayedCodes.mockResolvedValue([relayed()])
+    const listener = vi
+      .mocked(browser.storage.onChanged.addListener)
+      .mock.calls.at(-1)![0]
+    listener(
+      { backgroundState: { oldValue: null, newValue: { userId: 'user' } } },
+      'session'
+    )
+    await handleVerificationCodeMessage(
+      { kind: CodeMessageKind.SYNC_RELAYED },
+      popupSender
+    )
+    expect(fetchRelayedCodes).toHaveBeenCalledTimes(2)
+    expect(setBadgeText).toHaveBeenLastCalledWith({ text: '•' })
+    listener(
+      {
+        backgroundState: {
+          oldValue: { userId: 'user' },
+          newValue: { userId: 'user' }
+        }
+      },
+      'session'
+    )
+    expect(fetchRelayedCodes).toHaveBeenCalledTimes(2)
   })
 })
 afterEach(() => {
