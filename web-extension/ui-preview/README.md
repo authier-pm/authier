@@ -39,6 +39,12 @@ while the popup is open, and opening the Messages tab without copying. It captur
 `docs/screenshots/sms-verification-codes.png` and
 `docs/screenshots/sms-verification-codes-copied.png`.
 
+Add `&phone-only=1` to the `sms-verification-codes` scenario to start with the
+popup closed and no web-app codes. The same Playwright suite advances the mock
+browser alarm, verifies that a phone SMS raises the toolbar badge without a popup,
+then opens and copies it to clear the badge. It captures
+`docs/screenshots/sms-background-badge.png`.
+
 For a real Chromium extension smoke test, run `bun scripts/generateExtensionManifest.ts`,
 `bun run prodBuild`, then `bunx playwright test --config playwrightVerificationCodes.config.ts`
 from `web-extension`. It loads the production build into a disposable profile,

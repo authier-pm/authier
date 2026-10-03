@@ -56,8 +56,12 @@ Authier for Android can relay codes from incoming SMS (see `android-app/README.m
 The phone encrypts `{ v: 1, code, sender, receivedAt }`
 (`shared/relayedVerificationCode.ts`) with the vault key and uploads only ciphertext
 to `/api/v1/verificationCodes/relay`. The server deletes it 10 minutes later.
-While the popup is open and the vault is unlocked, it asks the background to
-check for relayed codes every 4 seconds (GraphQL `me.relayedVerificationCodes`).
+While the extension vault is unlocked, the background checks for relayed codes
+on startup, on unlock and every 30 seconds through a browser alarm (GraphQL
+`me.relayedVerificationCodes`). New phone codes update the same red toolbar badge
+as email codes, including while the popup is closed. Browser alarms wake a
+suspended Chrome service worker; the schedule is restored if missing on startup.
+Alarms may be delayed during sleep or by the browser. Opening the popup adds faster checks every 4 seconds.
 The background decrypts them with the unlocked vault key. A code that cannot be
 decrypted, for example one encrypted before a master password change, is skipped.
 Polls never overlap. A locked extension leaves codes encrypted on the server.

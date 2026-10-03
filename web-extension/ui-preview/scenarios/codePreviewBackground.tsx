@@ -80,7 +80,10 @@ export const useCodePreviewBackground = ({
           : {})
       })
     })
-    initializeVerificationCodes({ fetchRelayedCodes })
+    void initializeVerificationCodes({
+      fetchRelayedCodes,
+      pollRelayedInBackground: !!fetchRelayedCodes
+    })
     const stop = observe(document, (candidates) =>
       browser.runtime.sendMessage({ kind: CodeMessageKind.REPORT, candidates })
     )

@@ -7,6 +7,8 @@ import {
 export const VERIFICATION_CODE_STORAGE_KEY = 'verificationCodes'
 export const VERIFICATION_CODE_LIFETIME_MS = 10 * 60 * 1000
 export const VERIFICATION_CODE_EXPIRY_ALARM = 'expireVerificationCodes'
+export const VERIFICATION_CODE_RELAY_ALARM = 'pollRelayedVerificationCodes'
+export const VERIFICATION_CODE_RELAY_PERIOD_MINUTES = 0.5
 export const GOOGLE_MESSAGES_URL =
   'https://messages.google.com/web/conversations'
 

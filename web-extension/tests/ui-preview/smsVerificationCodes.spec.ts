@@ -61,6 +61,35 @@ test('picks up a code the phone relays while the popup is open', async ({
   expect(await page.evaluate(() => navigator.clipboard.readText())).toBe('4827')
 })
 
+test('badges a phone relay with the popup closed and shows it on opening', async ({
+  page
+}) => {
+  await page.clock.install()
+  await page.goto('/?scenario=sms-verification-codes&phone-only=1')
+  await expect(
+    page.getByText('Popup closed · background checks stay active')
+  ).toBeVisible()
+  await expect(page.locator('[data-preview-popup]')).toHaveCount(0)
+  await expect(page.getByLabel('New SMS verification code')).toHaveCount(0)
+  await page
+    .getByRole('button', { name: 'Receive an SMS on the phone' })
+    .click()
+  await page.clock.runFor(30_000)
+  await expect(page.getByLabel('New SMS verification code')).toBeVisible()
+  await expect(page.locator('[data-preview-popup]')).toHaveCount(0)
+  await page.screenshot({
+    path: '../docs/screenshots/sms-background-badge.png'
+  })
+  await page.getByRole('button', { name: 'Open popup' }).click()
+  const popup = page.locator('[data-preview-popup]')
+  await expect(popup.getByText('4***', { exact: true })).toBeVisible()
+  await popup
+    .getByRole('button', { name: 'Copy SMS verification code from Revolut' })
+    .click()
+  await expect(page.getByLabel('New SMS verification code')).toHaveCount(0)
+  expect(await page.evaluate(() => navigator.clipboard.readText())).toBe('4827')
+})
+
 test('opens Google Messages from the SMS icon without copying the code', async ({
   page
 }) => {

@@ -23,7 +23,13 @@ const googleMessagesTab = {
 const previewTabs = [gmailTab, googleMessagesTab]
 let activeTabId = 17
 const alarmListeners = new Set<(alarm: { name: string }) => void>()
-const alarms = new Map<string, ReturnType<typeof setTimeout>>()
+type PreviewAlarm = {
+  name: string
+  scheduledTime: number
+  periodInMinutes?: number
+  timer: ReturnType<typeof setTimeout>
+}
+const alarms = new Map<string, PreviewAlarm>()
 let badgeText = ''
 let messageHandler:
   | ((message: unknown) => Promise<unknown> | undefined)
@@ -138,20 +144,35 @@ const browser = {
         alarmListeners.add(listener)
       }
     },
-    create: async (name: string, { when }: { when: number }) => {
-      clearTimeout(alarms.get(name))
-      alarms.set(
+    get: async (name: string) => {
+      const alarm = alarms.get(name)
+      if (!alarm) return undefined
+      return {
         name,
-        setTimeout(
+        scheduledTime: alarm.scheduledTime,
+        periodInMinutes: alarm.periodInMinutes
+      }
+    },
+    create: async (
+      name: string,
+      { when, periodInMinutes }: { when?: number; periodInMinutes?: number }
+    ) => {
+      clearTimeout(alarms.get(name)?.timer)
+      const schedule = (scheduledTime: number) => {
+        const timer = setTimeout(
           () => {
+            if (periodInMinutes) schedule(Date.now() + periodInMinutes * 60_000)
+            else alarms.delete(name)
             for (const listener of alarmListeners) listener({ name })
           },
-          Math.max(0, when - Date.now())
+          Math.max(0, scheduledTime - Date.now())
         )
-      )
+        alarms.set(name, { name, scheduledTime, periodInMinutes, timer })
+      }
+      schedule(when ?? Date.now() + (periodInMinutes ?? 0) * 60_000)
     },
     clear: async (name: string) => {
-      clearTimeout(alarms.get(name))
+      clearTimeout(alarms.get(name)?.timer)
       return alarms.delete(name)
     }
   },
