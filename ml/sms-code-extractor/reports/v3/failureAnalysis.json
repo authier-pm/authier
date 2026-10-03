@@ -1,0 +1,39 @@
+{
+  "testEvaluated": true,
+  "testUsedForSelection": false,
+  "lettersRecovery": 0.9566666666666667,
+  "lettersCorrect": 3444,
+  "lettersExamples": 3600,
+  "languagesAbove95": 22,
+  "languagesEvaluated": 30,
+  "overall": {
+    "examples": 16800,
+    "positives": 8400,
+    "negatives": 8400,
+    "correctCodes": 8015,
+    "returnedCodes": 8567,
+    "falsePositives": 550,
+    "exactMatch": 0.9443452380952381,
+    "precision": 0.9355667094665577,
+    "recall": 0.9541666666666667,
+    "f1": 0.9447751517651913,
+    "falsePositiveRate": 0.06547619047619048
+  },
+  "goals": {
+    "lettersRecoveryAbove95": true,
+    "precisionAtLeast99_5": false
+  },
+  "falsePositiveFamilies": {
+    "v3/test/15": 127,
+    "v3/test/13": 397,
+    "v3/test/9": 5,
+    "v3/test/14": 7,
+    "v3/test/10": 9,
+    "v3/test/11": 5
+  },
+  "principalFailures": {
+    "vouchers": 397,
+    "ambiguousLoginCodePairs": 127
+  },
+  "nextIteration": "Broader semantic negatives and ambiguity supervision, then a new untouched test; do not tune on this exposed test and call it fresh."
+}

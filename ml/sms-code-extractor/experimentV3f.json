@@ -1,0 +1,16 @@
+{
+  "revision": "v3f",
+  "seed": 2026093008,
+  "epochs": 3,
+  "batchSize": 48,
+  "learningRate": 0.00002,
+  "headLearningRate": 0.0001,
+  "warmupFraction": 0.06,
+  "freezeWordEmbeddings": true,
+  "presenceHead": true,
+  "tokenHead": true,
+  "selectWithMargin": true,
+  "validationTargetPrecision": 0.995,
+  "initialCheckpoint": "artifacts/minilm-v3e/checkpoint",
+  "provenance": "Synthetic assistant-authored translations. Validation interventions revealed a sentence-format shortcut: bare delivery instructions were treated as codes while labelled tracking references were rejected. Added matched instruction pairs across all 30 languages, with replay of earlier families. Frozen v3 validation/test bytes remain identical. No private SMS or native-speaker review."
+}

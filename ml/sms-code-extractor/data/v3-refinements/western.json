@@ -1,0 +1,147 @@
+{
+  "en": {
+    "train": [
+      "To sign in, enter {code} in the application.",
+      "The requested confirmation: {code}. Continue on the website.",
+      "Your current access code is {code}. Your account status is unchanged.",
+      "Confirm the payment by typing {code}. Keep this value private.",
+      "To follow the delivery, enter {other} on the tracking page.",
+      "Your account is active. The shipping reference is {other}.",
+      "Login help request {other} is awaiting a reply. No code is included.",
+      "Payment receipt {other}. Authentication has already finished."
+    ],
+    "noise": ["Your account is still active.", "Your password has not changed."]
+  },
+  "de": {
+    "train": [
+      "Gib zum Anmelden {code} in der Anwendung ein.",
+      "Die angeforderte Bestätigung: {code}. Fahre auf der Website fort.",
+      "Dein aktueller Zugangscode ist {code}. Dein Kontostatus ist unverändert.",
+      "Bestätige die Zahlung durch Eingabe von {code}. Halte diesen Wert geheim.",
+      "Gib {other} auf der Sendungsverfolgungsseite ein, um die Lieferung zu verfolgen.",
+      "Dein Konto ist aktiv. Die Versandreferenz ist {other}.",
+      "Die Anfrage {other} zur Anmeldehilfe wartet auf Antwort. Kein Code enthalten.",
+      "Zahlungsbeleg {other}. Die Authentifizierung ist bereits abgeschlossen."
+    ],
+    "noise": [
+      "Dein Konto ist weiterhin aktiv.",
+      "Dein Passwort wurde nicht geändert."
+    ]
+  },
+  "cs": {
+    "train": [
+      "Pro přihlášení zadejte v aplikaci {code}.",
+      "Požadované potvrzení: {code}. Pokračujte na webu.",
+      "Váš aktuální přístupový kód je {code}. Stav účtu se nezměnil.",
+      "Potvrďte platbu napsáním {code}. Tuto hodnotu uchovejte v tajnosti.",
+      "Pro sledování doručení zadejte {other} na stránce zásilky.",
+      "Váš účet je aktivní. Číslo přepravní zásilky je {other}.",
+      "Žádost {other} o pomoc s přihlášením čeká na odpověď. Neobsahuje žádný kód.",
+      "Potvrzení platby {other}. Autentizace již skončila."
+    ],
+    "noise": ["Váš účet je nadále aktivní.", "Vaše heslo se nezměnilo."]
+  },
+  "sk": {
+    "train": [
+      "Na prihlásenie zadajte v aplikácii {code}.",
+      "Požadované potvrdenie: {code}. Pokračujte na webe.",
+      "Váš aktuálny prístupový kód je {code}. Stav účtu sa nezmenil.",
+      "Potvrďte platbu napísaním {code}. Túto hodnotu uchovajte v tajnosti.",
+      "Na sledovanie doručenia zadajte {other} na stránke zásielky.",
+      "Váš účet je aktívny. Číslo prepravnej zásielky je {other}.",
+      "Žiadosť {other} o pomoc s prihlásením čaká na odpoveď. Neobsahuje žiadny kód.",
+      "Potvrdenie platby {other}. Autentifikácia sa už skončila."
+    ],
+    "noise": ["Váš účet je naďalej aktívny.", "Vaše heslo sa nezmenilo."]
+  },
+  "fr": {
+    "train": [
+      "Pour vous connecter, saisissez {code} dans l'application.",
+      "La confirmation demandée : {code}. Continuez sur le site.",
+      "Votre code d'accès actuel est {code}. L'état du compte reste inchangé.",
+      "Confirmez le paiement en tapant {code}. Gardez cette valeur secrète.",
+      "Pour suivre la livraison, saisissez {other} sur la page de suivi.",
+      "Votre compte est actif. La référence d'expédition est {other}.",
+      "La demande d'aide à la connexion {other} attend une réponse. Aucun code inclus.",
+      "Reçu de paiement {other}. L'authentification est déjà terminée."
+    ],
+    "noise": [
+      "Votre compte est toujours actif.",
+      "Votre mot de passe n'a pas changé."
+    ]
+  },
+  "es": {
+    "train": [
+      "Para iniciar sesión, introduce {code} en la aplicación.",
+      "La confirmación solicitada: {code}. Continúa en el sitio web.",
+      "Tu código de acceso actual es {code}. El estado de tu cuenta no ha cambiado.",
+      "Confirma el pago escribiendo {code}. Mantén este valor privado.",
+      "Para seguir la entrega, introduce {other} en la página de seguimiento.",
+      "Tu cuenta está activa. La referencia de envío es {other}.",
+      "La solicitud de ayuda para iniciar sesión {other} espera respuesta. No incluye ningún código.",
+      "Recibo de pago {other}. La autenticación ya ha terminado."
+    ],
+    "noise": ["Tu cuenta sigue activa.", "Tu contraseña no ha cambiado."]
+  },
+  "pt": {
+    "train": [
+      "Para iniciar sessão, introduza {code} na aplicação.",
+      "A confirmação pedida: {code}. Continue no site.",
+      "O seu código de acesso atual é {code}. O estado da conta não mudou.",
+      "Confirme o pagamento digitando {code}. Mantenha este valor privado.",
+      "Para acompanhar a entrega, introduza {other} na página de seguimento.",
+      "A sua conta está ativa. A referência de envio é {other}.",
+      "O pedido de ajuda de início de sessão {other} aguarda resposta. Não inclui código.",
+      "Recibo de pagamento {other}. A autenticação já terminou."
+    ],
+    "noise": ["A sua conta continua ativa.", "A sua palavra-passe não mudou."]
+  },
+  "it": {
+    "train": [
+      "Per accedere, inserisci {code} nell'applicazione.",
+      "La conferma richiesta: {code}. Continua sul sito web.",
+      "Il tuo codice di accesso attuale è {code}. Lo stato dell'account è invariato.",
+      "Conferma il pagamento digitando {code}. Mantieni privato questo valore.",
+      "Per seguire la consegna, inserisci {other} nella pagina di tracciamento.",
+      "Il tuo account è attivo. Il riferimento di spedizione è {other}.",
+      "La richiesta di aiuto per l'accesso {other} attende risposta. Non include alcun codice.",
+      "Ricevuta di pagamento {other}. L'autenticazione è già terminata."
+    ],
+    "noise": [
+      "Il tuo account è ancora attivo.",
+      "La tua password non è cambiata."
+    ]
+  },
+  "nl": {
+    "train": [
+      "Voer {code} in de app in om je aan te melden.",
+      "De gevraagde bevestiging: {code}. Ga verder op de website.",
+      "Je huidige toegangscode is {code}. Je accountstatus is ongewijzigd.",
+      "Bevestig de betaling door {code} te typen. Houd deze waarde geheim.",
+      "Voer {other} in op de volgpagina om de bezorging te volgen.",
+      "Je account is actief. De verzendreferentie is {other}.",
+      "Hulpverzoek {other} over inloggen wacht op antwoord. Er staat geen code in.",
+      "Betaalbewijs {other}. De authenticatie is al afgerond."
+    ],
+    "noise": [
+      "Je account is nog steeds actief.",
+      "Je wachtwoord is niet gewijzigd."
+    ]
+  },
+  "pl": {
+    "train": [
+      "Aby się zalogować, wpisz {code} w aplikacji.",
+      "Żądane potwierdzenie: {code}. Kontynuuj na stronie internetowej.",
+      "Twój aktualny kod dostępu to {code}. Stan konta nie zmienił się.",
+      "Potwierdź płatność, wpisując {code}. Zachowaj tę wartość dla siebie.",
+      "Aby śledzić dostawę, wpisz {other} na stronie śledzenia.",
+      "Twoje konto jest aktywne. Numer przesyłki to {other}.",
+      "Prośba o pomoc w logowaniu {other} czeka na odpowiedź. Nie zawiera kodu.",
+      "Potwierdzenie płatności {other}. Uwierzytelnianie już zakończono."
+    ],
+    "noise": [
+      "Twoje konto jest nadal aktywne.",
+      "Twoje hasło nie zostało zmienione."
+    ]
+  }
+}

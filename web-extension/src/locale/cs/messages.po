@@ -842,3 +842,19 @@ msgstr "Dosáhli jste limitu vašich hesel. Prosím upgradujte váš účet pro 
 #: src/components/vault/settings/DeviceDefaultsForm.tsx
 #~ msgid "Your changes will be applied to new devices only."
 #~ msgstr "Vaše změny budou použity pouze pro nová zařízení."
+
+#: src/pages-vault/VaultList.tsx
+msgid "Connect to Authier to add an item"
+msgstr "Chcete-li přidat položku, připojte se k Authieru"
+
+#: src/pages-vault/VaultList.tsx
+msgid "Unable to connect to Authier. Your saved items are still available. Sync will be available when the connection is restored."
+msgstr "Nelze se připojit k Authieru. Vaše uložené položky jsou stále dostupné. Synchronizace bude dostupná po obnovení připojení."
+
+#: src/components/vault/SidebarWithHeader.tsx
+msgid "Passkeys"
+msgstr "Přístupové klíče"
+
+#: src/components/vault/TableList.tsx
+msgid "Details"
+msgstr "Podrobnosti"

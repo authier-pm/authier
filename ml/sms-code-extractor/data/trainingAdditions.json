@@ -1,0 +1,302 @@
+{
+  "en": [
+    "A login attempt needs your approval. Your secret is {code}.",
+    "Use {code} for this request. It grants access to your account.",
+    "Valid now: {code}. Ignore the expired password {old}.",
+    "Never enter {old}. The temporary password is {code}.",
+    "Reference {id}. Your login password will arrive in a separate SMS.",
+    "Pickup number: {other}. Show it at the parcel counter.",
+    "Payment authorization: {code}. Support reference {id}; valid for {minutes} minutes.",
+    "Your one-time passcode for registration: {code}"
+  ],
+  "zh": [
+    "有一次登录需要您批准。您的密令是{code}。",
+    "本次请求请使用{code}。它可授予您的账号访问权限。",
+    "当前有效：{code}。请忽略已过期的密码{old}。",
+    "切勿输入{old}。临时密码为{code}。",
+    "参考编号{id}。您的登录密码将通过另一条短信发送。",
+    "取件号码：{other}。请在包裹柜台出示。",
+    "付款授权：{code}。客服参考编号{id}，有效期{minutes}分钟。",
+    "您注册时使用的一次性口令：{code}"
+  ],
+  "hi": [
+    "लॉगिन प्रयास के लिए आपकी अनुमति चाहिए। आपका गुप्त शब्द {code} है।",
+    "इस अनुरोध के लिए {code} का उपयोग करें। इससे आपके खाते में प्रवेश मिलेगा।",
+    "अभी मान्य: {code}। समाप्त हो चुके पासवर्ड {old} को अनदेखा करें।",
+    "{old} कभी दर्ज न करें। अस्थायी पासवर्ड {code} है।",
+    "संदर्भ {id}। आपका लॉगिन पासवर्ड अलग SMS में आएगा।",
+    "प्राप्ति संख्या: {other}। इसे पार्सल काउंटर पर दिखाएँ।",
+    "भुगतान की अनुमति: {code}। सहायता संदर्भ {id}; {minutes} मिनट तक मान्य।",
+    "पंजीकरण के लिए आपका एक बार उपयोग होने वाला पासकोड: {code}"
+  ],
+  "es": [
+    "Un intento de acceso necesita tu aprobación. Tu clave secreta es {code}.",
+    "Usa {code} para esta solicitud. Permite acceder a tu cuenta.",
+    "Válido ahora: {code}. Ignora la contraseña caducada {old}.",
+    "Nunca introduzcas {old}. La contraseña temporal es {code}.",
+    "Referencia {id}. Tu contraseña de acceso llegará en otro SMS.",
+    "Número de recogida: {other}. Muéstralo en el mostrador de paquetes.",
+    "Autorización de pago: {code}. Referencia de soporte {id}; válido {minutes} minutos.",
+    "Tu clave de un solo uso para el registro: {code}"
+  ],
+  "ar": [
+    "تحتاج محاولة تسجيل الدخول إلى موافقتك. كلمتك السرية هي {code}.",
+    "استخدم {code} لهذا الطلب. يتيح الوصول إلى حسابك.",
+    "صالح الآن: {code}. تجاهل كلمة المرور المنتهية {old}.",
+    "لا تدخل {old} مطلقًا. كلمة المرور المؤقتة هي {code}.",
+    "المرجع {id}. ستصل كلمة مرور تسجيل الدخول في رسالة نصية منفصلة.",
+    "رقم الاستلام: {other}. أظهره عند شباك الطرود.",
+    "تفويض الدفع: {code}. مرجع الدعم {id}؛ صالح لمدة {minutes} دقائق.",
+    "رمز المرور لمرة واحدة لإنشاء الحساب: {code}"
+  ],
+  "fr": [
+    "Une tentative de connexion nécessite votre accord. Votre secret est {code}.",
+    "Utilisez {code} pour cette demande. Il donne accès à votre compte.",
+    "Valable maintenant : {code}. Ignorez le mot de passe expiré {old}.",
+    "Ne saisissez jamais {old}. Le mot de passe temporaire est {code}.",
+    "Référence {id}. Votre mot de passe de connexion arrivera dans un SMS séparé.",
+    "Numéro de retrait : {other}. Présentez-le au guichet des colis.",
+    "Autorisation de paiement : {code}. Référence d'assistance {id} ; valable {minutes} minutes.",
+    "Votre code à usage unique pour l'inscription : {code}"
+  ],
+  "bn": [
+    "লগইন প্রচেষ্টার জন্য আপনার অনুমতি প্রয়োজন। আপনার গোপন শব্দ {code}।",
+    "এই অনুরোধের জন্য {code} ব্যবহার করুন। এটি আপনার অ্যাকাউন্টে প্রবেশের অনুমতি দেয়।",
+    "এখন বৈধ: {code}। মেয়াদ শেষ হওয়া পাসওয়ার্ড {old} উপেক্ষা করুন।",
+    "কখনো {old} লিখবেন না। অস্থায়ী পাসওয়ার্ড {code}।",
+    "রেফারেন্স {id}। আপনার লগইন পাসওয়ার্ড আলাদা SMS-এ আসবে।",
+    "সংগ্রহ নম্বর: {other}। পার্সেল কাউন্টারে দেখান।",
+    "পেমেন্ট অনুমোদন: {code}। সহায়তা রেফারেন্স {id}; {minutes} মিনিট বৈধ।",
+    "নিবন্ধনের জন্য আপনার একবার ব্যবহারযোগ্য পাসকোড: {code}"
+  ],
+  "pt": [
+    "Uma tentativa de entrada precisa da sua aprovação. O seu segredo é {code}.",
+    "Use {code} para este pedido. Permite aceder à sua conta.",
+    "Válido agora: {code}. Ignore a senha expirada {old}.",
+    "Nunca introduza {old}. A senha temporária é {code}.",
+    "Referência {id}. A sua senha de acesso chegará num SMS separado.",
+    "Número de levantamento: {other}. Mostre-o no balcão de encomendas.",
+    "Autorização de pagamento: {code}. Referência de apoio {id}; válido por {minutes} minutos.",
+    "O seu código de uso único para o registo: {code}"
+  ],
+  "id": [
+    "Upaya masuk memerlukan persetujuan Anda. Rahasia Anda adalah {code}.",
+    "Gunakan {code} untuk permintaan ini. Kode ini memberikan akses ke akun Anda.",
+    "Berlaku sekarang: {code}. Abaikan kata sandi kedaluwarsa {old}.",
+    "Jangan pernah masukkan {old}. Kata sandi sementara adalah {code}.",
+    "Referensi {id}. Kata sandi masuk Anda akan tiba dalam SMS terpisah.",
+    "Nomor pengambilan: {other}. Tunjukkan di loket paket.",
+    "Otorisasi pembayaran: {code}. Referensi bantuan {id}; berlaku {minutes} menit.",
+    "Kode sandi sekali pakai untuk pendaftaran Anda: {code}"
+  ],
+  "ur": [
+    "لاگ ان کی کوشش کے لیے آپ کی منظوری درکار ہے۔ آپ کا خفیہ لفظ {code} ہے۔",
+    "اس درخواست کے لیے {code} استعمال کریں۔ یہ آپ کے اکاؤنٹ تک رسائی دیتا ہے۔",
+    "ابھی درست: {code}۔ ختم شدہ پاس ورڈ {old} کو نظر انداز کریں۔",
+    "کبھی {old} درج نہ کریں۔ عارضی پاس ورڈ {code} ہے۔",
+    "حوالہ {id}۔ آپ کا لاگ ان پاس ورڈ الگ SMS میں آئے گا۔",
+    "وصولی نمبر: {other}۔ اسے پارسل کاؤنٹر پر دکھائیں۔",
+    "ادائیگی کی منظوری: {code}۔ معاونت کا حوالہ {id}؛ {minutes} منٹ تک درست۔",
+    "رجسٹریشن کے لیے آپ کا ایک بار استعمال ہونے والا پاس کوڈ: {code}"
+  ],
+  "de": [
+    "Ein Anmeldeversuch benötigt deine Zustimmung. Dein Geheimwort ist {code}.",
+    "Verwende {code} für diese Anfrage. Damit erhältst du Zugang zu deinem Konto.",
+    "Jetzt gültig: {code}. Ignoriere das abgelaufene Passwort {old}.",
+    "Gib niemals {old} ein. Das vorläufige Passwort lautet {code}.",
+    "Referenz {id}. Dein Anmeldepasswort kommt in einer separaten SMS.",
+    "Abholnummer: {other}. Zeige sie am Paketschalter vor.",
+    "Zahlungsfreigabe: {code}. Supportreferenz {id}; gültig für {minutes} Minuten.",
+    "Dein einmaliges Kennwort für die Registrierung: {code}"
+  ],
+  "cs": [
+    "Pokus o přihlášení potřebuje váš souhlas. Vaše tajné heslo je {code}.",
+    "Pro tento požadavek použijte {code}. Umožní přístup k vašemu účtu.",
+    "Nyní platí: {code}. Prošlé heslo {old} ignorujte.",
+    "Nikdy nezadávejte {old}. Dočasné heslo je {code}.",
+    "Číslo požadavku {id}. Přihlašovací heslo vám přijde v samostatné SMS.",
+    "Číslo pro odběr: {other}. Ukažte jej u přepážky pro výdej zásilek.",
+    "Autorizace platby: {code}. Číslo podpory {id}; platí {minutes} minut.",
+    "Vaše jednorázové heslo pro registraci: {code}"
+  ],
+  "sk": [
+    "Pokus o prihlásenie potrebuje váš súhlas. Vaše tajné heslo je {code}.",
+    "Pre túto požiadavku použite {code}. Umožní prístup k vášmu účtu.",
+    "Teraz platí: {code}. Heslo s uplynutou platnosťou {old} ignorujte.",
+    "Nikdy nezadávajte {old}. Dočasné heslo je {code}.",
+    "Číslo požiadavky {id}. Prihlasovacie heslo vám príde v samostatnej SMS.",
+    "Číslo na odber: {other}. Ukážte ho pri priehradke na výdaj zásielok.",
+    "Autorizácia platby: {code}. Číslo podpory {id}; platí {minutes} minút.",
+    "Vaše jednorazové heslo na registráciu: {code}"
+  ],
+  "pl": [
+    "Próba logowania wymaga twojej zgody. Twoje tajne hasło to {code}.",
+    "Użyj {code} dla tego żądania. Umożliwia dostęp do twojego konta.",
+    "Teraz ważny: {code}. Zignoruj wygasłe hasło {old}.",
+    "Nigdy nie wpisuj {old}. Tymczasowe hasło to {code}.",
+    "Numer sprawy {id}. Hasło logowania przyjdzie w oddzielnym SMS-ie.",
+    "Numer odbioru: {other}. Pokaż go w punkcie odbioru paczek.",
+    "Autoryzacja płatności: {code}. Numer wsparcia {id}; ważny {minutes} minut.",
+    "Twoje jednorazowe hasło do rejestracji: {code}"
+  ],
+  "nl": [
+    "Een inlogpoging heeft je toestemming nodig. Je geheime wachtwoord is {code}.",
+    "Gebruik {code} voor dit verzoek. Hiermee krijg je toegang tot je account.",
+    "Nu geldig: {code}. Negeer het verlopen wachtwoord {old}.",
+    "Voer nooit {old} in. Het tijdelijke wachtwoord is {code}.",
+    "Referentie {id}. Je inlogwachtwoord komt in een aparte sms.",
+    "Afhaalnummer: {other}. Toon het bij de pakketbalie.",
+    "Betalingsgoedkeuring: {code}. Ondersteuningsreferentie {id}; geldig voor {minutes} minuten.",
+    "Je eenmalige toegangscode voor registratie: {code}"
+  ],
+  "it": [
+    "Un tentativo di accesso richiede la tua approvazione. La tua parola segreta è {code}.",
+    "Usa {code} per questa richiesta. Consente l'accesso al tuo account.",
+    "Valido ora: {code}. Ignora la password scaduta {old}.",
+    "Non inserire mai {old}. La password temporanea è {code}.",
+    "Riferimento {id}. La password di accesso arriverà in un SMS separato.",
+    "Numero di ritiro: {other}. Mostralo allo sportello pacchi.",
+    "Autorizzazione del pagamento: {code}. Riferimento assistenza {id}; valido per {minutes} minuti.",
+    "Il tuo codice monouso per la registrazione: {code}"
+  ],
+  "ro": [
+    "O încercare de conectare necesită aprobarea ta. Cuvântul tău secret este {code}.",
+    "Folosește {code} pentru această cerere. Oferă acces la contul tău.",
+    "Valabil acum: {code}. Ignoră parola expirată {old}.",
+    "Nu introduce niciodată {old}. Parola temporară este {code}.",
+    "Referință {id}. Parola de conectare va sosi într-un SMS separat.",
+    "Număr de ridicare: {other}. Arată-l la ghișeul de colete.",
+    "Autorizarea plății: {code}. Referință asistență {id}; valabil {minutes} minute.",
+    "Codul tău de unică folosință pentru înregistrare: {code}"
+  ],
+  "el": [
+    "Μια απόπειρα σύνδεσης χρειάζεται την έγκρισή σας. Η μυστική λέξη σας είναι {code}.",
+    "Χρησιμοποιήστε {code} για αυτό το αίτημα. Επιτρέπει πρόσβαση στον λογαριασμό σας.",
+    "Ισχύει τώρα: {code}. Αγνοήστε το ληγμένο συνθηματικό {old}.",
+    "Μην εισαγάγετε ποτέ {old}. Το προσωρινό συνθηματικό είναι {code}.",
+    "Αναφορά {id}. Το συνθηματικό σύνδεσης θα έρθει σε ξεχωριστό SMS.",
+    "Αριθμός παραλαβής: {other}. Δείξτε τον στο γκισέ δεμάτων.",
+    "Έγκριση πληρωμής: {code}. Αναφορά υποστήριξης {id}· ισχύει για {minutes} λεπτά.",
+    "Ο κωδικός μίας χρήσης για την εγγραφή σας: {code}"
+  ],
+  "mt": [
+    "Tentattiv ta' dħul jeħtieġ l-approvazzjoni tiegħek. Il-kelma sigrieta tiegħek hija {code}.",
+    "Uża {code} għal din it-talba. Tagħti aċċess għall-kont tiegħek.",
+    "Validu issa: {code}. Injora l-password skaduta {old}.",
+    "Qatt iddaħħal {old}. Il-password temporanja hija {code}.",
+    "Referenza {id}. Il-password għad-dħul se tasal f'SMS separat.",
+    "Numru tal-ġbir: {other}. Urih mal-bank tal-pakketti.",
+    "Awtorizzazzjoni tal-ħlas: {code}. Referenza tal-appoġġ {id}; validu għal {minutes} minuti.",
+    "Il-kodiċi ta' darba għar-reġistrazzjoni tiegħek: {code}"
+  ],
+  "hr": [
+    "Pokušaj prijave treba vaše odobrenje. Vaša tajna riječ je {code}.",
+    "Upotrijebite {code} za ovaj zahtjev. Omogućuje pristup vašem računu.",
+    "Sada vrijedi: {code}. Zanemarite isteklu lozinku {old}.",
+    "Nikad ne unosite {old}. Privremena lozinka je {code}.",
+    "Referenca {id}. Lozinka za prijavu stići će u zasebnom SMS-u.",
+    "Broj preuzimanja: {other}. Pokažite ga na šalteru za pakete.",
+    "Autorizacija plaćanja: {code}. Referenca podrške {id}; vrijedi {minutes} minuta.",
+    "Vaša jednokratna pristupna lozinka za registraciju: {code}"
+  ],
+  "et": [
+    "Sisselogimiskatse vajab sinu nõusolekut. Sinu salasõna on {code}.",
+    "Kasuta selle taotluse jaoks {code}. See annab juurdepääsu sinu kontole.",
+    "Praegu kehtiv: {code}. Eira aegunud parooli {old}.",
+    "Ära kunagi sisesta {old}. Ajutine parool on {code}.",
+    "Viide {id}. Sisselogimisparool saabub eraldi SMS-iga.",
+    "Väljastusnumber: {other}. Näita seda pakiletis.",
+    "Makse autoriseerimine: {code}. Tugiteenuse viide {id}; kehtib {minutes} minutit.",
+    "Sinu ühekordne pääsukood registreerimiseks: {code}"
+  ],
+  "lv": [
+    "Pierakstīšanās mēģinājumam vajadzīga jūsu atļauja. Jūsu slepenais vārds ir {code}.",
+    "Šim pieprasījumam izmantojiet {code}. Tas dod piekļuvi jūsu kontam.",
+    "Tagad derīgs: {code}. Ignorējiet beigušos paroli {old}.",
+    "Nekad neievadiet {old}. Pagaidu parole ir {code}.",
+    "Atsauce {id}. Pierakstīšanās parole pienāks atsevišķā SMS.",
+    "Saņemšanas numurs: {other}. Uzrādiet to paku izsniegšanas vietā.",
+    "Maksājuma autorizācija: {code}. Atbalsta atsauce {id}; derīgs {minutes} minūtes.",
+    "Jūsu vienreizējais piekļuves kods reģistrācijai: {code}"
+  ],
+  "lt": [
+    "Bandymui prisijungti reikia jūsų leidimo. Jūsų slaptas žodis yra {code}.",
+    "Šiai užklausai naudokite {code}. Jis suteikia prieigą prie jūsų paskyros.",
+    "Dabar galioja: {code}. Nepaisykite nebegaliojančio slaptažodžio {old}.",
+    "Niekada neįveskite {old}. Laikinasis slaptažodis yra {code}.",
+    "Nuoroda {id}. Prisijungimo slaptažodis bus atsiųstas atskira SMS žinute.",
+    "Atsiėmimo numeris: {other}. Parodykite jį siuntų skyriuje.",
+    "Mokėjimo leidimas: {code}. Pagalbos nuoroda {id}; galioja {minutes} minutes.",
+    "Jūsų vienkartinis prieigos kodas registracijai: {code}"
+  ],
+  "bg": [
+    "Опит за вход се нуждае от вашето одобрение. Вашата тайна дума е {code}.",
+    "Използвайте {code} за тази заявка. Той дава достъп до вашия профил.",
+    "Валиден сега: {code}. Игнорирайте изтеклата парола {old}.",
+    "Никога не въвеждайте {old}. Временната парола е {code}.",
+    "Референция {id}. Паролата за вход ще пристигне в отделен SMS.",
+    "Номер за вземане: {other}. Покажете го на гишето за пратки.",
+    "Разрешение за плащане: {code}. Референция за поддръжка {id}; валиден {minutes} минути.",
+    "Вашият еднократен код за регистрация: {code}"
+  ],
+  "sl": [
+    "Poskus prijave potrebuje vašo odobritev. Vaša skrivna beseda je {code}.",
+    "Za to zahtevo uporabite {code}. Omogoča dostop do vašega računa.",
+    "Trenutno velja: {code}. Prezrite pretečeno geslo {old}.",
+    "Nikoli ne vnesite {old}. Začasno geslo je {code}.",
+    "Referenca {id}. Geslo za prijavo bo prispelo v ločenem SMS-u.",
+    "Prevzemna številka: {other}. Pokažite jo pri okencu za pakete.",
+    "Odobritev plačila: {code}. Referenca podpore {id}; velja {minutes} minut.",
+    "Vaša enkratna dostopna koda za registracijo: {code}"
+  ],
+  "da": [
+    "Et loginforsøg kræver din godkendelse. Dit hemmelige ord er {code}.",
+    "Brug {code} til denne anmodning. Det giver adgang til din konto.",
+    "Gyldig nu: {code}. Ignorer den udløbne adgangskode {old}.",
+    "Indtast aldrig {old}. Den midlertidige adgangskode er {code}.",
+    "Reference {id}. Din loginadgangskode kommer i en separat SMS.",
+    "Afhentningsnummer: {other}. Vis det ved pakkeskranken.",
+    "Betalingsgodkendelse: {code}. Supportreference {id}; gyldig i {minutes} minutter.",
+    "Din engangskode til registrering: {code}"
+  ],
+  "sv": [
+    "Ett inloggningsförsök behöver ditt godkännande. Ditt hemliga ord är {code}.",
+    "Använd {code} för denna begäran. Det ger åtkomst till ditt konto.",
+    "Giltig nu: {code}. Ignorera det utgångna lösenordet {old}.",
+    "Ange aldrig {old}. Det tillfälliga lösenordet är {code}.",
+    "Referens {id}. Ditt inloggningslösenord kommer i ett separat SMS.",
+    "Hämtningsnummer: {other}. Visa det vid paketdisken.",
+    "Betalningsgodkännande: {code}. Supportreferens {id}; giltig i {minutes} minuter.",
+    "Din engångskod för registrering: {code}"
+  ],
+  "fi": [
+    "Kirjautumisyritys tarvitsee hyväksyntäsi. Salainen sanasi on {code}.",
+    "Käytä koodia {code} tähän pyyntöön. Se antaa pääsyn tilillesi.",
+    "Voimassa nyt: {code}. Ohita vanhentunut salasana {old}.",
+    "Älä koskaan syötä koodia {old}. Väliaikainen salasana on {code}.",
+    "Viite {id}. Kirjautumissalasanasi saapuu erillisellä tekstiviestillä.",
+    "Noutonumero: {other}. Näytä se pakettitiskillä.",
+    "Maksun hyväksyntä: {code}. Tukipalvelun viite {id}; voimassa {minutes} minuuttia.",
+    "Kertakäyttöinen tunnuksesi rekisteröitymiseen: {code}"
+  ],
+  "hu": [
+    "Egy bejelentkezési kísérlethez a jóváhagyásod szükséges. A titkos szavad: {code}.",
+    "Ehhez a kéréshez használd ezt: {code}. Hozzáférést biztosít a fiókodhoz.",
+    "Most érvényes: {code}. Hagyd figyelmen kívül a lejárt {old} jelszót.",
+    "Soha ne írd be ezt: {old}. Az ideiglenes jelszó: {code}.",
+    "Hivatkozás {id}. A bejelentkezési jelszavad külön SMS-ben érkezik.",
+    "Átvételi szám: {other}. Mutasd meg a csomagátvételi pultnál.",
+    "Fizetési engedély: {code}. Ügyfélszolgálati hivatkozás {id}; {minutes} percig érvényes.",
+    "Az egyszer használatos belépési kódod a regisztrációhoz: {code}"
+  ],
+  "ga": [
+    "Tá do chead ag teastáil le haghaidh iarracht logála isteach. Is é {code} d'fhocal rúnda.",
+    "Úsáid {code} don iarratas seo. Tugann sé rochtain ar do chuntas.",
+    "Bailí anois: {code}. Déan neamhaird den phasfhocal éagtha {old}.",
+    "Ná cuir isteach {old} riamh. Is é {code} an pasfhocal sealadach.",
+    "Tagairt {id}. Tiocfaidh do phasfhocal logála isteach i SMS ar leith.",
+    "Uimhir bhailithe: {other}. Taispeáin ag cuntar na mbeartán í.",
+    "Údarú íocaíochta: {code}. Tagairt tacaíochta {id}; bailí ar feadh {minutes} nóiméad.",
+    "Do chód rochtana aonuaire don chlárú: {code}"
+  ]
+}

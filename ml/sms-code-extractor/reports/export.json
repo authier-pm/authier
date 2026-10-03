@@ -1,0 +1,16 @@
+{
+  "floatParityMaxAbsoluteError": 4.76837158203125e-5,
+  "files": {
+    "model.onnx": {
+      "bytes": 470241240,
+      "sha256": "8a4325303fc534710adf750a2655b6c2d0c33d90b9f4f2a61d6907df56321ace"
+    },
+    "model.int8.onnx": {
+      "bytes": 118087010,
+      "sha256": "2b2c7e9e3da3b40596a4a443028cb67be1e6be482bb2361db58b03c4a3b2001b"
+    }
+  },
+  "baseLicense": "MIT",
+  "baseModel": "https://huggingface.co/microsoft/Multilingual-MiniLM-L12-H384",
+  "quantization": "Dynamic INT8 MatMul and Gather; embedding table included"
+}

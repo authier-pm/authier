@@ -1,0 +1,38 @@
+{
+  "checkpointSha256": "68d500295eff044ad0bb6466e39de7cb5e3bb2185e0b57a304d84938e5c22ec9",
+  "floatParityMaxAbsoluteError": 1.049041748046875e-5,
+  "files": {
+    "model.onnx": {
+      "bytes": 470248347,
+      "sha256": "f1f18db71e387cf3c049b7d59eeb57e20750e2ee5f37c619e26916e328e129e6"
+    },
+    "model.int8.onnx": {
+      "bytes": 140352237,
+      "sha256": "25bd506b64e5b30ebd80d863f5eecbbbf3209e766c8fd73ea5bc027fdb31ff88"
+    },
+    "model.rowEmbeddings.onnx": {
+      "bytes": 183206415,
+      "sha256": "d354b4900776b70ebb6cd1d5b04ac961e0a7fa491659c955f0ae6a84d569991b"
+    },
+    "model.rowEmbeddings.int8.onnx": {
+      "bytes": 119892984,
+      "sha256": "1ba0f51eb8b985e4c5453a750a974fbb67be618957e9161432159f8b40e3b9cd"
+    },
+    "model.compact.onnx": {
+      "bytes": 140352237,
+      "sha256": "25bd506b64e5b30ebd80d863f5eecbbbf3209e766c8fd73ea5bc027fdb31ff88"
+    },
+    "model.standard.int8.onnx": {
+      "bytes": 118093638,
+      "sha256": "84d538193d356c147aaaf53dfbbb4938c35249c9ebfc5eef68f58e13ae2c92e0"
+    }
+  },
+  "baseLicense": "MIT",
+  "baseModel": "https://huggingface.co/microsoft/Multilingual-MiniLM-L12-H384",
+  "quantization": "Per-row INT8 word embeddings, FP16 encoder matrix storage with FP32 computation. Constant casts may be expanded to FP32 on loading.",
+  "rowEmbeddingVariant": "Per-row INT8 word embeddings, per-channel dynamic INT8 MatMul; small position/type embeddings stay FP32",
+  "compactVariant": "Per-row INT8 word embeddings, FP16 encoder matrix storage with FP32 computation. Constant casts may be expanded to FP32 on loading.",
+  "selectedVariant": "compact",
+  "selectedSource": "model.compact.onnx",
+  "precisionLabel": "INT8 embeddings / FP16 encoder storage / FP32 encoder computation"
+}

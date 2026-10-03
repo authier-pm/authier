@@ -1,0 +1,14 @@
+{
+  "revision": "v3b",
+  "seed": 2026093004,
+  "epochs": 3,
+  "batchSize": 24,
+  "learningRate": 0.00001,
+  "headLearningRate": 0.00015,
+  "warmupFraction": 0.06,
+  "freezeWordEmbeddings": true,
+  "presenceHead": true,
+  "validationTargetPrecision": 0.995,
+  "initialCheckpoint": "artifacts/minilm-v2/checkpoint",
+  "provenance": "Synthetic assistant-authored translations and compositions. Training refinements were informed by v3 validation errors. Old v2 validation/test sentence families now form development/training material; only the newly frozen v3 test is held out. No private SMS or native-speaker review."
+}

@@ -1,0 +1,38 @@
+{
+  "ga": [
+    "Ceadaigh d'iarratas rochtana trí {code} a chur isteach.",
+    "Cuir {code} isteach nuair a iarrann an suíomh ort d'aitheantas a dheimhniú.",
+    "Logáil isteach sa chuntas {brand}\n{code}\nClóscríobh é seo ar an scáileán deimhnithe.",
+    "Díghlasálfar rochtain ar an gcuntas tar éis duit {code} a sheoladh.",
+    "Don seisiún seo amháin, is í {code} an frása faire atá ag teastáil.",
+    "Teastaíonn {code} chun {amount} EUR a údarú; tagairt admhála {other}.",
+    "Do luach fíoraithe nuashonraithe: {code}. Déan neamhaird de gach teachtaireacht roimhe seo.",
+    "Tá an gléas ag fanacht le deimhniú. Clóscríobh {code} chun é a cheadú.",
+    "Aimsigh do sheachadadh leis an aitheantóir rianaithe {other}.",
+    "Úsáid {other} chun stádas an tseachadta a fheiceáil ar ár suíomh gréasáin.",
+    "Is é {other} luach cuardaigh an phacáiste. Is féidir leat logáil isteach mar is gnách.",
+    "Má tá fadhb logála isteach agat, luaigh tagairt tacaíochta {other} nuair a dhéanann tú teagmháil linn.",
+    "Thaifeadamar fadhb rochtana faoin ticéad {other}. Freagróidh ball foirne.",
+    "Tá tagairt {other} ag d'eachtra logála isteach. Coinnigh í don deasc chabhrach.",
+    "Tagairt áirithinte {other}: taispeáin í ag an bhfáiltiú.",
+    "Tá tuairisc do chuntais réidh. Aitheantóir cáipéise {other}; níl ceadú logála isteach ag teastáil."
+  ],
+  "mt": [
+    "Approva t-talba tiegħek għall-aċċess billi ddaħħal {code}.",
+    "Daħħal {code} meta s-sit jitolbok tikkonferma l-identità tiegħek.",
+    "Dħul fil-kont {brand}\n{code}\nIkteb dan fuq l-iskrin tal-konferma.",
+    "L-aċċess għall-kont jinfetaħ wara li tibgħat {code}.",
+    "Għal din is-sessjoni biss, il-frażi sigrieta meħtieġa hija {code}.",
+    "L-awtorizzazzjoni ta' {amount} EUR teħtieġ {code}; referenza tal-irċevuta {other}.",
+    "Il-valur ta' verifika aġġornat tiegħek: {code}. Injora l-messaġġi kollha ta' qabel.",
+    "L-apparat qed jistenna konferma. Ikteb {code} biex tawtorizzah.",
+    "Sib il-konsenja tiegħek bl-identifikatur tat-traċċar {other}.",
+    "Uża {other} biex tara l-istat tal-kunsinna fuq is-sit tagħna.",
+    "Il-valur biex tfittex il-pakkett huwa {other}. Tista' tidħol bħas-soltu.",
+    "Għal problema biex tidħol, semmi r-referenza tal-appoġġ {other} meta tikkuntattjana.",
+    "Irreġistrajna problema ta' aċċess taħt it-talba {other}. Aġent se jwieġeb.",
+    "L-inċident tad-dħul tiegħek għandu r-referenza {other}. Żommha għad-desk tal-għajnuna.",
+    "Referenza tal-prenotazzjoni {other}: uriha fir-reception.",
+    "Ir-rapport tal-kont tiegħek lest. Identifikatur tad-dokument {other}; mhix meħtieġa approvazzjoni tad-dħul."
+  ]
+}

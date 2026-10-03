@@ -1,0 +1,16 @@
+{
+  "revision": "v3",
+  "seed": 2026093003,
+  "epochs": 4,
+  "batchSize": 24,
+  "learningRate": 0.00002,
+  "headLearningRate": 0.00008,
+  "warmupFraction": 0.06,
+  "freezeWordEmbeddings": true,
+  "validationTargetPrecision": 0.995,
+  "examplesPerTemplateAndKind": { "train": 8, "validation": 3, "test": 5 },
+  "initialCheckpoint": "artifacts/minilm-v2/checkpoint",
+  "trainCompositionProbability": 0.65,
+  "selectionPolicy": "Select weights and decoder exclusively on validation; open the newly frozen test split after selecting the deployment candidate. Compare the previous checkpoint on that same test split afterward.",
+  "provenance": "Synthetic assistant-authored translations and compositions; no private SMS. New translated template families, code values and brands are held out globally. No native-speaker review. The old test informed the categories of new training examples but its messages are not added to training."
+}

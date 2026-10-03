@@ -1,0 +1,138 @@
+{
+  "sl": {
+    "train": [
+      "Za prijavo v aplikacijo vnesite {code}.",
+      "Zahtevana potrditev: {code}. Nadaljujte na spletni strani.",
+      "Vaša trenutna dostopna koda je {code}. Stanje računa je nespremenjeno.",
+      "Potrdite plačilo z vpisom {code}. To vrednost ohranite zasebno.",
+      "Za sledenje dostavi na strani za sledenje vnesite {other}.",
+      "Vaš račun je aktiven. Referenca pošiljke je {other}.",
+      "Zahteva {other} za pomoč pri prijavi čaka odgovor. Koda ni vključena.",
+      "Potrdilo o plačilu {other}. Preverjanje pristnosti je že končano."
+    ],
+    "noise": ["Vaš račun je še vedno aktiven.", "Vaše geslo ni spremenjeno."]
+  },
+  "el": {
+    "train": [
+      "Για σύνδεση, εισαγάγετε {code} στην εφαρμογή.",
+      "Η ζητούμενη επιβεβαίωση: {code}. Συνεχίστε στον ιστότοπο.",
+      "Ο τρέχων κωδικός πρόσβασής σας είναι {code}. Η κατάσταση του λογαριασμού δεν άλλαξε.",
+      "Επιβεβαιώστε την πληρωμή πληκτρολογώντας {code}. Κρατήστε αυτή την τιμή μυστική.",
+      "Για να παρακολουθήσετε την παράδοση, εισαγάγετε {other} στη σελίδα παρακολούθησης.",
+      "Ο λογαριασμός σας είναι ενεργός. Η αναφορά αποστολής είναι {other}.",
+      "Το αίτημα βοήθειας σύνδεσης {other} περιμένει απάντηση. Δεν περιλαμβάνεται κωδικός.",
+      "Απόδειξη πληρωμής {other}. Η ταυτοποίηση έχει ήδη ολοκληρωθεί."
+    ],
+    "noise": [
+      "Ο λογαριασμός σας παραμένει ενεργός.",
+      "Ο κωδικός πρόσβασής σας δεν άλλαξε."
+    ]
+  },
+  "mt": {
+    "train": [
+      "Biex tidħol, daħħal {code} fl-applikazzjoni.",
+      "Il-konferma mitluba: {code}. Kompli fuq il-websajt.",
+      "Il-kodiċi tal-aċċess attwali tiegħek huwa {code}. L-istatus tal-kont ma nbidilx.",
+      "Ikkonferma l-ħlas billi tittajpja {code}. Żomm dan il-valur privat.",
+      "Biex issegwi l-kunsinna, daħħal {other} fil-paġna tat-traċċar.",
+      "Il-kont tiegħek huwa attiv. Ir-referenza tat-tbaħħir hija {other}.",
+      "It-talba għall-għajnuna fid-dħul {other} qed tistenna tweġiba. Ma hemm ebda kodiċi inkluż.",
+      "Irċevuta tal-ħlas {other}. L-awtentikazzjoni diġà ntemmet."
+    ],
+    "noise": [
+      "Il-kont tiegħek għadu attiv.",
+      "Il-password tiegħek ma nbidlitx."
+    ]
+  },
+  "ga": {
+    "train": [
+      "Chun logáil isteach, cuir {code} isteach san fheidhmchlár.",
+      "An deimhniú a iarradh: {code}. Lean ar aghaidh ar an suíomh gréasáin.",
+      "Is é {code} do chód rochtana reatha. Níl stádas do chuntais athraithe.",
+      "Deimhnigh an íocaíocht trí {code} a chlóscríobh. Coinnigh an luach seo príobháideach.",
+      "Chun an seachadadh a leanúint, cuir {other} isteach ar an leathanach rianaithe.",
+      "Tá do chuntas gníomhach. Is é {other} an tagairt loingseoireachta.",
+      "Tá iarratas cabhrach logála isteach {other} ag fanacht le freagra. Níl cód san áireamh.",
+      "Admháil íocaíochta {other}. Tá an fíordheimhniú críochnaithe cheana féin."
+    ],
+    "noise": ["Tá do chuntas fós gníomhach.", "Níl do phasfhocal athraithe."]
+  },
+  "zh": {
+    "train": [
+      "如需登录，请在应用中输入{code}。",
+      "您请求的确认信息：{code}。请在网站上继续。",
+      "您当前的访问代码是{code}。账户状态未变。",
+      "键入{code}确认付款。请保密此值。",
+      "如需跟踪配送，请在物流页面输入{other}。",
+      "您的账户处于活动状态。发货参考编号是{other}。",
+      "登录帮助请求{other}正在等待回复。其中不包含验证码。",
+      "付款收据{other}。身份验证已经完成。"
+    ],
+    "noise": ["您的账户仍处于活动状态。", "您的密码没有更改。"]
+  },
+  "ar": {
+    "train": [
+      "لتسجيل الدخول أدخل {code} في التطبيق.",
+      "التأكيد المطلوب: {code}. تابع على الموقع.",
+      "رمز الوصول الحالي هو {code}. حالة حسابك لم تتغير.",
+      "أكد الدفع بكتابة {code}. احتفظ بهذه القيمة سرية.",
+      "لمتابعة التسليم أدخل {other} في صفحة التتبع.",
+      "حسابك نشط. مرجع الشحن هو {other}.",
+      "طلب مساعدة تسجيل الدخول {other} ينتظر ردًا. لا يتضمن أي رمز.",
+      "إيصال الدفع {other}. انتهت المصادقة بالفعل."
+    ],
+    "noise": ["حسابك لا يزال نشطًا.", "كلمة مرورك لم تتغير."]
+  },
+  "hi": {
+    "train": [
+      "लॉगिन करने के लिए ऐप में {code} दर्ज करें।",
+      "अनुरोधित पुष्टि: {code}। वेबसाइट पर आगे बढ़ें।",
+      "आपका वर्तमान प्रवेश कोड {code} है। खाते की स्थिति नहीं बदली है।",
+      "{code} टाइप करके भुगतान की पुष्टि करें। इस मान को गोपनीय रखें।",
+      "डिलीवरी देखने के लिए ट्रैकिंग पृष्ठ पर {other} दर्ज करें।",
+      "आपका खाता सक्रिय है। शिपिंग संदर्भ {other} है।",
+      "लॉगिन सहायता अनुरोध {other} उत्तर की प्रतीक्षा कर रहा है। कोई कोड शामिल नहीं है।",
+      "भुगतान रसीद {other}। प्रमाणीकरण पहले ही पूरा हो चुका है।"
+    ],
+    "noise": ["आपका खाता अब भी सक्रिय है।", "आपका पासवर्ड नहीं बदला है।"]
+  },
+  "bn": {
+    "train": [
+      "লগইন করতে অ্যাপে {code} লিখুন।",
+      "অনুরোধ করা নিশ্চিতকরণ: {code}। ওয়েবসাইটে এগিয়ে যান।",
+      "আপনার বর্তমান প্রবেশ কোড {code}। অ্যাকাউন্টের অবস্থা বদলায়নি।",
+      "{code} টাইপ করে অর্থপ্রদান নিশ্চিত করুন। এই মানটি গোপন রাখুন।",
+      "ডেলিভারি অনুসরণ করতে ট্র্যাকিং পাতায় {other} লিখুন।",
+      "আপনার অ্যাকাউন্ট সক্রিয়। শিপিং রেফারেন্স {other}।",
+      "লগইন সহায়তার অনুরোধ {other} উত্তরের অপেক্ষায়। কোনো কোড অন্তর্ভুক্ত নেই।",
+      "অর্থপ্রদানের রসিদ {other}। প্রমাণীকরণ আগেই সম্পন্ন হয়েছে।"
+    ],
+    "noise": ["আপনার অ্যাকাউন্ট এখনও সক্রিয়।", "আপনার পাসওয়ার্ড বদলায়নি।"]
+  },
+  "id": {
+    "train": [
+      "Untuk login, masukkan {code} dalam aplikasi.",
+      "Konfirmasi yang diminta: {code}. Lanjutkan di situs web.",
+      "Kode akses Anda saat ini adalah {code}. Status akun tidak berubah.",
+      "Konfirmasikan pembayaran dengan mengetik {code}. Rahasiakan nilai ini.",
+      "Untuk mengikuti pengiriman, masukkan {other} di halaman pelacakan.",
+      "Akun Anda aktif. Referensi pengirimannya adalah {other}.",
+      "Permintaan bantuan login {other} menunggu balasan. Tidak ada kode yang disertakan.",
+      "Tanda terima pembayaran {other}. Autentikasi sudah selesai."
+    ],
+    "noise": ["Akun Anda masih aktif.", "Kata sandi Anda tidak berubah."]
+  },
+  "ur": {
+    "train": [
+      "لاگ ان کے لیے ایپ میں {code} درج کریں۔",
+      "درخواست کردہ تصدیق: {code}۔ ویب سائٹ پر جاری رکھیں۔",
+      "آپ کا موجودہ رسائی کوڈ {code} ہے۔ اکاؤنٹ کی حالت نہیں بدلی۔",
+      "{code} لکھ کر ادائیگی کی تصدیق کریں۔ اس قدر کو خفیہ رکھیں۔",
+      "ترسیل دیکھنے کے لیے نگرانی کے صفحے پر {other} درج کریں۔",
+      "آپ کا اکاؤنٹ فعال ہے۔ بھیجنے کا حوالہ {other} ہے۔",
+      "لاگ ان معاونت کی درخواست {other} جواب کی منتظر ہے۔ کوئی کوڈ شامل نہیں۔",
+      "ادائیگی کی رسید {other}۔ توثیق پہلے ہی مکمل ہو چکی ہے۔"
+    ],
+    "noise": ["آپ کا اکاؤنٹ اب بھی فعال ہے۔", "آپ کا پاس ورڈ نہیں بدلا۔"]
+  }
+}

@@ -1,0 +1,202 @@
+{
+  "et": {
+    "name": "Estonian",
+    "train": [
+      "Sinu kinnituskood on {code}. Ära jaga seda kellegagi.",
+      "{code} on sinu ühekordne parool teenusesse {brand} sisselogimiseks.",
+      "Kinnita oma telefoninumber koodiga {code}. Kehtib {minutes} minutit.",
+      "Makse {amount} EUR kinnitamiseks sisesta {code}. Kaardi lõpp {card}.",
+      "Eelmine kood: {old}. Sinu uus sisselogimiskood on {code}.",
+      "{brand}: kasuta parooli lähtestamiseks turvakoodi {code}.",
+      "Kasuta kupongi {other}, et saada teenuses {brand} {percent}% allahindlust.",
+      "Tellimus {id} on saadetud. Jälgimisnumber: {other}.",
+      "Sinu saldo on {amount} EUR. Sinu kaardi lõpunumbrid on {card}.",
+      "Sinu kinnituskood aegub {duration} sekundi pärast.",
+      "Sinu vana kinnituskood {old} on aegunud. Taotle uut.",
+      "Helista mulle homme numbril {phone}. Näeme kell {time}.",
+      "Sisselogimiskoodid: {old} või {other}. Pole selge, kumb praegu kehtib.",
+      "Ava see kinnituslink: https://example.invalid/verify?code={other}"
+    ],
+    "validation": [
+      "[{brand}] Konto loomise lõpetamiseks sisesta {code}.",
+      "Hoia {code} salajas. See kood kinnitab sinu taotletud sisselogimise.",
+      "Ära kasuta koodi {old}; kinnita oma isik selle asemel koodiga {code}.",
+      "Kinnitustaotlus aegub {duration} sekundi pärast. Ühtegi koodi pole väljastatud.",
+      "Väljastusviide {other}: sinu pakk ootab laos.",
+      "Eripakkumine! Sooduskoodiga {other} säästad {percent}%.",
+      "Kohtume kell {time}, võta kaasa pilet {id}.",
+      "Kaks erinevat kinnituskoodi, {old} ja {other}; kumbagi pole märgitud kehtivaks."
+    ],
+    "test": [
+      "Keegi siseneb sinu {brand} kontole. Kui see oled sina, kirjuta kinnitusekraanile {code}.",
+      "Autentimine on vajalik: {code}. Seda salasõna saab kasutada ainult üks kord.",
+      "Kinnita kaardilt **{card} tehtav {amount} EUR ülekanne koodiga {code}.",
+      "{code}\nKopeeri need märgid väljale oma e-posti aadressi kinnitamiseks. Aegub {minutes} minuti pärast.",
+      "Turvakontroll on kavandatud kuupäevale {date}. Sinu tugiteenuse viide on {id}.",
+      "Saadetise jälgimiskood: {other}. See ei ole sisselogimisparool.",
+      "Kinnitusteenus pole saadaval. Proovi uuesti {duration} sekundi pärast.",
+      "Kaardilt **{card} võeti makse {amount} EUR.",
+      "Viga {id}: kinnitussõnumit ei saanud kohale toimetada."
+    ]
+  },
+  "lv": {
+    "name": "Latvian",
+    "train": [
+      "Jūsu verifikācijas kods ir {code}. Neizpaudiet to nevienam.",
+      "{code} ir jūsu vienreizējā parole, lai pierakstītos {brand}.",
+      "Apstipriniet savu tālruņa numuru ar {code}. Derīgs {minutes} minūtes.",
+      "Lai autorizētu maksājumu {amount} EUR apmērā, ievadiet {code}. Kartes pēdējie cipari {card}.",
+      "Iepriekšējais kods: {old}. Jūsu jaunais pierakstīšanās kods ir {code}.",
+      "{brand}: izmantojiet drošības kodu {code}, lai atiestatītu paroli.",
+      "Izmantojiet kuponu {other}, lai saņemtu {percent}% atlaidi {brand}.",
+      "Pasūtījums {id} ir nosūtīts. Izsekošanas numurs: {other}.",
+      "Jūsu atlikums ir {amount} EUR. Jūsu kartes pēdējie cipari ir {card}.",
+      "Jūsu verifikācijas kods beigs darboties pēc {duration} sekundēm.",
+      "Jūsu vecais verifikācijas kods {old} ir beidzies. Pieprasiet jaunu.",
+      "Piezvani man rīt uz {phone}. Tiksimies {time}.",
+      "Pierakstīšanās kodi: {old} vai {other}. Nav skaidrs, kurš ir aktuāls.",
+      "Atveriet šo verifikācijas saiti: https://example.invalid/verify?code={other}"
+    ],
+    "validation": [
+      "[{brand}] Ievadiet {code}, lai pabeigtu konta izveidi.",
+      "Glabājiet {code} noslēpumā. Šis kods apstiprina jūsu pieprasīto pierakstīšanos.",
+      "Nelietojiet {old}; tā vietā aplieciniet savu identitāti ar {code}.",
+      "Verifikācijas pieprasījums beigsies pēc {duration} sekundēm. Kods nav izsniegts.",
+      "Saņemšanas atsauce {other}: jūsu paka gaida noliktavā.",
+      "Īpašais piedāvājums! Reklāmas kods {other} ietaupa {percent}%.",
+      "Tiksimies {time}; paņem līdzi biļeti {id}.",
+      "Divi atšķirīgi verifikācijas kodi, {old} un {other}; neviens nav norādīts kā aktuāls."
+    ],
+    "test": [
+      "Kāds piekļūst jūsu {brand} kontam. Ja tas esat jūs, verifikācijas ekrānā ierakstiet {code}.",
+      "Nepieciešama autentifikācija: {code}. Šo paroli drīkst izmantot tikai vienreiz.",
+      "Apstipriniet pārskaitījumu {amount} EUR no kartes **{card} ar {code}.",
+      "{code}\nIekopējiet šīs rakstzīmes laukā, lai apstiprinātu e-pasta adresi. Derīgums beidzas pēc {minutes} minūtēm.",
+      "Drošības pārbaude plānota {date}. Jūsu atbalsta pieprasījuma atsauce ir {id}.",
+      "Sūtījuma izsekošanas kods: {other}. Tā nav pierakstīšanās parole.",
+      "Verifikācijas pakalpojums nav pieejams. Mēģiniet vēlreiz pēc {duration} sekundēm.",
+      "No kartes **{card} ieturēts maksājums {amount} EUR apmērā.",
+      "Kļūda {id}: verifikācijas ziņojumu nevarēja piegādāt."
+    ]
+  },
+  "lt": {
+    "name": "Lithuanian",
+    "train": [
+      "Jūsų patvirtinimo kodas yra {code}. Niekam jo neatskleiskite.",
+      "{code} yra jūsų vienkartinis slaptažodis prisijungti prie {brand}.",
+      "Patvirtinkite savo telefono numerį kodu {code}. Galioja {minutes} minutes.",
+      "Norėdami patvirtinti {amount} EUR mokėjimą, įveskite {code}. Kortelės paskutiniai skaitmenys {card}.",
+      "Ankstesnis kodas: {old}. Jūsų naujas prisijungimo kodas yra {code}.",
+      "{brand}: naudokite saugos kodą {code}, kad iš naujo nustatytumėte slaptažodį.",
+      "Naudokite kuponą {other}, kad gautumėte {percent}% nuolaidą {brand}.",
+      "Užsakymas {id} išsiųstas. Sekimo numeris: {other}.",
+      "Jūsų likutis yra {amount} EUR. Jūsų kortelė baigiasi skaitmenimis {card}.",
+      "Jūsų patvirtinimo kodas nustos galioti po {duration} sekundžių.",
+      "Jūsų senasis patvirtinimo kodas {old} nebegalioja. Paprašykite naujo.",
+      "Paskambink man rytoj numeriu {phone}. Susitiksime {time}.",
+      "Prisijungimo kodai: {old} arba {other}. Neaišku, kuris dabar galioja.",
+      "Atidarykite šią patvirtinimo nuorodą: https://example.invalid/verify?code={other}"
+    ],
+    "validation": [
+      "[{brand}] Įveskite {code}, kad baigtumėte kurti paskyrą.",
+      "Laikykite {code} paslaptyje. Šis kodas patvirtina jūsų prašytą prisijungimą.",
+      "Nenaudokite {old}; vietoj jo patvirtinkite savo tapatybę kodu {code}.",
+      "Patvirtinimo užklausa nustos galioti po {duration} sekundžių. Kodas nebuvo išduotas.",
+      "Atsiėmimo nuoroda {other}: jūsų siunta laukia sandėlyje.",
+      "Specialus pasiūlymas! Reklaminis kodas {other} sutaupo {percent}%.",
+      "Susitikime {time}, atsinešk bilietą {id}.",
+      "Du skirtingi patvirtinimo kodai, {old} ir {other}; nė vienas nepažymėtas kaip dabartinis."
+    ],
+    "test": [
+      "Kažkas jungiasi prie jūsų {brand} paskyros. Jei tai jūs, patvirtinimo ekrane įrašykite {code}.",
+      "Reikalingas tapatybės nustatymas: {code}. Šį slaptažodį galima panaudoti tik vieną kartą.",
+      "Patvirtinkite {amount} EUR pervedimą iš kortelės **{card} naudodami {code}.",
+      "{code}\nNukopijuokite šiuos simbolius į lauką, kad patvirtintumėte el. pašto adresą. Galiojimas baigiasi po {minutes} minučių.",
+      "Saugumo patikra numatyta {date}. Jūsų pagalbos užklausos numeris yra {id}.",
+      "Siuntos sekimo kodas: {other}. Tai nėra prisijungimo slaptažodis.",
+      "Patvirtinimo paslauga nepasiekiama. Bandykite dar kartą po {duration} sekundžių.",
+      "Nuo kortelės **{card} nuskaičiuotas {amount} EUR mokėjimas.",
+      "Klaida {id}: patvirtinimo pranešimo nepavyko pristatyti."
+    ]
+  },
+  "bg": {
+    "name": "Bulgarian",
+    "train": [
+      "Вашият код за потвърждение е {code}. Не го споделяйте.",
+      "{code} е вашата еднократна парола за вход в {brand}.",
+      "Потвърдете телефонния си номер с {code}. Валиден е {minutes} минути.",
+      "За да разрешите плащане от {amount} EUR, въведете {code}. Картата завършва на {card}.",
+      "Предишен код: {old}. Вашият нов код за вход е {code}.",
+      "{brand}: използвайте кода за сигурност {code}, за да смените паролата си.",
+      "Използвайте купон {other} за {percent}% отстъпка в {brand}.",
+      "Поръчка {id} е изпратена. Номер за проследяване: {other}.",
+      "Наличността ви е {amount} EUR. Картата ви завършва на {card}.",
+      "Вашият код за потвърждение изтича след {duration} секунди.",
+      "Старият ви код за потвърждение {old} е изтекъл. Поискайте нов.",
+      "Обади ми се утре на {phone}. Ще се видим в {time}.",
+      "Кодове за вход: {old} или {other}. Не е ясно кой е актуален.",
+      "Отворете тази връзка за потвърждение: https://example.invalid/verify?code={other}"
+    ],
+    "validation": [
+      "[{brand}] Въведете {code}, за да завършите създаването на профила си.",
+      "Пазете {code} в тайна. Този код одобрява заявения от вас вход.",
+      "Не използвайте {old}; вместо това потвърдете самоличността си с {code}.",
+      "Заявката за потвърждение изтича след {duration} секунди. Не е издаден код.",
+      "Номер за получаване {other}: пратката ви чака в склада.",
+      "Специална оферта! Промокодът {other} ви спестява {percent}%.",
+      "Ще се срещнем в {time}; донеси билет {id}.",
+      "Два различни кода за потвърждение, {old} и {other}; никой не е обозначен като актуален."
+    ],
+    "test": [
+      "Някой влиза във вашия профил в {brand}. Ако сте вие, напишете {code} на екрана за потвърждение.",
+      "Необходимо е удостоверяване: {code}. Тази парола може да се използва само веднъж.",
+      "Одобрете превода от {amount} EUR от карта **{card} с {code}.",
+      "{code}\nКопирайте тези знаци в полето, за да потвърдите имейл адреса си. Изтича след {minutes} минути.",
+      "Проверката за сигурност е насрочена за {date}. Номерът на заявката ви за поддръжка е {id}.",
+      "Код за проследяване на пратката: {other}. Това не е парола за вход.",
+      "Услугата за потвърждение е недостъпна. Опитайте отново след {duration} секунди.",
+      "От карта **{card} е удържано плащане от {amount} EUR.",
+      "Грешка {id}: съобщението за потвърждение не можа да бъде доставено."
+    ]
+  },
+  "sl": {
+    "name": "Slovenian",
+    "train": [
+      "Vaša potrditvena koda je {code}. Ne delite je z nikomer.",
+      "{code} je vaše enkratno geslo za prijavo v {brand}.",
+      "Potrdite svojo telefonsko številko s kodo {code}. Velja {minutes} minut.",
+      "Za odobritev plačila {amount} EUR vnesite {code}. Kartica se konča z {card}.",
+      "Prejšnja koda: {old}. Vaša nova prijavna koda je {code}.",
+      "{brand}: za ponastavitev gesla uporabite varnostno kodo {code}.",
+      "Uporabite kupon {other} za {percent}% popusta pri {brand}.",
+      "Naročilo {id} je bilo poslano. Številka za sledenje: {other}.",
+      "Vaše stanje je {amount} EUR. Vaša kartica se konča z {card}.",
+      "Vaša potrditvena koda poteče čez {duration} sekund.",
+      "Vaša stara potrditvena koda {old} je potekla. Zahtevajte novo.",
+      "Pokliči me jutri na {phone}. Se vidiva ob {time}.",
+      "Prijavni kodi: {old} ali {other}. Ni jasno, katera je trenutno veljavna.",
+      "Odprite to potrditveno povezavo: https://example.invalid/verify?code={other}"
+    ],
+    "validation": [
+      "[{brand}] Vnesite {code}, da dokončate ustvarjanje računa.",
+      "Ohranite {code} v tajnosti. Ta koda odobri prijavo, ki ste jo zahtevali.",
+      "Ne uporabljajte {old}; namesto tega potrdite svojo identiteto s kodo {code}.",
+      "Zahteva za potrditev poteče po {duration} sekundah. Nobena koda ni bila izdana.",
+      "Referenca za prevzem {other}: vaš paket čaka v skladišču.",
+      "Posebna ponudba! Promocijska koda {other} vam prihrani {percent}%.",
+      "Dobiva se ob {time}; prinesi vstopnico {id}.",
+      "Dve različni potrditveni kodi, {old} in {other}; nobena ni označena kot trenutna."
+    ],
+    "test": [
+      "Nekdo dostopa do vašega računa {brand}. Če ste to vi, vnesite {code} na zaslonu za preverjanje.",
+      "Potrebna je avtentikacija: {code}. To geslo je mogoče uporabiti le enkrat.",
+      "Odobrite prenos {amount} EUR s kartice **{card} s kodo {code}.",
+      "{code}\nKopirajte te znake v polje za potrditev e-poštnega naslova. Poteče po {minutes} minutah.",
+      "Varnostni pregled je načrtovan za {date}. Referenca vašega zahtevka za podporo je {id}.",
+      "Koda za sledenje pošiljki: {other}. To ni geslo za prijavo.",
+      "Storitev preverjanja ni na voljo. Poskusite znova po {duration} sekundah.",
+      "S kartice **{card} je bilo odtegnjeno plačilo {amount} EUR.",
+      "Napaka {id}: potrditvenega sporočila ni bilo mogoče dostaviti."
+    ]
+  }
+}

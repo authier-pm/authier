@@ -1,0 +1,152 @@
+{
+  "en": [
+    "Finish signing in with {code}.",
+    "Approve this transaction using {code}.",
+    "Confirm who you are with {code}.",
+    "Regain account access by entering {code}.",
+    "Locate your package using {other}.",
+    "Find your reservation with {other}.",
+    "Find your support request using {other}.",
+    "Retrieve your invoice by entering {other}."
+  ],
+  "cs": [
+    "Dokončete přihlášení pomocí {code}.",
+    "Schvalte tuto transakci pomocí {code}.",
+    "Potvrďte svou totožnost pomocí {code}.",
+    "Obnovte přístup k účtu zadáním {code}.",
+    "Vyhledejte svůj balíček pomocí {other}.",
+    "Najděte svou rezervaci pomocí {other}.",
+    "Vyhledejte svůj požadavek na podporu pomocí {other}.",
+    "Načtěte svou fakturu zadáním {other}."
+  ],
+  "sk": [
+    "Dokončite prihlásenie pomocou {code}.",
+    "Schváľte túto transakciu pomocou {code}.",
+    "Potvrďte svoju totožnosť pomocou {code}.",
+    "Obnovte prístup k účtu zadaním {code}.",
+    "Vyhľadajte svoj balíček pomocou {other}.",
+    "Nájdite svoju rezerváciu pomocou {other}.",
+    "Vyhľadajte svoju požiadavku na podporu pomocou {other}.",
+    "Načítajte svoju faktúru zadaním {other}."
+  ],
+  "de": [
+    "Schließe die Anmeldung mit {code} ab.",
+    "Genehmige diese Transaktion mit {code}.",
+    "Bestätige deine Identität mit {code}.",
+    "Erhalte durch Eingabe von {code} wieder Kontozugang.",
+    "Finde dein Paket mithilfe von {other}.",
+    "Finde deine Reservierung mit {other}.",
+    "Finde deine Supportanfrage mithilfe von {other}.",
+    "Rufe deine Rechnung durch Eingabe von {other} ab."
+  ],
+  "nl": [
+    "Rond het inloggen af met {code}.",
+    "Keur deze transactie goed met {code}.",
+    "Bevestig je identiteit met {code}.",
+    "Krijg weer toegang tot je account door {code} in te voeren.",
+    "Zoek je pakket met {other}.",
+    "Vind je reservering met {other}.",
+    "Zoek je ondersteuningsverzoek met {other}.",
+    "Haal je factuur op door {other} in te voeren."
+  ],
+  "fr": [
+    "Terminez la connexion avec {code}.",
+    "Approuvez cette transaction avec {code}.",
+    "Confirmez votre identité avec {code}.",
+    "Retrouvez l'accès au compte en saisissant {code}.",
+    "Localisez votre colis avec {other}.",
+    "Retrouvez votre réservation avec {other}.",
+    "Retrouvez votre demande d'assistance avec {other}.",
+    "Récupérez votre facture en saisissant {other}."
+  ],
+  "es": [
+    "Completa el inicio de sesión con {code}.",
+    "Aprueba esta transacción con {code}.",
+    "Confirma tu identidad con {code}.",
+    "Recupera el acceso a la cuenta introduciendo {code}.",
+    "Localiza tu paquete usando {other}.",
+    "Busca tu reserva con {other}.",
+    "Busca tu solicitud de ayuda usando {other}.",
+    "Recupera tu factura introduciendo {other}."
+  ],
+  "pt": [
+    "Conclua a entrada com {code}.",
+    "Aprove esta transação com {code}.",
+    "Confirme a sua identidade com {code}.",
+    "Recupere o acesso à conta introduzindo {code}.",
+    "Localize a sua encomenda usando {other}.",
+    "Encontre a sua reserva com {other}.",
+    "Encontre o seu pedido de apoio usando {other}.",
+    "Obtenha a sua fatura introduzindo {other}."
+  ],
+  "it": [
+    "Completa l'accesso con {code}.",
+    "Approva questa transazione con {code}.",
+    "Conferma la tua identità con {code}.",
+    "Recupera l'accesso all'account inserendo {code}.",
+    "Trova il tuo pacco usando {other}.",
+    "Trova la tua prenotazione con {other}.",
+    "Trova la tua richiesta di assistenza usando {other}.",
+    "Recupera la tua fattura inserendo {other}."
+  ],
+  "ro": [
+    "Finalizează conectarea cu {code}.",
+    "Aprobă această tranzacție folosind {code}.",
+    "Confirmă-ți identitatea cu {code}.",
+    "Recapătă accesul la cont introducând {code}.",
+    "Localizează coletul folosind {other}.",
+    "Găsește rezervarea cu {other}.",
+    "Găsește cererea de asistență folosind {other}.",
+    "Recuperează factura introducând {other}."
+  ],
+  "pl": [
+    "Dokończ logowanie za pomocą {code}.",
+    "Zatwierdź tę transakcję za pomocą {code}.",
+    "Potwierdź swoją tożsamość za pomocą {code}.",
+    "Odzyskaj dostęp do konta, wpisując {code}.",
+    "Znajdź swoją paczkę za pomocą {other}.",
+    "Znajdź swoją rezerwację za pomocą {other}.",
+    "Znajdź swoje zgłoszenie do pomocy za pomocą {other}.",
+    "Pobierz swoją fakturę, wpisując {other}."
+  ],
+  "hu": [
+    "Fejezd be a bejelentkezést ezzel: {code}.",
+    "Hagyd jóvá ezt a tranzakciót ezzel: {code}.",
+    "Erősítsd meg a személyazonosságodat ezzel: {code}.",
+    "Szerezd vissza a fiókhoz való hozzáférést a(z) {code} megadásával.",
+    "Keresd meg a csomagodat ezzel: {other}.",
+    "Keresd meg a foglalásodat ezzel: {other}.",
+    "Keresd meg az ügyfélszolgálati kérésedet ezzel: {other}.",
+    "Töltsd le a számládat a(z) {other} megadásával."
+  ],
+  "da": [
+    "Afslut login med {code}.",
+    "Godkend denne transaktion med {code}.",
+    "Bekræft din identitet med {code}.",
+    "Få adgang til kontoen igen ved at indtaste {code}.",
+    "Find din pakke ved hjælp af {other}.",
+    "Find din reservation med {other}.",
+    "Find din supportanmodning ved hjælp af {other}.",
+    "Hent din faktura ved at indtaste {other}."
+  ],
+  "sv": [
+    "Slutför inloggningen med {code}.",
+    "Godkänn den här transaktionen med {code}.",
+    "Bekräfta din identitet med {code}.",
+    "Få åtkomst till kontot igen genom att ange {code}.",
+    "Hitta ditt paket med hjälp av {other}.",
+    "Hitta din bokning med {other}.",
+    "Hitta din supportförfrågan med hjälp av {other}.",
+    "Hämta din faktura genom att ange {other}."
+  ],
+  "fi": [
+    "Viimeistele kirjautuminen käyttämällä {code}.",
+    "Hyväksy tämä tapahtuma käyttämällä {code}.",
+    "Vahvista henkilöllisyytesi käyttämällä {code}.",
+    "Palauta pääsy tilille syöttämällä {code}.",
+    "Etsi pakettisi käyttämällä {other}.",
+    "Etsi varauksesi käyttämällä {other}.",
+    "Etsi tukipyyntösi käyttämällä {other}.",
+    "Nouda laskusi syöttämällä {other}."
+  ]
+}

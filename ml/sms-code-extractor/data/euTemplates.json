@@ -1,0 +1,202 @@
+{
+  "de": {
+    "name": "German",
+    "train": [
+      "Dein Bestätigungscode lautet {code}. Gib ihn nicht weiter.",
+      "{code} ist dein Einmalpasswort für die Anmeldung bei {brand}.",
+      "Bestätige deine Telefonnummer mit {code}. Gültig für {minutes} Minuten.",
+      "Gib {code} ein, um eine Zahlung von {amount} EUR zu autorisieren. Kartenendung {card}.",
+      "Vorheriger Code: {old}. Dein neuer Anmeldecode ist {code}.",
+      "{brand}: Verwende den Sicherheitscode {code}, um dein Passwort zurückzusetzen.",
+      "Nutze den Gutschein {other} für {percent}% Rabatt bei {brand}.",
+      "Bestellung {id} wurde versandt. Sendungsnummer: {other}.",
+      "Dein Guthaben beträgt {amount} EUR. Deine Karte endet auf {card}.",
+      "Dein Bestätigungscode läuft in {duration} Sekunden ab.",
+      "Dein alter Bestätigungscode {old} ist abgelaufen. Fordere einen neuen an.",
+      "Ruf mich morgen unter {phone} an. Wir sehen uns um {time}.",
+      "Anmeldecodes: {old} oder {other}. Es ist unklar, welcher aktuell ist.",
+      "Öffne diesen Bestätigungslink: https://example.invalid/verify?code={other}"
+    ],
+    "validation": [
+      "[{brand}] Gib {code} ein, um die Erstellung deines Kontos abzuschließen.",
+      "Halte {code} geheim. Dieser Code bestätigt die von dir angeforderte Anmeldung.",
+      "Verwende nicht {old}; bestätige deine Identität stattdessen mit {code}.",
+      "Die Bestätigungsanfrage läuft nach {duration} Sekunden ab. Es wurde kein Code ausgestellt.",
+      "Abholreferenz {other}: Dein Paket wartet im Depot.",
+      "Sonderangebot! Mit dem Aktionscode {other} sparst du {percent}%.",
+      "Triff mich um {time} und bring die Eintrittskarte {id} mit.",
+      "Zwei verschiedene Bestätigungscodes, {old} und {other}; keiner ist als aktuell markiert."
+    ],
+    "test": [
+      "Jemand greift auf dein {brand}-Konto zu. Wenn du das bist, tippe {code} auf dem Bestätigungsbildschirm ein.",
+      "Authentifizierung erforderlich: {code}. Dieses Kennwort ist nur einmal verwendbar.",
+      "Genehmige die Überweisung von {amount} EUR von Karte **{card} mit {code}.",
+      "{code}\nKopiere diese Zeichen in das Feld, um deine E-Mail-Adresse zu bestätigen. Läuft nach {minutes} Minuten ab.",
+      "Sicherheitsprüfung für {date} geplant. Deine Supportreferenz lautet {id}.",
+      "Sendungsverfolgungscode: {other}. Dies ist kein Anmeldepasswort.",
+      "Bestätigungsdienst nicht verfügbar. Versuche es nach {duration} Sekunden erneut.",
+      "Eine Zahlung von {amount} EUR wurde von Karte **{card} abgebucht.",
+      "Fehler {id}: Die Bestätigungsnachricht konnte nicht zugestellt werden."
+    ]
+  },
+  "cs": {
+    "name": "Czech",
+    "train": [
+      "Váš ověřovací kód je {code}. Nikomu ho nesdělujte.",
+      "{code} je vaše jednorázové heslo pro přihlášení do {brand}.",
+      "Potvrďte své telefonní číslo kódem {code}. Platí {minutes} minut.",
+      "Pro autorizaci platby {amount} EUR zadejte {code}. Karta končí číslicemi {card}.",
+      "Předchozí kód: {old}. Váš nový přihlašovací kód je {code}.",
+      "{brand}: pro obnovení hesla použijte bezpečnostní kód {code}.",
+      "Použijte kupon {other} pro slevu {percent}% u {brand}.",
+      "Objednávka {id} byla odeslána. Sledovací číslo: {other}.",
+      "Váš zůstatek je {amount} EUR. Vaše karta končí číslicemi {card}.",
+      "Platnost vašeho ověřovacího kódu vyprší za {duration} sekund.",
+      "Váš starý ověřovací kód {old} už neplatí. Vyžádejte si nový.",
+      "Zítra mi zavolej na {phone}. Uvidíme se v {time}.",
+      "Přihlašovací kódy: {old} nebo {other}. Není jasné, který je aktuální.",
+      "Otevřete tento ověřovací odkaz: https://example.invalid/verify?code={other}"
+    ],
+    "validation": [
+      "[{brand}] Dokončete vytvoření účtu zadáním {code}.",
+      "Uchovejte {code} v tajnosti. Tento kód schvaluje vámi požadované přihlášení.",
+      "Nepoužívejte {old}; svou totožnost ověřte místo toho pomocí {code}.",
+      "Požadavek na ověření vyprší za {duration} sekund. Žádný kód nebyl vydán.",
+      "Číslo pro vyzvednutí {other}: vaše zásilka čeká ve skladu.",
+      "Speciální nabídka! Slevový kód {other} vám ušetří {percent}%.",
+      "Sejdeme se v {time}, přines vstupenku {id}.",
+      "Dva různé ověřovací kódy, {old} a {other}; ani jeden není označen jako aktuální."
+    ],
+    "test": [
+      "Někdo vstupuje do vašeho účtu {brand}. Pokud jste to vy, napište do ověřovacího okna {code}.",
+      "Je vyžadováno ověření totožnosti: {code}. Toto heslo lze použít jen jednou.",
+      "Schvalte převod {amount} EUR z karty **{card} pomocí {code}.",
+      "{code}\nZkopírujte tyto znaky do pole pro potvrzení e-mailové adresy. Platnost skončí za {minutes} minut.",
+      "Bezpečnostní kontrola je naplánována na {date}. Číslo požadavku podpory je {id}.",
+      "Kód pro sledování zásilky: {other}. Nejde o přihlašovací heslo.",
+      "Ověřovací služba není dostupná. Zkuste to znovu za {duration} sekund.",
+      "Z karty **{card} byla stržena platba {amount} EUR.",
+      "Chyba {id}: ověřovací zprávu se nepodařilo doručit."
+    ]
+  },
+  "sk": {
+    "name": "Slovak",
+    "train": [
+      "Váš overovací kód je {code}. Nikomu ho neprezrádzajte.",
+      "{code} je vaše jednorazové heslo na prihlásenie do {brand}.",
+      "Potvrďte svoje telefónne číslo kódom {code}. Platí {minutes} minút.",
+      "Na autorizáciu platby {amount} EUR zadajte {code}. Karta končí číslicami {card}.",
+      "Predchádzajúci kód: {old}. Váš nový prihlasovací kód je {code}.",
+      "{brand}: na obnovenie hesla použite bezpečnostný kód {code}.",
+      "Použite kupón {other} na zľavu {percent}% v {brand}.",
+      "Objednávka {id} bola odoslaná. Sledovacie číslo: {other}.",
+      "Váš zostatok je {amount} EUR. Vaša karta končí číslicami {card}.",
+      "Platnosť vášho overovacieho kódu vyprší o {duration} sekúnd.",
+      "Váš starý overovací kód {old} už neplatí. Vyžiadajte si nový.",
+      "Zajtra mi zavolaj na {phone}. Uvidíme sa o {time}.",
+      "Prihlasovacie kódy: {old} alebo {other}. Nie je jasné, ktorý je aktuálny.",
+      "Otvorte tento overovací odkaz: https://example.invalid/verify?code={other}"
+    ],
+    "validation": [
+      "[{brand}] Dokončite vytvorenie účtu zadaním {code}.",
+      "Uchovajte {code} v tajnosti. Tento kód schvaľuje vami požadované prihlásenie.",
+      "Nepoužívajte {old}; svoju totožnosť overte namiesto toho pomocou {code}.",
+      "Požiadavka na overenie vyprší o {duration} sekúnd. Žiadny kód nebol vydaný.",
+      "Číslo na vyzdvihnutie {other}: vaša zásielka čaká v sklade.",
+      "Špeciálna ponuka! Zľavový kód {other} vám ušetrí {percent}%.",
+      "Stretneme sa o {time}, prines vstupenku {id}.",
+      "Dva rôzne overovacie kódy, {old} a {other}; ani jeden nie je označený ako aktuálny."
+    ],
+    "test": [
+      "Niekto vstupuje do vášho účtu {brand}. Ak ste to vy, napíšte na overovaciu obrazovku {code}.",
+      "Vyžaduje sa overenie totožnosti: {code}. Toto heslo možno použiť iba raz.",
+      "Schváľte prevod {amount} EUR z karty **{card} pomocou {code}.",
+      "{code}\nSkopírujte tieto znaky do poľa na potvrdenie e-mailovej adresy. Platnosť skončí o {minutes} minút.",
+      "Bezpečnostná kontrola je naplánovaná na {date}. Číslo požiadavky podpory je {id}.",
+      "Kód na sledovanie zásielky: {other}. Nie je to prihlasovacie heslo.",
+      "Overovacia služba nie je dostupná. Skúste to znova o {duration} sekúnd.",
+      "Z karty **{card} bola strhnutá platba {amount} EUR.",
+      "Chyba {id}: overovaciu správu sa nepodarilo doručiť."
+    ]
+  },
+  "pl": {
+    "name": "Polish",
+    "train": [
+      "Twój kod weryfikacyjny to {code}. Nie udostępniaj go nikomu.",
+      "{code} to twoje jednorazowe hasło do logowania w {brand}.",
+      "Potwierdź numer telefonu kodem {code}. Ważny przez {minutes} minut.",
+      "Aby zatwierdzić płatność {amount} EUR, wpisz {code}. Końcówka karty {card}.",
+      "Poprzedni kod: {old}. Twój nowy kod logowania to {code}.",
+      "{brand}: użyj kodu bezpieczeństwa {code}, aby zresetować hasło.",
+      "Użyj kuponu {other}, aby uzyskać {percent}% zniżki w {brand}.",
+      "Zamówienie {id} zostało wysłane. Numer przesyłki: {other}.",
+      "Twoje saldo wynosi {amount} EUR. Twoja karta kończy się na {card}.",
+      "Twój kod weryfikacyjny wygaśnie za {duration} sekund.",
+      "Twój stary kod weryfikacyjny {old} wygasł. Poproś o nowy.",
+      "Zadzwoń jutro pod {phone}. Widzimy się o {time}.",
+      "Kody logowania: {old} lub {other}. Nie wiadomo, który jest aktualny.",
+      "Otwórz ten link weryfikacyjny: https://example.invalid/verify?code={other}"
+    ],
+    "validation": [
+      "[{brand}] Wpisz {code}, aby zakończyć tworzenie konta.",
+      "Zachowaj {code} w tajemnicy. Ten kod zatwierdza żądane logowanie.",
+      "Nie używaj {old}; zamiast tego potwierdź tożsamość kodem {code}.",
+      "Żądanie weryfikacji wygaśnie po {duration} sekundach. Nie wydano żadnego kodu.",
+      "Numer odbioru {other}: twoja paczka czeka w magazynie.",
+      "Oferta specjalna! Kod promocyjny {other} pozwala zaoszczędzić {percent}%.",
+      "Spotkajmy się o {time}, przynieś bilet {id}.",
+      "Dwa różne kody weryfikacyjne, {old} i {other}; żaden nie jest oznaczony jako aktualny."
+    ],
+    "test": [
+      "Ktoś uzyskuje dostęp do twojego konta {brand}. Jeśli to ty, wpisz {code} na ekranie weryfikacji.",
+      "Wymagane uwierzytelnienie: {code}. Tego hasła można użyć tylko raz.",
+      "Zatwierdź przelew {amount} EUR z karty **{card} za pomocą {code}.",
+      "{code}\nSkopiuj te znaki do pola, aby potwierdzić adres e-mail. Wygasa po {minutes} minutach.",
+      "Kontrola bezpieczeństwa zaplanowana na {date}. Numer zgłoszenia do pomocy to {id}.",
+      "Kod śledzenia przesyłki: {other}. To nie jest hasło logowania.",
+      "Usługa weryfikacji niedostępna. Spróbuj ponownie za {duration} sekund.",
+      "Kartę **{card} obciążono płatnością {amount} EUR.",
+      "Błąd {id}: nie udało się dostarczyć wiadomości weryfikacyjnej."
+    ]
+  },
+  "nl": {
+    "name": "Dutch",
+    "train": [
+      "Je verificatiecode is {code}. Deel deze met niemand.",
+      "{code} is je eenmalige wachtwoord om in te loggen bij {brand}.",
+      "Bevestig je telefoonnummer met {code}. Geldig gedurende {minutes} minuten.",
+      "Voer {code} in om een betaling van {amount} EUR goed te keuren. Kaart eindigt op {card}.",
+      "Vorige code: {old}. Je nieuwe inlogcode is {code}.",
+      "{brand}: gebruik beveiligingscode {code} om je wachtwoord opnieuw in te stellen.",
+      "Gebruik kortingsbon {other} voor {percent}% korting bij {brand}.",
+      "Bestelling {id} is verzonden. Volgnummer: {other}.",
+      "Je saldo is {amount} EUR. Je kaart eindigt op {card}.",
+      "Je verificatiecode verloopt over {duration} seconden.",
+      "Je oude verificatiecode {old} is verlopen. Vraag een nieuwe aan.",
+      "Bel me morgen op {phone}. Tot {time}.",
+      "Inlogcodes: {old} of {other}. Het is onduidelijk welke geldig is.",
+      "Open deze verificatielink: https://example.invalid/verify?code={other}"
+    ],
+    "validation": [
+      "[{brand}] Voer {code} in om het aanmaken van je account af te ronden.",
+      "Houd {code} geheim. Deze code keurt je aangevraagde aanmelding goed.",
+      "Gebruik {old} niet; verifieer je identiteit in plaats daarvan met {code}.",
+      "Het verificatieverzoek verloopt na {duration} seconden. Er is geen code uitgegeven.",
+      "Afhaalreferentie {other}: je pakket wacht in het depot.",
+      "Speciale aanbieding! Met actiecode {other} bespaar je {percent}%.",
+      "Ontmoet me om {time} en neem kaartje {id} mee.",
+      "Twee verschillende verificatiecodes, {old} en {other}; geen van beide is als actueel gemarkeerd."
+    ],
+    "test": [
+      "Iemand probeert je {brand}-account te openen. Als jij dit bent, typ dan {code} op het verificatiescherm.",
+      "Authenticatie vereist: {code}. Dit wachtwoord kan slechts eenmaal worden gebruikt.",
+      "Keur de overschrijving van {amount} EUR vanaf kaart **{card} goed met {code}.",
+      "{code}\nKopieer deze tekens naar het veld om je e-mailadres te bevestigen. Verloopt na {minutes} minuten.",
+      "Beveiligingscontrole gepland op {date}. Je ondersteuningsreferentie is {id}.",
+      "Traceercode van de zending: {other}. Dit is geen inlogwachtwoord.",
+      "Verificatiedienst niet beschikbaar. Probeer het na {duration} seconden opnieuw.",
+      "Er is een betaling van {amount} EUR afgeschreven van kaart **{card}.",
+      "Fout {id}: het verificatiebericht kon niet worden bezorgd."
+    ]
+  }
+}

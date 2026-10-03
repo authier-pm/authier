@@ -108,6 +108,23 @@ clearing an empty search restores the list, and resizing updates the visible
 items in Firefox and Chromium. Screenshots are captured under
 `docs/screenshots/vault-scrolling-{table,cards}-{firefox,chromium}.png`.
 
+The `offline-vault` scenario (`scenarios/offlineVault.ts`) renders the actual built
+extension in a disposable Chromium profile with encrypted synthetic passwords,
+a TOTP and a passkey. All network traffic is intercepted. Run from `web-extension`:
+
+```sh
+bun run prodBuild
+bunx playwright test --config playwrightOfflineVault.config.ts
+```
+
+It covers a disconnected network, HTTP 503 with an expired session, GraphQL
+database errors, and session renewal returning no items before subsequent
+requests fail. It checks that cached items render while requests are pending
+and remain visible after retry and reload, search and password reveal work,
+both card and table views remain populated, and a successful retry clears the
+offline notice. It captures
+`docs/screenshots/offline-vault.png`.
+
 The `bitfinex-totp` scenario exercises the production account picker and OTP fill
 against a synthetic Bitfinex login and its asynchronous document-level paste
 handler. Its deliberately broad saved username selector also matches the OTP
