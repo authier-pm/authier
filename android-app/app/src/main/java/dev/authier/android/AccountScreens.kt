@@ -1,7 +1,6 @@
 package dev.authier.android
 
 import android.content.Intent
-import android.net.Uri
 import android.provider.Settings
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -24,11 +23,7 @@ fun SettingsScreen(state: VaultUiState, model: VaultViewModel) {
     var discard by remember { mutableStateOf<PendingWrite?>(null) }
     LazyColumn(Modifier.fillMaxSize(), contentPadding = PaddingValues(24.dp), verticalArrangement = Arrangement.spacedBy(20.dp)) {
         item { ScreenHeading("Vault settings", state.email) }
-        item {
-            SettingSection("ANDROID AUTOFILL", "Fill passwords in Android apps you explicitly associate with a vault item. Choose an account to fill. Unlock is only needed after your timeout expires.") {
-                OutlinedButton({ context.startActivity(Intent(Settings.ACTION_REQUEST_SET_AUTOFILL_SERVICE, Uri.parse("package:${context.packageName}"))) }, enabled = !state.demo, modifier = Modifier.fillMaxWidth()) { Text("Set up Android Autofill") }
-            }
-        }
+        item { AndroidAutofillSettings(demo = state.demo) }
         item {
             SettingSection("SIGN-IN NOTIFICATIONS", "Get notified when another device signs in or needs your approval. Your device access policy determines which trusted devices receive requests.") {
                 OutlinedButton({ context.startActivity(Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)) }, enabled = !state.demo, modifier = Modifier.fillMaxWidth()) { Text("Notification settings") }

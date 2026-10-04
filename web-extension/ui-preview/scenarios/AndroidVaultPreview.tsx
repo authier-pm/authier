@@ -17,10 +17,24 @@ import associationScreenshot from '../../../docs/screenshots/android-autofill-as
 import masterDevicesScreenshot from '../../../docs/screenshots/android-devices-master.png'
 import transferMasterScreenshot from '../../../docs/screenshots/android-devices-transfer.png'
 import memberDevicesScreenshot from '../../../docs/screenshots/android-devices-member.png'
+import autofillEnabledScreenshot from '../../../docs/screenshots/android-autofill-settings-enabled.png'
+import autofillDisabledScreenshot from '../../../docs/screenshots/android-autofill-settings-disabled.png'
 
 // Compose runs in Android, so this scenario displays captures from the actual
 // debug app instead of maintaining a second implementation of its UI in React.
 const screens = [
+  {
+    title: 'Autofill set up',
+    image: autofillEnabledScreenshot,
+    description:
+      'A green check confirms Android has selected Authier as its autofill service. Returning from Android settings refreshes the status automatically.'
+  },
+  {
+    title: 'Autofill not set up',
+    image: autofillDisabledScreenshot,
+    description:
+      'When Authier is not selected, settings show Not set up and the setup action. Canceling setup or selecting another provider leaves this status unchanged.'
+  },
   {
     title: 'Recovery setup',
     image: recoverySetupScreenshot,

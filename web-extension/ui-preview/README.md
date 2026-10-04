@@ -163,6 +163,15 @@ second web implementation. Refresh `docs/screenshots/android-vault.png` and
 `android-autofill-association.png` after selecting a login in that preview, then run its
 Playwright test to render `docs/screenshots/android-ui-preview.png`.
 
+The gallery includes `android-autofill-settings-enabled.png` and
+`android-autofill-settings-disabled.png`, captured from the debug demo intent with
+`--ei tab 2`. These use Android's actual selected autofill provider, even in demo
+mode: select the debug Authier service in a disposable emulator for the enabled
+capture, then select another provider for the disabled capture. Restore the
+emulator's previous provider afterward. `AndroidAutofillSettingsTest` checks
+returning without setup, selecting Authier, and switching to another provider
+while the settings screen is paused.
+
 The Android gallery also includes `android-api-error.png`, captured from the debug-only
 `ApiErrorPreviewActivity` after tapping its error banner. It uses the production
 response dialog with a synthetic HTTP 500 payload and makes no network requests.
