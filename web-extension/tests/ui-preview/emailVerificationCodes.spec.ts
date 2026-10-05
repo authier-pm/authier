@@ -136,6 +136,44 @@ test('detects a later unread inbox email while the popup is already open', async
   await expect(page.getByLabel('New email verification code')).toBeVisible()
 })
 
+test('bulk dismissal counts codes and keeps an email received half a second before clicking', async ({
+  page
+}) => {
+  await page.clock.install()
+  await page.goto('/?scenario=email-verification-codes')
+  const popup = page.locator('[data-preview-popup]')
+  await expect(popup.getByText('213***', { exact: true })).toBeVisible()
+  await expect(
+    popup.getByRole('button', { name: 'Dismiss all 1 temp codes', exact: true })
+  ).toBeVisible()
+  await page.clock.runFor(1000)
+  await page.getByRole('button', { name: 'Receive another email code' }).click()
+  await page.clock.runFor(500)
+  await expect(popup.getByText('A7B*****', { exact: true })).toBeVisible()
+  await page.screenshot({
+    path: '../docs/screenshots/email-verification-codes-dismiss-all.png'
+  })
+  await popup
+    .getByRole('button', { name: 'Dismiss all 2 temp codes', exact: true })
+    .click()
+  await expect(popup.getByText('213***', { exact: true })).toHaveCount(0)
+  await expect(popup.getByText('A7B*****', { exact: true })).toBeVisible()
+  await expect(page.getByLabel('New email verification code')).toBeVisible()
+  const dismiss = popup.getByRole('button', {
+    name: 'Dismiss all 1 temp codes',
+    exact: true
+  })
+  await dismiss.click()
+  await expect(popup.getByText('A7B*****', { exact: true })).toBeVisible()
+  // Allow a full second after the observer has detected the new email.
+  await page.clock.runFor(1000)
+  await dismiss.click()
+  await expect(
+    popup.getByRole('region', { name: 'Email verification codes' })
+  ).toHaveCount(0)
+  await expect(page.getByLabel('New email verification code')).toHaveCount(0)
+})
+
 test('copies normalized codes from different real browser HTML layouts', async ({
   page
 }) => {

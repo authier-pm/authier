@@ -1,16 +1,21 @@
-import { useSyncExternalStore } from 'react'
+import { useState, useSyncExternalStore } from 'react'
 import { IoMailOutline } from 'react-icons/io5'
 import { VerificationCodes } from '@src/verification-codes/VerificationCodes'
 import { observeGmailCodes } from '@src/verification-codes/readGmailCodes'
+import { Button } from '@src/components/ui/button'
 import { PopupPreview } from '../PopupPreview'
 import { getPreviewActiveTabId, subscribePreviewTab } from '../browserMock'
-import { gmailVerificationEmail } from '../fixtures/gmailVerificationEmail'
+import {
+  gmailVerificationEmail,
+  gmailUnreadVerificationEmail
+} from '../fixtures/gmailVerificationEmail'
 import {
   CodePopupToolbar,
   useCodePreviewBackground
 } from './codePreviewBackground'
 
 export const EmailVerificationCodesPreview = () => {
+  const [email, setEmail] = useState(gmailVerificationEmail)
   const ready = useCodePreviewBackground({
     reportUrl: 'https://mail.google.com/mail/u/0/#inbox',
     reportTabId: 42,
@@ -40,12 +45,20 @@ export const EmailVerificationCodesPreview = () => {
           <div
             data-gmail-fixture
             className="rounded-2xl border border-[color:var(--color-border)] bg-[color:var(--color-card)] p-5 text-sm [&_.hP]:mb-4 [&_.hP]:text-lg [&_.hP]:font-semibold [&_.gE]:mb-6 [&_.gE]:text-xs [&_.gE]:text-[color:var(--color-muted)] [&_p]:mb-4 [&_strong]:font-mono [&_strong]:text-2xl [&_strong]:tracking-widest"
-            dangerouslySetInnerHTML={{ __html: gmailVerificationEmail }}
+            dangerouslySetInnerHTML={{ __html: email }}
           />
           <p className="mt-4 text-xs leading-relaxed text-[color:var(--color-muted)]">
             Detected from the email already in your browser. Click the masked
             code in Authier to copy and reveal it.
           </p>
+          <Button
+            className="mt-3"
+            size="sm"
+            variant="outline"
+            onClick={() => setEmail(gmailUnreadVerificationEmail)}
+          >
+            Receive another email code
+          </Button>
         </div>
         <div>
           <CodePopupToolbar badgeLabel="New email verification code" />

@@ -68,14 +68,28 @@ export const useVerificationCodes = () => {
     }
   }, [])
 
-  const update = async (
-    kind: typeof CodeMessageKind.COPIED | typeof CodeMessageKind.DISMISS,
-    id: string
-  ) => {
-    const response: unknown = await browser.runtime.sendMessage({ kind, id })
+  const applyUpdate = (response: unknown) => {
     const parsed = verificationCodesSchema.parse(response)
     setEntries(parsed.filter((entry) => entry.expiresAt > Date.now()))
   }
 
-  return { entries, error, update }
+  const update = (
+    kind: typeof CodeMessageKind.COPIED | typeof CodeMessageKind.DISMISS,
+    id: string
+  ) => browser.runtime.sendMessage({ kind, id }).then(applyUpdate)
+
+  const dismissAll = async (sectionEntries: VerificationCode[]) => {
+    // Snapshot eligible IDs at click time so new arrivals cannot be swept up,
+    // even if the background takes a while to process this request.
+    const cutoff = Date.now() - 1000
+    const ids = sectionEntries
+      .filter((entry) => entry.detectedAt <= cutoff)
+      .map((entry) => entry.id)
+    if (!ids.length) return
+    await browser.runtime
+      .sendMessage({ kind: CodeMessageKind.DISMISS_MANY, ids })
+      .then(applyUpdate)
+  }
+
+  return { entries, error, update, dismissAll }
 }

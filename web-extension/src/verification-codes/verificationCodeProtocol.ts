@@ -21,7 +21,8 @@ export const CodeMessageKind = {
   GET_FOR_PAGE: 'authierVerificationCodeGetForPage',
   FILLED_FOR_PAGE: 'authierVerificationCodeFilledForPage',
   OPEN_SOURCE: 'authierVerificationCodeOpenSource',
-  DISMISS: 'authierVerificationCodeDismiss'
+  DISMISS: 'authierVerificationCodeDismiss',
+  DISMISS_MANY: 'authierVerificationCodeDismissMany'
 } as const
 export const CODE_MESSAGE_PREFIX = 'authierVerificationCode'
 
@@ -121,6 +122,10 @@ export const codeMessageSchema = z.discriminatedUnion('kind', [
   idMessage(CodeMessageKind.FILLED_FOR_PAGE),
   idMessage(CodeMessageKind.COPIED),
   idMessage(CodeMessageKind.DISMISS),
+  z.object({
+    kind: z.literal(CodeMessageKind.DISMISS_MANY),
+    ids: z.array(z.string().uuid()).max(20)
+  }),
   idMessage(CodeMessageKind.OPEN_SOURCE)
 ])
 

@@ -61,6 +61,26 @@ test('picks up a code the phone relays while the popup is open', async ({
   expect(await page.evaluate(() => navigator.clipboard.readText())).toBe('4827')
 })
 
+test('dismisses all older phone codes from both web and Android sources', async ({
+  page
+}) => {
+  await page.clock.install()
+  await page.goto('/?scenario=sms-verification-codes')
+  const sms = page.getByRole('region', { name: 'SMS verification codes' })
+  const dismiss = sms.getByRole('button', {
+    name: 'Dismiss all 3 temp codes',
+    exact: true
+  })
+  await expect(dismiss).toBeVisible()
+  await page.clock.runFor(1000)
+  await dismiss.click()
+  await expect(sms).toHaveCount(0)
+  await expect(page.getByLabel('New SMS verification code')).toHaveCount(0)
+  // The next phone poll must not restore dismissed codes.
+  await page.clock.runFor(4000)
+  await expect(sms).toHaveCount(0)
+})
+
 test('badges a phone relay with the popup closed and shows it on opening', async ({
   page
 }) => {

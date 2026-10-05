@@ -26,6 +26,10 @@ to verify masked codes, copy/reveal, clipboard rejection, new inbox previews,
 expiry, sender favicons with a mail-icon fallback, and opening the source Gmail
 tab without copying the code. The popover's sender favicon carries a red mail
 badge for a new code. The favicon response is a deterministic fixture.
+The "Receive another email code" control also exercises bulk dismissal: the
+popover counts each section's codes and preserves arrivals less than one second
+old when "Dismiss all X temp codes" is clicked. The suite captures this action in
+`docs/screenshots/email-verification-codes-dismiss-all.png`.
 It captures `docs/screenshots/email-verification-codes.png` and
 `docs/screenshots/email-verification-codes-copied.png`.
 

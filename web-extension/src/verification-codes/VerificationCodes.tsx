@@ -136,23 +136,51 @@ const VerificationCodeItem = ({
 const CodeSection = ({
   section,
   entries,
-  update
+  update,
+  dismissAll
 }: {
   section: (typeof codeSections)[number]
   entries: VerificationCode[]
   update: UpdateCode
+  dismissAll: ReturnType<typeof useVerificationCodes>['dismissAll']
 }) => {
+  const [busy, setBusy] = useState(false)
+  const [error, setError] = useState('')
   if (!entries.length) return null
+
+  const dismiss = () => {
+    setBusy(true)
+    setError('')
+    void dismissAll(entries)
+      .catch(() => {
+        setError('Could not dismiss the codes. Please try again.')
+      })
+      .finally(() => setBusy(false))
+  }
+
   return (
     <section aria-label={section.label} className="px-3 pt-3 pb-1">
       <div className="mb-2 flex items-center justify-between gap-2 px-1">
         <h2 className="text-xs font-semibold text-[color:var(--color-muted)]">
           {section.heading}
         </h2>
-        <span className="text-[10px] text-[color:var(--color-muted)]">
-          Temporary codes
-        </span>
+        <button
+          type="button"
+          className="shrink-0 rounded-sm text-[10px] text-[color:var(--color-muted)] hover:text-[color:var(--color-primary)] hover:underline focus-visible:outline-[color:var(--color-ring)] disabled:opacity-60"
+          disabled={busy}
+          onClick={dismiss}
+        >
+          Dismiss all {entries.length} temp codes
+        </button>
       </div>
+      {error ? (
+        <p
+          role="alert"
+          className="mb-2 text-xs text-[color:var(--color-danger)]"
+        >
+          {error}
+        </p>
+      ) : null}
       <ul className="grid gap-2">
         {entries.map((entry) => (
           <VerificationCodeItem key={entry.id} entry={entry} update={update} />
@@ -163,7 +191,7 @@ const CodeSection = ({
 }
 
 export const VerificationCodes = () => {
-  const { entries, error, update } = useVerificationCodes()
+  const { entries, error, update, dismissAll } = useVerificationCodes()
   if (!entries.length && !error) return null
 
   return (
@@ -182,6 +210,7 @@ export const VerificationCodes = () => {
           section={section}
           entries={entries.filter(section.includes)}
           update={update}
+          dismissAll={dismissAll}
         />
       ))}
     </>

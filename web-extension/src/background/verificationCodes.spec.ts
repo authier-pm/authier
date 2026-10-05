@@ -250,15 +250,17 @@ describe('verification code background messages', () => {
 
   it('does not disclose codes to Gmail or ordinary content scripts', async () => {
     await report()
+    const [entry] = await list()
     for (const kind of [
       CodeMessageKind.LIST,
       CodeMessageKind.COPIED,
       CodeMessageKind.DISMISS,
+      CodeMessageKind.DISMISS_MANY,
       CodeMessageKind.OPEN_SOURCE
     ]) {
       expect(
         await handleVerificationCodeMessage(
-          { kind, id: (await list())[0].id },
+          { kind, id: entry.id, ids: [entry.id] },
           gmailSender
         )
       ).toBeNull()
@@ -488,6 +490,41 @@ describe('verification code background messages', () => {
     await report()
     expect(await list()).toEqual([])
     expect(JSON.stringify(storage)).not.toContain(candidate.code)
+  })
+
+  it('dismisses the selected codes atomically and does not resurrect them', async () => {
+    await Promise.all([report(), report('ABCDEFGH')])
+    const entries = await list()
+    vi.mocked(browser.storage.session.set).mockClear()
+    const response = await handleVerificationCodeMessage(
+      {
+        kind: CodeMessageKind.DISMISS_MANY,
+        ids: entries.map((entry) => entry.id)
+      },
+      popupSender
+    )
+    expect(response).toEqual([])
+    expect(browser.storage.session.set).toHaveBeenCalledTimes(1)
+    expect(setBadgeText).toHaveBeenLastCalledWith({ text: '' })
+    await Promise.all([report(), report('ABCDEFGH')])
+    expect(await list()).toEqual([])
+  })
+
+  it('preserves codes arriving before a queued bulk dismissal is processed', async () => {
+    await report()
+    const [entry] = await list()
+    await Promise.all([
+      report('A1B2C3'),
+      handleVerificationCodeMessage(
+        { kind: CodeMessageKind.DISMISS_MANY, ids: [entry.id] },
+        popupSender
+      )
+    ])
+    const remaining = await list()
+    expect(remaining).toHaveLength(1)
+    expect(remaining[0].code).toBe('A1B2C3')
+    expect(remaining[0].copied).toBe(false)
+    expect(setBadgeText).toHaveBeenLastCalledWith({ text: '•' })
   })
 
   it('expires code values and clears the badge and alarm', async () => {

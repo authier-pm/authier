@@ -296,6 +296,10 @@ export const handleVerificationCodeMessage = (
   return updateState((state) => {
     if (request.kind === CodeMessageKind.DISMISS) {
       state.entries = state.entries.filter((entry) => entry.id !== request.id)
+    } else if (request.kind === CodeMessageKind.DISMISS_MANY) {
+      state.entries = state.entries.filter(
+        (entry) => !request.ids.includes(entry.id)
+      )
     } else if (request.kind === CodeMessageKind.COPIED) {
       const entry = state.entries.find((entry) => entry.id === request.id)
       if (entry) entry.copied = true
