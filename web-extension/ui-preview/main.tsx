@@ -14,7 +14,8 @@ import {
   AndroidLandingPreview,
   AndroidBlogPreview,
   AndroidUpdatesPreview,
-  SeptemberReleaseBlogPreview
+  SeptemberReleaseBlogPreview,
+  OctoberReleaseBlogPreview
 } from './scenarios/AndroidUpdatesPreview'
 import { BitfinexTotpPreview } from './scenarios/BitfinexTotpPreview'
 import { KostkohratkyPasswordPreview } from './scenarios/KostkohratkyPasswordPreview'
@@ -46,6 +47,7 @@ const scenarios: Record<string, ComponentType> = {
   'android-updates': AndroidUpdatesPreview,
   'android-blog': AndroidBlogPreview,
   'september-release-blog': SeptemberReleaseBlogPreview,
+  'october-release-blog': OctoberReleaseBlogPreview,
   'android-landing': AndroidLandingPreview,
   'bitfinex-totp': BitfinexTotpPreview,
   'totp-labels': TotpLabelsPreview,
@@ -73,7 +75,7 @@ document.body.classList.toggle(
     requestedScenario !== 'email-verification-codes' &&
     requestedScenario !== 'inline-verification-codes' &&
     requestedScenario !== 'sms-verification-codes' &&
-    requestedScenario !== 'september-release-blog' &&
+    !requestedScenario.endsWith('-release-blog') &&
     !requestedScenario.startsWith('passkey-')
 )
 

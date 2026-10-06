@@ -19,3 +19,7 @@ export const AndroidBlogPreview = () => (
 export const SeptemberReleaseBlogPreview = () => (
   <WebsitePreview path="/blog/email-codes-and-easier-sign-ins" />
 )
+
+export const OctoberReleaseBlogPreview = () => (
+  <WebsitePreview path="/blog/sms-codes-and-device-recovery" />
+)

@@ -4,6 +4,16 @@ export type BlogPost = ContentEntry
 
 export const blogPosts = [
   {
+    title: 'SMS codes, device recovery, and a steadier vault',
+    description:
+      'Authier’s October update brings SMS codes to your browser, inline verification filling, configurable device recovery, and more reliable vault access.',
+    href: '/blog/sms-codes-and-device-recovery',
+    publishedAt: '2026-10-06',
+    updatedAt: '2026-10-06',
+    readingTime: '7 min read',
+    category: 'Product update'
+  },
+  {
     title: 'Email codes in your popup, easier sign-ins on Android',
     description:
       'What’s new in Authier extension 1.2.13 and Android 0.1.5: Gmail verification codes, browser passkeys, better autofill, and faster fingerprint unlock.',

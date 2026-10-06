@@ -219,6 +219,15 @@ check runs with `bunx playwright test --config playwrightAndroidUpdates.config.t
 --grep 'September release article'` and captures `september-release-blog-desktop.png`
 and `september-release-blog-mobile.png` in `docs/screenshots/`.
 
+The `october-release-blog` scenario embeds the product update covering changes
+since September 16, including extension 1.2.14–1.2.16, Android 0.1.6, and clearly
+labeled follow-up features. Start the Astro server on port 4321 alongside the
+preview, then open `/?scenario=october-release-blog`. Desktop and mobile captures
+are `docs/screenshots/october-release-blog-desktop.png` and
+`october-release-blog-mobile.png`. The article’s screenshots render production
+SMS, inline verification, and recovery UI against synthetic accounts; its SMS
+capture comes from the 1.2.16 release tag so the preview matches that release.
+
 The `android-vault` password and authenticator captures show the production
 lazy-loading favicon component. Refresh both native screenshots after icon changes.
 `FaviconLoadingTest` uses a local HTTP server and 1,000 synthetic rows to verify

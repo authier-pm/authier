@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "lastCoveredCommit": null,
-  "lastCoveredAt": null,
-  "lastArticlePath": null
+  "lastCoveredCommit": "f24c1b62314897505b44207c5145c8841b96ebbd",
+  "lastCoveredAt": "2026-10-05T19:15:00+02:00",
+  "lastArticlePath": "landing-page/src/pages/blog/sms-codes-and-device-recovery/index.astro"
 }

@@ -1,0 +1,301 @@
+---
+import ArticleLayout from '../../../layouts/ArticleLayout.astro'
+---
+
+<ArticleLayout
+  title="SMS codes, device recovery, and a steadier vault"
+  description="Authier’s October update brings SMS codes to your browser, inline verification filling, configurable device recovery, and more reliable vault access."
+  publishedAt="2026-10-06"
+  readingTime="7 min read"
+  imagePaths={[
+    '/blog/october-2026/sms-verification-codes.png',
+    '/blog/october-2026/inline-verification-codes.png',
+    '/blog/october-2026/master-device-recovery.png'
+  ]}
+  socialImage={{
+    path: '/blog/october-2026/sms-verification-codes.png',
+    width: 1040,
+    height: 760,
+    alt: 'Authier showing masked SMS codes from Google Messages for Web and an Android phone',
+    type: 'image/png'
+  }}
+>
+  <p>
+    A code arrives on your phone while you are signing in on your laptop. A
+    password form asks you to enter the same new password twice. Your connection
+    drops just when you need a saved login. These are the moments we have been
+    working on since our <a href="/blog/email-codes-and-easier-sign-ins">September 16 update</a>.
+  </p>
+  <p>
+    This roundup covers changes through October 6: extension releases
+    <strong>1.2.14–1.2.16</strong>, <strong>Authier for Android 0.1.6</strong>,
+    and two follow-up improvements coming in the next builds. Alongside SMS
+    codes and inline filling, you can now choose how to recover a lost master
+    device and receive device sign-in notifications on Android.
+  </p>
+
+  <h2>SMS codes from your phone, in your browser</h2>
+  <p>
+    The extension now brings text-message verification codes into the same popup
+    as your Gmail codes. Email appears under <strong>From your email</strong>;
+    SMS appears under <strong>From your phone</strong>. A red dot on the toolbar
+    tells you when a new code is available, including when the popup is closed.
+    Open your unlocked vault, then click a masked code to copy and reveal it.
+  </p>
+  <p>There are two ways to bring SMS codes into Authier:</p>
+  <ul>
+    <li>
+      <strong>Authier for Android:</strong> in Settings, enable
+      <strong>Send SMS codes while unlocked</strong> and grant Android’s SMS
+      permission. Incoming texts are checked on the phone. Authier encrypts the
+      extracted code and sender with your vault key before sending them to your
+      browser; the message body stays on the phone.
+    </li>
+    <li>
+      <strong>Google Messages for Web:</strong> pair it with your phone and keep
+      it open in a browser tab. Authier reads codes from rendered unread
+      conversation previews and the newest received message in the open
+      conversation. It skips earlier messages in the thread.
+    </li>
+  </ul>
+  <figure>
+    <img
+      src="/blog/october-2026/sms-verification-codes.png"
+      alt="A synthetic Google Messages conversation beside the Authier popup, with masked SMS codes from the web tab and an Android phone"
+      width="1040"
+      height="760"
+      loading="eager"
+    />
+    <figcaption>
+      Both SMS sources share one list. This preview shows the 1.2.16 UI with
+      synthetic messages and sample codes.
+    </figcaption>
+  </figure>
+  <p>
+    Phone relay needs Authier signed in to the same vault on both devices. A
+    locked phone vault sends nothing, and the browser needs an unlocked vault to
+    decrypt relayed codes. Choose a timed unlock on Android if you want relay to
+    work while Authier is in the background; locking as soon as you leave the
+    app stops it. Background checks can be delayed by browser sleep, so delivery
+    is not guaranteed to be instant.
+  </p>
+  <p>
+    SMS detection handles four-to-eight-character codes, including common
+    localized code labels, while filtering amounts, card numbers, and other
+    unrelated numbers. Temporary codes expire from Authier after ten minutes;
+    the sender may expire them sooner. They stay separate from your saved vault
+    items. A phone-relayed code identifies its sending device, while a web code’s
+    source icon opens its Gmail or Messages tab without copying it.
+  </p>
+
+  <h2>Fill verification codes where you need them</h2>
+  <p>
+    On supported HTTPS pages, the Authier logo now appears beside a detected
+    verification field or a group of digit boxes. Click it, choose a masked
+    suggestion, and Authier fills the code directly into the form. This works
+    with Gmail, Google Messages, and Android-relayed codes, including forms
+    that appear after the page first loads.
+  </p>
+  <figure>
+    <img
+      src="/blog/october-2026/inline-verification-codes.png"
+      alt="Authier’s inline picker offering a masked email code beside six verification inputs on a synthetic Shopify form"
+      width="1100"
+      height="820"
+      loading="lazy"
+    />
+    <figcaption>
+      Choose the code beside the form. One selection fills all six boxes in this
+      synthetic verification page.
+    </figcaption>
+  </figure>
+  <p>
+    Your vault must be unlocked and autofill enabled. Email suggestions match
+    the sender’s domain to the website, while SMS codes remain explicit choices:
+    a phone number or sender name cannot reliably identify a website. Only codes
+    that fit the field’s length and numeric requirements are offered. Selecting
+    one replaces partially entered digits too; you still complete the website’s
+    sign-in flow yourself.
+  </p>
+
+  <h2>Choose your plan for a lost master device</h2>
+  <p>
+    New accounts now choose a recovery policy during signup in the extension,
+    web vault, and Android app. The default requires
+    <strong>one approval from another device and a 48-hour wait</strong>. You
+    can choose zero to ten device approvals and a waiting period from five
+    minutes to 90 days, plus additional email addresses for recovery updates.
+  </p>
+  <figure class="recovery-shot">
+    <img
+      src="/blog/october-2026/master-device-recovery.png"
+      alt="Authier’s recovery setup showing one required device approval, a 48-hour waiting period, and optional notification email addresses"
+      width="900"
+      height="1040"
+      loading="lazy"
+    />
+    <figcaption>
+      Set the approval count and waiting period before you need recovery.
+      Screenshot addresses are synthetic.
+    </figcaption>
+  </figure>
+  <p>
+    If you lose your master device, request a reset from the login approval
+    screen. Confirm the link sent to your account email within 24 hours; that
+    confirmation starts the waiting period. Eligible devices you already had
+    can approve through Devices, and signed-in devices can cancel an unexpected
+    request. The progress display shows the approval count and when the wait
+    ends. Both conditions must be met before the lost master is removed.
+  </p>
+  <p>
+    If you need recovery without another available device, choose zero approvals
+    in advance. <strong>Your vault password is still required.</strong> This
+    recovers device access, not a forgotten password. Extra notification addresses
+    receive updates; only your account email receives the confirmation link.
+  </p>
+  <p>
+    The master device can change the policy in the extension’s settings or the
+    web vault’s Security page. Pending requests keep the rules they started
+    with. Existing accounts retain their email-based recovery policy rather than
+    silently gaining a new approval requirement. Our
+    <a href="/guides/trusted-device-approval">trusted-device guide</a> explains
+    how device access fits into Authier’s security model.
+  </p>
+
+  <h2>Android notifications for device sign-ins</h2>
+  <p>
+    Authier for Android now receives push notifications when another device
+    signs in or requests approval, according to your device access policy. Tap
+    the notification to open Devices and review the request. If the vault is
+    locked, unlock it first; the app then takes you to the device list.
+  </p>
+  <p>
+    Android 13 and newer ask for notification permission. You can revisit it
+    through <strong>Settings → Sign-in notifications → Notification settings</strong>.
+    Notification delivery depends on the phone’s notification settings and push
+    service. The extension’s device-policy chooser also now handles selection,
+    saving errors, keyboard focus, and scrolling on small screens more clearly.
+  </p>
+
+  <h2>Authenticator labels that identify the account</h2>
+  <p>
+    Scanning a TOTP QR code in the extension now saves an account-first label
+    such as <strong>alex@example.com | Microsoft</strong>. That makes work and
+    personal codes easier to distinguish when they belong to the same provider.
+    The account email comes from the QR code when available, then the page or a
+    recently entered email in the current browser session. If none is available,
+    Authier asks you to enter it before saving.
+  </p>
+  <p>
+    When that extra step is needed, the form separates account email and provider
+    and previews the saved label. Regular and private browsing keep their session email
+    fallbacks separate. These labels apply to newly saved codes; existing
+    authenticator entries keep their names.
+  </p>
+
+  <h2>Fewer interruptions from forms and connections</h2>
+  <ul>
+    <li>
+      <strong>Generated passwords fill confirmation fields.</strong> On
+      supported signup and password-change forms, choosing a generated password
+      also fills its repeat field with the same value. Current-password fields
+      stay unchanged, and detection reaches more forms built with web components.
+    </li>
+    <li>
+      <strong>Autofill respects the account you selected.</strong> A username
+      already entered on the page takes priority, including Google’s separate
+      password step. Ambiguous password-only forms offer an account picker
+      instead of guessing. Android Autofill also tolerates missing field hints
+      that could previously interrupt filling.
+    </li>
+    <li>
+      <strong>Saved items remain available through connection failures.</strong>
+      The extension shows locally cached items while checking the server, keeps
+      them through failed session renewal, and displays an offline notice when
+      it cannot connect. You can search, reveal passwords, and switch views;
+      retry sync when the connection returns. Adding items still needs a
+      connection when the service cannot be reached.
+    </li>
+    <li>
+      <strong>Connecting a browser populates the vault more reliably.</strong>
+      The initial sync continues in the background when the popup closes, and
+      received items appear in an already open popup without a manual refresh.
+    </li>
+    <li>
+      <strong>Large vaults use the available space.</strong> Card and table
+      views fill tall windows, recover after a search finds no matches, and
+      resize correctly in Firefox as well as Chromium.
+    </li>
+  </ul>
+
+  <h2>Coming in the next builds</h2>
+  <div class="article-callout">
+    <p>
+      Two more improvements landed after the October 4 release tags and will
+      arrive in subsequent builds:
+    </p>
+    <ul>
+      <li>
+        <strong>Dismiss a section’s temporary codes together.</strong> Each
+        email or SMS section shows its count and a <strong>Dismiss all</strong>
+        action. It clears the displayed codes while preserving a code that
+        arrived just as you clicked.
+      </li>
+      <li>
+        <strong>See whether Android Autofill is set up.</strong> Settings shows
+        whether Authier is the selected provider and offers the appropriate
+        setup or settings button. The status refreshes when you return from
+        Android settings, including after canceling or switching providers.
+      </li>
+    </ul>
+  </div>
+
+  <h2>Get the updates</h2>
+  <p>
+    The latest published GitHub releases are
+    <a href="https://github.com/authier-pm/authier/releases/tag/v1.2.16-extension">v1.2.16-extension</a>
+    and <a href="https://github.com/authier-pm/authier/releases/tag/v0.1.6-android">v0.1.6-android</a>.
+    Browser store rollout can follow release publication; use the
+    <a href="/download#browsers">browser download page</a> for Chrome, Firefox,
+    and Edge. Reload existing Gmail and Google Messages tabs after updating so
+    the new detection scripts can run.
+  </p>
+  <p>
+    On Android, <a href="/download#android">update through Obtainium or the signed APK</a>.
+    Update your existing installation in place to keep the local vault. For the
+    complete release window, browse the
+    <a href="https://github.com/authier-pm/authier/compare/v1.2.13-extension...v1.2.16-extension">extension changes</a>
+    and <a href="https://github.com/authier-pm/authier/compare/v0.1.5-android...v0.1.6-android">Android changes</a>.
+  </p>
+</ArticleLayout>
+
+<style>
+  figure {
+    min-width: 0;
+    margin: 32px 0;
+  }
+
+  figure img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border: 1px solid var(--border-strong);
+    border-radius: 16px;
+  }
+
+  figcaption {
+    margin-top: 12px;
+    color: var(--text-muted);
+    font-size: 0.8rem;
+    line-height: 1.6;
+  }
+
+  .recovery-shot {
+    max-width: 600px;
+    margin-inline: auto;
+  }
+
+  .article-callout ul {
+    margin-bottom: 0;
+  }
+</style>
