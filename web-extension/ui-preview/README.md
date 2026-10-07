@@ -33,6 +33,11 @@ old when "Dismiss all X temp codes" is clicked. The suite captures this action i
 It captures `docs/screenshots/email-verification-codes.png` and
 `docs/screenshots/email-verification-codes-copied.png`.
 
+Add `&email-routing=1` to reproduce the link-only Cloudflare Email Routing email.
+The same suite verifies that its footer postal address does not become a code,
+that the popup and badge stay clear, and that a later genuine code still appears.
+It captures `docs/screenshots/cloudflare-email-routing-no-code.png`.
+
 The `inline-verification-codes` scenario recreates Shopify's six separate code
 inputs with React-controlled values and runs the production inline picker, fill
 helper, and background handler. The Authier logo opens masked choices on click;

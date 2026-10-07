@@ -19,6 +19,33 @@ test.beforeEach(async ({ page }) => {
   )
 })
 
+test('keeps the popup and badge clear for a link-only Cloudflare Email Routing email', async ({
+  page
+}) => {
+  await page.clock.install()
+  await page.goto('/?scenario=email-verification-codes&email-routing=1')
+  const popup = page.locator('[data-preview-popup]')
+  await expect(popup).toBeVisible()
+  await expect(page.locator('[data-gmail-fixture]')).toContainText('CA 94107')
+  await page.clock.runFor(1000)
+  await expect(
+    popup.getByRole('region', { name: 'Email verification codes' })
+  ).toHaveCount(0)
+  await expect(
+    popup.getByRole('button', { name: /Copy Gmail verification code/ })
+  ).toHaveCount(0)
+  await expect(page.getByLabel('New email verification code')).toHaveCount(0)
+  await page.screenshot({
+    path: '../docs/screenshots/cloudflare-email-routing-no-code.png',
+    fullPage: true
+  })
+
+  await page.getByRole('button', { name: 'Receive another email code' }).click()
+  await page.clock.runFor(500)
+  await expect(popup.getByText('A7B*****', { exact: true })).toBeVisible()
+  await expect(page.getByLabel('New email verification code')).toBeVisible()
+})
+
 test('detects Gmail, masks the code, copies and reveals it, and clears the badge', async ({
   page
 }) => {

@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest'
 import smsVectors from '../../../shared/smsVerificationCodeVectors.json'
 import {
+  cloudflareEmailRoutingBody,
+  cloudflareEmailRoutingSubject
+} from '../../ui-preview/fixtures/cloudflareEmailRouting'
+import {
   extractSmsVerificationCode,
   extractVerificationCode
 } from './extractVerificationCode'
@@ -38,6 +42,41 @@ describe('extractVerificationCode', () => {
       extractVerificationCode(
         'Hi Alex. Enter 213456 to continue.',
         'Verify your email'
+      )
+    ).toBe('213456')
+  })
+
+  it('does not turn the postal address in a link-only Cloudflare email into a code', () => {
+    expect(
+      extractVerificationCode(
+        cloudflareEmailRoutingBody,
+        cloudflareEmailRoutingSubject
+      )
+    ).toBeNull()
+  })
+
+  it.each(['CA 94107', 'NY 10001', 'CA94107'])(
+    'ignores a city/state/ZIP address near verification language: %s',
+    (address) => {
+      expect(
+        extractVerificationCode(
+          `Verify your email using the link above.\n101 Example Street, Example City, ${address}`,
+          'Verify your email'
+        )
+      ).toBeNull()
+    }
+  )
+
+  it('still accepts a real alphanumeric code that resembles a state and ZIP', () => {
+    expect(extractVerificationCode('Your verification code: CA 94107')).toBe(
+      'CA94107'
+    )
+    expect(extractVerificationCode('Your verification code: CA94107')).toBe(
+      'CA94107'
+    )
+    expect(
+      extractVerificationCode(
+        'Your verification code: 213456.\n101 Townsend Street, San Francisco, CA 94107'
       )
     ).toBe('213456')
   })

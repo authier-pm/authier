@@ -9,13 +9,19 @@ import {
   gmailVerificationEmail,
   gmailUnreadVerificationEmail
 } from '../fixtures/gmailVerificationEmail'
+import { gmailCloudflareEmailRouting } from '../fixtures/cloudflareEmailRouting'
 import {
   CodePopupToolbar,
   useCodePreviewBackground
 } from './codePreviewBackground'
 
 export const EmailVerificationCodesPreview = () => {
-  const [email, setEmail] = useState(gmailVerificationEmail)
+  const isEmailRouting = new URLSearchParams(window.location.search).has(
+    'email-routing'
+  )
+  const [email, setEmail] = useState(
+    isEmailRouting ? gmailCloudflareEmailRouting : gmailVerificationEmail
+  )
   const ready = useCodePreviewBackground({
     reportUrl: 'https://mail.google.com/mail/u/0/#inbox',
     reportTabId: 42,
@@ -32,7 +38,9 @@ export const EmailVerificationCodesPreview = () => {
         Authier / Email verification
       </p>
       <h1 className="mt-2 mb-8 text-2xl font-semibold">
-        Your email code, one click away.
+        {isEmailRouting
+          ? 'An email verification link leaves the popup clear.'
+          : 'Your email code, one click away.'}
       </h1>
       <div className="grid grid-cols-[minmax(0,1fr)_350px] items-start gap-8">
         <div>
@@ -48,8 +56,9 @@ export const EmailVerificationCodesPreview = () => {
             dangerouslySetInnerHTML={{ __html: email }}
           />
           <p className="mt-4 text-xs leading-relaxed text-[color:var(--color-muted)]">
-            Detected from the email already in your browser. Click the masked
-            code in Authier to copy and reveal it.
+            {isEmailRouting
+              ? 'This email verifies an address through a link. The footer’s CA 94107 postal address does not produce a temporary code or notification badge.'
+              : 'Detected from the email already in your browser. Click the masked code in Authier to copy and reveal it.'}
           </p>
           <Button
             className="mt-3"

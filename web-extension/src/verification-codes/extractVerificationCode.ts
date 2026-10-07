@@ -160,6 +160,15 @@ const isAmountOrCard = (text: string, { code, start, end }: CodeCandidate) =>
   ) ||
   /^x{2,}\d+$/i.test(code)
 
+// A footer's "street, city, CA 94107" must not become the code "CA94107".
+// Keep the surrounding address evidence so real codes such as "CA 94107"
+// remain eligible when they follow a code label instead.
+const isPostalAddress = (text: string, { start, end }: CodeCandidate) =>
+  /^[A-Z]{2}\s*\d{5}$/.test(text.slice(start, end)) &&
+  /,\s*[\p{L}][\p{L} .'’-]*,\s*$/u.test(
+    text.slice(Math.max(0, start - 120), start)
+  )
+
 const hasValidLength = (code: string, format: VerificationCodeFormat) => {
   if (!/^[a-zA-Z0-9]+$/.test(code)) return false
   if (format === 'email') return code.length >= 6 && code.length <= 8
@@ -185,7 +194,8 @@ const getCandidates = (
       !hasValidLength(candidate.code, format) ||
       ordinaryWords.has(candidate.code.toUpperCase()) ||
       !hasCodeBoundaries(text, candidate, format) ||
-      isAmountOrCard(text, candidate)
+      isAmountOrCard(text, candidate) ||
+      (format === 'email' && isPostalAddress(text, candidate))
     )
       return
     const prefix = text.slice(

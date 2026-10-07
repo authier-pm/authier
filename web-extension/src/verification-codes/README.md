@@ -41,6 +41,9 @@ authentication language.
 Both formats skip URLs, email addresses, amounts with a currency, masked card
 numbers and order/phone/tracking numbers. Numbers and adjacent short words never
 merge, so `1 234 CZK` or `je 474230` stay separate.
+Email detection also skips state/ZIP fragments in comma-separated postal addresses,
+so a footer such as `101 Townsend Street, San Francisco, CA 94107` cannot supply
+`CA94107` to a link-only verification email.
 `android-app/.../SmsCodeExtractor.kt` ports the SMS format. Both implementations are
 tested against `shared/smsVerificationCodeVectors.json`; add cases there.
 

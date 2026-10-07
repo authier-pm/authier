@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { webcrypto } from 'node:crypto'
+import { gmailCloudflareEmailRouting } from '../../ui-preview/fixtures/cloudflareEmailRouting'
 import {
   formattedEmailCodeBodies,
   gmailUnreadVerificationEmail,
@@ -24,6 +25,11 @@ describe('Gmail email code detection', () => {
     expect(readGmailCodes(document)).toEqual([
       { provider: 'Gmail', sender: 'someone@example.com', code: '213456' }
     ])
+  })
+
+  it('does not offer the Cloudflare Email Routing footer as a verification code', () => {
+    document.body.innerHTML = gmailCloudflareEmailRouting
+    expect(readGmailCodes(document)).toEqual([])
   })
 
   it.each(formattedEmailCodeBodies)(
