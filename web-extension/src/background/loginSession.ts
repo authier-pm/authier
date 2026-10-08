@@ -25,6 +25,7 @@ import {
   setAccessToken
 } from '@src/util/accessTokenExtension'
 import { getAutofillCredentialsEnabled } from '@src/util/autofillCredentialsPreference'
+import { passkeyCreationVerification } from '@src/passkeys/passkeyCreationPreference'
 import {
   abToCryptoKey,
   base64ToBuffer,
@@ -619,6 +620,12 @@ const completeLogin = async (
     theme: user.defaultDeviceSettings.theme
   }
 
+  if (rememberedSession && device.state !== rememberedSession.state) return
+  // The backend snapshots account defaults when a device is added. Seed this
+  // browser once; later logins and default changes preserve its local choice.
+  await passkeyCreationVerification.initialize(
+    user.device.passkeyCreationVerificationRequired ?? true
+  )
   if (rememberedSession && device.state !== rememberedSession.state) return
   await device.save(deviceState)
 }

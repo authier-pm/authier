@@ -1,5 +1,24 @@
 import { expect, test } from '@playwright/test'
 
+test('unlocked creation still requires explicit approval without a password input', async ({
+  page
+}) => {
+  await page.setViewportSize({ width: 440, height: 660 })
+  await page.goto('/?scenario=passkey-approval&unlocked=1')
+  await expect(page.getByLabel('Master password')).toHaveCount(0)
+  await expect(
+    page.getByText('alex@example.com', { exact: true })
+  ).toBeVisible()
+  await expect(
+    page.getByRole('button', { name: 'Save passkey', exact: true })
+  ).toBeEnabled()
+  await page.screenshot({
+    path: '../docs/screenshots/passkey-approval-unlocked.png'
+  })
+  await page.getByRole('button', { name: 'Save passkey', exact: true }).click()
+  await expect(page.getByRole('status')).toHaveText('Continue in your browser.')
+})
+
 test('verifies identity before saving a passkey', async ({ page }) => {
   await page.setViewportSize({ width: 440, height: 660 })
   await page.goto('/?scenario=passkey-approval')

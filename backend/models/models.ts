@@ -93,6 +93,9 @@ export class SettingsInput {
 
 @InputType()
 export class DefaultSettingsInput {
+  @Field(() => Boolean, { nullable: true })
+  passkeyCreationVerificationRequired?: boolean
+
   @Field(() => Boolean, { nullable: false })
   syncTOTP: boolean
 

@@ -27,8 +27,7 @@ import { useAppToast } from '@src/ExtensionProviders'
 import { PasswordGenerator } from '@src/components/vault/PasswordGenerator'
 import { EditFormButtons } from './EditFormButtons'
 import { ILoginSecret, ITOTPSecret } from '@src/util/useDeviceState'
-import { PasskeyDetailCard } from './PasskeyDetailCard'
-import { DeleteSecretButton } from './DeleteSecretButton'
+import { PasskeySettings } from './PasskeySettings'
 import type { SecretTypeUnion } from '@src/background/ExtensionDevice'
 import { device } from '@src/background/ExtensionDevice'
 import {
@@ -389,13 +388,7 @@ export const VaultItemSettings = () => {
   }
 
   if (secret.kind === EncryptedSecretType.PASSKEY) {
-    return (
-      <PasskeyDetailCard passkey={secret.passkey}>
-        <DeleteSecretButton secrets={[secret]}>
-          Delete passkey
-        </DeleteSecretButton>
-      </PasskeyDetailCard>
-    )
+    return <PasskeySettings key={secret.id} secret={secret} />
   }
 
   if (secret.kind === EncryptedSecretType.TOTP) {

@@ -18,6 +18,7 @@ import { Switch } from '@src/components/ui/switch'
 import { useVaultLockTimeoutOptions } from '@src/util/useVaultLockTimeoutOptions'
 import { serializeAutofillForbiddenUrlPatterns } from '@shared/autofillForbiddenUrlPatterns'
 import { toBackendSettings } from '@src/util/securitySettings'
+import { PasskeyCreationSettings } from './PasskeyCreationSettings'
 
 interface Values {
   vaultLockTimeoutSeconds: number
@@ -47,11 +48,13 @@ export default function Security() {
       <CardHeader>
         <CardTitle>Security behavior</CardTitle>
         <CardDescription>
-          Control locking, language, autofill, and vault notifications.
+          Control passkeys, locking, language, autofill, and vault
+          notifications.
         </CardDescription>
       </CardHeader>
 
-      <CardContent>
+      <CardContent className="space-y-6">
+        <PasskeyCreationSettings />
         <Formik
           initialValues={{
             autofillTOTPEnabled: deviceState.autofillTOTPEnabled,

@@ -97,6 +97,22 @@ const browser = {
     }
   },
   storage: {
+    local: {
+      get: async (key: string) => {
+        const value = window.localStorage.getItem(
+          `authier-preview-local:${key}`
+        )
+        return value === null ? {} : { [key]: JSON.parse(value) as unknown }
+      },
+      set: async (items: Record<string, unknown>) => {
+        for (const [key, value] of Object.entries(items)) {
+          window.localStorage.setItem(
+            `authier-preview-local:${key}`,
+            JSON.stringify(value)
+          )
+        }
+      }
+    },
     onChanged: {
       addListener: (
         listener: (changes: StorageChanges, area: string) => void

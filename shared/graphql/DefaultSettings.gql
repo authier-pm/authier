@@ -5,6 +5,7 @@ mutation updateDefaultDeviceSettings($config: DefaultSettingsInput!) {
       update(config: $config) {
         id
         autofillTOTPEnabled
+        passkeyCreationVerificationRequired
         theme
         syncTOTP
         vaultLockTimeoutSeconds
@@ -36,6 +37,7 @@ query defaultSettings {
     defaultDeviceSettings {
       id
       autofillTOTPEnabled
+      passkeyCreationVerificationRequired
       syncTOTP
       vaultLockTimeoutSeconds
       theme

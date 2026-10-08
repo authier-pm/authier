@@ -15,6 +15,7 @@ import {
   passkeyErrorReply
 } from './passkeyRequestManager'
 import type { PasskeyApprovalReply } from './passkeyApprovalTypes'
+import { passkeyCreationVerification } from './passkeyCreationPreference'
 
 const approvalUrl = (token: string) =>
   browser.runtime.getURL(`js/passkey.html?request=${encodeURIComponent(token)}`)
@@ -23,6 +24,8 @@ const currentSnapshot = () => device.state ?? device.lockedState
 export const passkeyRequestManager = new PasskeyRequestManager(
   {
     initialize: () => deviceInitialization,
+    allowUnlockedCreation: async () =>
+      !(await passkeyCreationVerification.get()),
     identity: () => {
       const snapshot = currentSnapshot()
       return snapshot ? `${snapshot.userId}:${snapshot.encryptionSalt}` : null

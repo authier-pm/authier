@@ -153,6 +153,8 @@ export class UserMutation extends UserBase {
         lastIpAddress: ipAddress,
         vaultLockTimeoutSeconds: deviceDefaultSettings.vaultLockTimeoutSeconds,
         autofillTOTPEnabled: deviceDefaultSettings.autofillTOTPEnabled,
+        passkeyCreationVerificationRequired:
+          deviceDefaultSettings.passkeyCreationVerificationRequired,
         syncTOTP: deviceDefaultSettings.syncTOTP
       })
       .returning()

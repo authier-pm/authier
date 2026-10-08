@@ -1,0 +1,2 @@
+ALTER TABLE "DefaultSettings" ADD COLUMN "passkeyCreationVerificationRequired" boolean DEFAULT true NOT NULL;--> statement-breakpoint
+ALTER TABLE "Device" ADD COLUMN "passkeyCreationVerificationRequired" boolean DEFAULT true NOT NULL;

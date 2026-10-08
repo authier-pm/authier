@@ -238,6 +238,8 @@ export class DecryptionChallengeApproved extends DecryptionChallengeGQL {
             platform: input.devicePlatform,
             syncTOTP: defaultSettings.syncTOTP,
             autofillTOTPEnabled: defaultSettings.autofillTOTPEnabled,
+            passkeyCreationVerificationRequired:
+              defaultSettings.passkeyCreationVerificationRequired,
             vaultLockTimeoutSeconds: defaultSettings.vaultLockTimeoutSeconds
           })
           .returning()

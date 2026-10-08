@@ -7,6 +7,7 @@ import {
   type PasskeyWindows
 } from './passkeyRequestManager'
 import { createPasskey, type PasskeyCreationOptions } from './webauthn'
+import { fromBase64url } from './encoding'
 import type { PasskeyData } from '@shared/passkeySchema'
 
 const options: PasskeyCreationOptions = {
@@ -20,7 +21,7 @@ const website: PasskeySender = {
   id: 'extension',
   frameId: 0,
   url: 'https://example.com/login',
-  tab: { id: 7 }
+  tab: { id: 7, title: 'Example account settings' }
 }
 let manager: PasskeyRequestManager
 let repository: PasskeyRepository
@@ -44,6 +45,7 @@ beforeEach(() => {
     initialize: async () => undefined,
     identity: () => 'user:salt',
     session: () => session,
+    allowUnlockedCreation: vi.fn(async () => false),
     verifyPassword: vi.fn(async (password: string) => {
       if (password !== 'correct')
         throw new DOMException('Incorrect master password.', 'NotAllowedError')
@@ -86,6 +88,113 @@ const deferred = <T>() => {
 }
 
 describe('trusted passkey ceremonies', () => {
+  it('creates with UV set after explicit approval when this device allows an unlocked vault', async () => {
+    repository.allowUnlockedCreation = async () => true
+    const result = start()
+    await opened()
+    expect((await manager.view(token, approval())).verified).toBe(true)
+    expect(repository.save).not.toHaveBeenCalled()
+    await expect(manager.approve(token, undefined, website)).rejects.toThrow(
+      'Only the Authier'
+    )
+    await manager.approve(token, undefined, approval())
+    const reply = await result
+    if (reply.status !== 'ok') throw new Error('Expected a created credential')
+    expect(
+      fromBase64url(reply.credential.response.authenticatorData)[32] & 0x04
+    ).toBe(0x04)
+    expect(repository.verifyPassword).not.toHaveBeenCalled()
+    expect(repository.save).toHaveBeenCalledTimes(1)
+  })
+
+  it('still requires a password when creation is allowed but the vault is locked', async () => {
+    repository.allowUnlockedCreation = async () => true
+    session = null
+    const result = start()
+    await opened()
+    expect((await manager.view(token, approval())).verified).toBe(false)
+    await expect(manager.approve(token, undefined, approval())).rejects.toThrow(
+      'Verify your master password'
+    )
+    await manager.verify(token, 'correct', approval())
+    await manager.approve(token, undefined, approval())
+    expect(await result).toMatchObject({ status: 'ok' })
+  })
+
+  it.each(['locked', 'new-session', 'setting', 'expired'])(
+    'invalidates unlocked creation when %s changes before approval',
+    async (change) => {
+      repository.allowUnlockedCreation = async () => true
+      const result = start()
+      await opened()
+      if (change === 'locked') session = null
+      if (change === 'new-session') session = {}
+      if (change === 'setting')
+        repository.allowUnlockedCreation = async () => false
+      if (change === 'expired') {
+        vi.useFakeTimers()
+        vi.setSystemTime(Date.now() + 60_001)
+      }
+      expect((await manager.view(token, approval())).verified).toBe(false)
+      await expect(
+        manager.approve(token, undefined, approval())
+      ).rejects.toThrow('Verify your master password')
+      expect(repository.save).not.toHaveBeenCalled()
+      manager.dismiss(token, false, approval())
+      await result
+    }
+  )
+
+  it('withholds unlocked creation if the vault locks during persistence', async () => {
+    repository.allowUnlockedCreation = async () => true
+    repository.save = vi.fn(async () => {
+      session = null
+    })
+    const result = start()
+    await opened()
+    await expect(manager.approve(token, undefined, approval())).rejects.toThrow(
+      'vault was locked'
+    )
+    expect(await result).toMatchObject({ status: 'error' })
+  })
+
+  it('does not authorize a replacement session during the preference lookup', async () => {
+    const preference = deferred<boolean>()
+    repository.allowUnlockedCreation = vi.fn(() => preference.promise)
+    const result = start()
+    await vi.waitFor(() =>
+      expect(repository.allowUnlockedCreation).toHaveBeenCalled()
+    )
+    session = {}
+    preference.resolve(true)
+    await opened()
+    expect((await manager.view(token, approval())).verified).toBe(false)
+    manager.dismiss(token, false, approval())
+    await result
+  })
+
+  it('serializes approvals while rechecking the device preference', async () => {
+    repository.allowUnlockedCreation = async () => true
+    const result = start()
+    await opened()
+    const preference = deferred<boolean>()
+    repository.allowUnlockedCreation = vi.fn(() => preference.promise)
+    const approving = manager.approve(token, undefined, approval())
+    await vi.waitFor(() =>
+      expect(repository.allowUnlockedCreation).toHaveBeenCalled()
+    )
+    await expect(manager.approve(token, undefined, approval())).rejects.toThrow(
+      'Please wait'
+    )
+    await expect(manager.verify(token, 'correct', approval())).rejects.toThrow(
+      'Please wait'
+    )
+    preference.resolve(true)
+    await approving
+    expect(await result).toMatchObject({ status: 'ok' })
+    expect(repository.save).toHaveBeenCalledTimes(1)
+  })
+
   it('saves only after password verification and explicit extension approval', async () => {
     const result = start()
     await opened()
@@ -108,6 +217,9 @@ describe('trusted passkey ceremonies', () => {
       credential: { type: 'public-key' }
     })
     expect(passkeys).toHaveLength(1)
+    expect(passkeys[0].label).toBe(
+      'alex@example.com | Example account settings'
+    )
     expect(JSON.stringify(view)).not.toContain('privateKey')
   })
 
@@ -200,6 +312,7 @@ describe('trusted passkey ceremonies', () => {
   })
 
   it('signs with the selected synced account and exposes no private key', async () => {
+    repository.allowUnlockedCreation = async () => true
     passkeys.push(
       (await createPasskey(options, 'https://example.com', true)).passkey
     )
@@ -216,6 +329,9 @@ describe('trusted passkey ceremonies', () => {
       website
     )
     await opened()
+    await expect(
+      manager.approve(token, passkeys[0].credentialId, approval())
+    ).rejects.toThrow('Verify your master password')
     expect((await manager.view(token, approval())).accounts).toEqual([])
     const view = await manager.verify(token, 'correct', approval())
     expect(view.accounts).toHaveLength(1)
@@ -252,7 +368,10 @@ describe('trusted passkey ceremonies', () => {
     manager.cancel('request', { ...website, tab: { id: 99 } })
     expect((await manager.view(token, approval())).verified).toBe(false)
     manager.cancel('request', website)
-    expect(await result).toMatchObject({ status: 'error', name: 'AbortError' })
+    expect(await result).toMatchObject({
+      status: 'error',
+      name: 'AbortError'
+    })
   })
 
   it('blocks multiple approval windows in the same tab and cancels on close', async () => {
@@ -286,7 +405,10 @@ describe('trusted passkey ceremonies', () => {
     const result = start()
     await expect(start()).rejects.toThrow('already open')
     manager.cancel('request', website)
-    expect(await result).toMatchObject({ status: 'error', name: 'AbortError' })
+    expect(await result).toMatchObject({
+      status: 'error',
+      name: 'AbortError'
+    })
     initialization.resolve()
     await initialization.promise
     expect(windows.open).not.toHaveBeenCalled()
@@ -309,7 +431,10 @@ describe('trusted passkey ceremonies', () => {
     )
     await vi.waitFor(() => expect(repository.list).toHaveBeenCalled())
     manager.cancel('request', website)
-    expect(await result).toMatchObject({ status: 'error', name: 'AbortError' })
+    expect(await result).toMatchObject({
+      status: 'error',
+      name: 'AbortError'
+    })
     listing.resolve(passkeys)
     await listing.promise
     expect(windows.open).not.toHaveBeenCalled()
@@ -393,7 +518,10 @@ describe('trusted passkey ceremonies', () => {
     const approving = manager.approve(token, undefined, approval())
     await vi.waitFor(() => expect(repository.save).toHaveBeenCalled())
     manager.cancel('request', website)
-    expect(await result).toMatchObject({ status: 'error', name: 'AbortError' })
+    expect(await result).toMatchObject({
+      status: 'error',
+      name: 'AbortError'
+    })
     saving.resolve()
     await expect(approving).rejects.toThrow('website or vault changed')
   })
@@ -440,7 +568,10 @@ describe('trusted passkey ceremonies', () => {
     const result = start()
     await opened()
     manager.cancel('request', website)
-    expect(await result).toMatchObject({ status: 'error', name: 'AbortError' })
+    expect(await result).toMatchObject({
+      status: 'error',
+      name: 'AbortError'
+    })
     opening.resolve(10)
     await vi.waitFor(() => expect(windows.close).toHaveBeenCalledWith(10))
   })

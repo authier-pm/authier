@@ -271,7 +271,8 @@ export const assertNoExcludedPasskey = (
 export const createPasskey = async (
   options: PasskeyCreationOptions,
   origin: string,
-  userVerified: boolean
+  userVerified: boolean,
+  windowTitle?: string
 ): Promise<{ passkey: PasskeyData; credential: PasskeyCredentialResult }> => {
   const rpId = validateRpId(options.rp.id, origin)
   assertSupported(options, 'create')
@@ -308,7 +309,7 @@ export const createPasskey = async (
     privateKeyJwk,
     createdAt: new Date().toISOString(),
     url: new URL(origin).origin,
-    label: options.rp.name,
+    label: `${options.user.name} | ${windowTitle?.trim() || options.rp.name}`,
     iconUrl: null
   })
   const coseKey = encodeCbor(

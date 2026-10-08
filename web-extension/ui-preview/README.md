@@ -161,7 +161,16 @@ checks every filled digit, and captures `docs/screenshots/bitfinex-totp.png`.
 
 The `remembered-session` scenario renders the unlocked popup using the shared encrypted IndexedDB snapshot store. Reloading restores it without a password prompt. Its Playwright test captures `docs/screenshots/remembered-session-restart.png`.
 
-The `passkey-vault` scenario renders the production passkey detail card, including the website and account without exposing key material. Its Playwright test captures `docs/screenshots/passkey-vault.png`. The `passkey-approval` scenario renders the extension's passkey approval dialog.
+The `passkey-vault` scenario renders the production passkey table and label editor,
+including the website and account without exposing key material. Its Playwright
+tests exercise editing and returning to the list, verify that all other passkey
+data survives, and check failed sync with `failSave=1`. They capture
+`docs/screenshots/passkey-vault-list.png` and `docs/screenshots/passkey-vault.png`.
+The preview uses synthetic passkeys and mock encryption and sync.
+The `passkey-sidebar` scenario shows the production vault navigation with Passkeys
+selected and its fingerprint icon distinct from the TOTP key icon. The captured
+navigation is saved in `docs/screenshots/passkey-sidebar.png`.
+The `passkey-approval` scenario renders the extension's passkey approval dialog.
 
 The `android-vault` scenario displays actual emulator captures of the Kotlin app's
 password, TOTP and native autofill screens. Compose cannot be imported into this React harness;
