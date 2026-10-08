@@ -25,7 +25,10 @@ import {
 i18n.load('en', messages)
 i18n.activate('en')
 
-const passkeys: IPasskeySecret[] = ['GitHub', 'Google'].map((site, index) => {
+const passkeys: Array<IPasskeySecret & { version: number }> = [
+  'GitHub',
+  'Google'
+].map((site, index) => {
   const rpId = index === 0 ? 'github.com' : 'accounts.google.com'
   const passkey: IPasskeySecret['passkey'] = {
     credentialId: `preview${index}`,
@@ -49,6 +52,7 @@ const passkeys: IPasskeySecret[] = ['GitHub', 'Google'].map((site, index) => {
   return {
     id: `preview-passkey-${index}`,
     kind: EncryptedSecretType.PASSKEY,
+    version: 1,
     createdAt: passkey.createdAt,
     // The preview uses synthetic data and a reversible mock of vault encryption.
     encrypted: encodePreviewSecret(JSON.stringify(passkey)),
@@ -86,7 +90,7 @@ export function PasskeySidebarPreview() {
 
 export function PasskeyVaultPreview() {
   const defaults = useContext(DeviceStateContext)
-  const [items, setItems] = useState(passkeys)
+  const [items, setItems] = useState<IPasskeySecret[]>(passkeys)
   const [selectedItems, setSelectedItems] = useState(defaults.selectedItems)
   const [client] = useState(
     () =>
@@ -124,7 +128,7 @@ export function PasskeyVaultPreview() {
                     id: 'preview-user',
                     encryptedSecret: {
                       id: original.id,
-                      update: { id: original.id }
+                      update: { id: original.id, version: original.version + 1 }
                     }
                   }
                 }

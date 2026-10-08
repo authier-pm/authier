@@ -32,7 +32,8 @@ export function PasskeySettings({ secret }: { secret: IPasskeySecret }) {
         patch: { encrypted, kind: EncryptedSecretType.PASSKEY }
       }
     })
-    if (result.data?.me?.encryptedSecret?.update?.id !== secret.id) {
+    const updated = result.data?.me?.encryptedSecret?.update
+    if (updated?.id !== secret.id) {
       throw new Error('The passkey could not be saved. Please try again.')
     }
     if (device.state !== state) {
@@ -41,6 +42,7 @@ export function PasskeySettings({ secret }: { secret: IPasskeySecret }) {
       )
     }
     stored.encrypted = encrypted
+    stored.version = updated.version
     await state.save()
   }
 
