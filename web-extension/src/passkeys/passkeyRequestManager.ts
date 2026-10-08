@@ -17,13 +17,14 @@ export interface PasskeySender {
   id?: string
   url?: string
   frameId?: number
-  tab?: { id?: number }
+  tab?: { id?: number; title?: string }
 }
 
 export interface PasskeyRepository {
   initialize(): Promise<unknown>
   identity(): string | null
   session(): object | null
+  allowUnlockedCreation(): Promise<boolean>
   verifyPassword(password: string): Promise<object>
   list(): Promise<PasskeyData[]>
   save(passkey: PasskeyData): Promise<void>
@@ -45,12 +46,14 @@ type PendingRequest = RequestOptions & {
   token: string
   requestId: string
   tabId: number
+  windowTitle?: string
   url: string
   origin: string
   rpId: string
   identity: string
   session: object | null
   verifiedUntil: number
+  verification: 'password' | 'unlocked' | null
   windowId?: number
   processing: boolean
   attempts: number
@@ -98,6 +101,7 @@ export class PasskeyRequestManager {
       )
     }
     const tabId = sender.tab.id
+    const windowTitle = sender.tab.title
     const url = sender.url
     const origin = new URL(url).origin
     const serializedOptions = JSON.stringify(request.options)
@@ -138,12 +142,14 @@ export class PasskeyRequestManager {
         token,
         requestId: request.requestId,
         tabId,
+        windowTitle,
         url,
         origin,
         rpId,
         identity: '',
         session: null,
         verifiedUntil: 0,
+        verification: null,
         processing: false,
         attempts: 0,
         resolve,
@@ -173,6 +179,17 @@ export class PasskeyRequestManager {
     }
     pending.identity = identity
     await this.assertCurrent(pending)
+    if (pending.operation === 'create') {
+      const session = this.repository.session()
+      if (session && (await this.repository.allowUnlockedCreation())) {
+        await this.assertCurrent(pending)
+        if (session === this.repository.session()) {
+          pending.session = session
+          pending.verification = 'unlocked'
+          pending.verifiedUntil = Date.now() + 60_000
+        }
+      }
+    }
     if (pending.operation === 'get' && this.repository.session()) {
       const matches = (await this.repository.list()).some((passkey) =>
         passkeyMatchesRequest(passkey, pending.options, pending.origin)
@@ -228,8 +245,16 @@ export class PasskeyRequestManager {
     }
   }
 
-  private isVerified(pending: PendingRequest) {
+  private async isVerified(pending: PendingRequest) {
+    const allowed =
+      pending.verification === 'password' ||
+      (pending.verification === 'unlocked' &&
+        pending.operation === 'create' &&
+        (await this.repository.allowUnlockedCreation()))
     return (
+      allowed &&
+      this.pending.get(pending.token) === pending &&
+      pending.identity === this.repository.identity() &&
       pending.verifiedUntil > Date.now() &&
       pending.session !== null &&
       pending.session === this.repository.session()
@@ -242,12 +267,12 @@ export class PasskeyRequestManager {
   ): Promise<PasskeyApprovalView> {
     const pending = this.get(token, sender)
     await this.assertCurrent(pending)
-    let verified = this.isVerified(pending)
+    let verified = await this.isVerified(pending)
     let accounts: PasskeyApprovalView['accounts'] = []
     if (verified && pending.operation === 'get') {
       const passkeys = await this.repository.list()
       await this.assertCurrent(pending)
-      verified = this.isVerified(pending)
+      verified = await this.isVerified(pending)
       if (verified) {
         accounts = passkeys
           .filter((passkey) =>
@@ -295,6 +320,7 @@ export class PasskeyRequestManager {
       if (verifiedSession !== this.repository.session())
         throw denied('The vault changed. Verify your master password again.')
       pending.session = verifiedSession
+      pending.verification = 'password'
       pending.verifiedUntil = Date.now() + 60_000
       return await this.view(token, sender)
     } finally {
@@ -311,14 +337,25 @@ export class PasskeyRequestManager {
     await this.assertCurrent(pending)
     if (pending.processing)
       throw denied('Please wait for the current operation.')
-    if (!this.isVerified(pending)) {
-      throw denied('Verify your master password again to continue.')
-    }
     pending.processing = true
+    try {
+      if (!(await this.isVerified(pending))) {
+        throw denied('Verify your master password again to continue.')
+      }
+      await this.completeApproval(pending, credentialId)
+    } finally {
+      pending.processing = false
+    }
+  }
+
+  private async completeApproval(
+    pending: PendingRequest,
+    credentialId: string | undefined
+  ) {
     try {
       const passkeys = await this.repository.list()
       await this.assertCurrent(pending)
-      if (!this.isVerified(pending))
+      if (!(await this.isVerified(pending)))
         throw denied(
           'The vault was locked or verification expired. Please try again.'
         )
@@ -327,21 +364,26 @@ export class PasskeyRequestManager {
         const result = await createPasskey(
           pending.options,
           pending.origin,
-          true
+          // The device's opt-in policy accepts its unlocked session as verification for creation.
+          true,
+          pending.windowTitle
         )
         await this.assertCurrent(pending)
-        if (!this.isVerified(pending))
+        if (!(await this.isVerified(pending)))
           throw denied(
             'The vault was locked or verification expired. Please try again.'
           )
         // Persist encrypted credentials to the sync service before telling the website registration succeeded.
         await this.repository.save(result.passkey)
         await this.assertCurrent(pending)
-        if (!this.isVerified(pending))
+        if (!(await this.isVerified(pending)))
           throw denied(
             'The vault was locked or verification expired. Please try again.'
           )
-        this.finish(token, { status: 'ok', credential: result.credential })
+        this.finish(pending.token, {
+          status: 'ok',
+          credential: result.credential
+        })
       } else {
         const passkey = passkeys.find(
           (item) =>
@@ -356,19 +398,17 @@ export class PasskeyRequestManager {
           true
         )
         await this.assertCurrent(pending)
-        if (!this.isVerified(pending))
+        if (!(await this.isVerified(pending)))
           throw denied(
             'The vault was locked or verification expired. Please try again.'
           )
-        this.finish(token, { status: 'ok', credential })
+        this.finish(pending.token, { status: 'ok', credential })
       }
     } catch (error) {
       // Every completed approval attempt settles the website, including exclusion
       // failures; otherwise it would hang until timeout while the popup retries.
-      this.finish(token, passkeyErrorReply(error))
+      this.finish(pending.token, passkeyErrorReply(error))
       throw error
-    } finally {
-      pending.processing = false
     }
   }
 

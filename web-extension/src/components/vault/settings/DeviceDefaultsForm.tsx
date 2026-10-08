@@ -16,8 +16,10 @@ import {
 } from '@src/components/ui/card'
 import { Switch } from '@src/components/ui/switch'
 import { useVaultLockTimeoutOptions } from '@src/util/useVaultLockTimeoutOptions'
+import { PasskeyCreationChoices } from './PasskeyCreationChoices'
 
 interface Values {
+  passkeyCreationVerificationRequired: boolean
   vaultLockTimeoutSeconds: number
   autofillTOTPEnabled: boolean
   syncTOTP: boolean
@@ -81,6 +83,8 @@ export function DeviceDefaultsForm() {
       <CardContent>
         <Formik
           initialValues={{
+            passkeyCreationVerificationRequired:
+              data.me.defaultDeviceSettings.passkeyCreationVerificationRequired,
             autofillTOTPEnabled:
               data.me.defaultDeviceSettings.autofillTOTPEnabled,
             syncTOTP: data.me.defaultDeviceSettings.syncTOTP,
@@ -94,6 +98,8 @@ export function DeviceDefaultsForm() {
             { resetForm, setSubmitting }: FormikHelpers<Values>
           ) => {
             const config = {
+              passkeyCreationVerificationRequired:
+                values.passkeyCreationVerificationRequired,
               autofillTOTPEnabled: values.autofillTOTPEnabled,
               syncTOTP: values.syncTOTP,
               theme: values.theme,
@@ -115,6 +121,17 @@ export function DeviceDefaultsForm() {
         >
           {({ dirty, handleSubmit, isSubmitting, setFieldValue, values }) => (
             <form className="space-y-6" onSubmit={handleSubmit}>
+              <PasskeyCreationChoices
+                scope="defaults"
+                verify={values.passkeyCreationVerificationRequired}
+                disabled={isSubmitting}
+                onChange={(value) => {
+                  void setFieldValue(
+                    'passkeyCreationVerificationRequired',
+                    value
+                  )
+                }}
+              />
               <div className="grid gap-4 md:grid-cols-2">
                 <Field name="vaultLockTimeoutSeconds">
                   {() => (

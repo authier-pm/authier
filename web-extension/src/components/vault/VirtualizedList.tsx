@@ -235,7 +235,7 @@ function VaultListCard({ secret }: { secret: SecretTypeUnion }) {
               }}
             >
               <EditIcon boxSize={16} />
-              {isPasskeySecret(secret) ? 'Details' : <Trans>Edit</Trans>}
+              <Trans>Edit</Trans>
             </Link>
           </div>
         </div>

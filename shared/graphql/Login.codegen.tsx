@@ -38,7 +38,7 @@ export type AddNewDeviceForUserMutationVariables = Exact<{
 
 
 export type AddNewDeviceForUserMutation = { deviceDecryptionChallenge:
-    | { __typename: 'DecryptionChallengeApproved', id: number, addNewDeviceForUser: { accessToken: string, user: { id: string, uiLanguage: string, notificationOnVaultUnlock: boolean, notificationOnWrongPasswordAttempts: number, autofillForbiddenUrlPatterns: string, EncryptedSecrets: Array<{ id: string, encrypted: string, kind: Types.EncryptedSecretType, createdAt: string, updatedAt: string | null, version: number }>, device: { id: string, syncTOTP: boolean, vaultLockTimeoutSeconds: number, autofillTOTPEnabled: boolean }, defaultDeviceSettings: { id: number, autofillTOTPEnabled: boolean, theme: string, syncTOTP: boolean, vaultLockTimeoutSeconds: number } } } }
+    | { __typename: 'DecryptionChallengeApproved', id: number, addNewDeviceForUser: { accessToken: string, user: { id: string, uiLanguage: string, notificationOnVaultUnlock: boolean, notificationOnWrongPasswordAttempts: number, autofillForbiddenUrlPatterns: string, EncryptedSecrets: Array<{ id: string, encrypted: string, kind: Types.EncryptedSecretType, createdAt: string, updatedAt: string | null, version: number }>, device: { id: string, syncTOTP: boolean, vaultLockTimeoutSeconds: number, autofillTOTPEnabled: boolean, passkeyCreationVerificationRequired: boolean }, defaultDeviceSettings: { id: number, autofillTOTPEnabled: boolean, theme: string, syncTOTP: boolean, vaultLockTimeoutSeconds: number } } } }
     | { __typename: 'DecryptionChallengeForApproval' }
    | null };
 
@@ -93,6 +93,7 @@ export const AddNewDeviceForUserDocument = gql`
             syncTOTP
             vaultLockTimeoutSeconds
             autofillTOTPEnabled
+            passkeyCreationVerificationRequired
           }
           defaultDeviceSettings {
             id

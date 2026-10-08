@@ -50,6 +50,7 @@ export function TableList({ filter }: { filter: string }) {
     [debouncedSearchTerm, pathname, searchSecrets]
   )
   const showBulkActions = selectedItems.length > 0
+  const canRevealSecrets = data.some((secret) => !isPasskeySecret(secret))
   const [showAllSecrets, setShowAllSecrets] = useState(false)
   const {
     height: containerHeight,
@@ -100,25 +101,29 @@ export function TableList({ filter }: { filter: string }) {
               : `${data.length} results`}
           </div>
           <div className="flex items-center gap-2">
-            <Button
-              aria-label={
-                showAllSecrets ? t`Hide all secrets` : t`Show all secrets`
-              }
-              onClick={() => setShowAllSecrets((currentValue) => !currentValue)}
-              size="sm"
-              variant="outline"
-            >
-              {showAllSecrets ? (
-                <ViewOffIcon boxSize={16} />
-              ) : (
-                <ViewIcon boxSize={16} />
-              )}
-              {showAllSecrets ? (
-                <Trans>Hide secrets</Trans>
-              ) : (
-                <Trans>Show secrets</Trans>
-              )}
-            </Button>
+            {canRevealSecrets && (
+              <Button
+                aria-label={
+                  showAllSecrets ? t`Hide all secrets` : t`Show all secrets`
+                }
+                onClick={() =>
+                  setShowAllSecrets((currentValue) => !currentValue)
+                }
+                size="sm"
+                variant="outline"
+              >
+                {showAllSecrets ? (
+                  <ViewOffIcon boxSize={16} />
+                ) : (
+                  <ViewIcon boxSize={16} />
+                )}
+                {showAllSecrets ? (
+                  <Trans>Hide secrets</Trans>
+                ) : (
+                  <Trans>Show secrets</Trans>
+                )}
+              </Button>
+            )}
             {showBulkActions ? (
               <DeleteSecretButton secrets={[...selectedItems]} size="sm">
                 <Trans>Delete selected</Trans>
@@ -301,8 +306,9 @@ function SecretTableRow({
             </Tooltip>
           </>
         )}
-        <Tooltip content={isPasskeySecret(row) ? t`Details` : t`Edit`}>
+        <Tooltip content={t`Edit`}>
           <Link
+            aria-label={t`Edit ${getSecretLabel(row)}`}
             className={buttonVariants({ size: 'icon', variant: 'ghost' })}
             to={{
               pathname: `/secret/${row.id}`

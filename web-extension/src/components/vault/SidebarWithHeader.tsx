@@ -14,7 +14,7 @@ import {
   FiSettings,
   FiStar
 } from 'react-icons/fi'
-import { TbLogout } from 'react-icons/tb'
+import { TbFingerprint, TbLogout } from 'react-icons/tb'
 import type { IconType } from 'react-icons'
 import { device } from '@src/background/ExtensionDevice'
 import { Button } from '@src/components/ui/button'
@@ -46,7 +46,7 @@ const primaryLinks: LinkItemProps[] = [
     icon: FiKey,
     path: '/totps'
   },
-  { title: <Trans>Passkeys</Trans>, icon: FiKey, path: '/passkeys' }
+  { title: <Trans>Passkeys</Trans>, icon: TbFingerprint, path: '/passkeys' }
 ]
 
 const secondaryLinks: LinkItemProps[] = [

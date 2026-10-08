@@ -46,6 +46,30 @@ const required = <T>(value: T | undefined): T => {
   return value
 }
 
+describe('new passkey labels', () => {
+  it.each([
+    [
+      'Account settings – Example',
+      'alex@example.com | Account settings – Example'
+    ],
+    [undefined, 'alex@example.com | Example'],
+    ['   ', 'alex@example.com | Example']
+  ])(
+    'includes the login and falls back to the site name for title %s',
+    async (title, expected) => {
+      const { passkey } = await createPasskey(
+        creationOptions(),
+        origin,
+        true,
+        title
+      )
+      expect(passkey.label).toBe(expected)
+      expect(passkey.rpName).toBe('Example')
+      expect(passkey.userName).toBe('alex@example.com')
+    }
+  )
+})
+
 type DecodedCbor =
   | number
   | string

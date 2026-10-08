@@ -16,7 +16,7 @@ type ScreenshotSecuritySettings = {
 type ScreenshotDeviceStateContext = {
   currentTab: { id: number }
   currentURL: string
-  deviceState: ScreenshotSecuritySettings
+  deviceState: ScreenshotSecuritySettings & { secrets: SecretTypeUnion[] }
   setSecuritySettings: (settings: ScreenshotSecuritySettings) => Promise<void>
   loginCredentials: SecretTypeUnion[]
   TOTPSecrets: SecretTypeUnion[]
@@ -29,7 +29,8 @@ type ScreenshotDeviceStateContext = {
   ) => SecretTypeUnion[]
 }
 
-const initialDeviceState: ScreenshotSecuritySettings = {
+const initialDeviceState: ScreenshotDeviceStateContext['deviceState'] = {
+  secrets: [],
   autofillCredentialsEnabled: true,
   autofillForbiddenUrlPatterns: '',
   autofillTOTPEnabled: true,
@@ -67,7 +68,7 @@ export const ScreenshotDeviceStateProvider = ({
       currentURL: initialContextValue.currentURL,
       deviceState,
       setSecuritySettings: async (settings) => {
-        setDeviceState(settings)
+        setDeviceState((current) => ({ ...current, ...settings }))
       }
     }),
     [deviceState]

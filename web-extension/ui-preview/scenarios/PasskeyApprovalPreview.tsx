@@ -9,13 +9,11 @@ const view: PasskeyApprovalView = {
   origin: 'https://github.com',
   rpId: 'github.com',
   accountName: 'alex@example.com',
-  verified: false,
+  verified: !signingIn && new URLSearchParams(location.search).has('unlocked'),
   accounts: []
 }
 
 export function PasskeyApprovalPreview() {
-  document.documentElement.dataset.theme = 'dark'
-  document.body.classList.remove('extension-popup')
   return (
     <PasskeyApproval
       initialView={view}

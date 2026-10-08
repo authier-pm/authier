@@ -15,6 +15,9 @@ export class DefaultDeviceSettingsGQLScalars {
   @Field(() => Boolean)
   autofillTOTPEnabled: boolean
 
+  @Field(() => Boolean)
+  passkeyCreationVerificationRequired: boolean
+
   @Field(() => String)
   theme: string
 

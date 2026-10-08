@@ -1,21 +1,12 @@
-import browser from 'webextension-polyfill'
+import { localBooleanPreference } from './localBooleanPreference'
 
 export const AUTOFILL_CREDENTIALS_ENABLED_STORAGE_KEY =
   'autofillCredentialsEnabled'
 
-export const getAutofillCredentialsEnabled = async (): Promise<boolean> => {
-  const storage = await browser.storage.local.get(
-    AUTOFILL_CREDENTIALS_ENABLED_STORAGE_KEY
-  )
-  const storedValue = storage[AUTOFILL_CREDENTIALS_ENABLED_STORAGE_KEY]
+const preference = localBooleanPreference(
+  AUTOFILL_CREDENTIALS_ENABLED_STORAGE_KEY,
+  true
+)
 
-  return typeof storedValue === 'boolean' ? storedValue : true
-}
-
-export const setAutofillCredentialsEnabled = async (
-  enabled: boolean
-): Promise<void> => {
-  await browser.storage.local.set({
-    [AUTOFILL_CREDENTIALS_ENABLED_STORAGE_KEY]: enabled
-  })
-}
+export const getAutofillCredentialsEnabled = preference.get
+export const setAutofillCredentialsEnabled = preference.set

@@ -1,35 +1,49 @@
+/** Internal type. DO NOT USE DIRECTLY. */
+type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
+/** Internal type. DO NOT USE DIRECTLY. */
+export type Incremental<T> = T | { [P in keyof T]?: P extends ' $fragmentName' | '__typename' ? T[P] : never };
 import * as Types from '@shared/generated/graphqlBaseTypes';
 
 import { gql } from '@apollo/client';
 import * as ApolloReactCommon from '@apollo/client/react';
 import * as ApolloReactHooks from '@apollo/client/react';
 const defaultOptions = {} as const;
-export type EncryptedSecretsQueryVariables = Types.Exact<{ [key: string]: never; }>;
+export type EncryptedSecretInput = {
+  encrypted: string;
+  kind: EncryptedSecretType;
+};
+
+export type EncryptedSecretType =
+  | 'LOGIN_CREDENTIALS'
+  | 'PASSKEY'
+  | 'TOTP';
+
+export type EncryptedSecretsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type EncryptedSecretsQuery = { __typename?: 'Query', me: { __typename?: 'UserQuery', id: string, encryptedSecrets: Array<{ __typename?: 'EncryptedSecretQuery', id: string, kind: Types.EncryptedSecretType, encrypted: string }> } };
+export type EncryptedSecretsQuery = { me: { id: string, encryptedSecrets: Array<{ id: string, kind: Types.EncryptedSecretType, encrypted: string }> } };
 
-export type DeleteEncryptedSecretMutationVariables = Types.Exact<{
-  id: Types.Scalars['ID']['input'];
+export type DeleteEncryptedSecretMutationVariables = Exact<{
+  id: string | number;
 }>;
 
 
-export type DeleteEncryptedSecretMutation = { __typename?: 'Mutation', me: { __typename?: 'UserMutation', encryptedSecret: { __typename?: 'EncryptedSecretMutation', id: string, delete: { __typename?: 'EncryptedSecretGQL', id: string } } } };
+export type DeleteEncryptedSecretMutation = { me: { encryptedSecret: { id: string, delete: { id: string } } } };
 
-export type RemoveEncryptedSecretsMutationVariables = Types.Exact<{
-  secrets: Array<Types.Scalars['UUID']['input']> | Types.Scalars['UUID']['input'];
+export type RemoveEncryptedSecretsMutationVariables = Exact<{
+  secrets: Array<string> | string;
 }>;
 
 
-export type RemoveEncryptedSecretsMutation = { __typename?: 'Mutation', me: { __typename?: 'UserMutation', removeEncryptedSecrets: Array<{ __typename?: 'EncryptedSecretMutation', id: string }> } };
+export type RemoveEncryptedSecretsMutation = { me: { removeEncryptedSecrets: Array<{ id: string }> } };
 
-export type UpdateEncryptedSecretMutationVariables = Types.Exact<{
-  id: Types.Scalars['ID']['input'];
+export type UpdateEncryptedSecretMutationVariables = Exact<{
+  id: string | number;
   patch: Types.EncryptedSecretInput;
 }>;
 
 
-export type UpdateEncryptedSecretMutation = { __typename?: 'Mutation', me: { __typename?: 'UserMutation', encryptedSecret: { __typename?: 'EncryptedSecretMutation', id: string, update: { __typename?: 'EncryptedSecretGQL', id: string } } } };
+export type UpdateEncryptedSecretMutation = { me: { encryptedSecret: { id: string, update: { id: string, version: number } } } };
 
 
 export const EncryptedSecretsDocument = gql`
@@ -156,6 +170,7 @@ export const UpdateEncryptedSecretDocument = gql`
       id
       update(patch: $patch) {
         id
+        version
       }
     }
   }

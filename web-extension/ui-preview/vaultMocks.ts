@@ -1,5 +1,7 @@
 import { EncryptedSecretType } from '@shared/generated/graphqlBaseTypes'
 import type { SecretTypeUnion } from '../src/background/ExtensionDevice'
+import type { ISecret, IPasskeySecret } from '../src/util/useDeviceState'
+import { passkeySchema } from '@shared/passkeySchema'
 
 export const pathNameToTypes = {
   '/credentials': [EncryptedSecretType.LOGIN_CREDENTIALS],
@@ -26,9 +28,23 @@ export const getDecryptedSecretProp = (
   return typeof value === 'string' ? value : ''
 }
 
+export const encodePreviewSecret = (value: string) =>
+  btoa(encodeURIComponent(value))
+export const decodePreviewPasskey = (encrypted: string) =>
+  passkeySchema.parse(JSON.parse(decodeURIComponent(atob(encrypted))))
+
 export const device = {
   state: {
     email: 'alex@example.com',
+    secrets: [] as ISecret[],
+    encrypt: async (value: string) => encodePreviewSecret(value),
+    decrypt: async (encrypted: string) => decodeURIComponent(atob(encrypted)),
+    decryptSecret: async (secret: ISecret): Promise<IPasskeySecret> => ({
+      ...secret,
+      kind: EncryptedSecretType.PASSKEY,
+      passkey: decodePreviewPasskey(secret.encrypted)
+    }),
+    save: async () => undefined,
     backendSync: async () => ({ newAndUpdatedSecrets: 0, removedSecrets: 0 }),
     removeSecrets: async () => undefined,
     removeSecret: async () => undefined

@@ -21,7 +21,13 @@ import { BitfinexTotpPreview } from './scenarios/BitfinexTotpPreview'
 import { KostkohratkyPasswordPreview } from './scenarios/KostkohratkyPasswordPreview'
 
 import { PasskeyApprovalPreview } from './scenarios/PasskeyApprovalPreview'
-import { PasskeyVaultPreview } from './scenarios/PasskeyVaultPreview'
+import { PasskeyCreationSettingsPreview } from './scenarios/PasskeyCreationSettingsPreview'
+import { PasskeyDeviceDefaultsPreview } from './scenarios/PasskeyDeviceDefaultsPreview'
+import {
+  PasskeySidebarPreview,
+  PasskeyVaultPreview
+} from './scenarios/PasskeyVaultPreview'
+import { PasskeyPopupPreview } from './scenarios/PasskeyPopupPreview'
 import { EmailVerificationCodesPreview } from './scenarios/EmailVerificationCodesPreview'
 import { InlineVerificationCodesPreview } from './scenarios/InlineVerificationCodesPreview'
 import { SmsVerificationCodesPreview } from './scenarios/SmsVerificationCodesPreview'
@@ -37,7 +43,11 @@ const scenarios: Record<string, ComponentType> = {
   'master-device-reset-progress': MasterDeviceResetProgressPreview,
   'remembered-session': RememberedSessionPreview,
   'passkey-vault': PasskeyVaultPreview,
+  'passkey-sidebar': PasskeySidebarPreview,
+  'passkey-popup': PasskeyPopupPreview,
   'passkey-approval': PasskeyApprovalPreview,
+  'passkey-creation-settings': PasskeyCreationSettingsPreview,
+  'passkey-device-defaults': PasskeyDeviceDefaultsPreview,
   'email-verification-codes': EmailVerificationCodesPreview,
   'inline-verification-codes': InlineVerificationCodesPreview,
   'sms-verification-codes': SmsVerificationCodesPreview,
@@ -76,7 +86,8 @@ document.body.classList.toggle(
     requestedScenario !== 'inline-verification-codes' &&
     requestedScenario !== 'sms-verification-codes' &&
     !requestedScenario.endsWith('-release-blog') &&
-    !requestedScenario.startsWith('passkey-')
+    (!requestedScenario.startsWith('passkey-') ||
+      requestedScenario === 'passkey-popup')
 )
 
 ReactDOM.createRoot(document.getElementById('ui-preview')!).render(<Scenario />)

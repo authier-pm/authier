@@ -32,6 +32,7 @@ CREATE TABLE "DefaultSettings" (
 	"createdAt" timestamp(3) DEFAULT CURRENT_TIMESTAMP NOT NULL,
 	"updatedAt" timestamp(3),
 	"autofillTOTPEnabled" boolean DEFAULT true NOT NULL,
+	"passkeyCreationVerificationRequired" boolean DEFAULT true NOT NULL,
 	"vaultLockTimeoutSeconds" integer DEFAULT 86400 NOT NULL,
 	"userId" uuid NOT NULL,
 	"syncTOTP" boolean DEFAULT true NOT NULL,
@@ -58,7 +59,8 @@ CREATE TABLE "Device" (
 	"lastUnlockAt" timestamp(3),
 	"syncTOTP" boolean NOT NULL,
 	"deletedAt" timestamp(3),
-	"autofillTOTPEnabled" boolean NOT NULL
+	"autofillTOTPEnabled" boolean NOT NULL,
+	"passkeyCreationVerificationRequired" boolean DEFAULT true NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE "EmailVerification" (

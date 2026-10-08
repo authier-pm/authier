@@ -25,6 +25,8 @@ export class DefaultDeviceSettingsMutation extends DefaultDeviceSettingsGQLScala
   ) {
     assertValidVaultLockTimeoutSeconds(config.vaultLockTimeoutSeconds)
     const data = {
+      passkeyCreationVerificationRequired:
+        config.passkeyCreationVerificationRequired ?? undefined,
       autofillTOTPEnabled: config.autofillTOTPEnabled,
       syncTOTP: config.syncTOTP,
       vaultLockTimeoutSeconds: config.vaultLockTimeoutSeconds,

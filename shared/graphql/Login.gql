@@ -33,6 +33,7 @@ mutation addNewDeviceForUser(
             syncTOTP
             vaultLockTimeoutSeconds
             autofillTOTPEnabled
+            passkeyCreationVerificationRequired
           }
           defaultDeviceSettings {
             id

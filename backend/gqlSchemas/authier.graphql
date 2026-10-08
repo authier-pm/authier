@@ -141,6 +141,7 @@ type DeviceGQL {
   syncTOTP: Boolean!
   vaultLockTimeoutSeconds: Int!
   autofillTOTPEnabled: Boolean!
+  passkeyCreationVerificationRequired: Boolean!
   createdAt: DateTime!
   updatedAt: DateTime
   deletedAt: DateTime
@@ -281,6 +282,7 @@ type DefaultDeviceSettingsGQL {
   createdAt: DateTime!
   updatedAt: DateTime
   autofillTOTPEnabled: Boolean!
+  passkeyCreationVerificationRequired: Boolean!
   theme: String!
   syncTOTP: Boolean!
   vaultLockTimeoutSeconds: Int!
@@ -300,6 +302,7 @@ type DeviceQuery {
   syncTOTP: Boolean!
   vaultLockTimeoutSeconds: Int!
   autofillTOTPEnabled: Boolean!
+  passkeyCreationVerificationRequired: Boolean!
   createdAt: DateTime!
   updatedAt: DateTime
   deletedAt: DateTime
@@ -343,6 +346,7 @@ type DefaultDeviceSettingsQuery {
   createdAt: DateTime!
   updatedAt: DateTime
   autofillTOTPEnabled: Boolean!
+  passkeyCreationVerificationRequired: Boolean!
   theme: String!
   syncTOTP: Boolean!
   vaultLockTimeoutSeconds: Int!
@@ -536,6 +540,7 @@ type DeviceMutation {
   syncTOTP: Boolean!
   vaultLockTimeoutSeconds: Int!
   autofillTOTPEnabled: Boolean!
+  passkeyCreationVerificationRequired: Boolean!
   createdAt: DateTime!
   updatedAt: DateTime
   deletedAt: DateTime
@@ -593,6 +598,7 @@ type DefaultDeviceSettingsMutation {
   createdAt: DateTime!
   updatedAt: DateTime
   autofillTOTPEnabled: Boolean!
+  passkeyCreationVerificationRequired: Boolean!
   theme: String!
   syncTOTP: Boolean!
   vaultLockTimeoutSeconds: Int!
@@ -605,6 +611,7 @@ type DefaultDeviceSettingsGQLScalars {
   createdAt: DateTime!
   updatedAt: DateTime
   autofillTOTPEnabled: Boolean!
+  passkeyCreationVerificationRequired: Boolean!
   theme: String!
   syncTOTP: Boolean!
   vaultLockTimeoutSeconds: Int!
@@ -612,6 +619,7 @@ type DefaultDeviceSettingsGQLScalars {
 }
 
 input DefaultSettingsInput {
+  passkeyCreationVerificationRequired: Boolean
   syncTOTP: Boolean!
   vaultLockTimeoutSeconds: Int!
   autofillTOTPEnabled: Boolean!

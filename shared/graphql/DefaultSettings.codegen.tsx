@@ -10,6 +10,7 @@ import * as ApolloReactHooks from '@apollo/client/react';
 const defaultOptions = {} as const;
 export type DefaultSettingsInput = {
   autofillTOTPEnabled: boolean;
+  passkeyCreationVerificationRequired?: boolean | null | undefined;
   syncTOTP: boolean;
   theme: string;
   uiLanguage: string;
@@ -21,7 +22,7 @@ export type UpdateDefaultDeviceSettingsMutationVariables = Exact<{
 }>;
 
 
-export type UpdateDefaultDeviceSettingsMutation = { me: { defaultDeviceSettings: { id: number, update: { id: number, autofillTOTPEnabled: boolean, theme: string, syncTOTP: boolean, vaultLockTimeoutSeconds: number } } } };
+export type UpdateDefaultDeviceSettingsMutation = { me: { defaultDeviceSettings: { id: number, update: { id: number, autofillTOTPEnabled: boolean, passkeyCreationVerificationRequired: boolean, theme: string, syncTOTP: boolean, vaultLockTimeoutSeconds: number } } } };
 
 export type UpdateMasterDeviceResetTimeoutMutationVariables = Exact<{
   deviceRecoveryCooldownMinutes: number;
@@ -33,7 +34,7 @@ export type UpdateMasterDeviceResetTimeoutMutation = { me: { setDeviceRecoveryCo
 export type DefaultSettingsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type DefaultSettingsQuery = { me: { id: string, masterDeviceId: string | null, uiLanguage: string, deviceRecoveryCooldownMinutes: number, masterDeviceResetConfig: unknown, defaultDeviceSettings: { id: number, autofillTOTPEnabled: boolean, syncTOTP: boolean, vaultLockTimeoutSeconds: number, theme: string } } };
+export type DefaultSettingsQuery = { me: { id: string, masterDeviceId: string | null, uiLanguage: string, deviceRecoveryCooldownMinutes: number, masterDeviceResetConfig: unknown, defaultDeviceSettings: { id: number, autofillTOTPEnabled: boolean, passkeyCreationVerificationRequired: boolean, syncTOTP: boolean, vaultLockTimeoutSeconds: number, theme: string } } };
 
 export type UpdateMasterDeviceResetConfigMutationVariables = Exact<{
   config: unknown;
@@ -51,6 +52,7 @@ export const UpdateDefaultDeviceSettingsDocument = gql`
       update(config: $config) {
         id
         autofillTOTPEnabled
+        passkeyCreationVerificationRequired
         theme
         syncTOTP
         vaultLockTimeoutSeconds
@@ -130,6 +132,7 @@ export const DefaultSettingsDocument = gql`
     defaultDeviceSettings {
       id
       autofillTOTPEnabled
+      passkeyCreationVerificationRequired
       syncTOTP
       vaultLockTimeoutSeconds
       theme

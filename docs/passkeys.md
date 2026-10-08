@@ -9,16 +9,33 @@ sync the vault to use the same website credentials there.
 1. Install the updated extension and sign in to Authier.
 2. Open a website's security settings and choose to add a passkey.
 3. In the separate Authier window, check the website address, enter your master
-   password, and select **Save passkey**.
+   password if prompted, and select **Save passkey**.
 4. On the website's next passkey sign-in, verify your master password in Authier,
    choose the account, and select **Sign in**.
 5. On a new browser, sign in to the same Authier vault and sync before signing in
    to the website. You do not need to enroll another website passkey.
 
+In **Settings → Security → Creating passkeys**, choose whether to always verify
+identity (the default) or allow creating new passkeys while this device's vault
+is unlocked. This preference saves automatically in local browser storage and
+does not sync to other devices. Both choices require explicit **Save passkey**
+approval. A locked vault still requires the master password, and passkey sign-in
+always requires verification.
+
+Choose the same policy under **Settings → Defaults → Creating passkeys on new
+devices** to set the starting behavior for devices you add later. New devices
+inherit the account default at enrollment; existing devices retain their own
+choice. Each browser can override its inherited choice under **Security**.
+
 Choose **Use another provider** to continue with your browser, operating system,
 phone, or security key. Closing or canceling the Authier window cancels the
-request. Passkeys appear under **Passkeys** in the vault, where their account and
-website can be inspected and the item deleted. Deleting a vault item does not
+request. Passkeys appear in the extension popup below TOTP codes and passwords,
+with the same site filter and search. They also appear under **Passkeys** in the
+vault, where the **Edit** action lets you edit the label, inspect the account and
+website, or delete the item. New labels use `<login> | <window title>`, falling
+back to the site's name when the browser tab has no title. Labels sync encrypted
+with the rest of the passkey. The passkey list has no reveal-secrets button.
+Deleting a vault item does not
 remove the site's registration; remove it from the site's security settings too.
 
 Existing passkeys stored by a browser, operating system, or hardware key cannot
@@ -54,7 +71,9 @@ unrelated domains, insecure origins, and embedded frames are rejected. Passkey
 signatures bind the challenge, origin, and RP ID hash.
 
 A separate extension window shows the trusted origin and obtains explicit
-approval. Each operation verifies the master password. Approval is bound to one
+approval. Each operation verifies the master password by default; creation can
+instead use the unlocked vault when the device-local preference allows it.
+Approval is bound to one
 request, one tab, and the current unlocked vault session, and expires after one
 minute. Navigation, cancellation, timeouts, vault changes, and window closure
 invalidate pending requests. Page messages cannot approve an operation.
@@ -67,9 +86,13 @@ exports. Passkeys sync even when TOTP sync is disabled and count toward the
 login credential allowance.
 
 Synced credentials use a zero signature counter and set backup eligibility/state
-flags. User verification is only asserted after a successful master-password
-check. The authenticator uses none attestation and does not claim hardware key
-protection or biometric verification.
+flags. Creation returns the user-verification flag after either a successful
+master-password check or approval using the opted-in unlocked-vault policy,
+including when the website requests required verification. This convenience
+policy accepts the existing unlocked session without a fresh identity check.
+Sign-in still requires a successful master-password check. The authenticator
+uses none attestation and does not claim hardware key protection or biometric
+verification.
 
 ## Rollout and development
 
@@ -79,12 +102,18 @@ and deployment commands; no production migration is run by tests. Update clients
 that share the vault before enrolling passkeys: older clients do not understand
 the new secret kind.
 
+The passkey creation defaults also require the migration adding
+`passkeyCreationVerificationRequired` to `DefaultSettings` and `Device` before
+deploying the backend and updated extension. Existing accounts and devices
+default to requiring verification.
+
 Build Chromium with the normal `generateManifest` and `prodBuild` scripts.
 For Firefox, set `MANIFEST_VERSION=2` for **both** scripts. The approval page and
 both bridge scripts are included in the build. No extra browser permission is
 needed beyond the extension's existing website access.
 
-The checked-in UI scenarios are `passkey-approval` and `passkey-vault` under
+The checked-in UI scenarios are `passkey-approval`, `passkey-creation-settings`,
+`passkey-device-defaults`, `passkey-popup`, and `passkey-vault` under
 `web-extension/ui-preview`. Passkey unit tests cover independent cryptographic
 verification, encrypted round trips, RP isolation, user verification, request
 ownership, fallback, cancellation, and persistence failures. Backend tests use

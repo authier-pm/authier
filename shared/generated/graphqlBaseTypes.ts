@@ -136,6 +136,7 @@ export type DefaultDeviceSettingsGql = {
   autofillTOTPEnabled: Scalars['Boolean']['output']
   createdAt: Scalars['DateTime']['output']
   id: Scalars['Int']['output']
+  passkeyCreationVerificationRequired: Scalars['Boolean']['output']
   syncTOTP: Scalars['Boolean']['output']
   theme: Scalars['String']['output']
   updatedAt?: Maybe<Scalars['DateTime']['output']>
@@ -149,6 +150,7 @@ export type DefaultDeviceSettingsGqlScalars = {
   autofillTOTPEnabled: Scalars['Boolean']['output']
   createdAt: Scalars['DateTime']['output']
   id: Scalars['Int']['output']
+  passkeyCreationVerificationRequired: Scalars['Boolean']['output']
   syncTOTP: Scalars['Boolean']['output']
   theme: Scalars['String']['output']
   updatedAt?: Maybe<Scalars['DateTime']['output']>
@@ -161,6 +163,7 @@ export type DefaultDeviceSettingsMutation = {
   autofillTOTPEnabled: Scalars['Boolean']['output']
   createdAt: Scalars['DateTime']['output']
   id: Scalars['Int']['output']
+  passkeyCreationVerificationRequired: Scalars['Boolean']['output']
   syncTOTP: Scalars['Boolean']['output']
   theme: Scalars['String']['output']
   update: DefaultDeviceSettingsGqlScalars
@@ -179,6 +182,7 @@ export type DefaultDeviceSettingsQuery = {
   createdAt: Scalars['DateTime']['output']
   /** 0 index for system defaults */
   id: Scalars['Int']['output']
+  passkeyCreationVerificationRequired: Scalars['Boolean']['output']
   syncTOTP: Scalars['Boolean']['output']
   theme: Scalars['String']['output']
   updatedAt?: Maybe<Scalars['DateTime']['output']>
@@ -188,6 +192,7 @@ export type DefaultDeviceSettingsQuery = {
 
 export type DefaultSettingsInput = {
   autofillTOTPEnabled: Scalars['Boolean']['input']
+  passkeyCreationVerificationRequired?: InputMaybe<Scalars['Boolean']['input']>
   syncTOTP: Scalars['Boolean']['input']
   theme: Scalars['String']['input']
   uiLanguage: Scalars['String']['input']
@@ -214,6 +219,7 @@ export type DeviceGql = {
   logoutAt?: Maybe<Scalars['DateTime']['output']>
   masterPasswordOutdatedAt?: Maybe<Scalars['DateTime']['output']>
   name: Scalars['String']['output']
+  passkeyCreationVerificationRequired: Scalars['Boolean']['output']
   platform: Scalars['String']['output']
   registeredWithMasterAt?: Maybe<Scalars['DateTime']['output']>
   syncTOTP: Scalars['Boolean']['output']
@@ -252,6 +258,7 @@ export type DeviceMutation = {
   markAsSynced: Scalars['DateTime']['output']
   masterPasswordOutdatedAt?: Maybe<Scalars['DateTime']['output']>
   name: Scalars['String']['output']
+  passkeyCreationVerificationRequired: Scalars['Boolean']['output']
   platform: Scalars['String']['output']
   registeredWithMasterAt?: Maybe<Scalars['DateTime']['output']>
   /** user has to approve it when they log in again on that device */
@@ -303,6 +310,7 @@ export type DeviceQuery = {
   logoutAt?: Maybe<Scalars['DateTime']['output']>
   masterPasswordOutdatedAt?: Maybe<Scalars['DateTime']['output']>
   name: Scalars['String']['output']
+  passkeyCreationVerificationRequired: Scalars['Boolean']['output']
   platform: Scalars['String']['output']
   registeredWithMasterAt?: Maybe<Scalars['DateTime']['output']>
   syncTOTP: Scalars['Boolean']['output']
@@ -501,16 +509,6 @@ export type QueryWebInputsArgs = {
   hosts?: InputMaybe<Array<Scalars['String']['input']>>
 }
 
-export type RelayedVerificationCodeGql = {
-  __typename?: 'RelayedVerificationCodeGQL'
-  createdAt: Scalars['DateTime']['output']
-  /** Name of the phone that relayed it */
-  deviceName: Scalars['String']['output']
-  encrypted: Scalars['String']['output']
-  expiresAt: Scalars['DateTime']['output']
-  id: Scalars['ID']['output']
-}
-
 export type RegisterNewAccountInput = {
   addDeviceSecret: Scalars['NonEmptyString']['input']
   addDeviceSecretEncrypted: Scalars['NonEmptyString']['input']
@@ -522,6 +520,16 @@ export type RegisterNewAccountInput = {
   /** Firebase token is only used for mobile app */
   firebaseToken?: InputMaybe<Scalars['String']['input']>
   masterDeviceResetConfig?: InputMaybe<Scalars['JSON']['input']>
+}
+
+export type RelayedVerificationCodeGql = {
+  __typename?: 'RelayedVerificationCodeGQL'
+  createdAt: Scalars['DateTime']['output']
+  /** Name of the phone that relayed it */
+  deviceName: Scalars['String']['output']
+  encrypted: Scalars['String']['output']
+  expiresAt: Scalars['DateTime']['output']
+  id: Scalars['ID']['output']
 }
 
 export type SecretUsageEventGql = {

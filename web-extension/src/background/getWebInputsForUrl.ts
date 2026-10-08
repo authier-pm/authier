@@ -1,5 +1,5 @@
 import { constructURL } from '@shared/urlUtils'
-import { device } from './ExtensionDevice'
+import { device } from '@src/background/ExtensionDevice'
 import { WebInputType } from '@shared/generated/graphqlBaseTypes'
 
 export const getWebInputsForUrl = (url: string) => {

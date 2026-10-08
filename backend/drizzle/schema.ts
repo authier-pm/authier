@@ -115,6 +115,7 @@ export const defaultSettings = pgTable(
       .notNull(),
     updatedAt: timestamp({ precision: 3 }),
     autofillTOTPEnabled: boolean().default(true).notNull(),
+    passkeyCreationVerificationRequired: boolean().default(true).notNull(),
     vaultLockTimeoutSeconds: integer().default(86400).notNull(),
     userId: uuid()
       .notNull()
@@ -159,7 +160,8 @@ export const device = pgTable(
     lastUnlockAt: timestamp({ precision: 3 }),
     syncTOTP: boolean().notNull(),
     deletedAt: timestamp({ precision: 3 }),
-    autofillTOTPEnabled: boolean().notNull()
+    autofillTOTPEnabled: boolean().notNull(),
+    passkeyCreationVerificationRequired: boolean().default(true).notNull()
   },
   (table) => [
     uniqueIndex('Device_firebaseToken_key').using(

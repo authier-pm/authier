@@ -2,13 +2,18 @@ import { useContext, useEffect, useState } from 'react'
 import { t } from '@lingui/core/macro'
 import browser from 'webextension-polyfill'
 import debug from 'debug'
-import { TbAuth2Fa } from 'react-icons/tb'
+import { TbAuth2Fa, TbFingerprint } from 'react-icons/tb'
 import { IoBanOutline, IoCopyOutline } from 'react-icons/io5'
 import { DeviceStateContext } from '@src/providers/DeviceStateProvider'
-import { ILoginSecret, ITOTPSecret } from '@src/util/useDeviceState'
+import type {
+  ILoginSecret,
+  IPasskeySecret,
+  ITOTPSecret
+} from '@src/util/useDeviceState'
 import { Button } from '@src/components/ui/button'
 import { Tooltip } from '@src/components/ui/tooltip'
 import { copyTextToClipboard } from '@src/lib/clipboard'
+import { cn } from '@src/lib/cn'
 import { SecretItemIcon } from '../SecretItemIcon'
 import { useAddOtpEventMutation } from './AuthList.codegen'
 import { getDomainNameAndTldFromUrl } from '@shared/urlUtils'
@@ -104,7 +109,10 @@ const OtpCode = ({ totpSecret }: { totpSecret: ITOTPSecret }) => {
           )}
         </div>
 
-        <Tooltip content={t`Fill TOTP into input on screen by point&click`}>
+        <Tooltip
+          className="left-auto right-0 translate-x-0"
+          content={t`Fill TOTP into input on screen by point&click`}
+        >
           <Button
             disabled={Boolean(otpCodeError)}
             size="icon"
@@ -154,7 +162,10 @@ const LoginCredentialsListItem = ({
           </div>
         </div>
 
-        <Tooltip content={t`Copy password`}>
+        <Tooltip
+          className="left-auto right-0 translate-x-0"
+          content={t`Copy password`}
+        >
           <Button
             size="icon"
             variant="outline"
@@ -170,6 +181,40 @@ const LoginCredentialsListItem = ({
   )
 }
 
+const PasskeyListItem = ({
+  passkey
+}: {
+  passkey: Pick<IPasskeySecret['passkey'], 'label' | 'rpId' | 'userName'>
+}) => {
+  const label = passkey.label || passkey.rpId
+  const showAccount = passkey.userName && !label.includes(passkey.userName)
+
+  return (
+    <div
+      className={cn(
+        cardClassName,
+        'flex items-center gap-2 rounded-xl py-2 shadow-none'
+      )}
+      title={`${label}\n${passkey.userName}\n${passkey.rpId}`}
+    >
+      <TbFingerprint
+        aria-hidden
+        className="size-4 shrink-0 text-[color:var(--color-primary)]"
+      />
+      <p className="min-w-0 flex-1 truncate text-sm">
+        <span className="sr-only">Passkey: </span>
+        <span className="font-medium">{label}</span>
+        {showAccount && (
+          <span className="text-[color:var(--color-muted)]">
+            {' · '}
+            {passkey.userName}
+          </span>
+        )}
+      </p>
+    </div>
+  )
+}
+
 export const AuthsList = ({
   filterByTLD,
   search
@@ -177,95 +222,49 @@ export const AuthsList = ({
   filterByTLD: boolean
   search: string
 }) => {
-  const {
-    deviceState,
-    TOTPSecrets,
-    loginCredentials,
-    currentURL,
-    searchSecrets
-  } = useContext(DeviceStateContext)
+  const { deviceState, currentURL, searchSecrets } =
+    useContext(DeviceStateContext)
   const [removeWebInput] = useRemoveWebInputMutation()
 
-  if (!deviceState) {
-    return null
-  }
+  if (!deviceState) return null
 
-  const TOTPForCurrentDomain = TOTPSecrets.filter(({ totp }) => {
-    if (!currentURL || !totp.url) {
-      return true
+  const matchingSecrets = searchSecrets(search).filter((secret) => {
+    if (!filterByTLD || !currentURL) return true
+    let url: string | null | undefined
+    switch (secret.kind) {
+      case EncryptedSecretType.TOTP:
+        url = secret.totp.url
+        if (!url) return true
+        break
+      case EncryptedSecretType.LOGIN_CREDENTIALS:
+        url = secret.loginCredentials.url
+        break
+      case EncryptedSecretType.PASSKEY:
+        url = `https://${secret.passkey.rpId}`
+        break
     }
-
+    if (!url) return false
     return (
-      getDomainNameAndTldFromUrl(totp.url) ===
-      getDomainNameAndTldFromUrl(currentURL)
+      getDomainNameAndTldFromUrl(url) === getDomainNameAndTldFromUrl(currentURL)
     )
   })
-
-  const loginCredentialForCurrentDomain = loginCredentials.filter(
-    ({ loginCredentials }) => {
-      if (!loginCredentials.url) {
-        return false
-      }
-
-      if (!currentURL) {
-        return true
-      }
-
-      return (
-        getDomainNameAndTldFromUrl(loginCredentials.url) ===
-        getDomainNameAndTldFromUrl(currentURL)
-      )
-    }
+  const orderedSecrets = [
+    EncryptedSecretType.TOTP,
+    EncryptedSecretType.LOGIN_CREDENTIALS,
+    EncryptedSecretType.PASSKEY
+  ].flatMap((kind) =>
+    matchingSecrets
+      .filter((secret) => secret.kind === kind)
+      .slice(0, filterByTLD ? undefined : 20)
   )
-
   const hasNoSecrets = deviceState.secrets.length === 0
   const matchingWebInputsForCurrentPage = currentURL
     ? getWebInputsForUrl(currentURL)
     : []
-  const totps = searchSecrets(search, [
-    EncryptedSecretType.TOTP
-  ]) as ITOTPSecret[]
-  const creds = searchSecrets(search, [
-    EncryptedSecretType.LOGIN_CREDENTIALS
-  ]) as ILoginSecret[]
-
-  const renderedSecrets = filterByTLD
-    ? [
-        ...TOTPForCurrentDomain.map((auth, i) => (
-          <OtpCode totpSecret={auth as ITOTPSecret} key={auth.totp.label + i} />
-        )),
-        ...loginCredentialForCurrentDomain.map((credentials, i) => (
-          <LoginCredentialsListItem
-            key={credentials.loginCredentials.label + i}
-            loginSecret={credentials as ILoginSecret}
-          />
-        ))
-      ]
-    : [
-        ...totps
-          .slice(0, 20)
-          .map((auth, i) => (
-            <OtpCode
-              totpSecret={auth as ITOTPSecret}
-              key={auth.totp.label + i}
-            />
-          )),
-        ...creds
-          .slice(0, 20)
-          .map((psw, i) => (
-            <LoginCredentialsListItem
-              key={psw.loginCredentials.label + i}
-              loginSecret={psw as ILoginSecret}
-            />
-          ))
-      ]
 
   return (
     <div className="flex flex-col">
-      {!hasNoSecrets &&
-      filterByTLD &&
-      TOTPForCurrentDomain.length === 0 &&
-      loginCredentialForCurrentDomain.length === 0 ? (
+      {!hasNoSecrets && filterByTLD && orderedSecrets.length === 0 ? (
         <div className="flex h-[50vh] items-center justify-center text-sm text-[color:var(--color-muted)]">
           <span className="inline-flex items-center gap-2">
             <IoBanOutline className="size-4" />
@@ -274,11 +273,25 @@ export const AuthsList = ({
         </div>
       ) : null}
 
-      {renderedSecrets}
+      <div role="list" aria-label="Saved secrets">
+        {orderedSecrets.map((secret) => (
+          <div role="listitem" key={secret.id}>
+            {secret.kind === EncryptedSecretType.TOTP && (
+              <OtpCode totpSecret={secret} />
+            )}
+            {secret.kind === EncryptedSecretType.LOGIN_CREDENTIALS && (
+              <LoginCredentialsListItem loginSecret={secret} />
+            )}
+            {secret.kind === EncryptedSecretType.PASSKEY && (
+              <PasskeyListItem passkey={secret.passkey} />
+            )}
+          </div>
+        ))}
+      </div>
 
       {hasNoSecrets ? (
         <div className="px-2 py-3 text-sm text-[color:var(--color-muted)]">
-          Start by adding a login secret or TOTP code
+          Start by adding a password, TOTP code, or passkey
         </div>
       ) : null}
 

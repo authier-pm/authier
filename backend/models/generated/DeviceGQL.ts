@@ -38,6 +38,9 @@ export class DeviceGQLScalars {
   @Field(() => Boolean)
   autofillTOTPEnabled: boolean
 
+  @Field(() => Boolean)
+  passkeyCreationVerificationRequired: boolean
+
   @Field(() => GraphQLISODateTime)
   createdAt: Date
 
