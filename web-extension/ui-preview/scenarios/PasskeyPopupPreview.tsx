@@ -53,7 +53,12 @@ const passkey = (
   }
 })
 const passkeys = [
-  passkey('github-passkey', 'GitHub', 'github.com', 'alex@example.com'),
+  passkey(
+    'github-passkey',
+    'alex@example.com | GitHub',
+    'github.com',
+    'alex@example.com'
+  ),
   passkey(
     'github-work-passkey',
     'GitHub work',

@@ -2,7 +2,7 @@ import { useContext, useEffect, useState } from 'react'
 import { t } from '@lingui/core/macro'
 import browser from 'webextension-polyfill'
 import debug from 'debug'
-import { TbAuth2Fa, TbKey } from 'react-icons/tb'
+import { TbAuth2Fa, TbFingerprint } from 'react-icons/tb'
 import { IoBanOutline, IoCopyOutline } from 'react-icons/io5'
 import { DeviceStateContext } from '@src/providers/DeviceStateProvider'
 import type {
@@ -13,6 +13,7 @@ import type {
 import { Button } from '@src/components/ui/button'
 import { Tooltip } from '@src/components/ui/tooltip'
 import { copyTextToClipboard } from '@src/lib/clipboard'
+import { cn } from '@src/lib/cn'
 import { SecretItemIcon } from '../SecretItemIcon'
 import { useAddOtpEventMutation } from './AuthList.codegen'
 import { getDomainNameAndTldFromUrl } from '@shared/urlUtils'
@@ -184,41 +185,35 @@ const PasskeyListItem = ({
   passkey
 }: {
   passkey: Pick<IPasskeySecret['passkey'], 'label' | 'rpId' | 'userName'>
-}) => (
-  <div className={cardClassName}>
-    <div className="flex items-center gap-3">
-      <TbKey
+}) => {
+  const label = passkey.label || passkey.rpId
+  const showAccount = passkey.userName && !label.includes(passkey.userName)
+
+  return (
+    <div
+      className={cn(
+        cardClassName,
+        'flex items-center gap-2 rounded-xl py-2 shadow-none'
+      )}
+      title={`${label}\n${passkey.userName}\n${passkey.rpId}`}
+    >
+      <TbFingerprint
         aria-hidden
-        className="size-[30px] shrink-0 text-[color:var(--color-primary)]"
+        className="size-4 shrink-0 text-[color:var(--color-primary)]"
       />
-      <div className="min-w-0 flex-1">
-        <div className="flex items-center justify-between gap-2">
-          <h3
-            className="truncate text-sm font-semibold"
-            title={passkey.label || passkey.rpId}
-          >
-            {passkey.label || passkey.rpId}
-          </h3>
-          <span className="shrink-0 text-xs text-[color:var(--color-primary)]">
-            Passkey
+      <p className="min-w-0 flex-1 truncate text-sm">
+        <span className="sr-only">Passkey: </span>
+        <span className="font-medium">{label}</span>
+        {showAccount && (
+          <span className="text-[color:var(--color-muted)]">
+            {' · '}
+            {passkey.userName}
           </span>
-        </div>
-        <p
-          className="truncate text-sm text-[color:var(--color-muted)]"
-          title={passkey.userName}
-        >
-          {passkey.userName}
-        </p>
-        <p
-          className="truncate text-xs text-[color:var(--color-muted)]"
-          title={passkey.rpId}
-        >
-          {passkey.rpId}
-        </p>
-      </div>
+        )}
+      </p>
     </div>
-  </div>
-)
+  )
+}
 
 export const AuthsList = ({
   filterByTLD,
