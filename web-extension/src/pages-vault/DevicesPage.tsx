@@ -628,6 +628,8 @@ function DateMeta({
   emptyLabel?: ReactNode
   label: ReactNode
 }) {
+  const [referenceTime] = useState(() => new Date())
+
   if (!date) {
     return (
       <MetaRow
@@ -644,7 +646,7 @@ function DateMeta({
     weekday: 'long',
     year: 'numeric'
   })
-  const relative = `${formatDistance(new Date(date), new Date())} ago`
+  const relative = `${formatDistance(new Date(date), referenceTime)} ago`
 
   return (
     <Tooltip content={absolute}>

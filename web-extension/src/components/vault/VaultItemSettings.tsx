@@ -424,6 +424,8 @@ function SecretDetailLayout({
     url: string
   }>
 }) {
+  const [referenceTime] = useState(() => new Date())
+
   return (
     <div className="mx-auto flex w-full max-w-6xl flex-col gap-6">
       <div className="flex flex-wrap items-start justify-between gap-4">
@@ -484,7 +486,7 @@ function SecretDetailLayout({
             </CardHeader>
             <CardContent className="space-y-3 text-sm">
               <MetadataRow label="Created">
-                {formatRelative(new Date(createdAt), new Date())}
+                {formatRelative(new Date(createdAt), referenceTime)}
               </MetadataRow>
               <MetadataRow label="Web inputs">{webInputs.length}</MetadataRow>
             </CardContent>

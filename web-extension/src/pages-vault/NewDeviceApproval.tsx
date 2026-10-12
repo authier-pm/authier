@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { useAppToast } from '@src/ExtensionProviders'
 import { MasterDeviceResetProgress } from '@shared/MasterDeviceResetProgress'
 import { Trans } from '@lingui/react/macro'
@@ -15,6 +16,7 @@ import { LOGIN_DECRYPTION_CHALLENGE_REFETCH_INTERVAL } from '@src/background/log
 import { useDevicesListWithDataQuery } from './Devices.codegen'
 
 export const NewDevicesApprovalStack = () => {
+  const [referenceTime] = useState(() => new Date())
   const toast = useAppToast()
   const { refetch: devicesRefetch } = useDevicesListWithDataQuery()
   const { data: devicesRequests, refetch } = useDevicesRequestsQuery({
@@ -52,7 +54,7 @@ export const NewDevicesApprovalStack = () => {
                     New device "{challengeToApprove.deviceName}" tried to login{' '}
                     {formatRelative(
                       new Date(challengeToApprove.createdAt),
-                      new Date()
+                      referenceTime
                     )}
                   </Trans>
                   :{' '}
