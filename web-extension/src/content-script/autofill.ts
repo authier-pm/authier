@@ -23,7 +23,6 @@ import {
   getSelectorForElement
 } from './cssSelectorGenerators'
 import { notyf } from './notyf'
-import { WebInputsArrayClientSide } from '../background/WebInputForAutofill'
 import { wait } from './wait'
 import {
   filterUselessInputs,
@@ -497,10 +496,7 @@ export const autofill = (
     hasTotpSecret: Boolean(totpSecret)
   })
 
-  /**
-   * Our fallback whenever we refuse to autofill - the user gets the Authier icon
-   * next to the password field and fills with a single click.
-   */
+  /** Use the live form for the picker, even when learned selectors are stale. */
   const offerCredentialPicker = (
     classification: PasswordFormClassification
   ) => {
@@ -508,28 +504,30 @@ export const autofill = (
       return
     }
 
-    const anchorInput =
-      classification.currentPasswordInput ?? classification.usernameInput
-    if (!anchorInput) {
+    const pickerInputs = [
+      classification.currentPasswordInput,
+      classification.usernameInput
+    ].filter((input): input is HTMLInputElement => input !== null)
+    if (pickerInputs.length === 0) {
       return
     }
 
-    const selector = getSelectorForElement(anchorInput)
     renderLoginCredOption({
       loginCredentials: secretsForHost.loginCredentials,
-      webInputs: [
-        {
+      webInputs: pickerInputs.map((input) => {
+        const selector = getSelectorForElement(input)
+        return {
           createdAt: new Date().toString(),
           domPath: selector.css,
           domOrdinal: selector.domOrdinal,
           host: location.host,
           url: location.href,
           kind:
-            anchorInput.type === 'password'
+            input.type === 'password'
               ? WebInputType.PASSWORD
               : WebInputType.USERNAME_OR_EMAIL
         }
-      ]
+      })
     })
   }
 
@@ -625,7 +623,8 @@ export const autofill = (
 
     firstLoginCred = selectLoginForPage(
       secretsForHost.loginCredentials,
-      classification
+      classification,
+      { userInitiated }
     )
     if (storedPasswordTarget && !firstLoginCred) {
       offerCredentialPicker(classification)
@@ -726,6 +725,8 @@ export const autofill = (
         })
       }
       log('autofillResult', autofillResult)
+    } else if (secretsForHost.loginCredentials.length > 1) {
+      offerCredentialPicker(classification)
     }
 
     /**
@@ -914,7 +915,6 @@ export const autofill = (
       documentBody: HTMLElement,
       formClassification: PasswordFormClassification
     ) {
-      const newWebInputs: WebInputsArrayClientSide = []
       const storedPasswordTarget =
         selectStoredPasswordAutofillTarget(formClassification)
       // only look inside the credential form - a flat scan of the whole document
@@ -926,10 +926,15 @@ export const autofill = (
 
       const matchingLogin = selectLoginForPage(
         secretsForHost.loginCredentials,
-        formClassification
+        formClassification,
+        { userInitiated }
       )
-      if (!matchingLogin) {
+      // Password-only steps can fill successfully without ever visiting the
+      // username branch. Keep account choices available on those steps too.
+      if (secretsForHost.loginCredentials.length > 1 || !matchingLogin) {
         offerCredentialPicker(formClassification)
+      }
+      if (!matchingLogin) {
         return false
       }
 
@@ -952,16 +957,6 @@ export const autofill = (
               webInputs.length === 0 &&
               secretsForHost.loginCredentials.length > 1
             ) {
-              const selector = getSelectorForElement(input)
-              newWebInputs.push({
-                createdAt: new Date().toString(),
-                domPath: selector.css,
-                domOrdinal: selector.domOrdinal,
-                host: location.host,
-                url: location.href,
-                kind: WebInputType.PASSWORD
-              })
-
               domRecorder.addInputEvent({
                 element: input,
                 eventType: 'input',
@@ -982,16 +977,6 @@ export const autofill = (
                 secretsForHost.loginCredentials.length > 1 &&
                 !usernameInputEl.value.trim()
               ) {
-                const selector = getSelectorForElement(usernameInputEl)
-                newWebInputs.push({
-                  createdAt: new Date().toString(),
-                  domPath: selector.css,
-                  domOrdinal: selector.domOrdinal,
-                  host: location.host,
-                  url: location.href,
-                  kind: WebInputType.USERNAME
-                })
-
                 domRecorder.addInputEvent({
                   element: usernameInputEl,
                   eventType: 'input',
@@ -1029,14 +1014,9 @@ export const autofill = (
               }
             }
 
-            //Let user choose which credential to use
+            // The live-form picker above lets the user choose the account.
             if (secretsForHost.loginCredentials.length > 1) {
               log('choose credential', domRecorder.toJSON())
-              renderLoginCredOption({
-                loginCredentials: secretsForHost.loginCredentials,
-                webInputs: newWebInputs
-              })
-
               return true
             }
 

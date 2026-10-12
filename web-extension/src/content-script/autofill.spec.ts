@@ -1,6 +1,8 @@
 import { WebInputType } from '@shared/generated/graphqlBaseTypes'
 import browser from 'webextension-polyfill'
 import type { IInitStateRes } from './contentScript'
+import type { PromptPasswordOptionProps } from './renderLoginCredOption'
+import { findCredentialPickerInput } from './findCredentialPickerInput'
 import { kostkohratkyRegisterConfirmHtml } from '../../ui-preview/fixtures/kostkohratkyRegisterConfirm'
 import {
   fingerprintPasswordForm,
@@ -17,7 +19,7 @@ const {
   isElementVisibleInViewport
 } = vi.hoisted(() => ({
   renderSaveCredentialsForm: vi.fn().mockResolvedValue(undefined),
-  renderLoginCredOption: vi.fn(),
+  renderLoginCredOption: vi.fn<(props: PromptPasswordOptionProps) => void>(),
   renderPasswordGenerator: vi.fn(),
   classifyPasswordForm: vi.fn().mockResolvedValue(null),
   notyfSuccess: vi.fn(),
@@ -924,6 +926,8 @@ describe('auto-submit', () => {
 })
 
 describe('selected account on multi-step login', () => {
+  const googlePasswordInput = `<input id="password" type="password" class="whsOnd zHQkBf" jsname="YPqjbf" autocomplete="current-password webauthn" spellcheck="false" tabindex="0" aria-label="Enter your password" aria-describedby="c0" name="Passwd" aria-disabled="false" autocapitalize="off" data-initial-value="">`
+
   const googleCredentials = () => {
     const state = initState()
     const base = state.secretsForHost.loginCredentials[0]
@@ -948,6 +952,181 @@ describe('selected account on multi-step login', () => {
     ]
     return state
   }
+
+  const tenGoogleCredentials = () => {
+    const state = googleCredentials()
+    const base = state.secretsForHost.loginCredentials[0]
+    for (let index = 0; index < 8; index++) {
+      state.secretsForHost.loginCredentials.push({
+        ...base,
+        id: `google-account-${index}`,
+        loginCredentials: {
+          ...base.loginCredentials,
+          username: `account-${index}@gmail.com`,
+          password: `account-password-${index}`
+        }
+      })
+    }
+    return state
+  }
+
+  const expectLiveGooglePasswordPicker = (state: IInitStateRes) => {
+    const picker = renderLoginCredOption.mock.calls.at(-1)?.[0]
+    expect(picker?.loginCredentials).toEqual(
+      state.secretsForHost.loginCredentials
+    )
+    expect(findCredentialPickerInput(picker?.webInputs ?? [])).toBe(
+      inputById('password')
+    )
+  }
+
+  it.each([
+    { identity: 'profile', mapping: 'missing' },
+    { identity: 'profile', mapping: 'stale' },
+    { identity: 'profile', mapping: 'matching' },
+    { identity: 'hidden username', mapping: 'missing' },
+    { identity: 'hidden username', mapping: 'stale' },
+    { identity: 'hidden username', mapping: 'matching' }
+  ])(
+    'keeps the picker beside the Google password with $identity and $mapping mappings',
+    async ({ identity, mapping }) => {
+      const selectedAccount =
+        identity === 'profile'
+          ? '<div id="profileIdentifier">capajj@gmail.com</div>'
+          : '<input type="email" autocomplete="username" value="capajj@gmail.com" style="display:none">'
+      const page =
+        identity === 'profile'
+          ? `${selectedAccount}<form>${googlePasswordInput}</form>`
+          : `<form>${selectedAccount}${googlePasswordInput}<input type="checkbox"></form>`
+      setPage(page, {
+        url: 'https://accounts.google.com/v3/signin/challenge/pwd'
+      })
+      const state = tenGoogleCredentials()
+      if (mapping !== 'missing') {
+        state.webInputs = [
+          {
+            domPath:
+              mapping === 'matching'
+                ? '[autocomplete="current-password webauthn"]'
+                : '[autocomplete="current-password"]',
+            domOrdinal: 0,
+            kind: WebInputType.PASSWORD,
+            host: 'accounts.google.com',
+            url: 'https://accounts.google.com/v3/signin/challenge/pwd',
+            createdAt: '2026-01-01'
+          }
+        ]
+      }
+
+      const stop = await runAutofill(state)
+
+      expect(inputById('password').value).toBe('selected-account-password')
+      expectLiveGooglePasswordPicker(state)
+      stop()
+    }
+  )
+
+  it('keeps both fields fillable when an account is chosen on a full login form', async () => {
+    setPage(
+      '<form><input id="user" autocomplete="username"><input id="password" type="password" autocomplete="current-password"></form>'
+    )
+    const state = tenGoogleCredentials()
+    const stop = await runAutofill(state)
+    const picker = renderLoginCredOption.mock.calls.at(-1)?.[0]
+    expect(picker).toBeDefined()
+    expect(inputById('user').value).toBe('')
+    expect(inputById('password').value).toBe('')
+    stop()
+
+    // The picker starts a user-initiated autofill with the chosen account and
+    // the live mappings it received from the initial scan.
+    const chosenState = {
+      ...state,
+      secretsForHost: {
+        ...state.secretsForHost,
+        loginCredentials: [state.secretsForHost.loginCredentials[1]]
+      },
+      webInputs: picker?.webInputs ?? []
+    }
+    const stopSelected = await runAutofill(chosenState, {
+      userInitiated: true
+    })
+
+    expect(inputById('user').value).toBe('capajj@gmail.com')
+    expect(inputById('password').value).toBe('selected-account-password')
+    stopSelected()
+  })
+
+  it('adds the picker when the Google password step appears after the initial scan', async () => {
+    setPage(
+      '<div id="profileIdentifier">capajj@gmail.com</div><input type="text" name="search">',
+      { url: 'https://accounts.google.com/v3/signin/challenge/pwd' }
+    )
+    const state = tenGoogleCredentials()
+    const stop = await runAutofill(state)
+    document.body.insertAdjacentHTML(
+      'beforeend',
+      `<form>${googlePasswordInput}<input id="show-password" type="checkbox"></form>`
+    )
+    const { bodyInputChangeEmitter } = await import('./domMutationObserver')
+    bodyInputChangeEmitter.emit('inputAdded', inputById('password'))
+    bodyInputChangeEmitter.emit('inputAdded', inputById('show-password'))
+    await vi.advanceTimersByTimeAsync(600)
+
+    expect(inputById('password').value).toBe('selected-account-password')
+    expectLiveGooglePasswordPicker(state)
+    stop()
+  })
+
+  it('fills the account explicitly chosen in the picker even when Google shows a different account', async () => {
+    setPage(
+      `<div id="profileIdentifier">capajj@gmail.com</div><form>${googlePasswordInput}</form>`,
+      { url: 'https://accounts.google.com/v3/signin/challenge/pwd' }
+    )
+    const state = googleCredentials()
+    state.secretsForHost.loginCredentials = [
+      state.secretsForHost.loginCredentials[0]
+    ]
+
+    const stop = await runAutofill(state, { userInitiated: true })
+
+    expect(inputById('password').value).toBe('wrong-account-password')
+    stop()
+  })
+
+  it('does not automatically fill a sole saved account that differs from Google’s selection', async () => {
+    setPage(
+      `<div id="profileIdentifier">capajj@gmail.com</div><form>${googlePasswordInput}</form>`,
+      { url: 'https://accounts.google.com/v3/signin/challenge/pwd' }
+    )
+    const state = googleCredentials()
+    state.secretsForHost.loginCredentials = [
+      state.secretsForHost.loginCredentials[0]
+    ]
+
+    const stop = await runAutofill(state)
+
+    expect(inputById('password').value).toBe('')
+    expectLiveGooglePasswordPicker(state)
+    stop()
+  })
+
+  it.each([
+    '<input id="password" type="password" autocomplete="new-password">',
+    '<input id="code" type="text" autocomplete="one-time-code" inputmode="numeric" maxlength="6">'
+  ])(
+    'does not add an account picker to %s with ten saved accounts',
+    async (input) => {
+      setPage(`<form>${input}</form>`, {
+        url: 'https://accounts.google.com/v3/signin/challenge/pwd'
+      })
+
+      const stop = await runAutofill(tenGoogleCredentials())
+
+      expect(renderLoginCredOption).not.toHaveBeenCalled()
+      stop()
+    }
+  )
 
   it.each([false, true])(
     'matches the selected Google email with learned selectors=%s',

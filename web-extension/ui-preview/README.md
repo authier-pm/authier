@@ -299,3 +299,15 @@ captured after a Firebase delivery to a disposable emulator. Run
 `bun run playwright:ui-preview androidNotifications.spec.ts` to render it.
 The native `NotificationPreviewActivity` can also produce a synthetic request
 without sending anything to the backend; see `android-app/README.md`.
+
+The `google-password` scenario reproduces Google's password challenge with the
+supplied `Passwd` input and `autocomplete="current-password webauthn"`, a hidden
+username and selected account outside the form, and ten synthetic saved accounts.
+It runs production autofill without learned selectors. Add `&stale-selector=1`,
+`&no-identity=1`, or `&late=1` to exercise a stale selector, an unknown account,
+or a late-mounted form. The replacement control exercises live input replacement.
+Run `pnpm playwright:ui-preview googlePassword.spec.ts` from `web-extension` to
+verify the adjacent picker, all ten choices, selected-account autofill, explicitly
+choosing another account, no automatic submit, resizing, scrolling, and opening
+above a field near the viewport bottom. It captures
+`docs/screenshots/google-password-picker.png` with the production dropdown open.

@@ -11,6 +11,9 @@
   position: absolute;
   background-color: #f1f1f1;
   min-width: 160px;
+  box-sizing: border-box;
+  overflow-y: auto;
+  overscroll-behavior: contain;
   box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
   z-index: 1;
 }
@@ -20,6 +23,7 @@
   padding: 12px 16px;
   text-decoration: none;
   display: block;
+  cursor: pointer;
 }
 
 .authier-dropdown-content a:hover {

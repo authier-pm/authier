@@ -7,6 +7,7 @@ import type { ICapturedInput } from '@src/background/chromeRuntimeListener'
 let capturedInputEvents: ICapturedInput[] = []
 export const trpc = {
   getContentScriptInitialState: { query: async () => null },
+  executeMainWorldAutofillFunction: { mutate: async () => [] },
   classifyPasswordForm: {
     mutate: async (snapshot: PasswordFormSnapshot) => {
       const fingerprint = await fingerprintPasswordForm(snapshot)

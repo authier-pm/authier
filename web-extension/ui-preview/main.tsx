@@ -19,6 +19,7 @@ import {
 } from './scenarios/AndroidUpdatesPreview'
 import { BitfinexTotpPreview } from './scenarios/BitfinexTotpPreview'
 import { KostkohratkyPasswordPreview } from './scenarios/KostkohratkyPasswordPreview'
+import { GooglePasswordPreview } from './scenarios/GooglePasswordPreview'
 
 import { PasskeyApprovalPreview } from './scenarios/PasskeyApprovalPreview'
 import { PasskeyCreationSettingsPreview } from './scenarios/PasskeyCreationSettingsPreview'
@@ -62,7 +63,8 @@ const scenarios: Record<string, ComponentType> = {
   'bitfinex-totp': BitfinexTotpPreview,
   'totp-labels': TotpLabelsPreview,
   'vault-scrolling': VaultScrollingPreview,
-  'kostkohratky-password': KostkohratkyPasswordPreview
+  'kostkohratky-password': KostkohratkyPasswordPreview,
+  'google-password': GooglePasswordPreview
 }
 const requestedScenario =
   new URLSearchParams(window.location.search).get('scenario') ??
@@ -82,6 +84,7 @@ document.body.classList.toggle(
     requestedScenario !== 'totp-labels' &&
     requestedScenario !== 'vault-scrolling' &&
     requestedScenario !== 'kostkohratky-password' &&
+    requestedScenario !== 'google-password' &&
     requestedScenario !== 'email-verification-codes' &&
     requestedScenario !== 'inline-verification-codes' &&
     requestedScenario !== 'sms-verification-codes' &&

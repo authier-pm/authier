@@ -7,8 +7,13 @@ const normalizeUsername = (username: string) => username.trim().toLowerCase()
 /** Account identity on the current step takes precedence over credential recency. */
 export const selectLoginForPage = (
   logins: ILoginSecret[],
-  classification: PasswordFormClassification
+  classification: PasswordFormClassification,
+  { userInitiated = false }: { userInitiated?: boolean } = {}
 ): ILoginSecret | undefined => {
+  // The picker passes exactly the account the user chose. Page identity only
+  // decides automatic fills; it must not override an explicit selection.
+  if (userInitiated && logins.length === 1) return logins[0]
+
   let username = classification.usernameInput?.value.trim()
   if (!username && location.hostname === 'accounts.google.com') {
     // Google keeps the chosen account outside the password form, often alongside

@@ -12,6 +12,8 @@ import type { ILoginSecret } from '../../util/useDeviceState'
 
 const log = debug('au:PromptPasswordOption')
 const REFRESH_INTERVAL_MS = 100
+const TRIGGER_SIZE = 25
+const VIEWPORT_MARGIN = 8
 
 function didRectChange(prev: DOMRect, next: DOMRect) {
   return (
@@ -32,7 +34,7 @@ export const PromptPasswordOption = (
     onSelectLogin: (login: ILoginSecret) => void
   }
 ) => {
-  const { loginCredentials, webInputs } = props
+  const { loginCredentials, webInputs, container } = props
 
   if (webInputs.length === 0) {
     log('No web inputs in PromptPasswordOption')
@@ -46,6 +48,10 @@ export const PromptPasswordOption = (
     return null
   }
   const [pos, setPos] = useState(inputEl.getBoundingClientRect())
+  const [viewport, setViewport] = useState(() => ({
+    width: window.innerWidth,
+    height: window.innerHeight
+  }))
   log('GOT in option prompt', {
     inputEl,
     loginCredentials,
@@ -57,7 +63,7 @@ export const PromptPasswordOption = (
       return
     }
 
-    const mountedPromptOption = props.container
+    const mountedPromptOption = container
     let trackedInputEl: HTMLInputElement | null = inputEl
     let frameId: number | null = null
     let timeoutId: number | null = null
@@ -107,6 +113,15 @@ export const PromptPasswordOption = (
 
       const nextBounds = trackedInputEl.getBoundingClientRect()
       setPos((prev) => (didRectChange(prev, nextBounds) ? nextBounds : prev))
+      setViewport((prev) => {
+        if (
+          prev.width === window.innerWidth &&
+          prev.height === window.innerHeight
+        ) {
+          return prev
+        }
+        return { width: window.innerWidth, height: window.innerHeight }
+      })
       if (mountedPromptOption && !mountedPromptOption.parentNode) {
         document.body.appendChild(mountedPromptOption)
       }
@@ -196,12 +211,25 @@ export const PromptPasswordOption = (
       window.removeEventListener('scroll', queuePositionUpdate, true)
       window.removeEventListener('resize', queuePositionUpdate)
     }
-  }, [inputEl, setPos, webInputs])
+  }, [container, inputEl, setPos, webInputs])
   if (!pos) {
     return null
   }
 
   const darkTheme = window.matchMedia('(prefers-color-scheme: dark)').matches
+  const triggerLeft = Math.min(
+    pos.right + 2,
+    viewport.width - TRIGGER_SIZE - VIEWPORT_MARGIN
+  )
+  const triggerTop = Math.max(
+    VIEWPORT_MARGIN,
+    pos.top + (pos.height - TRIGGER_SIZE) / 2
+  )
+  const spaceBelow =
+    viewport.height - triggerTop - TRIGGER_SIZE - VIEWPORT_MARGIN
+  const spaceAbove = triggerTop - VIEWPORT_MARGIN
+  const openAbove = spaceBelow < 240 && spaceAbove > spaceBelow
+  const menuWidth = Math.min(300, viewport.width - VIEWPORT_MARGIN * 2)
   return (
     <div
       className="authier-dropdown"
@@ -209,12 +237,12 @@ export const PromptPasswordOption = (
         zIndex: '2147483647', // max z-index according to stackoverflow
         justifyContent: 'center',
         alignItems: 'baseline',
-        fontFamily: 'sans-serif !important',
+        fontFamily: 'sans-serif',
         position: 'fixed',
-        top: pos.top + (pos.height / 2 - 12.5) + 'px',
-        left: pos.left + pos.width + 2 + 'px', // 2px is extra padding
-        right: pos.right + 'px',
-        bottom: pos.bottom + 'px'
+        top: triggerTop + 'px',
+        left: triggerLeft + 'px',
+        width: TRIGGER_SIZE + 'px',
+        height: TRIGGER_SIZE + 'px'
       }}
     >
       <span
@@ -229,7 +257,16 @@ export const PromptPasswordOption = (
       <div
         className="authier-dropdown-content"
         style={{
-          backgroundColor: darkTheme ? '#1A202C' : '#dbedee'
+          backgroundColor: darkTheme ? '#1A202C' : '#dbedee',
+          top: openAbove ? 'auto' : TRIGGER_SIZE + 'px',
+          bottom: openAbove ? TRIGGER_SIZE + 'px' : 'auto',
+          left:
+            Math.min(
+              0,
+              viewport.width - VIEWPORT_MARGIN - triggerLeft - menuWidth
+            ) + 'px',
+          width: menuWidth + 'px',
+          maxHeight: Math.min(480, openAbove ? spaceAbove : spaceBelow) + 'px'
         }}
       >
         {loginCredentials.map((loginCredential) => {
