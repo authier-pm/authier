@@ -1,0 +1,30 @@
+{
+  "note": "Diagnostic only; no thresholds or models selected from this result. Rejecting disabled to measure top-candidate recovery.",
+  "withoutRejection": {
+    "examples": 7560,
+    "positives": 3780,
+    "negatives": 3780,
+    "correctCodes": 1298,
+    "returnedCodes": 7560,
+    "falsePositives": 3780,
+    "exactMatch": 0.1716931216931217,
+    "precision": 0.1716931216931217,
+    "recall": 0.3433862433862434,
+    "f1": 0.2289241622574956,
+    "falsePositiveRate": 1.0
+  },
+  "positiveCandidateScorePercentiles": [
+    -4.874705747664802,
+    -3.2771069062408142,
+    -2.7622629974542603,
+    -2.2089231324249354,
+    -0.5364607995050008
+  ],
+  "negativeCandidateScorePercentiles": [
+    -6.544876344880976,
+    -4.1144923454255995,
+    -3.590502545619393,
+    -3.0687162026071855,
+    -0.9144408851806467
+  ]
+}

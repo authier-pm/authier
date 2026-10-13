@@ -1,0 +1,149 @@
+{
+  "datasetSha256": "732f352b33e462740f567a2a76a28f27aaf20ae08c2342cadcafa463130b5868",
+  "metrics": {
+    "gemma": {
+      "examples": 16800,
+      "positives": 8400,
+      "negatives": 8400,
+      "correctCodes": 228,
+      "returnedCodes": 228,
+      "falsePositives": 0,
+      "exactMatch": 0.5135714285714286,
+      "precision": 1.0,
+      "recall": 0.027142857142857142,
+      "f1": 0.05285118219749652,
+      "falsePositiveRate": 0.0
+    },
+    "minilm": {
+      "examples": 16800,
+      "positives": 8400,
+      "negatives": 8400,
+      "correctCodes": 8015,
+      "returnedCodes": 8567,
+      "falsePositives": 550,
+      "exactMatch": 0.9443452380952381,
+      "precision": 0.9355667094665577,
+      "recall": 0.9541666666666667,
+      "f1": 0.9447751517651913,
+      "falsePositiveRate": 0.06547619047619048
+    }
+  },
+  "cpuLatency": {
+    "gemma": {
+      "p50EndToEndMs": 375.5039690022386,
+      "p95EndToEndMs": 1065.1047597475556,
+      "meanEndToEndMs": 460.94532567328616,
+      "loadSeconds": 2.2398193779990834
+    },
+    "minilm": {
+      "p50EndToEndMs": 3.7950869991618674,
+      "p95EndToEndMs": 5.154400598439679,
+      "meanEndToEndMs": 3.863255866805654,
+      "loadSeconds": 0.5335086929990212
+    }
+  },
+  "gemmaGpuLatency": {
+    "p50EndToEndMs": 25.604898000892717,
+    "p95EndToEndMs": 41.70648370036361,
+    "meanEndToEndMs": 27.191343886612838,
+    "loadSeconds": 2.500658385000861
+  },
+  "gemmaCpuVsGpuPredictionDifferencesOn300Sms": 0,
+  "pairedExactMatch": {
+    "bothCorrect": 8066,
+    "onlyGemmaCorrect": 562,
+    "onlyMiniLmCorrect": 7799,
+    "bothWrong": 373
+  },
+  "exampleDisagreements": [
+    {
+      "id": "v3/test/en/6/separated/0",
+      "text": "Access check\nSJP YZE Y\nKeep this one-time credential to yourself.",
+      "expected": "SJPYZEY",
+      "gemma": null,
+      "minilm": "SJPYZEY"
+    },
+    {
+      "id": "v3/test/en/5/separated/1",
+      "text": "Reference N F L Q D R B o K. Paying 6077.44 EUR? Key in r\n7\nF\nN to complete checkout.",
+      "expected": "r7FN",
+      "gemma": null,
+      "minilm": "r7FN"
+    },
+    {
+      "id": "v3/test/en/3/numeric/1",
+      "text": "Pair this phone with your account. Type 079288 on the other device.",
+      "expected": "079288",
+      "gemma": null,
+      "minilm": "079288"
+    },
+    {
+      "id": "v3/test/en/5/lettersLower/1",
+      "text": "Reference hwvfsbrjyl. Paying 8622.87 EUR? Key in zsmxpqo to complete checkout.",
+      "expected": "zsmxpqo",
+      "gemma": null,
+      "minilm": "zsmxpqo"
+    },
+    {
+      "id": "v3/test/en/6/numeric/3",
+      "text": "Selva] Access check\n074869\nKeep this one-time credential to yourself.",
+      "expected": "074869",
+      "gemma": null,
+      "minilm": "074869"
+    },
+    {
+      "id": "v3/test/en/1/alphanumeric/0",
+      "text": "Your Oriole profile will open after you provide this secret: k1sDMGi.",
+      "expected": "k1sDMGi",
+      "gemma": null,
+      "minilm": "k1sDMGi"
+    },
+    {
+      "id": "v3/test/en/4/separated/3",
+      "text": "[Selva: Discard Mt iB O. To approve the password change, use 8A Ok G.",
+      "expected": "8AOkG",
+      "gemma": null,
+      "minilm": "8AOkG"
+    },
+    {
+      "id": "v3/test/en/1/lettersMixed/0",
+      "text": "Your Oriole profile will open after you provide this secret: EgBBjbxE.",
+      "expected": "EgBBjbxE",
+      "gemma": null,
+      "minilm": "EgBBjbxE"
+    },
+    {
+      "id": "v3/test/en/0/separated/2",
+      "text": "We are holding a transfer of 2132.61 EUR. Release it by entering 70-87-79. Card ending 4549.",
+      "expected": "708779",
+      "gemma": null,
+      "minilm": "708779"
+    },
+    {
+      "id": "v3/test/en/2/lettersLower/4",
+      "text": "kudemknypf is the confirmation we just sent for your new email address.",
+      "expected": "kudemknypf",
+      "gemma": null,
+      "minilm": "kudemknypf"
+    },
+    {
+      "id": "v3/test/en/1/lettersMixed/4",
+      "text": "Caldera] Your Caldera profile will open after you provide this secret: OnLffkWEZ.",
+      "expected": "OnLffkWEZ",
+      "gemma": null,
+      "minilm": "OnLffkWEZ"
+    },
+    {
+      "id": "v3/test/en/3/alphanumeric/1",
+      "text": "Pair this phone with your account. Type v7z094W on the other device.",
+      "expected": "v7z094W",
+      "gemma": null,
+      "minilm": "v7z094W"
+    }
+  ],
+  "limitations": [
+    "Synthetic assistant-translated corpus, not customer SMS.",
+    "The v3 test is already exposed through the earlier MiniLM experiment and discussion. This is a comparative replay, not a new untouched test.",
+    "No v3 test labels or predictions are used to fit this classifier or select its hyperparameters/threshold."
+  ]
+}

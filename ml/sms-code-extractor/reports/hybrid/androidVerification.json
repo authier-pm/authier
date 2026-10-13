@@ -1,0 +1,23 @@
+{
+  "androidApi": 34,
+  "device": "x86_64 emulator (not a physical handset)",
+  "nativeReferenceMessages": 60,
+  "sharedRegressionMessages": 43,
+  "semanticFallbackLanguages": [
+    "en",
+    "zh"
+  ],
+  "nativeTestsPassed": 3,
+  "unitTestsPassed": 85,
+  "unitTestsSkipped": 1,
+  "unitTestSkipReason": "Optional cached benchmark replay; run separately with AUTHIER_SMS_BENCHMARK=1",
+  "tokenizerValidationMessages": 7560,
+  "tokenizerIdMismatches": 0,
+  "arm64TokenizerLoadSegmentAlignmentBytes": 16384,
+  "downloadBytes": 145422392,
+  "limits": [
+    "Synthetic test remains below 97% precision.",
+    "No physical-device latency or memory measurements.",
+    "Public model download awaits publication approval."
+  ]
+}

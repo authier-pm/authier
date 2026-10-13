@@ -1,0 +1,103 @@
+{
+  "attempts": [
+    {
+      "C": 0.1,
+      "nullThreshold": -1.3835118873214722,
+      "minimumMargin": 1.0,
+      "validation": {
+        "examples": 7560,
+        "positives": 3780,
+        "negatives": 3780,
+        "correctCodes": 38,
+        "returnedCodes": 38,
+        "falsePositives": 0,
+        "exactMatch": 0.505026455026455,
+        "precision": 1.0,
+        "recall": 0.010052910052910053,
+        "f1": 0.01990570979570456,
+        "falsePositiveRate": 0.0,
+        "minimumMargin": 1.0
+      },
+      "fitSeconds": 3.1275116389988398
+    },
+    {
+      "C": 1.0,
+      "nullThreshold": 1000000.0,
+      "minimumMargin": 0.0,
+      "validation": {
+        "examples": 7560,
+        "positives": 3780,
+        "negatives": 3780,
+        "correctCodes": 0,
+        "returnedCodes": 0,
+        "falsePositives": 0,
+        "exactMatch": 0.5,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "falsePositiveRate": 0.0,
+        "minimumMargin": 0.0
+      },
+      "fitSeconds": 4.620751219001249
+    },
+    {
+      "C": 10.0,
+      "nullThreshold": 2.7460851805114745,
+      "minimumMargin": 0.0,
+      "validation": {
+        "examples": 7560,
+        "positives": 3780,
+        "negatives": 3780,
+        "correctCodes": 2,
+        "returnedCodes": 2,
+        "falsePositives": 0,
+        "exactMatch": 0.5002645502645503,
+        "precision": 1.0,
+        "recall": 0.0005291005291005291,
+        "f1": 0.0010576414595452142,
+        "falsePositiveRate": 0.0,
+        "minimumMargin": 0.0
+      },
+      "fitSeconds": 9.227881740000157
+    },
+    {
+      "C": 100.0,
+      "nullThreshold": 2.1064462797546386,
+      "minimumMargin": 0.0,
+      "validation": {
+        "examples": 7560,
+        "positives": 3780,
+        "negatives": 3780,
+        "correctCodes": 5,
+        "returnedCodes": 5,
+        "falsePositives": 0,
+        "exactMatch": 0.5006613756613757,
+        "precision": 1.0,
+        "recall": 0.0013227513227513227,
+        "f1": 0.0026420079260237777,
+        "falsePositiveRate": 0.0,
+        "minimumMargin": 0.0
+      },
+      "fitSeconds": 6.483372529000917
+    }
+  ],
+  "trainingCoverage": {
+    "positiveMessages": 14070,
+    "coveredPositiveMessages": 14070,
+    "recallCeiling": 1.0,
+    "totalCandidates": 625048,
+    "meanCandidatesPerSms": 22.047548500881835,
+    "p95CandidatesPerSms": 47.0
+  },
+  "validationCoverage": {
+    "positiveMessages": 3780,
+    "coveredPositiveMessages": 3780,
+    "recallCeiling": 1.0,
+    "totalCandidates": 79910,
+    "meanCandidatesPerSms": 10.57010582010582,
+    "p95CandidatesPerSms": 22.0
+  },
+  "trainingPositiveCandidates": 14070,
+  "trainMessages": 28350,
+  "validationMessages": 7560
+}

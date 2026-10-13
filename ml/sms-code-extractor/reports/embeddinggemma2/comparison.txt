@@ -1,0 +1,32 @@
+EmbeddingGemma 2 candidate classifier vs MiniLM v3g
+
+Same 16,800 synthetic SMS, 30 languages, 8,400 codes and 8,400 no-code messages.
+Selection uses validation only, maximizing recall at 99.5% precision.
+
+Metric                         Gemma candidate       MiniLM v3g
+Exact-code precision              100.00%              93.56%
+Code recovery / recall              2.71%              95.42%
+False-positive rate                 0.00%               6.55%
+Overall exact match                51.36%              94.43%
+False positives / 8,400                 0                 550
+CPU p50 per SMS (ms)               375.50                3.80
+CPU p95 per SMS (ms)              1065.10                5.15
+
+Gemma GPU p50/p95: 25.60/41.71 ms per SMS.
+Gemma CPU FP32 vs GPU BF16: 0/300 output disagreements.
+
+Quality uses Gemma GPU BF16 embeddings and MiniLM compact ONNX CPU inference.
+CPU latency is sequential, four threads, the same 300 validation SMS, warm calls.
+It includes candidate enumeration, tokenization, inference and rejection.
+These are desktop measurements; Android was not measured.
+
+Gemma's encoder is frozen; its trained logistic regression selects among source
+spans. MiniLM's encoder and span/token heads were fine-tuned in the earlier run.
+This comparison does not test a fine-tuned Gemma span extractor.
+
+Synthetic assistant-translated corpus, not customer SMS.
+The v3 test is already exposed through the earlier MiniLM experiment and discussion. This is a comparative replay, not a new untouched test.
+No v3 test labels or predictions are used to fit this classifier or select its hyperparameters/threshold.
+
+Sources, selected hyperparameters, per-language scores, environment and runtime
+details are alongside this file. Large checkpoints/feature caches remain ignored.

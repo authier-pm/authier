@@ -1,0 +1,12 @@
+torch==2.10.0
+torchvision==0.25.0
+transformers==5.19.0
+sentence-transformers==6.1.0
+accelerate==1.15.0
+scikit-learn==1.9.1
+numpy==2.5.3
+onnxruntime==1.24.2
+tokenizers==0.23.2
+pillow==12.3.0
+pytest==9.1.1
+ruff==0.16.10

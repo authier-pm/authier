@@ -1,0 +1,83 @@
+EmbeddingGemma 2 candidate classifier versus MiniLM v3g
+
+This is an offline experiment. Read reports/embeddinggemma2/comparison.txt for
+measured results. The selected small classifier/decoder JSON is also saved there.
+It does not integrate either model into the Android application.
+
+The experiment freezes google/embeddinggemma-2 at revision
+914f7f89142e33e77833254d9c9b90c3cef7303b, loading only the 271,002,624-parameter text
+model. Every eligible 4–10-character ASCII alphanumeric span is marked in its
+complete SMS with <candidate>...</candidate>. Whitespace, hyphens and middle dots
+can separate fragments. The model's Classification prefix produces a normalized
+768-dimensional vector. A logistic regression classifier scores each candidate.
+Exact characters are copied from the source, with the same normalization and
+source-span constraints as MiniLM. The encoder is never fine-tuned.
+
+Ordinary words remain candidates so lowercase-only codes do not depend on a
+dictionary. Candidate generation never reads the expected answer or injects a
+gold candidate. Labels mark the annotated source span. Scores are grouped by SMS;
+duplicate occurrences of the same code are collapsed before taking the margin
+between the two best distinct codes. Threshold or margin failure returns null.
+
+Both models use the exact v3-targeted dataset bytes. Gemma fits its classifier on
+the 28,350 training SMS only. The fixed C grid is 0.1, 1, 10, 100. Selection maximizes
+exact-code recall on the 7,560 validation SMS while meeting 99.5% precision, using
+the existing MiniLM threshold/margin calibration code. Source, data, classifier,
+decoder and upstream model hashes/revision are frozen in selection.json before
+Gemma test inference. Test has 16,800 SMS (8,400 positive, 8,400 negative) across
+30 languages. Current MiniLM v3g uses its existing selected compact ONNX weights
+and decoder unchanged; the benchmark actually reruns its inference.
+
+The v3 test was already exposed in the earlier experiment and this discussion.
+This comparison is a replay on the same benchmark, not a fresh generalization
+test. Its templates are synthetic and assistant-translated. Do not treat these
+numbers as field accuracy. The two models have different adaptation methods:
+frozen embeddings plus logistic regression versus a fine-tuned span extractor.
+The result assesses this candidate-classifier approach, not the maximum possible
+quality of the Gemma backbone after task-specific fine-tuning.
+
+Setup (from this directory):
+  uv venv --python 3.12 artifacts/embeddinggemma2-benchmark/venv
+  uv pip install --python artifacts/embeddinggemma2-benchmark/venv/bin/python torch==2.10.0 torchvision==0.25.0 --index-url https://download.pytorch.org/whl/rocm7.1
+  uv pip install --python artifacts/embeddinggemma2-benchmark/venv/bin/python -r embeddingGemmaRequirements.txt
+
+Use the CPU wheel index instead on a system without this AMD GPU. The original
+.venv remains unchanged. Full resolved versions are in
+reports/embeddinggemma2/environment.txt. EmbeddingGemma's processor currently
+imports image dependencies even though the vision/audio weights are disabled.
+
+Run with HIP_VISIBLE_DEVICES=0, TOKENIZERS_PARALLELISM=false, OMP_NUM_THREADS=4 and
+OPENBLAS_NUM_THREADS=4. The examples below abbreviate the executable as PYTHON;
+use artifacts/embeddinggemma2-benchmark/venv/bin/python, not the original .venv.
+
+  PYTHON compareSmsModels.py train --device cuda --batch-size 64
+  PYTHON compareSmsModels.py evaluate --model gemma --device cuda --batch-size 64
+  PYTHON compareSmsModels.py evaluate --model minilm --device cpu
+  PYTHON compareSmsModels.py runtime --model gemma --device cpu
+  PYTHON compareSmsModels.py runtime --model gemma --device cuda
+  PYTHON compareSmsModels.py runtime --model minilm --device cpu
+  PYTHON summarizeSmsComparison.py
+
+Train and evaluate save resumable, source/data/revision-checked embedding chunks.
+Training refuses to replace an existing selection. For an independent run, pass
+--output-dir artifacts/your-new-run and --report-dir reports/your-new-run on every
+command. Keep the environment in the original location or create a separate one.
+Do not alter inference/scoring sources after selection; evaluation checks them.
+A batch-256 throughput trial was stopped before classifier fitting because it
+used excessive memory and was slower. The batch-64 run resumed from its own cache;
+no batch-256 features enter the selected classifier or its evaluation.
+
+Runtime benchmarks must run sequentially with no training/evaluation in parallel.
+Each fresh process loads one model, warms up ten calls, then measures the same
+300 validation SMS (ten per language), one SMS per call. Gemma batches candidates
+within the SMS. CPU uses four threads for both. Timing includes candidate search,
+tokenization, inference, classifier, and rejection. Gemma CPU is FP32; its GPU
+path is BF16. MiniLM is the existing compact ONNX CPU runtime. These are desktop
+measurements, not Android latency. Process RSS includes the common Python harness
+and imports, so it is not an optimized mobile memory estimate.
+
+Validation:
+  PYTHON -m pytest testCandidateClassifier.py -q
+  .venv/bin/python -m pytest testSmsModel.py -q
+  PYTHON -m ruff check candidateClassifier.py compareSmsModels.py testCandidateClassifier.py
+  pnpm lint (from repository root)

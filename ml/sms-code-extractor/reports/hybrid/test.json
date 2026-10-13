@@ -1,0 +1,308 @@
+{
+    "note": "Synthetic exposed test replay. Uses dataset language labels (oracle routing), not ML Kit predictions. Native language detection is checked separately on regression and semantic examples; these aggregate numbers are not end-to-end phone accuracy.",
+    "sourceSha256": "7167b88b38b9a9e71282ad96d1064b5d696f144b549cf8bb14ffd4cc954d422d",
+    "policySha256": "aaa3dd0d5a29a4cc275cb6669b48565170afbf308173bad89d92c4f64ca08d89",
+    "regex": {
+        "examples": 16800,
+        "correct": 27,
+        "returned": 308,
+        "falsePositives": 254,
+        "precision": 0.08766233766233766,
+        "recall": 0.0032142857142857142,
+        "exactMatch": 0.4864880952380952
+    },
+    "minilm": {
+        "examples": 16800,
+        "correct": 8015,
+        "returned": 8567,
+        "falsePositives": 550,
+        "precision": 0.9355667094665577,
+        "recall": 0.9541666666666667,
+        "exactMatch": 0.9443452380952381
+    },
+    "hybrid": {
+        "examples": 16800,
+        "correct": 7899,
+        "returned": 8450,
+        "falsePositives": 549,
+        "precision": 0.934792899408284,
+        "recall": 0.9403571428571429,
+        "exactMatch": 0.9375
+    },
+    "routes": {
+        "model": 15780,
+        "rejected": 1020
+    },
+    "byLanguage": {
+        "sv": {
+            "examples": 560,
+            "correct": 280,
+            "returned": 288,
+            "falsePositives": 8,
+            "precision": 0.9722222222222222,
+            "recall": 1.0,
+            "exactMatch": 0.9857142857142858
+        },
+        "cs": {
+            "examples": 560,
+            "correct": 252,
+            "returned": 252,
+            "falsePositives": 0,
+            "precision": 1.0,
+            "recall": 0.9,
+            "exactMatch": 0.95
+        },
+        "zh": {
+            "examples": 560,
+            "correct": 269,
+            "returned": 270,
+            "falsePositives": 0,
+            "precision": 0.9962962962962963,
+            "recall": 0.9607142857142857,
+            "exactMatch": 0.9803571428571428
+        },
+        "fr": {
+            "examples": 560,
+            "correct": 278,
+            "returned": 313,
+            "falsePositives": 35,
+            "precision": 0.8881789137380192,
+            "recall": 0.9928571428571429,
+            "exactMatch": 0.9339285714285714
+        },
+        "en": {
+            "examples": 560,
+            "correct": 255,
+            "returned": 255,
+            "falsePositives": 0,
+            "precision": 1.0,
+            "recall": 0.9107142857142857,
+            "exactMatch": 0.9553571428571429
+        },
+        "pt": {
+            "examples": 560,
+            "correct": 280,
+            "returned": 294,
+            "falsePositives": 14,
+            "precision": 0.9523809523809523,
+            "recall": 1.0,
+            "exactMatch": 0.975
+        },
+        "ur": {
+            "examples": 560,
+            "correct": 250,
+            "returned": 286,
+            "falsePositives": 36,
+            "precision": 0.8741258741258742,
+            "recall": 0.8928571428571429,
+            "exactMatch": 0.8821428571428571
+        },
+        "fi": {
+            "examples": 560,
+            "correct": 276,
+            "returned": 281,
+            "falsePositives": 5,
+            "precision": 0.9822064056939501,
+            "recall": 0.9857142857142858,
+            "exactMatch": 0.9839285714285714
+        },
+        "ro": {
+            "examples": 560,
+            "correct": 252,
+            "returned": 273,
+            "falsePositives": 21,
+            "precision": 0.9230769230769231,
+            "recall": 0.9,
+            "exactMatch": 0.9125
+        },
+        "mt": {
+            "examples": 560,
+            "correct": 213,
+            "returned": 250,
+            "falsePositives": 37,
+            "precision": 0.852,
+            "recall": 0.7607142857142857,
+            "exactMatch": 0.8142857142857143
+        },
+        "ga": {
+            "examples": 560,
+            "correct": 273,
+            "returned": 308,
+            "falsePositives": 35,
+            "precision": 0.8863636363636364,
+            "recall": 0.975,
+            "exactMatch": 0.925
+        },
+        "lv": {
+            "examples": 560,
+            "correct": 275,
+            "returned": 275,
+            "falsePositives": 0,
+            "precision": 1.0,
+            "recall": 0.9821428571428571,
+            "exactMatch": 0.9910714285714286
+        },
+        "bg": {
+            "examples": 560,
+            "correct": 280,
+            "returned": 288,
+            "falsePositives": 8,
+            "precision": 0.9722222222222222,
+            "recall": 1.0,
+            "exactMatch": 0.9857142857142858
+        },
+        "sl": {
+            "examples": 560,
+            "correct": 277,
+            "returned": 313,
+            "falsePositives": 36,
+            "precision": 0.8849840255591054,
+            "recall": 0.9892857142857143,
+            "exactMatch": 0.9303571428571429
+        },
+        "pl": {
+            "examples": 560,
+            "correct": 280,
+            "returned": 305,
+            "falsePositives": 25,
+            "precision": 0.9180327868852459,
+            "recall": 1.0,
+            "exactMatch": 0.9553571428571429
+        },
+        "es": {
+            "examples": 560,
+            "correct": 246,
+            "returned": 279,
+            "falsePositives": 33,
+            "precision": 0.8817204301075269,
+            "recall": 0.8785714285714286,
+            "exactMatch": 0.8803571428571428
+        },
+        "bn": {
+            "examples": 560,
+            "correct": 234,
+            "returned": 267,
+            "falsePositives": 33,
+            "precision": 0.8764044943820225,
+            "recall": 0.8357142857142857,
+            "exactMatch": 0.8589285714285714
+        },
+        "nl": {
+            "examples": 560,
+            "correct": 279,
+            "returned": 280,
+            "falsePositives": 1,
+            "precision": 0.9964285714285714,
+            "recall": 0.9964285714285714,
+            "exactMatch": 0.9964285714285714
+        },
+        "it": {
+            "examples": 560,
+            "correct": 280,
+            "returned": 281,
+            "falsePositives": 1,
+            "precision": 0.99644128113879,
+            "recall": 1.0,
+            "exactMatch": 0.9982142857142857
+        },
+        "id": {
+            "examples": 560,
+            "correct": 272,
+            "returned": 272,
+            "falsePositives": 0,
+            "precision": 1.0,
+            "recall": 0.9714285714285714,
+            "exactMatch": 0.9857142857142858
+        },
+        "lt": {
+            "examples": 560,
+            "correct": 279,
+            "returned": 279,
+            "falsePositives": 0,
+            "precision": 1.0,
+            "recall": 0.9964285714285714,
+            "exactMatch": 0.9982142857142857
+        },
+        "hu": {
+            "examples": 560,
+            "correct": 277,
+            "returned": 312,
+            "falsePositives": 34,
+            "precision": 0.8878205128205128,
+            "recall": 0.9892857142857143,
+            "exactMatch": 0.9339285714285714
+        },
+        "el": {
+            "examples": 560,
+            "correct": 245,
+            "returned": 268,
+            "falsePositives": 23,
+            "precision": 0.914179104477612,
+            "recall": 0.875,
+            "exactMatch": 0.8964285714285715
+        },
+        "de": {
+            "examples": 560,
+            "correct": 255,
+            "returned": 256,
+            "falsePositives": 1,
+            "precision": 0.99609375,
+            "recall": 0.9107142857142857,
+            "exactMatch": 0.9535714285714286
+        },
+        "hi": {
+            "examples": 560,
+            "correct": 245,
+            "returned": 279,
+            "falsePositives": 34,
+            "precision": 0.8781362007168458,
+            "recall": 0.875,
+            "exactMatch": 0.8767857142857143
+        },
+        "et": {
+            "examples": 560,
+            "correct": 269,
+            "returned": 304,
+            "falsePositives": 35,
+            "precision": 0.8848684210526315,
+            "recall": 0.9607142857142857,
+            "exactMatch": 0.9178571428571428
+        },
+        "sk": {
+            "examples": 560,
+            "correct": 253,
+            "returned": 253,
+            "falsePositives": 0,
+            "precision": 1.0,
+            "recall": 0.9035714285714286,
+            "exactMatch": 0.9517857142857142
+        },
+        "ar": {
+            "examples": 560,
+            "correct": 223,
+            "returned": 263,
+            "falsePositives": 40,
+            "precision": 0.8479087452471483,
+            "recall": 0.7964285714285714,
+            "exactMatch": 0.8267857142857142
+        },
+        "hr": {
+            "examples": 560,
+            "correct": 272,
+            "returned": 308,
+            "falsePositives": 36,
+            "precision": 0.8831168831168831,
+            "recall": 0.9714285714285714,
+            "exactMatch": 0.9214285714285714
+        },
+        "da": {
+            "examples": 560,
+            "correct": 280,
+            "returned": 298,
+            "falsePositives": 18,
+            "precision": 0.9395973154362416,
+            "recall": 1.0,
+            "exactMatch": 0.9678571428571429
+        }
+    }
+}

@@ -1,0 +1,20 @@
+{
+  "C": 0.1,
+  "nullThreshold": -1.3835118873214722,
+  "minimumMargin": 1.0,
+  "validation": {
+    "examples": 7560,
+    "positives": 3780,
+    "negatives": 3780,
+    "correctCodes": 38,
+    "returnedCodes": 38,
+    "falsePositives": 0,
+    "exactMatch": 0.505026455026455,
+    "precision": 1.0,
+    "recall": 0.010052910052910053,
+    "f1": 0.01990570979570456,
+    "falsePositiveRate": 0.0,
+    "minimumMargin": 1.0
+  },
+  "fitSeconds": 3.1275116389988398
+}

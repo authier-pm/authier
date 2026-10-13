@@ -1,0 +1,48 @@
+{
+  "selectedAtUtc": "2026-10-07T15:36:43.121078+00:00",
+  "model": "google/embeddinggemma-2",
+  "revision": "914f7f89142e33e77833254d9c9b90c3cef7303b",
+  "encoderFrozen": true,
+  "embeddingBatchSize": 64,
+  "encoderParameters": 271002624,
+  "policy": "Highest validation recall at >=99.5% exact-code precision; C grid [0.1, 1, 10, 100]; existing margin grid.",
+  "classifierSha256": "dc5c2dc2e7718efac0e95190c31f265f295d0a9a95f51e5c83c892ffedb33d3f",
+  "decoderSha256": "bfd91187e7968019a7cf5ad3a17e5c2694c982895af3fa09691e324751377bf3",
+  "sources": {
+    "candidateClassifier.py": "c246c7a9ba6defaefc81169e9ca68f47adaca373d71be7c7b3595b1acc36ae16",
+    "compareSmsModels.py": "d401966ec2c77943bcac4f199b8090a0824ec94c730800b0e8d323da7c3fe2b4",
+    "decodeSpans.py": "0b39fa93ac8ff61df2371dbc7b781965ac43d590f35da218d846a5e1e32a2dbc",
+    "smsModel.py": "7b9d4f3eae3093475692998a1acd9d152854cc226e937dd63bf51f6736f08b95",
+    "smsData.py": "148f366d8ae27d7a60c9fa7dc47259777846569ea01fa59ab5c81d4647feca09"
+  },
+  "data": {
+    "train": "ad5e25d40821708f7f6be15ca992002aaa86064b3a86c38c7b6fe71624304b14",
+    "validation": "a3722a0e82bdfc785f1bb30f266d844f4781b962b13ce9ca794f5aab94a3e8f8",
+    "test": "732f352b33e462740f567a2a76a28f27aaf20ae08c2342cadcafa463130b5868"
+  },
+  "selection": {
+    "C": 0.1,
+    "nullThreshold": -1.3835118873214722,
+    "minimumMargin": 1.0,
+    "validation": {
+      "examples": 7560,
+      "positives": 3780,
+      "negatives": 3780,
+      "correctCodes": 38,
+      "returnedCodes": 38,
+      "falsePositives": 0,
+      "exactMatch": 0.505026455026455,
+      "precision": 1.0,
+      "recall": 0.010052910052910053,
+      "f1": 0.01990570979570456,
+      "falsePositiveRate": 0.0,
+      "minimumMargin": 1.0
+    },
+    "fitSeconds": 3.1275116389988398
+  },
+  "limitations": [
+    "Synthetic assistant-translated corpus, not customer SMS.",
+    "The v3 test is already exposed through the earlier MiniLM experiment and discussion. This is a comparative replay, not a new untouched test.",
+    "No v3 test labels or predictions are used to fit this classifier or select its hyperparameters/threshold."
+  ]
+}

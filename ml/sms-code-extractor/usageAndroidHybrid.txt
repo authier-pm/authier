@@ -1,0 +1,75 @@
+Android hybrid SMS extraction
+
+Production entry point: AndroidSmsCodeExtractor, called by SmsCodeRelay only while
+relay is enabled and the vault is unlocked. The unlock and relay setting are checked
+again after inference. The TypeScript/browser regex remains unchanged.
+
+Routing:
+  - Whole-message shapes in SmsCodeExtractor.trustedTemplates use the existing
+    parser. All 31 positive shared regression examples take this path.
+  - Promotional, obsolete, ambiguous and invalid known-format messages are rejected.
+    A rejection never falls through to the model.
+  - Other wording uses bundled ML Kit language identification. Confidence must be
+    >= 0.8 with >= 0.2 separation from the next language. Unknown/unsupported
+    languages abstain; regional tags map to the base language.
+  - MiniLM runs locally only when its verified download is present. A language's
+    validity threshold and span margin determine acceptance. Conflicting multipart
+    windows abstain. At most eight 192-token windows are allowed; longer inputs
+    abstain rather than silently truncating.
+
+The 145,422,392-byte download contains the existing v3g compact ONNX weights,
+a SentencePiece tokenizer, and the base model MIT license.
+The APK contains ONNX Runtime, bundled language identification and a small native
+SentencePiece 0.2.0 adapter, not those weights. CMake fetches a SHA-256-pinned source
+archive; native LOAD segments use 16 KB alignment. Upstream license notices are
+included in the APK's sentencepieceNotices.txt asset.
+CPU inference uses two threads. The 140 MB model is storage size, not peak memory.
+
+Reproduce from ml/sms-code-extractor (existing v3g artifacts required):
+  uv pip install --python .venv/bin/python sentencepiece==0.2.0
+  .venv/bin/python exportAndroidSmsModel.py
+  .venv/bin/python calibrateSmsRouting.py
+
+The exporter checks token-ID parity on all 7,560 validation messages and writes 60
+native reference vectors, one positive and one negative per language. Android
+decoding converts SentencePiece UTF-8 offsets to UTF-16 source spans, including
+supplementary Unicode. Literal tokenizer control tokens abstain.
+
+Calibration uses only saved validation predictions and never lowers the original
+v3g confidence threshold or span margin. It targets >= 97% validation precision per
+language. The language-ID confidence gates are conservative engineering choices,
+not statistically calibrated extraction probabilities. Reports record source hashes.
+
+Run the optional cached replay with the actual production Kotlin router:
+  cd ../../android-app
+  AUTHIER_SMS_BENCHMARK=1 ./gradlew :app:testDebugUnitTest --tests dev.authier.android.SmsHybridBenchmarkTest
+
+reports/hybrid/test.json is a replay of the previously exposed synthetic test. It
+uses oracle dataset languages, not inferred languages. Whole-message test templates
+are disjoint from the regression templates, so this stress set exercises the model
+and rejection paths. It is not independent field evaluation or a 97% accuracy claim.
+
+Native checks (use a disposable emulator with at least 1 GB free storage):
+  ./gradlew :app:assembleDebug :app:assembleDebugAndroidTest
+  adb install -r app/build/outputs/apk/debug/app-debug.apk
+  adb install -r app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk
+  adb push ../ml/sms-code-extractor/artifacts/android-sms-model /data/local/tmp/authier-sms-fixture
+  adb shell run-as dev.authier.android.debug mkdir -p files/sms-model-fixture
+  for file in model.int8.onnx sentencepiece.bpe.model baseModelLicense.txt; do
+    adb shell "cat /data/local/tmp/authier-sms-fixture/$file | run-as dev.authier.android.debug tee files/sms-model-fixture/$file > /dev/null"
+  done
+  adb shell am instrument -w -e class dev.authier.android.SmsModelTest -e smsModelFixture true dev.authier.android.debug.test/androidx.test.runner.AndroidJUnitRunner
+
+The opt-in native tests install only synthetic model fixtures in the debug app.
+They compare 60 raw model predictions to the research runtime, run all 43 shared
+SMS regression cases through real language identification/inference, and test
+English/Chinese semantic fallback. Ordinary unit tests need no model files/network.
+
+Capture UI without a model download, SMS permission, or vault:
+  adb shell am start -W -n dev.authier.android.debug/dev.authier.android.SmsModelPreviewActivity
+  adb exec-out screencap -p > /tmp/android-sms-model-download.png
+
+Hosting: a model-only GitHub prerelease named sms-model-minilm-v3g-1. Publish exactly
+the three files listed in the checked-in manifest, never overwrite a published
+version. A new model requires a new version and new pinned hashes. Existing Android
+and extension release workflows ignore this tag suffix. No customer SMS is included.

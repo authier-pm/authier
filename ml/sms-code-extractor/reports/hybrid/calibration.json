@@ -1,0 +1,193 @@
+{
+  "targetPrecision": 0.97,
+  "source": "validation.compact.predictions.jsonl",
+  "sourceSha256": "9af5ac1d74161c198e9d5aa15ba52c7364572711b1ae1f498615682d96443c76",
+  "policySha256": "aaa3dd0d5a29a4cc275cb6669b48565170afbf308173bad89d92c4f64ca08d89",
+  "notes": [
+    "Uses validation only, with dataset language labels. Does not establish accuracy of language detection.",
+    "Thresholds cannot be lower than the original selected decoder. Unknown/uncertain languages abstain.",
+    "Synthetic validation precision is not a deployment guarantee. Language-ID confidence gates are conservative routing rules, not calibrated probabilities of correct extraction."
+  ],
+  "languages": {
+    "ar": {
+      "returned": 126,
+      "correct": 126,
+      "precision": 1.0,
+      "recall": 1.0
+    },
+    "bg": {
+      "returned": 126,
+      "correct": 126,
+      "precision": 1.0,
+      "recall": 1.0
+    },
+    "bn": {
+      "returned": 105,
+      "correct": 105,
+      "precision": 1.0,
+      "recall": 0.8333333333333334
+    },
+    "cs": {
+      "returned": 125,
+      "correct": 125,
+      "precision": 1.0,
+      "recall": 0.9920634920634921
+    },
+    "da": {
+      "returned": 123,
+      "correct": 123,
+      "precision": 1.0,
+      "recall": 0.9761904761904762
+    },
+    "de": {
+      "returned": 126,
+      "correct": 126,
+      "precision": 1.0,
+      "recall": 1.0
+    },
+    "el": {
+      "returned": 125,
+      "correct": 125,
+      "precision": 1.0,
+      "recall": 0.9920634920634921
+    },
+    "en": {
+      "returned": 126,
+      "correct": 126,
+      "precision": 1.0,
+      "recall": 1.0
+    },
+    "es": {
+      "returned": 126,
+      "correct": 126,
+      "precision": 1.0,
+      "recall": 1.0
+    },
+    "et": {
+      "returned": 124,
+      "correct": 124,
+      "precision": 1.0,
+      "recall": 0.9841269841269841
+    },
+    "fi": {
+      "returned": 126,
+      "correct": 126,
+      "precision": 1.0,
+      "recall": 1.0
+    },
+    "fr": {
+      "returned": 124,
+      "correct": 124,
+      "precision": 1.0,
+      "recall": 0.9841269841269841
+    },
+    "ga": {
+      "returned": 125,
+      "correct": 125,
+      "precision": 1.0,
+      "recall": 0.9920634920634921
+    },
+    "hi": {
+      "returned": 126,
+      "correct": 126,
+      "precision": 1.0,
+      "recall": 1.0
+    },
+    "hr": {
+      "returned": 126,
+      "correct": 126,
+      "precision": 1.0,
+      "recall": 1.0
+    },
+    "hu": {
+      "returned": 127,
+      "correct": 126,
+      "precision": 0.9921259842519685,
+      "recall": 1.0
+    },
+    "id": {
+      "returned": 126,
+      "correct": 125,
+      "precision": 0.9920634920634921,
+      "recall": 0.9920634920634921
+    },
+    "it": {
+      "returned": 120,
+      "correct": 120,
+      "precision": 1.0,
+      "recall": 0.9523809523809523
+    },
+    "lt": {
+      "returned": 122,
+      "correct": 122,
+      "precision": 1.0,
+      "recall": 0.9682539682539683
+    },
+    "lv": {
+      "returned": 85,
+      "correct": 84,
+      "precision": 0.9882352941176471,
+      "recall": 0.6666666666666666
+    },
+    "mt": {
+      "returned": 111,
+      "correct": 111,
+      "precision": 1.0,
+      "recall": 0.8809523809523809
+    },
+    "nl": {
+      "returned": 124,
+      "correct": 124,
+      "precision": 1.0,
+      "recall": 0.9841269841269841
+    },
+    "pl": {
+      "returned": 122,
+      "correct": 122,
+      "precision": 1.0,
+      "recall": 0.9682539682539683
+    },
+    "pt": {
+      "returned": 125,
+      "correct": 125,
+      "precision": 1.0,
+      "recall": 0.9920634920634921
+    },
+    "ro": {
+      "returned": 126,
+      "correct": 126,
+      "precision": 1.0,
+      "recall": 1.0
+    },
+    "sk": {
+      "returned": 124,
+      "correct": 124,
+      "precision": 1.0,
+      "recall": 0.9841269841269841
+    },
+    "sl": {
+      "returned": 122,
+      "correct": 122,
+      "precision": 1.0,
+      "recall": 0.9682539682539683
+    },
+    "sv": {
+      "returned": 125,
+      "correct": 125,
+      "precision": 1.0,
+      "recall": 0.9920634920634921
+    },
+    "ur": {
+      "returned": 126,
+      "correct": 126,
+      "precision": 1.0,
+      "recall": 1.0
+    },
+    "zh": {
+      "returned": 122,
+      "correct": 122,
+      "precision": 1.0,
+      "recall": 0.9682539682539683
+    }
+  }
+}

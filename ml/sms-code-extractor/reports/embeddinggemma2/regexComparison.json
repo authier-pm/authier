@@ -1,0 +1,286 @@
+{
+  "notes": [
+    "Same synthetic v3 test replay, 30 languages, not a deployment change.",
+    "Regex is the production TypeScript SMS-mode implementation ported into Android SmsCodeExtractor.",
+    "Supported-format subset keeps every negative plus positives with 4-8 ASCII alphanumeric characters, a digit, and uppercase-only letters for lengths 4-5.",
+    "Corpus text is already Unicode decimal-digit normalized."
+  ],
+  "full": {
+    "regex": {
+      "examples": 16800,
+      "positives": 8400,
+      "negatives": 8400,
+      "correctCodes": 27,
+      "returnedCodes": 308,
+      "falsePositives": 254,
+      "exactMatch": 0.4864880952380952,
+      "precision": 0.08766233766233766,
+      "recall": 0.0032142857142857142,
+      "f1": 0.006201194304088195,
+      "falsePositiveRate": 0.030238095238095238
+    },
+    "minilmCurrent": {
+      "examples": 16800,
+      "positives": 8400,
+      "negatives": 8400,
+      "correctCodes": 8015,
+      "returnedCodes": 8567,
+      "falsePositives": 550,
+      "exactMatch": 0.9443452380952381,
+      "precision": 0.9355667094665577,
+      "recall": 0.9541666666666667,
+      "f1": 0.9447751517651913,
+      "falsePositiveRate": 0.06547619047619048
+    },
+    "minilmTarget97": {
+      "examples": 16800,
+      "positives": 8400,
+      "negatives": 8400,
+      "correctCodes": 8390,
+      "returnedCodes": 10007,
+      "falsePositives": 1615,
+      "exactMatch": 0.9032738095238095,
+      "precision": 0.8384131108224243,
+      "recall": 0.9988095238095238,
+      "f1": 0.9116097136958766,
+      "falsePositiveRate": 0.19226190476190477
+    }
+  },
+  "regexSupportedFormats": {
+    "regex": {
+      "examples": 10961,
+      "positives": 2561,
+      "negatives": 8400,
+      "correctCodes": 27,
+      "returnedCodes": 295,
+      "falsePositives": 254,
+      "exactMatch": 0.7456436456527689,
+      "precision": 0.09152542372881356,
+      "recall": 0.010542756735650137,
+      "f1": 0.018907563025210083,
+      "falsePositiveRate": 0.030238095238095238
+    },
+    "minilmCurrent": {
+      "examples": 10961,
+      "positives": 2561,
+      "negatives": 8400,
+      "correctCodes": 2439,
+      "returnedCodes": 2989,
+      "falsePositives": 550,
+      "exactMatch": 0.9386917252075541,
+      "precision": 0.8159919705587153,
+      "recall": 0.952362358453729,
+      "f1": 0.8789189189189188,
+      "falsePositiveRate": 0.06547619047619048
+    },
+    "minilmTarget97": {
+      "examples": 10961,
+      "positives": 2561,
+      "negatives": 8400,
+      "correctCodes": 2560,
+      "returnedCodes": 4175,
+      "falsePositives": 1615,
+      "exactMatch": 0.8525681963324514,
+      "precision": 0.6131736526946108,
+      "recall": 0.9996095275283092,
+      "f1": 0.7600950118764845,
+      "falsePositiveRate": 0.19226190476190477
+    }
+  },
+  "recalibration": {
+    "targetPrecision": 0.97,
+    "calibratedOn": "validation only",
+    "nullThreshold": -5.250213609466552,
+    "minimumMargin": 0.0,
+    "validation": {
+      "examples": 7560,
+      "positives": 3780,
+      "negatives": 3780,
+      "correctCodes": 3766,
+      "returnedCodes": 3882,
+      "falsePositives": 113,
+      "exactMatch": 0.9832010582010582,
+      "precision": 0.970118495620814,
+      "recall": 0.9962962962962963,
+      "f1": 0.9830331506134168,
+      "falsePositiveRate": 0.029894179894179893,
+      "minimumMargin": 0.0
+    },
+    "test": {
+      "examples": 16800,
+      "positives": 8400,
+      "negatives": 8400,
+      "correctCodes": 8390,
+      "returnedCodes": 10007,
+      "falsePositives": 1615,
+      "exactMatch": 0.9032738095238095,
+      "precision": 0.8384131108224243,
+      "recall": 0.9988095238095238,
+      "f1": 0.9116097136958766,
+      "falsePositiveRate": 0.19226190476190477
+    }
+  },
+  "miniLmRawPositiveSpanAccuracy": 0.9997619047619047,
+  "regressionVectors": {
+    "count": 43,
+    "note": "Small development regression suite tailored to the regex; includes null expectations for formats intentionally supported by MiniLM (9-digit and letters-only codes). Not an unbiased test of either system.",
+    "minilm": {
+      "current": {
+        "metrics": {
+          "examples": 43,
+          "positives": 31,
+          "negatives": 12,
+          "correctCodes": 24,
+          "returnedCodes": 29,
+          "falsePositives": 3,
+          "exactMatch": 0.7674418604651163,
+          "precision": 0.8275862068965517,
+          "recall": 0.7741935483870968,
+          "f1": 0.7999999999999999,
+          "falsePositiveRate": 0.25
+        },
+        "failures": [
+          {
+            "text": "G-123456 is your Google verification code.",
+            "expected": "123456",
+            "prediction": "G123456"
+          },
+          {
+            "text": "Telegram code: 12345",
+            "expected": "12345",
+            "prediction": null
+          },
+          {
+            "text": "FB-12345 is your Facebook confirmation code",
+            "expected": "12345",
+            "prediction": "FB12345"
+          },
+          {
+            "text": "Kód pro platbu kartou *1234: 567890",
+            "expected": "567890",
+            "prediction": null
+          },
+          {
+            "text": "Kód 1234 platí 5 minut.",
+            "expected": "1234",
+            "prediction": null
+          },
+          {
+            "text": "mTAN: 482913 für Überweisung von 250,00 EUR",
+            "expected": "482913",
+            "prediction": null
+          },
+          {
+            "text": "Payment of EUR 1234 to SHOP. Code: 998877",
+            "expected": "998877",
+            "prediction": null
+          },
+          {
+            "text": "Your verification code: 123456789",
+            "expected": null,
+            "prediction": "123456789"
+          },
+          {
+            "text": "Your code: PLATBA",
+            "expected": null,
+            "prediction": "PLATBA"
+          },
+          {
+            "text": "Your balance is 1234 CZK. Code words are fun.",
+            "expected": null,
+            "prediction": "1234CZK"
+          }
+        ]
+      },
+      "target97": {
+        "metrics": {
+          "examples": 43,
+          "positives": 31,
+          "negatives": 12,
+          "correctCodes": 25,
+          "returnedCodes": 32,
+          "falsePositives": 5,
+          "exactMatch": 0.7441860465116279,
+          "precision": 0.78125,
+          "recall": 0.8064516129032258,
+          "f1": 0.7936507936507936,
+          "falsePositiveRate": 0.4166666666666667
+        },
+        "failures": [
+          {
+            "text": "G-123456 is your Google verification code.",
+            "expected": "123456",
+            "prediction": "G123456"
+          },
+          {
+            "text": "Telegram code: 12345",
+            "expected": "12345",
+            "prediction": null
+          },
+          {
+            "text": "FB-12345 is your Facebook confirmation code",
+            "expected": "12345",
+            "prediction": "FB12345"
+          },
+          {
+            "text": "Kód pro platbu kartou *1234: 567890",
+            "expected": "567890",
+            "prediction": null
+          },
+          {
+            "text": "Kód 1234 platí 5 minut.",
+            "expected": "1234",
+            "prediction": null
+          },
+          {
+            "text": "Payment of EUR 1234 to SHOP. Code: 998877",
+            "expected": "998877",
+            "prediction": null
+          },
+          {
+            "text": "Call me at 555 1234 when you land",
+            "expected": null,
+            "prediction": "5551234"
+          },
+          {
+            "text": "Your verification code: 123456789",
+            "expected": null,
+            "prediction": "123456789"
+          },
+          {
+            "text": "Your code: PLATBA",
+            "expected": null,
+            "prediction": "PLATBA"
+          },
+          {
+            "text": "Your balance is 1234 CZK. Code words are fun.",
+            "expected": null,
+            "prediction": "1234CZK"
+          },
+          {
+            "text": "123456 verification code 654321",
+            "expected": null,
+            "prediction": "123456"
+          }
+        ]
+      }
+    },
+    "regex": {
+      "correct": 43,
+      "total": 43
+    }
+  },
+  "sourceHashes": {
+    "web-extension/src/verification-codes/extractVerificationCode.ts": "f8b0cb3956278eee2fc39d8e2f281c1cb3f5f005208f2679f72b5598d6525e89",
+    "shared/smsVerificationCodeVectors.json": "64e783bc7aed9b4a8ff84fbb4b47df925f1adb892a4d177263c7c4b610f22d50",
+    "ml/sms-code-extractor/data/generated/v3-targeted/test.jsonl": "732f352b33e462740f567a2a76a28f27aaf20ae08c2342cadcafa463130b5868"
+  },
+  "miniLmPositiveDiagnostic": {
+    "positiveMessages": 8400,
+    "correctTopSpan": 8398,
+    "acceptedCorrect": 8015,
+    "missedOrWrong": 385,
+    "correctSpanRejected": 383,
+    "note": "The current span selector is strong on this synthetic stress test; confidence and no-code rejection are the bottleneck."
+  }
+}
