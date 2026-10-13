@@ -55,6 +55,8 @@ internal fun SmsRelaySettings(state: VaultUiState, model: VaultViewModel) {
             Text("Send SMS codes while unlocked", style = MaterialTheme.typography.bodyMedium, modifier = Modifier.weight(1f))
             Switch(active, ::toggle, enabled = !state.busy, colors = SwitchDefaults.colors(checkedTrackColor = Mint))
         }
+        if (active) SmsModelDownloadStatus(state.demo)
+        else Text("Enabling downloads additional language support once (145 MB). SMS text stays on this phone.", color = Muted, style = MaterialTheme.typography.bodySmall)
         if (denied) {
             Text("Android did not allow Authier to receive text messages. Allow SMS access in app settings to send codes.", color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall)
             TextButton({ context.startActivity(Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:${context.packageName}"))) }) { Text("Open app settings") }

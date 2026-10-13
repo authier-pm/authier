@@ -206,6 +206,11 @@ The Android gallery includes `android-sms-relay-settings.png`, captured from the
 debug demo intent with `--ei tab 2` after scrolling to **SMS codes to browsers** and
 turning it on (demo mode needs no SMS permission and sends nothing).
 
+`android-sms-model-download.png` shows the production download notices in synthetic
+downloading, ready and retry states. Capture it from the debug-only
+`SmsModelPreviewActivity`; it makes no network calls and reads no vault. The
+`android-vault` scenario includes the new capture.
+
 The Android gallery includes `android-unlock-settings.png` and
 `android-fingerprint-unlock.png`. Capture the production Compose screens with the
 debug demo intent and `--ei tab 2` (settings) or `--ez locked true` (unlock),

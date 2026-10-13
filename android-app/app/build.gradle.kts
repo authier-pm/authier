@@ -6,9 +6,15 @@ plugins {
     id("org.jetbrains.kotlin.plugin.serialization")
 }
 
+val smsTestAssets by tasks.registering(Copy::class) {
+    from(rootProject.file("../shared/smsVerificationCodeVectors.json"))
+    into(layout.buildDirectory.dir("generated/sms-test-assets"))
+}
+
 android {
     namespace = "dev.authier.android"
     compileSdk = 35
+    ndkVersion = "27.1.12297006"
     defaultConfig {
         applicationId = "dev.authier.android"
         minSdk = 26
@@ -16,6 +22,12 @@ android {
         versionCode = providers.gradleProperty("authierVersionCode").orElse("1000").get().toInt()
         versionName = providers.gradleProperty("authierVersionName").orElse("0.1.0").get()
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        externalNativeBuild {
+            cmake {
+                arguments += "-DANDROID_STL=c++_static"
+                targets += "authier_sms_tokenizer"
+            }
+        }
     }
     buildTypes {
         debug {
@@ -28,6 +40,8 @@ android {
         }
     }
     buildFeatures { compose = true; buildConfig = true }
+    externalNativeBuild { cmake { path = file("src/main/cpp/CMakeLists.txt"); version = "3.22.1" } }
+    sourceSets.getByName("androidTest").assets.srcDir(layout.buildDirectory.dir("generated/sms-test-assets"))
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
@@ -38,11 +52,18 @@ android {
         unitTests.all {
             it.systemProperty("authier.cryptoVectors", rootProject.file("../shared/cryptoTestVectors.json").absolutePath)
             it.systemProperty("authier.smsCodeVectors", rootProject.file("../shared/smsVerificationCodeVectors.json").absolutePath)
+            it.systemProperty("authier.repoRoot", rootProject.file("..").absolutePath)
         }
     }
 }
 
+tasks.matching { it.name == "mergeDebugAndroidTestAssets" || it.name == "mergeReleaseAndroidTestAssets" }.configureEach {
+    dependsOn(smsTestAssets)
+}
+
 dependencies {
+    implementation("com.microsoft.onnxruntime:onnxruntime-android:1.24.2")
+    implementation("com.google.mlkit:language-id:17.0.6")
     implementation(platform("com.google.firebase:firebase-bom:34.19.0"))
     implementation("com.google.firebase:firebase-messaging")
     implementation("androidx.work:work-runtime-ktx:2.10.1")

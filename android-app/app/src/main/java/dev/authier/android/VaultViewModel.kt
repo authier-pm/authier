@@ -64,6 +64,7 @@ class VaultViewModel(application: Application) : AndroidViewModel(application) {
     val ui = state.asStateFlow()
 
     init {
+        if (snapshot.relaySmsCodes) SmsModelDownload.ensure(application)
         viewModelScope.launch {
             while (true) {
                 delay(1000)
@@ -433,7 +434,14 @@ class VaultViewModel(application: Application) : AndroidViewModel(application) {
     fun setSmsRelay(enabled: Boolean) = action {
         if (state.value.demo) state.value = state.value.copy(smsRelayEnabled = enabled)
         // A per-phone preference: it must work offline, like the lock timeout.
-        else persist(snapshot.copy(relaySmsCodes = enabled))
+        else {
+            persist(snapshot.copy(relaySmsCodes = enabled))
+            if (enabled) SmsModelDownload.ensure(getApplication())
+            else {
+                SmsModelDownload.cancel(getApplication())
+                AndroidSmsCodeExtractor.close()
+            }
+        }
     }
 
     fun signOut() = action {

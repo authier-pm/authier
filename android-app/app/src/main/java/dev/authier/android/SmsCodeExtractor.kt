@@ -11,6 +11,11 @@ import java.text.Normalizer
  * whitespace and absolute end of input.
  */
 object SmsCodeExtractor {
+    sealed interface Decision {
+        data class Recognized(val code: String) : Decision
+        data object Rejected : Decision
+        data object Unrecognized : Decision
+    }
     private const val WORD = "[A-Za-z0-9_]"
     private const val B = "(?:(?<=$WORD)(?!$WORD)|(?<!$WORD)(?=$WORD))"
     private const val INLINE_SPACE = "\\t\\u000B\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff"
@@ -156,4 +161,54 @@ object SmsCodeExtractor {
         if (runnerUp != null && runnerUp.second == best.second && runnerUp.first != best.first) return null
         return best.first
     }
+
+    /** The hybrid must distinguish an unknown template from an intentional rejection. */
+    fun route(message: String): Decision {
+        if (message.length > 32_000 || message.isBlank()) return Decision.Rejected
+        val text = normalize(message)
+        // These exclusions are terminal: the model must not revive an expired code,
+        // voucher, phone number or a deliberately unsupported code in a known template.
+        if (promotional.containsMatchIn(text) || obsolete.containsMatchIn(text)) return Decision.Rejected
+        val labels = (context.findAll(text) + codeWord.findAll(text)).toList()
+        if (labels.isEmpty()) return Decision.Unrecognized
+        val code = extract(message) ?: return Decision.Rejected
+        val eligible = candidates(text)
+        // Multiple distinct candidates need semantic interpretation. A known label
+        // alone is insufficient evidence to override the model's ambiguity rejection.
+        if (eligible.map { it.code }.distinct().size != 1) return Decision.Rejected
+        val candidate = eligible.first()
+        val shape = (text.substring(0, candidate.start) + "{code}" + text.substring(candidate.end))
+            .replace(Regex("$S+"), " ").trim()
+        return if (trustedTemplates.any { it.matches(shape) }) Decision.Recognized(code) else Decision.Unrecognized
+    }
+
+    // Whole-message shapes, covered by shared/smsVerificationCodeVectors.json.
+    // A bare keyword match is deliberately insufficient for this fast path.
+    private val trustedTemplates = listOf(
+        "(?:G-|FB-)?\\{code\\} is your (?:Google verification|Facebook confirmation|Instagram) code\\.?(?: Don't share it\\.)?",
+        "Your (?:(?:Uber|WhatsApp|PayPal|Steam Guard|verification|login) )?code(?: is|:)? ?\\{code\\}(?:[.!])?(?: (?:Never share this code\\.|Don't share it\\.|It expires in [0-9]+ minutes\\.))?",
+        "Telegram code: \\{code\\}",
+        "Amazon: Your one-time password is \\{code\\}",
+        "Microsoft account security code: \\{code\\}",
+        "\\{code\\} je Váš jednorázový SMS kód pro platbu [0-9 ,.]+ CZK u [\\p{L}\\p{N} .-]+\\.",
+        "Autorizační kód pro platbu [0-9 ,.]+ CZK u obchodníka [\\p{L}\\p{N} .-]+ kartou \\*[0-9]{4} je \\{code\\}\\.",
+        "Kód pro platbu kartou \\*[0-9]{4}: \\{code\\}",
+        "VAS KOD PRO PLATBU JE \\{code\\}\\. VASE BANKA",
+        "Kód \\{code\\} platí [0-9]+ minut\\.",
+        "Dein Bestätigungscode lautet \\{code\\}\\.",
+        "Ihr Sicherheitscode lautet \\{code\\}\\. Geben Sie ihn nicht weiter\\.",
+        "Tu código de verificación es \\{code\\}",
+        "Il tuo codice di verifica è \\{code\\}",
+        "Votre code de vérification est \\{code\\}",
+        "Ваш код подтверждения: \\{code\\}",
+        "Twój kod weryfikacyjny to \\{code\\}",
+        "Jednorazové heslo: \\{code\\}",
+        "mTAN: \\{code\\} für Überweisung von [0-9,. ]+ EUR",
+        "Payment of EUR [0-9,. ]+ to [\\p{L}\\p{N} -]+\\. Code: \\{code\\}",
+        "Card xxxx[0-9]{4} payment [0-9,. ]+ USD\\. Your one-time code is \\{code\\}",
+    ).map { Regex(it, ignoreCase) }
+
+    private val obsolete = Regex(
+        "(?i)\\b(?:expired|obsolete|already used|no longer valid|previous code|old code|do not use|not a (?:login|verification) code)\\b",
+    )
 }

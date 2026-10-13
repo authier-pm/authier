@@ -25,6 +25,12 @@ class SmsCodeExtractorTest {
         for ((text, code) in vectors) assertEquals(text, code, SmsCodeExtractor.extract(text))
     }
 
+    @Test fun `all established positive templates take the hybrid fast path`() {
+        for ((text, code) in vectors) {
+            if (code != null) assertEquals(text, SmsCodeExtractor.Decision.Recognized(code), SmsCodeExtractor.route(text))
+        }
+    }
+
     // Long runs without spaces once took seconds on the JVM through regex backtracking.
     @Test(timeout = 2_000)
     fun `rejects oversized input without scanning past the length limit`() {

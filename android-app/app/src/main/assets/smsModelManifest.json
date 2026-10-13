@@ -1,0 +1,21 @@
+{
+  "version": "minilm-v3g-1",
+  "baseUrl": "https://github.com/authier-pm/authier/releases/download/sms-model-minilm-v3g-1",
+  "files": [
+    {
+      "name": "model.int8.onnx",
+      "bytes": 140352237,
+      "sha256": "25bd506b64e5b30ebd80d863f5eecbbbf3209e766c8fd73ea5bc027fdb31ff88"
+    },
+    {
+      "name": "sentencepiece.bpe.model",
+      "bytes": 5069051,
+      "sha256": "cfc8146abe2a0488e9e2a0c56de7952f7c11ab059eca145a0a727afce0db2865"
+    },
+    {
+      "name": "baseModelLicense.txt",
+      "bytes": 1104,
+      "sha256": "904dc4d8749877f1dba1cda48200d2462dccbeb7c134d5e4ef6fa75e0198c8fe"
+    }
+  ]
+}

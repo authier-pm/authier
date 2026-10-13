@@ -6,7 +6,8 @@ export const MAX_ACTIVE_RELAYED_CODES = 20
 /** Base64 envelope of the small JSON payload below; generous for long sender names. */
 export const MAX_RELAYED_CODE_CIPHERTEXT_LENGTH = 2048
 
-export const relayedCodeSchema = z.string().regex(/^[a-zA-Z0-9]{4,8}$/)
+// The on-device model also recognizes 9–10 character and letters-only codes.
+export const relayedCodeSchema = z.string().regex(/^[a-zA-Z0-9]{4,10}$/)
 // Phone numbers, alphanumeric sender IDs or contact names, on a single line.
 export const relayedCodeSenderSchema = z
   .string()

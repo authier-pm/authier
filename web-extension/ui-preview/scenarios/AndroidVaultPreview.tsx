@@ -5,6 +5,7 @@ import webAutofillScreenshot from '../../../docs/screenshots/android-autofill-we
 import unlockSettingsScreenshot from '../../../docs/screenshots/android-unlock-settings.png'
 import fingerprintScreenshot from '../../../docs/screenshots/android-fingerprint-unlock.png'
 import smsRelayScreenshot from '../../../docs/screenshots/android-sms-relay-settings.png'
+import smsModelDownloadScreenshot from '../../../docs/screenshots/android-sms-model-download.png'
 import automaticFingerprintScreenshot from '../../../docs/screenshots/android-fingerprint-auto-prompt.png'
 import passwordFallbackScreenshot from '../../../docs/screenshots/android-fingerprint-password-fallback.png'
 import errorScreenshot from '../../../docs/screenshots/android-api-error.png'
@@ -88,6 +89,12 @@ const screens = [
     image: smsRelayScreenshot,
     description:
       'Opt in to send verification codes from incoming texts, end-to-end encrypted, to the browser extension while the vault is unlocked.'
+  },
+  {
+    title: 'Additional SMS languages',
+    image: smsModelDownloadScreenshot,
+    description:
+      'Enabling SMS relay downloads language support once. Existing templates keep working during downloads and retries; extraction stays on the phone.'
   },
   {
     title: 'Automatic fingerprint prompt',

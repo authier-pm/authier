@@ -39,11 +39,15 @@ object SmsCodeRelay {
      * Called for each incoming SMS. Relays only when enabled, signed in and unlocked:
      * a valid timed unlock provides the key without prompting, a locked vault sends nothing.
      */
-    fun relay(context: Context, sender: String, body: String, receivedAt: Long = System.currentTimeMillis()) {
+    suspend fun relay(context: Context, sender: String, body: String, receivedAt: Long = System.currentTimeMillis()) {
         val snapshot = VaultStore(context).read()
         if (!snapshot.relaySmsCodes || snapshot.sealedTokens.isBlank()) return
-        val code = SmsCodeExtractor.extract(body) ?: return
-        val key = VaultUnlockStore(context).restore(snapshot) ?: return
+        if (VaultUnlockStore(context).restore(snapshot) == null) return
+        val code = AndroidSmsCodeExtractor.extract(context, body) ?: return
+        // Inference can outlive a timed unlock or a settings change. Recheck both.
+        val current = VaultStore(context).read()
+        if (!current.relaySmsCodes || current.sealedTokens != snapshot.sealedTokens) return
+        val key = VaultUnlockStore(context).restore(current) ?: return
         val encrypted = encrypt(key, snapshot.encryptionSalt, code, sender, receivedAt)
         SmsCodeRelayWorker.enqueue(context, UUID.randomUUID().toString(), encrypted, receivedAt + LIFETIME_MS)
     }

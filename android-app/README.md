@@ -22,7 +22,7 @@ The launcher icons in `app/src/main/res/mipmap-*` contain the original golden-ke
 artwork at all five Android densities, including the round variants. Obtainium displays the installed APK's launcher
 icon, so icon changes take effect when the updated APK is installed.
 
-Install JDK 17 and Android SDK 35 with build tools 35.0.0. On Apple Silicon, use an ARM64 JDK. Set `ANDROID_HOME` or create the ignored `local.properties` containing `sdk.dir=/absolute/path/to/Android/sdk`.
+Install JDK 17 and Android SDK 35 with build tools 35.0.0, NDK 27.1.12297006 and CMake 3.22.1. The first build downloads SHA-256-pinned SentencePiece 0.2.0 sources for the small native SMS tokenizer; Gradle installs missing NDK/CMake packages when SDK licenses are accepted. On Apple Silicon, use an ARM64 JDK. Set `ANDROID_HOME` or create the ignored `local.properties` containing `sdk.dir=/absolute/path/to/Android/sdk`.
 
 ```sh
 cd android-app
@@ -102,6 +102,26 @@ The atomic snapshot lives in the app's `noBackupFilesDir`. It contains ciphertex
 Encrypted payloads are byte-compatible with Authier's browser client: PBKDF2-HMAC-SHA512 (600,000 iterations, 16-byte account salt), AES-256-GCM, and Base64 of `salt || 12-byte IV || ciphertext || 16-byte authentication tag`. Kotlin and WebCrypto both execute the checked-in interoperability vectors.
 
 ## Synthetic UI preview
+
+SMS relay now uses complete, tested message templates first, then on-device MiniLM
+for unrecognized wording. Ambiguous or explicitly excluded templates are terminal
+rejections. Language identification must be confident and supported by the checked-in
+validation-calibrated policy; otherwise the fallback abstains. Model inference never
+sends an SMS body to a service. Only accepted codes enter the existing encrypted relay.
+
+Enabling SMS relay schedules a separate 145 MB model/tokenizer download through
+WorkManager. Existing templates work immediately. Downloads require connectivity,
+retry transient failures, and verify pinned sizes and SHA-256 hashes before atomically
+installing in `noBackupFilesDir`. Turning relay off cancels a pending download and
+releases inference sessions. The downloaded files remain available for re-enabling.
+The settings show waiting, progress, ready and retry states. An app upgrade also
+schedules the download for phones with relay already enabled when the app opens.
+
+The model manifest is `app/src/main/assets/smsModelManifest.json`; the language
+thresholds are in `smsModelPolicy.json`. Model publication is separate from APK releases.
+See `../ml/sms-code-extractor/usageAndroidHybrid.txt` for reproduction and native tests.
+The existing exposed synthetic test remains below 97% precision; these checks do not
+establish field accuracy or memory/latency on a physical phone.
 
 Only debug builds accept the demo intent, which displays synthetic data and permits screenshots. The demo never talks to the API and never persists demo secrets. Real vault screenshots remain protected.
 

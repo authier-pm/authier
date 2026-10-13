@@ -1,0 +1,422 @@
+[
+  {
+    "text": "للتحقق من ملكيتك لهذا الرقم أدخل J59HOVndvJ في التطبيق.",
+    "language": "ar",
+    "code": "J59HOVndvJ",
+    "score": 9.381875038146973,
+    "margin": 1000000.0
+  },
+  {
+    "text": "Tavora sign-in confirmation. Enter 089911 to finish.",
+    "language": "en",
+    "code": "089911",
+    "score": 9.160894393920898,
+    "margin": 16.08076572418213
+  },
+  {
+    "text": "Váš přístupový klíč vyprší za 2 minut: ICVUFMUAI. Starý klíč EXXO již nefunguje.",
+    "language": "cs",
+    "code": "ICVUFMUAI",
+    "score": 9.163224220275879,
+    "margin": 34.10615158081055
+  },
+  {
+    "text": "Permintaan pembayaran tidak dapat diproses. Referensi HDOEVAAR; tidak ada kode persetujuan yang diterbitkan.",
+    "language": "id",
+    "code": "HDOEVAAR",
+    "score": -10.871317863464355,
+    "margin": 1.4791319370269775
+  },
+  {
+    "text": "Mistral: اس نمبر کی ملکیت کی تصدیق کے لیے ایپ میں N-H-R-O درج کریں۔",
+    "language": "ur",
+    "code": "NHRO",
+    "score": 9.32211971282959,
+    "margin": 35.742658615112305
+  },
+  {
+    "text": "Kokous 2026-11-28, huone 22 76, alkaa kello 21:30.",
+    "language": "fi",
+    "code": "20261128",
+    "score": -10.915139198303223,
+    "margin": 0.4696083068847656
+  },
+  {
+    "text": "Deimhniú logála isteach Tavora. Cuir isteach 018386 chun críochnú.",
+    "language": "ga",
+    "code": "018386",
+    "score": 9.139503479003906,
+    "margin": 14.671887397766113
+  },
+  {
+    "text": "Potrditev prijave v Tavora. Za dokončanje vnesite 6618.",
+    "language": "sl",
+    "code": "6618",
+    "score": 9.209888458251953,
+    "margin": 33.94428825378418
+  },
+  {
+    "text": "It-talba għall-ħlas ma setgħetx tiġi pproċessata. Referenza IHYOPHGD; ma nħareġ ebda kodiċi ta' approvazzjoni.",
+    "language": "mt",
+    "code": "ebda",
+    "score": -10.398417472839355,
+    "margin": 2.6220250725746155
+  },
+  {
+    "text": "Svůj balíček sledujte pomocí NWKAE. Přístup k účtu není ovlivněn.",
+    "language": "cs",
+    "code": "NWKAE",
+    "score": -10.710185050964355,
+    "margin": 4.285124316811562
+  },
+  {
+    "text": "Tavora] Autentiseringskoden mkwjuitoc har redan gått ut.",
+    "language": "sv",
+    "code": "mkwjuitoc",
+    "score": -10.321319580078125,
+    "margin": 2.6604501008987427
+  },
+  {
+    "text": "লগইনে সমস্যা? টিকিট 1093732434 দিয়ে সহায়তার সঙ্গে যোগাযোগ করুন।",
+    "language": "bn",
+    "code": "1093732434",
+    "score": -10.979007720947266,
+    "margin": 1000000.0
+  },
+  {
+    "text": "[Tavora] Referenca 6161484, novi uređaj: tajna fraza 85210320 dovršava povezivanje.",
+    "language": "hr",
+    "code": "85210320",
+    "score": 8.55456829071045,
+    "margin": 35.690391540527344
+  },
+  {
+    "text": "Mistral] Παρακολουθήστε το δέμα με BxItjEs. Η πρόσβαση στον λογαριασμό δεν επηρεάζεται.",
+    "language": "el",
+    "code": "BxItjEs",
+    "score": -6.329024791717529,
+    "margin": 17.600056171417236
+  },
+  {
+    "text": "Това съобщение съдържа само купон XNODVGYKIT за 15% отстъпка.",
+    "language": "bg",
+    "code": "XNODVGYKIT",
+    "score": -10.79948902130127,
+    "margin": 1000000.0
+  },
+  {
+    "text": "O código de autenticação 4005778 já expirou.",
+    "language": "pt",
+    "code": "4005778",
+    "score": -9.607466697692871,
+    "margin": 4.3765400648117065
+  },
+  {
+    "text": "Cheia de acces expiră în 30 minute: GLZXEWMSQ. Vechea cheie ZSLATZLC nu mai funcționează.",
+    "language": "ro",
+    "code": "GLZXEWMSQ",
+    "score": 9.495963096618652,
+    "margin": 34.958852767944336
+  },
+  {
+    "text": "Ce message contient uniquement le bon T5evQW84 pour 50% de réduction.",
+    "language": "fr",
+    "code": "T5evQW84",
+    "score": -10.425065040588379,
+    "margin": 4.927506685256958
+  },
+  {
+    "text": "[Mistral: 88330\nTo tymczasowe dane uwierzytelniające do odzyskania konta.",
+    "language": "pl",
+    "code": "88330",
+    "score": 9.167496681213379,
+    "margin": 14.709511756896973
+  },
+  {
+    "text": "Sestanek 2026-02-26, soba itovyzv, začetek ob 12:28.",
+    "language": "sl",
+    "code": "itovyzv",
+    "score": -10.852620124816895,
+    "margin": 0.025826692581176758
+  },
+  {
+    "text": "为验证您拥有此号码,请在应用中输入ewjkb。",
+    "language": "zh",
+    "code": "ewjkb",
+    "score": 9.259679794311523,
+    "margin": 1000000.0
+  },
+  {
+    "text": "[Sorrel] Diese Nachricht enthält nur den Gutschein 1930564 für 20% Rabatt.",
+    "language": "de",
+    "code": "1930564",
+    "score": -10.617903709411621,
+    "margin": 2.3382614850997925
+  },
+  {
+    "text": "Konfirmasi login Mistral. Masukkan 18·52·83·56 untuk menyelesaikan.",
+    "language": "id",
+    "code": "18528356",
+    "score": 9.500663757324219,
+    "margin": 13.129087448120117
+  },
+  {
+    "text": "प्रमाणीकरण कोड 0936 पहले ही समाप्त हो चुका है।",
+    "language": "hi",
+    "code": "0936",
+    "score": -10.249276161193848,
+    "margin": 1000000.0
+  },
+  {
+    "text": "اجلاس 2026-08-21 کو، کمرہ elqhabii، آغاز 12:56 پر۔",
+    "language": "ur",
+    "code": "20260821",
+    "score": -10.798202514648438,
+    "margin": 0.20738983154296875
+  },
+  {
+    "text": "Sorrel: CDTAIK\nEsta es la credencial temporal para recuperar tu cuenta.",
+    "language": "es",
+    "code": "CDTAIK",
+    "score": 9.294612884521484,
+    "margin": 16.4490966796875
+  },
+  {
+    "text": "54\n77\n32\n9\nDin hija l-kredenzjal temporanju biex tirkupra l-kont tiegħek.",
+    "language": "mt",
+    "code": "5477329",
+    "score": 9.178337097167969,
+    "margin": 12.437356948852539
+  },
+  {
+    "text": "यह नंबर आपका है, इसे सत्यापित करने के लिए ऐप में sihct दर्ज करें।",
+    "language": "hi",
+    "code": "sihct",
+    "score": 9.23753547668457,
+    "margin": 1000000.0
+  },
+  {
+    "text": "Tavora: Din adgangsnøgle udløber om 2 minutter: XEXBFG. Den gamle nøgle HHTNLSETP virker ikke mere.",
+    "language": "da",
+    "code": "XEXBFG",
+    "score": 8.075648307800293,
+    "margin": 30.99773931503296
+  },
+  {
+    "text": "Apstipriniet maksājumu 6006.15 EUR: XTHPEIQAB. Debetkarte 0011.",
+    "language": "lv",
+    "code": "XTHPEIQAB",
+    "score": 9.257525444030762,
+    "margin": 35.960418701171875
+  },
+  {
+    "text": "Ez az üzenet csak a 05682 kupont tartalmazza 10% kedvezményhez.",
+    "language": "hu",
+    "code": "05682",
+    "score": -10.384214401245117,
+    "margin": 2.615845113992691
+  },
+  {
+    "text": "[Tavora\nرمز المصادقة slokgwa انتهت صلاحيته بالفعل.",
+    "language": "ar",
+    "code": "slokgwa",
+    "score": -10.246441841125488,
+    "margin": 3.4773322343826294
+  },
+  {
+    "text": "Maksetaotlust ei saanud töödelda. Viide 264695; kinnituskoodi ei väljastatud.",
+    "language": "et",
+    "code": "264695",
+    "score": -10.62209701538086,
+    "margin": 1.6144770383834839
+  },
+  {
+    "text": "Na overenie, že vám toto číslo patrí, zadajte v aplikácii 9813.",
+    "language": "sk",
+    "code": "9813",
+    "score": 8.986703872680664,
+    "margin": 35.202467918395996
+  },
+  {
+    "text": "Sanāksme 2026-05-01, telpa Q\np\ne\ne\nm\nu\nm\nN\nj\no, sākums 19:45.",
+    "language": "lv",
+    "code": "20260501",
+    "score": -10.759178161621094,
+    "margin": 0.4957958459854126
+  },
+  {
+    "text": "Разрешете плащането от 3392.63 EUR: 07199077. Дебитна карта 9566.",
+    "language": "bg",
+    "code": "07199077",
+    "score": 9.135844230651855,
+    "margin": 36.128825187683105
+  },
+  {
+    "text": "Níorbh fhéidir an t-iarratas íocaíochta a phróiseáil. Tagairt 855416305; níor eisíodh cód ceadaithe.",
+    "language": "ga",
+    "code": "orbh",
+    "score": -10.345834732055664,
+    "margin": 0.1241307258605957
+  },
+  {
+    "text": "Este mensaje solo contiene el cupón IcGXiCGa para un 10% de descuento.",
+    "language": "es",
+    "code": "IcGXiCGa",
+    "score": -10.516810417175293,
+    "margin": 4.510591626167297
+  },
+  {
+    "text": "[Mistral: Voer 0521774723 in de app in om te controleren dat dit nummer van jou is.",
+    "language": "nl",
+    "code": "0521774723",
+    "score": 9.35476016998291,
+    "margin": 35.32853126525879
+  },
+  {
+    "text": "Întâlnire pe 2026-10-11, camera 0557, începe la 15:31.",
+    "language": "ro",
+    "code": "20261011",
+    "score": -10.812055587768555,
+    "margin": 0.7860205173492432
+  },
+  {
+    "text": "Per verificare che questo numero sia tuo, inserisci 2835619910 nell'app.",
+    "language": "it",
+    "code": "2835619910",
+    "score": 9.403129577636719,
+    "margin": 35.397605895996094
+  },
+  {
+    "text": "Stretnutie dňa 2026-04-08, miestnosť VOUKJFKV, začiatok o 13:00.",
+    "language": "sk",
+    "code": "20260408",
+    "score": -10.93325138092041,
+    "margin": 0.5262750387191772
+  },
+  {
+    "text": "Tavora: Tavora-kirjautumisen vahvistus. Viimeistele syöttämällä 3359840505.",
+    "language": "fi",
+    "code": "3359840505",
+    "score": 9.428352355957031,
+    "margin": 35.23186111450195
+  },
+  {
+    "text": "身份验证代码ZgUJynS已经过期。",
+    "language": "zh",
+    "code": "ZgUJynS",
+    "score": -10.656076431274414,
+    "margin": 1000000.0
+  },
+  {
+    "text": "Patvirtinkite 5489.30 EUR mokėjimą: D8JHc. Debeto kortelė 6119.",
+    "language": "lt",
+    "code": "D8JHc",
+    "score": 9.261008262634277,
+    "margin": 34.8879337310791
+  },
+  {
+    "text": "Για να επαληθεύσετε ότι ο αριθμός σάς ανήκει, εισαγάγετε 4605245 στην εφαρμογή.",
+    "language": "el",
+    "code": "4605245",
+    "score": 9.177226066589355,
+    "margin": 1000000.0
+  },
+  {
+    "text": "এই নম্বরের মালিকানা যাচাই করতে অ্যাপে dwufpxfilh লিখুন।",
+    "language": "bn",
+    "code": "dwufpxfilh",
+    "score": 9.292900085449219,
+    "margin": 1000000.0
+  },
+  {
+    "text": "Meeting on 2026-04-14, room AoZNEbZH, starting at 9:30.",
+    "language": "en",
+    "code": "20260414",
+    "score": -10.784138679504395,
+    "margin": 1.110121726989746
+  },
+  {
+    "text": "Tavora bejelentkezés megerősítése. A befejezéshez add meg: DBVYAD.",
+    "language": "hu",
+    "code": "DBVYAD",
+    "score": 9.392183303833008,
+    "margin": 35.12297058105469
+  },
+  {
+    "text": "Ange KQ QI D i appen för att verifiera att numret tillhör dig.",
+    "language": "sv",
+    "code": "KQQID",
+    "score": 9.387910842895508,
+    "margin": 12.837015151977539
+  },
+  {
+    "text": "Mistral\nGib FW\nKJ\nOR\nIJ\nY in der App ein, um zu bestätigen, dass diese Nummer dir gehört.",
+    "language": "de",
+    "code": "FWKJORIJY",
+    "score": 9.434958457946777,
+    "margin": 12.815375328063965
+  },
+  {
+    "text": "Mistral sisselogimise kinnitus. Lõpetamiseks sisesta whksiyj.",
+    "language": "et",
+    "code": "whksiyj",
+    "score": 9.365564346313477,
+    "margin": 35.28224182128906
+  },
+  {
+    "text": "Spotkanie 2026-01-22, sala 25132, początek o 18:06.",
+    "language": "pl",
+    "code": "20260122",
+    "score": -10.973626136779785,
+    "margin": 0.22709035873413086
+  },
+  {
+    "text": "Référence ouou, nouvel appareil : la phrase secrète emweeoyn finalise la connexion.",
+    "language": "fr",
+    "code": "emweeoyn",
+    "score": 8.94737720489502,
+    "margin": 35.063175201416016
+  },
+  {
+    "text": "Kod za autentifikaciju w18E već je istekao.",
+    "language": "hr",
+    "code": "w18E",
+    "score": -9.192425727844238,
+    "margin": 7.092958450317383
+  },
+  {
+    "text": "Godkendelseskoden GVIETBSSA er allerede udløbet.",
+    "language": "da",
+    "code": "GVIETBSSA",
+    "score": -10.250431060791016,
+    "margin": 2.660284787416458
+  },
+  {
+    "text": "Referência DLJBEYJ, novo dispositivo: a frase secreta UNEOCKIW conclui a ligação.",
+    "language": "pt",
+    "code": "UNEOCKIW",
+    "score": 8.934887886047363,
+    "margin": 35.29788017272949
+  },
+  {
+    "text": "Prisijungimo problema? Susisiekite su pagalba dėl užklausos UDYIXQQM.",
+    "language": "lt",
+    "code": "UDYIXQQM",
+    "score": -9.876177787780762,
+    "margin": 7.145397186279297
+  },
+  {
+    "text": "[Sorrel] Authenticatiecode HEEPD is al verlopen.",
+    "language": "nl",
+    "code": "HEEPD",
+    "score": -10.438848495483398,
+    "margin": 1.1912785768508911
+  },
+  {
+    "text": "Problemi di accesso? Contatta l'assistenza con il ticket 243975.",
+    "language": "it",
+    "code": "243975",
+    "score": -11.056118965148926,
+    "margin": 1.7219061851501465
+  }
+]
