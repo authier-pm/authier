@@ -1,13 +1,22 @@
+/** Internal type. DO NOT USE DIRECTLY. */
+type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
+/** Internal type. DO NOT USE DIRECTLY. */
+export type Incremental<T> = T | { [P in keyof T]?: P extends ' $fragmentName' | '__typename' ? T[P] : never };
 import * as Types from '@shared/generated/graphqlBaseTypes';
 
 import { gql } from '@apollo/client';
 import * as ApolloReactCommon from '@apollo/client/react';
 import * as ApolloReactHooks from '@apollo/client/react';
 const defaultOptions = {} as const;
-export type LimitsQueryVariables = Types.Exact<{ [key: string]: never; }>;
+export type EncryptedSecretType =
+  | 'LOGIN_CREDENTIALS'
+  | 'PASSKEY'
+  | 'TOTP';
+
+export type LimitsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type LimitsQuery = { __typename?: 'Query', me: { __typename?: 'UserQuery', id: string, loginCredentialsLimit: number, TOTPlimit: number, encryptedSecrets: Array<{ __typename?: 'EncryptedSecretQuery', kind: Types.EncryptedSecretType }> } };
+export type LimitsQuery = { me: { id: string, loginCredentialsLimit: number, TOTPlimit: number, encryptedSecrets: Array<{ kind: Types.EncryptedSecretType }> } };
 
 
 export const LimitsDocument = gql`

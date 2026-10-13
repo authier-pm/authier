@@ -1,13 +1,17 @@
+/** Internal type. DO NOT USE DIRECTLY. */
+type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
+/** Internal type. DO NOT USE DIRECTLY. */
+export type Incremental<T> = T | { [P in keyof T]?: P extends ' $fragmentName' | '__typename' ? T[P] : never };
 import * as Types from '@shared/generated/graphqlBaseTypes';
 
 import { gql } from '@apollo/client';
 import * as ApolloReactCommon from '@apollo/client/react';
 import * as ApolloReactHooks from '@apollo/client/react';
 const defaultOptions = {} as const;
-export type DeviceCountQueryVariables = Types.Exact<{ [key: string]: never; }>;
+export type DeviceCountQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type DeviceCountQuery = { __typename?: 'Query', me: { __typename?: 'UserQuery', devicesCount: number } };
+export type DeviceCountQuery = { me: { devicesCount: number } };
 
 
 export const DeviceCountDocument = gql`

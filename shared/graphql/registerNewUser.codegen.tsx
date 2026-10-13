@@ -1,16 +1,33 @@
+/** Internal type. DO NOT USE DIRECTLY. */
+type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
+/** Internal type. DO NOT USE DIRECTLY. */
+export type Incremental<T> = T | { [P in keyof T]?: P extends ' $fragmentName' | '__typename' ? T[P] : never };
 import * as Types from '@shared/generated/graphqlBaseTypes';
 
 import { gql } from '@apollo/client';
 import * as ApolloReactCommon from '@apollo/client/react';
 import * as ApolloReactHooks from '@apollo/client/react';
 const defaultOptions = {} as const;
-export type RegisterNewUserMutationVariables = Types.Exact<{
+export type RegisterNewAccountInput = {
+  addDeviceSecret: string;
+  addDeviceSecretEncrypted: string;
+  deviceId: string | number;
+  deviceName: string;
+  devicePlatform: string;
+  email: string;
+  encryptionSalt: string;
+  /** Firebase token is only used for mobile app */
+  firebaseToken?: string | null | undefined;
+  masterDeviceResetConfig?: unknown;
+};
+
+export type RegisterNewUserMutationVariables = Exact<{
   input: Types.RegisterNewAccountInput;
-  userId: Types.Scalars['UUID']['input'];
+  userId: string;
 }>;
 
 
-export type RegisterNewUserMutation = { __typename?: 'Mutation', registerNewUser: { __typename?: 'LoginResponse', accessToken: string, user: { __typename?: 'UserMutation', id: string, sendEmailVerification: number, notificationOnVaultUnlock: boolean, notificationOnWrongPasswordAttempts: number, Devices: Array<{ __typename?: 'DeviceGQL', id: string, name: string }> } } };
+export type RegisterNewUserMutation = { registerNewUser: { accessToken: string, user: { id: string, sendEmailVerification: number, notificationOnVaultUnlock: boolean, notificationOnWrongPasswordAttempts: number, Devices: Array<{ id: string, name: string }> } } };
 
 
 export const RegisterNewUserDocument = gql`

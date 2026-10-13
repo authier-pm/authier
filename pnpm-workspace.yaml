@@ -71,7 +71,7 @@ minimumReleaseAgeExclude:
   - unplugin-swc@1.5.10 || 1.6.0
   - postcss@8.5.26
   - tsx@4.23.10
-  - vite@8.2.1
+  - vite@8.2.1 || 8.3.4
   - '@mermaid-js/mermaid-cli@11.17.0'
   - '@types/node@26.4.1'
   - '@types/webextension-polyfill@0.12.6'
@@ -102,6 +102,28 @@ minimumReleaseAgeExclude:
   - react-dropzone@20.1.2
   - turbo@2.10.13
   - vitest@5.0.1
+  - '@apollo/client@4.3.3'
+  - '@firebase/ai@3.0.0'
+  - '@firebase/app-compat@0.5.19'
+  - '@firebase/app@0.16.3'
+  - '@firebase/auth-compat@0.6.12'
+  - '@firebase/auth@1.13.7'
+  - '@firebase/firestore-compat@0.4.15'
+  - '@firebase/firestore@4.18.0'
+  - '@firebase/remote-config-compat@0.2.30'
+  - '@firebase/remote-config@0.9.3'
+  - '@firebase/storage-compat@0.4.6'
+  - '@firebase/storage@0.14.6'
+  - '@playwright/test@1.64.0'
+  - astro@7.3.7
+  - firebase@13.0.0
+  - graphql-yoga@5.24.4
+  - lucide-react@1.53.0
+  - playwright-core@1.64.0
+  - playwright@1.64.0
+  - preact@11.0.1
+  - tldts-core@7.4.18
+  - tldts@7.4.18
 
 allowBuilds:
   '@capaj/type-graphql': true

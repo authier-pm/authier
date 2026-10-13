@@ -1,15 +1,19 @@
+/** Internal type. DO NOT USE DIRECTLY. */
+type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
+/** Internal type. DO NOT USE DIRECTLY. */
+export type Incremental<T> = T | { [P in keyof T]?: P extends ' $fragmentName' | '__typename' ? T[P] : never };
 import * as Types from '@shared/generated/graphqlBaseTypes';
 
 import { gql } from '@apollo/client';
 import * as ApolloReactCommon from '@apollo/client/react';
 import * as ApolloReactHooks from '@apollo/client/react';
 const defaultOptions = {} as const;
-export type CreateCheckoutSessionVaultMutationVariables = Types.Exact<{
-  product: Types.Scalars['String']['input'];
+export type CreateCheckoutSessionVaultMutationVariables = Exact<{
+  product: string;
 }>;
 
 
-export type CreateCheckoutSessionVaultMutation = { __typename?: 'Mutation', me: { __typename?: 'UserMutation', createCheckoutSession: string } };
+export type CreateCheckoutSessionVaultMutation = { me: { createCheckoutSession: string } };
 
 
 export const CreateCheckoutSessionVaultDocument = gql`

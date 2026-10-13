@@ -1,32 +1,46 @@
+/** Internal type. DO NOT USE DIRECTLY. */
+type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
+/** Internal type. DO NOT USE DIRECTLY. */
+export type Incremental<T> = T | { [P in keyof T]?: P extends ' $fragmentName' | '__typename' ? T[P] : never };
 import * as Types from '@shared/generated/graphqlBaseTypes';
 
 import { gql } from '@apollo/client';
 import * as ApolloReactCommon from '@apollo/client/react';
 import * as ApolloReactHooks from '@apollo/client/react';
 const defaultOptions = {} as const;
-export type LogoutMutationVariables = Types.Exact<{ [key: string]: never; }>;
+export type EncryptedSecretInput = {
+  encrypted: string;
+  kind: EncryptedSecretType;
+};
+
+export type EncryptedSecretType =
+  | 'LOGIN_CREDENTIALS'
+  | 'PASSKEY'
+  | 'TOTP';
+
+export type LogoutMutationVariables = Exact<{ [key: string]: never; }>;
 
 
-export type LogoutMutation = { __typename?: 'Mutation', currentDevice: { __typename?: 'DeviceMutation', logout: { __typename?: 'DeviceGQL', logoutAt?: string | null } } };
+export type LogoutMutation = { currentDevice: { logout: { logoutAt: string | null } } };
 
-export type MarkAsSyncedMutationVariables = Types.Exact<{ [key: string]: never; }>;
-
-
-export type MarkAsSyncedMutation = { __typename?: 'Mutation', currentDevice: { __typename?: 'DeviceMutation', markAsSynced: string } };
-
-export type SyncEncryptedSecretsQueryVariables = Types.Exact<{ [key: string]: never; }>;
+export type MarkAsSyncedMutationVariables = Exact<{ [key: string]: never; }>;
 
 
-export type SyncEncryptedSecretsQuery = { __typename?: 'Query', currentDevice: { __typename?: 'DeviceQuery', id: string, encryptedSecretsToSync: Array<{ __typename?: 'EncryptedSecretQuery', id: string, encrypted: string, kind: Types.EncryptedSecretType, createdAt: string, updatedAt?: string | null, deletedAt?: string | null, version: number }> } };
+export type MarkAsSyncedMutation = { currentDevice: { markAsSynced: string } };
 
-export type SecretExtensionFragment = { __typename?: 'EncryptedSecretQuery', id: string, encrypted: string, kind: Types.EncryptedSecretType, createdAt: string, updatedAt?: string | null, deletedAt?: string | null, version: number };
+export type SyncEncryptedSecretsQueryVariables = Exact<{ [key: string]: never; }>;
 
-export type AddEncryptedSecretsMutationVariables = Types.Exact<{
+
+export type SyncEncryptedSecretsQuery = { currentDevice: { id: string, encryptedSecretsToSync: Array<{ id: string, encrypted: string, kind: Types.EncryptedSecretType, createdAt: string, updatedAt: string | null, deletedAt: string | null, version: number }> } };
+
+export type SecretExtensionFragment = { id: string, encrypted: string, kind: Types.EncryptedSecretType, createdAt: string, updatedAt: string | null, deletedAt: string | null, version: number };
+
+export type AddEncryptedSecretsMutationVariables = Exact<{
   secrets: Array<Types.EncryptedSecretInput> | Types.EncryptedSecretInput;
 }>;
 
 
-export type AddEncryptedSecretsMutation = { __typename?: 'Mutation', me: { __typename?: 'UserMutation', addEncryptedSecrets: Array<{ __typename?: 'EncryptedSecretQuery', id: string, kind: Types.EncryptedSecretType, encrypted: string, version: number, createdAt: string, updatedAt?: string | null }> } };
+export type AddEncryptedSecretsMutation = { me: { addEncryptedSecrets: Array<{ id: string, kind: Types.EncryptedSecretType, encrypted: string, version: number, createdAt: string, updatedAt: string | null }> } };
 
 export const SecretExtensionFragmentDoc = gql`
     fragment secretExtension on EncryptedSecretQuery {

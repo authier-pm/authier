@@ -1,13 +1,17 @@
+/** Internal type. DO NOT USE DIRECTLY. */
+type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
+/** Internal type. DO NOT USE DIRECTLY. */
+export type Incremental<T> = T | { [P in keyof T]?: P extends ' $fragmentName' | '__typename' ? T[P] : never };
 import * as Types from '@shared/generated/graphqlBaseTypes';
 
 import { gql } from '@apollo/client';
 import * as ApolloReactCommon from '@apollo/client/react';
 import * as ApolloReactHooks from '@apollo/client/react';
 const defaultOptions = {} as const;
-export type DevicesListWithDataQueryVariables = Types.Exact<{ [key: string]: never; }>;
+export type DevicesListWithDataQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type DevicesListWithDataQuery = { __typename?: 'Query', me: { __typename?: 'UserQuery', id: string, masterDeviceId?: string | null, devices: Array<{ __typename?: 'DeviceQuery', id: string, name: string, firstIpAddress: string, lastIpAddress: string, logoutAt?: string | null, lastGeoLocation: string, createdAt: string, lastSyncAt?: string | null, platform: string, syncTOTP: boolean, vaultLockTimeoutSeconds: number }> } };
+export type DevicesListWithDataQuery = { me: { id: string, masterDeviceId: string | null, devices: Array<{ id: string, name: string, firstIpAddress: string, lastIpAddress: string, logoutAt: string | null, lastGeoLocation: string, createdAt: string, lastSyncAt: string | null, platform: string, syncTOTP: boolean, vaultLockTimeoutSeconds: number }> } };
 
 
 export const DevicesListWithDataDocument = gql`

@@ -1,13 +1,22 @@
+/** Internal type. DO NOT USE DIRECTLY. */
+type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
+/** Internal type. DO NOT USE DIRECTLY. */
+export type Incremental<T> = T | { [P in keyof T]?: P extends ' $fragmentName' | '__typename' ? T[P] : never };
 import * as Types from '@shared/generated/graphqlBaseTypes';
 
 import { gql } from '@apollo/client';
 import * as ApolloReactCommon from '@apollo/client/react';
 import * as ApolloReactHooks from '@apollo/client/react';
 const defaultOptions = {} as const;
-export type UserNewDevicePolicyQueryQueryVariables = Types.Exact<{ [key: string]: never; }>;
+export type UserNewDevicePolicy =
+  | 'ALLOW'
+  | 'REQUIRE_ANY_DEVICE_APPROVAL'
+  | 'REQUIRE_MASTER_DEVICE_APPROVAL';
+
+export type UserNewDevicePolicyQueryQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type UserNewDevicePolicyQueryQuery = { __typename?: 'Query', me: { __typename?: 'UserQuery', id: string, newDevicePolicy?: Types.UserNewDevicePolicy | null, masterDeviceId?: string | null } };
+export type UserNewDevicePolicyQueryQuery = { me: { id: string, newDevicePolicy: Types.UserNewDevicePolicy | null, masterDeviceId: string | null } };
 
 
 export const UserNewDevicePolicyQueryDocument = gql`

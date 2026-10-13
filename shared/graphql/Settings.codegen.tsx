@@ -1,20 +1,34 @@
+/** Internal type. DO NOT USE DIRECTLY. */
+type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
+/** Internal type. DO NOT USE DIRECTLY. */
+export type Incremental<T> = T | { [P in keyof T]?: P extends ' $fragmentName' | '__typename' ? T[P] : never };
 import * as Types from '@shared/generated/graphqlBaseTypes';
 
 import { gql } from '@apollo/client';
 import * as ApolloReactCommon from '@apollo/client/react';
 import * as ApolloReactHooks from '@apollo/client/react';
 const defaultOptions = {} as const;
-export type SyncSettingsQueryVariables = Types.Exact<{ [key: string]: never; }>;
+export type SettingsInput = {
+  autofillForbiddenUrlPatterns?: string | null | undefined;
+  autofillTOTPEnabled: boolean;
+  notificationOnVaultUnlock: boolean;
+  notificationOnWrongPasswordAttempts: number;
+  syncTOTP: boolean;
+  uiLanguage: string;
+  vaultLockTimeoutSeconds: number;
+};
+
+export type SyncSettingsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type SyncSettingsQuery = { __typename?: 'Query', me: { __typename?: 'UserQuery', id: string, loginCredentialsLimit: number, TOTPlimit: number, notificationOnVaultUnlock: boolean, notificationOnWrongPasswordAttempts: number, uiLanguage: string, autofillForbiddenUrlPatterns: string }, currentDevice: { __typename?: 'DeviceQuery', id: string, syncTOTP: boolean, vaultLockTimeoutSeconds: number, autofillTOTPEnabled: boolean } };
+export type SyncSettingsQuery = { me: { id: string, loginCredentialsLimit: number, TOTPlimit: number, notificationOnVaultUnlock: boolean, notificationOnWrongPasswordAttempts: number, uiLanguage: string, autofillForbiddenUrlPatterns: string }, currentDevice: { id: string, syncTOTP: boolean, vaultLockTimeoutSeconds: number, autofillTOTPEnabled: boolean } };
 
-export type UpdateSettingsMutationVariables = Types.Exact<{
+export type UpdateSettingsMutationVariables = Exact<{
   config: Types.SettingsInput;
 }>;
 
 
-export type UpdateSettingsMutation = { __typename?: 'Mutation', me: { __typename?: 'UserMutation', updateSettings: { __typename?: 'UserGQL', id: string } } };
+export type UpdateSettingsMutation = { me: { updateSettings: { id: string } } };
 
 
 export const SyncSettingsDocument = gql`

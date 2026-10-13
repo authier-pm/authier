@@ -1,15 +1,19 @@
+/** Internal type. DO NOT USE DIRECTLY. */
+type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
+/** Internal type. DO NOT USE DIRECTLY. */
+export type Incremental<T> = T | { [P in keyof T]?: P extends ' $fragmentName' | '__typename' ? T[P] : never };
 import * as Types from '@shared/generated/graphqlBaseTypes';
 
 import { gql } from '@apollo/client';
 import * as ApolloReactCommon from '@apollo/client/react';
 import * as ApolloReactHooks from '@apollo/client/react';
 const defaultOptions = {} as const;
-export type SaveFirebaseTokenMutationVariables = Types.Exact<{
-  firebaseToken: Types.Scalars['String']['input'];
+export type SaveFirebaseTokenMutationVariables = Exact<{
+  firebaseToken: string;
 }>;
 
 
-export type SaveFirebaseTokenMutation = { __typename?: 'Mutation', me: { __typename?: 'UserMutation', updateFireToken: { __typename?: 'DeviceGQL', id: string } } };
+export type SaveFirebaseTokenMutation = { me: { updateFireToken: { id: string } } };
 
 
 export const SaveFirebaseTokenDocument = gql`

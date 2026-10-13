@@ -1,33 +1,50 @@
+/** Internal type. DO NOT USE DIRECTLY. */
+type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
+/** Internal type. DO NOT USE DIRECTLY. */
+export type Incremental<T> = T | { [P in keyof T]?: P extends ' $fragmentName' | '__typename' ? T[P] : never };
 import * as Types from '@shared/generated/graphqlBaseTypes';
 
 import { gql } from '@apollo/client';
 import * as ApolloReactCommon from '@apollo/client/react';
 import * as ApolloReactHooks from '@apollo/client/react';
 const defaultOptions = {} as const;
-export type ChangeMasterPasswordMutationVariables = Types.Exact<{
+export type EncryptedSecretPatchInput = {
+  encrypted: string;
+  /** Version read before re-encryption; required when changing the master password. */
+  expectedVersion?: number | null | undefined;
+  id: string;
+  kind: EncryptedSecretType;
+};
+
+export type EncryptedSecretType =
+  | 'LOGIN_CREDENTIALS'
+  | 'PASSKEY'
+  | 'TOTP';
+
+export type ChangeMasterPasswordMutationVariables = Exact<{
   secrets: Array<Types.EncryptedSecretPatchInput> | Types.EncryptedSecretPatchInput;
-  addDeviceSecret: Types.Scalars['NonEmptyString']['input'];
-  addDeviceSecretEncrypted: Types.Scalars['NonEmptyString']['input'];
-  decryptionChallengeId: Types.Scalars['PositiveInt']['input'];
+  addDeviceSecret: string;
+  addDeviceSecretEncrypted: string;
+  decryptionChallengeId: number;
 }>;
 
 
-export type ChangeMasterPasswordMutation = { __typename?: 'Mutation', me: { __typename?: 'UserMutation', changeMasterPassword: number } };
+export type ChangeMasterPasswordMutation = { me: { changeMasterPassword: number } };
 
-export type AccountQueryVariables = Types.Exact<{ [key: string]: never; }>;
-
-
-export type AccountQuery = { __typename?: 'Query', me: { __typename?: 'UserQuery', id: string, deviceRecoveryCooldownMinutes: number, primaryEmailVerification?: { __typename?: 'EmailVerificationGQLScalars', createdAt: string, verifiedAt?: string | null } | null } };
-
-export type ResendEmailVerificationMutationVariables = Types.Exact<{ [key: string]: never; }>;
+export type AccountQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type ResendEmailVerificationMutation = { __typename?: 'Mutation', me: { __typename?: 'UserMutation', sendEmailVerification: number } };
+export type AccountQuery = { me: { id: string, deviceRecoveryCooldownMinutes: number, primaryEmailVerification: { createdAt: string, verifiedAt: string | null } | null } };
 
-export type DeleteAccountMutationVariables = Types.Exact<{ [key: string]: never; }>;
+export type ResendEmailVerificationMutationVariables = Exact<{ [key: string]: never; }>;
 
 
-export type DeleteAccountMutation = { __typename?: 'Mutation', me: { __typename?: 'UserMutation', delete: { __typename?: 'UserGQL', id: string } } };
+export type ResendEmailVerificationMutation = { me: { sendEmailVerification: number } };
+
+export type DeleteAccountMutationVariables = Exact<{ [key: string]: never; }>;
+
+
+export type DeleteAccountMutation = { me: { delete: { id: string } } };
 
 
 export const ChangeMasterPasswordDocument = gql`
