@@ -362,6 +362,78 @@ describe('trusted passkey ceremonies', () => {
     expect(windows.open).not.toHaveBeenCalled()
   })
 
+  it('approves a Google RP passkey when a request also allows legacy AppID credentials', async () => {
+    const googleOrigin = 'https://accounts.google.com'
+    const { passkey } = await createPasskey(
+      { ...options, rp: { id: 'google.com', name: 'Google' } },
+      googleOrigin,
+      true
+    )
+    passkeys.push(passkey)
+    const result = manager.begin(
+      {
+        requestId: 'google-sign-in',
+        operation: 'get',
+        options: {
+          challenge: 'bmV3LWNoYWxsZW5nZQ',
+          rpId: 'google.com',
+          allowCredentials: [
+            { type: 'public-key', id: 'bGVnYWN5LWtleQ', transports: ['usb'] },
+            {
+              type: 'public-key',
+              id: passkey.credentialId,
+              transports: ['internal']
+            }
+          ],
+          userVerification: 'required',
+          extensions: {
+            appid: 'https://www.gstatic.com/securitykey/origins.json'
+          }
+        }
+      },
+      { ...website, url: `${googleOrigin}/v3/signin/challenge/pk` }
+    )
+    await opened()
+    expect((await manager.view(token, approval())).accounts).toEqual([])
+    const view = await manager.verify(token, 'correct', approval())
+    expect(view.accounts.map(({ credentialId }) => credentialId)).toEqual([
+      passkey.credentialId
+    ])
+    await manager.approve(token, passkey.credentialId, approval())
+    expect(await result).toMatchObject({
+      status: 'ok',
+      credential: {
+        id: passkey.credentialId,
+        clientExtensionResults: { appid: false }
+      }
+    })
+  })
+
+  it('leaves an AppID request for an unmatched legacy key with the native provider', async () => {
+    const { passkey } = await createPasskey(
+      options,
+      'https://example.com',
+      true
+    )
+    passkeys.push(passkey)
+    expect(
+      await manager.begin(
+        {
+          requestId: 'legacy-sign-in',
+          operation: 'get',
+          options: {
+            challenge: options.challenge,
+            rpId: 'example.com',
+            allowCredentials: [{ type: 'public-key', id: 'bGVnYWN5LWtleQ' }],
+            extensions: { appid: 'https://example.com/u2f' }
+          }
+        },
+        website
+      )
+    ).toEqual({ status: 'fallback' })
+    expect(windows.open).not.toHaveBeenCalled()
+  })
+
   it('cancels only requests owned by the requesting tab', async () => {
     const result = start()
     await opened()

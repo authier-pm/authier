@@ -1,4 +1,5 @@
 import { chromium, expect, test } from '@playwright/test'
+import { createHash, createPublicKey, verify } from 'node:crypto'
 import { resolve } from 'node:path'
 import {
   cryptoKeyToString,
@@ -9,11 +10,12 @@ import {
 
 // Requires generateManifest + prodBuild first. All network traffic is intercepted;
 // the test never contacts a real Authier backend or database.
-test('built extension saves an encrypted passkey and signs in with it after restoring a vault', async ({}, testInfo) => {
+test('built extension approves Google-shaped sign-in under nonce CSP after restoring an encrypted passkey', async ({}, testInfo) => {
   const context = await chromium.launchPersistentContext(
     testInfo.outputPath('profile'),
     {
       channel: 'chromium',
+      executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH,
       headless: true,
       args: [
         `--disable-extensions-except=${resolve('dist')}`,
@@ -35,10 +37,14 @@ test('built extension saves an encrypted passkey and signs in with it after rest
   await context.route('**/*', async (route) => {
     const url = new URL(route.request().url())
     if (url.protocol === 'chrome-extension:') return route.continue()
-    if (url.hostname === 'localhost')
+    if (url.hostname === 'accounts.google.com')
       return route.fulfill({
         contentType: 'text/html',
-        body: '<!doctype html><title>Passkey test</title><h1>Passkey test website</h1>'
+        headers: {
+          'Content-Security-Policy':
+            "default-src 'none'; script-src 'nonce-passkey-test' 'unsafe-inline'"
+        },
+        body: '<!doctype html><title>Passkey test</title><h1>Mock Google passkey flow</h1>'
       })
     const payload = route.request().postDataJSON() as {
       operationName?: string
@@ -109,13 +115,14 @@ test('built extension saves an encrypted passkey and signs in with it after rest
       })
     }, snapshot)
     const site = await context.newPage()
-    await site.goto('http://localhost:9988/')
+    // This origin is fulfilled locally above; no Google account is contacted.
+    await site.goto('https://accounts.google.com/v3/signin/challenge/pk')
     const popupPromise = context.waitForEvent('page', { timeout: 10_000 })
     const registration = site.evaluate(async () => {
       const credential = (await navigator.credentials.create({
         publicKey: {
           challenge: new TextEncoder().encode('registration challenge'),
-          rp: { id: 'localhost', name: 'Test website' },
+          rp: { id: 'google.com', name: 'Google' },
           user: {
             id: new TextEncoder().encode('user-1'),
             name: 'alex@example.com',
@@ -132,6 +139,13 @@ test('built extension saves an encrypted passkey and signs in with it after rest
       return {
         id: credential.id,
         type: credential.type,
+        publicKey: Array.from(
+          new Uint8Array(
+            (
+              credential.response as AuthenticatorAttestationResponse
+            ).getPublicKey()!
+          )
+        ),
         json: credential.toJSON()
       }
     })
@@ -177,12 +191,25 @@ test('built extension saves an encrypted passkey and signs in with it after rest
       const credential = (await navigator.credentials.get({
         publicKey: {
           challenge: new TextEncoder().encode('fresh authentication challenge'),
-          rpId: 'localhost',
+          rpId: 'google.com',
           userVerification: 'required',
+          extensions: {
+            appid: 'https://www.gstatic.com/securitykey/origins.json'
+          },
           timeout: 50_000
         }
       })) as PublicKeyCredential
-      return { id: credential.id, json: credential.toJSON() }
+      const response = credential.response as AuthenticatorAssertionResponse
+      return {
+        id: credential.id,
+        json: credential.toJSON(),
+        extensions: credential.getClientExtensionResults(),
+        authenticatorData: Array.from(
+          new Uint8Array(response.authenticatorData)
+        ),
+        clientDataJSON: Array.from(new Uint8Array(response.clientDataJSON)),
+        signature: Array.from(new Uint8Array(response.signature))
+      }
     })
     void assertion.catch(() => undefined)
     const assertionPopup = await assertionPopupPromise
@@ -196,6 +223,35 @@ test('built extension saves an encrypted passkey and signs in with it after rest
       .click()
     const signed = await assertion
     expect(signed.id).toBe(registered.id)
+    expect(signed.extensions).toEqual({ appid: false })
+    const authenticatorData = Buffer.from(signed.authenticatorData)
+    const clientDataJSON = Buffer.from(signed.clientDataJSON)
+    expect(authenticatorData.subarray(0, 32)).toEqual(
+      createHash('sha256').update('google.com').digest()
+    )
+    expect(authenticatorData[32]).toBe(0x1d)
+    expect(JSON.parse(clientDataJSON.toString())).toMatchObject({
+      type: 'webauthn.get',
+      origin: 'https://accounts.google.com',
+      challenge: Buffer.from('fresh authentication challenge').toString(
+        'base64url'
+      )
+    })
+    expect(
+      verify(
+        'sha256',
+        Buffer.concat([
+          authenticatorData,
+          createHash('sha256').update(clientDataJSON).digest()
+        ]),
+        createPublicKey({
+          key: Buffer.from(registered.publicKey),
+          format: 'der',
+          type: 'spki'
+        }),
+        Buffer.from(signed.signature)
+      )
+    ).toBe(true)
     expect(stored).toHaveLength(1)
     expect(JSON.stringify(signed.json)).not.toContain('privateKey')
     expect(extensionId).toHaveLength(32)

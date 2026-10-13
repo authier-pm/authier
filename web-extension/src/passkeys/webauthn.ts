@@ -71,7 +71,7 @@ export type PasskeyCredentialResult = {
   rawId: string
   type: 'public-key'
   authenticatorAttachment: 'platform'
-  clientExtensionResults: { credProps?: { rk: boolean } }
+  clientExtensionResults: { credProps?: { rk: boolean }; appid?: false }
   response: {
     clientDataJSON: string
     authenticatorData: string
@@ -147,10 +147,12 @@ export const getUnsupportedPasskeyReason = (
   }
   const extensions = options.extensions
   if (!extensions) return null
+  // appid allows legacy U2F credentials alongside RP-scoped WebAuthn passkeys.
+  // Its presence must not send a matching modern passkey to another provider.
+  // Authier never uses the AppID for credential matching or signing.
   for (const key of [
     'prf',
     'largeBlob',
-    'appid',
     'appidExclude',
     'hmacCreateSecret',
     'hmacGetSecret'
@@ -406,7 +408,8 @@ export const getPasskeyAssertion = async (
     rawId: passkey.credentialId,
     type: 'public-key',
     authenticatorAttachment: 'platform',
-    clientExtensionResults: {},
+    clientExtensionResults:
+      typeof options.extensions?.appid === 'string' ? { appid: false } : {},
     response: {
       clientDataJSON: toBase64url(clientDataJSON),
       authenticatorData: toBase64url(authenticatorData),

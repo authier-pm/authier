@@ -53,9 +53,13 @@ sync to move them between browsers.
   credential lists, user verification by master password, and none attestation.
 - Embedded frames and conditional/silent mediation use the native provider.
   Requests requiring roaming authenticators, enterprise attestation, PRF,
-  largeBlob, legacy AppID, or unsupported required extension features also use
-  the native provider. Site/browser restrictions on extension injection still
-  apply. This does not add a mobile OS passkey provider.
+  largeBlob, legacy AppID exclusion, or unsupported required extension features
+  also use the native provider. Site/browser restrictions on extension injection
+  still apply. This does not add a mobile OS passkey provider.
+- Authentication requests may include the legacy `appid` extension alongside
+  modern passkeys. Authier still matches by RP ID and credential ID, signs with
+  the RP ID hash, and returns `appid: false`. Legacy U2F-only requests without a
+  matching Authier passkey fall back to the native provider.
 - Registration waits for encrypted backend persistence. Signing in can use an
   already synced local credential without a network request to Authier.
 
@@ -119,6 +123,12 @@ verification, encrypted round trips, RP isolation, user verification, request
 ownership, fallback, cancellation, and persistence failures. Backend tests use
 PGlite. Browser tests live under `web-extension/tests/passkeys` and the UI
 preview tests under `web-extension/tests/ui-preview`.
+
+Google sign-in regression coverage uses a mocked `accounts.google.com` page with
+nonce-only script execution, RP ID `google.com`, and a legacy AppID alongside
+modern passkeys. It checks extension injection, master-password approval,
+encrypted vault restoration, and independent signature verification. These
+fixtures do not contact Google or prove live Google account acceptance.
 
 Implementation references: [W3C WebAuthn Level 3](https://www.w3.org/TR/webauthn-3/),
 [Firefox 128 extension changes](https://blog.mozilla.org/addons/2024/07/10/manifest-v3-updates-landed-in-firefox-128/),

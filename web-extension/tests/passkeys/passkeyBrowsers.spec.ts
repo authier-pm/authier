@@ -13,32 +13,37 @@ import {
 
 let extensionPath: string
 const testUrl = 'https://passkeys.example.test/account'
+const googleTestUrl = 'https://accounts.google.com/v3/signin/challenge/pk'
+const matches = [
+  'https://passkeys.example.test/*',
+  'https://accounts.google.com/*'
+]
 const fixtureContentScripts = [
   {
-    matches: ['https://passkeys.example.test/*'],
+    matches,
     js: ['bridgeEntry.js'],
     run_at: 'document_start'
   },
   {
-    matches: ['https://passkeys.example.test/*'],
+    matches,
     js: ['pageEntry.js'],
     run_at: 'document_start',
     world: 'MAIN'
   }
 ]
 
-async function openTestPage(page: Page) {
-  await page.route('https://passkeys.example.test/**', (route) =>
+async function openTestPage(page: Page, url = testUrl) {
+  await page.route(`${new URL(url).origin}/**`, (route) =>
     route.fulfill({
       contentType: 'text/html',
       headers: {
         'Content-Security-Policy':
-          "default-src 'none'; script-src 'nonce-test'; frame-src 'self'"
+          "default-src 'none'; script-src 'nonce-test' 'unsafe-inline'; frame-src 'self'"
       },
       body: '<!doctype html><title>Passkey interoperability test</title>'
     })
   )
-  await page.goto(testUrl)
+  await page.goto(url)
 }
 
 test.beforeAll(async () => {
@@ -66,7 +71,7 @@ test.beforeAll(async () => {
       name: 'Authier test passkey provider',
       version: '1.0.0',
       background: { service_worker: 'approvedTestBackground.js' },
-      host_permissions: ['https://passkeys.example.test/*'],
+      host_permissions: matches,
       content_scripts: fixtureContentScripts
     })
   )
@@ -88,7 +93,7 @@ test.beforeAll(async () => {
       browser_specific_settings: {
         gecko: { id: 'passkey-test@authier.pm', strict_min_version: '128.0' }
       },
-      permissions: ['https://passkeys.example.test/*'],
+      permissions: matches,
       content_scripts: fixtureContentScripts
     })
   )
@@ -98,7 +103,7 @@ test.afterAll(async () => {
   await rm(extensionPath, { recursive: true, force: true })
 })
 
-test('registers and authenticates through a Firefox MV2 addon', async () => {
+test('registers and authenticates a Google RP passkey with AppID through a Firefox MV2 addon under nonce CSP', async () => {
   const port = await findFreeTcpPort()
   const context = await firefox.launchPersistentContext('', {
     executablePath: process.env.PLAYWRIGHT_FIREFOX_EXECUTABLE_PATH,
@@ -112,12 +117,12 @@ test('registers and authenticates through a Firefox MV2 addon', async () => {
   const remote = await connectWithMaxRetries({ port, maxRetries: 20 })
   await remote.installTemporaryAddon(path.join(extensionPath, 'firefox'), false)
   const page = await context.newPage()
-  await openTestPage(page)
+  await openTestPage(page, googleTestUrl)
   const result = await page.evaluate(async () => {
     const created = (await navigator.credentials.create({
       publicKey: {
         challenge: new Uint8Array([1, 2, 3]),
-        rp: { name: 'Example', id: 'example.test' },
+        rp: { name: 'Google', id: 'google.com' },
         user: {
           id: new Uint8Array([4, 5, 6]),
           name: 'alice',
@@ -129,7 +134,11 @@ test('registers and authenticates through a Firefox MV2 addon', async () => {
     const signed = (await navigator.credentials.get({
       publicKey: {
         challenge: new Uint8Array([7, 8, 9]),
-        rpId: 'example.test',
+        rpId: 'google.com',
+        userVerification: 'required',
+        extensions: {
+          appid: 'https://www.gstatic.com/securitykey/origins.json'
+        },
         allowCredentials: [{ type: 'public-key', id: created.rawId }]
       }
     })) as PublicKeyCredential
@@ -139,6 +148,8 @@ test('registers and authenticates through a Firefox MV2 addon', async () => {
       creationType:
         created.response instanceof AuthenticatorAttestationResponse,
       assertionType: signed.response instanceof AuthenticatorAssertionResponse,
+      extensionResults: signed.getClientExtensionResults(),
+      json: signed.toJSON(),
       platformAvailable:
         await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable()
     }
@@ -147,6 +158,8 @@ test('registers and authenticates through a Firefox MV2 addon', async () => {
     createdId: result.signedId,
     creationType: true,
     assertionType: true,
+    extensionResults: { appid: false },
+    json: { clientExtensionResults: { appid: false } },
     platformAvailable: true
   })
   remote.disconnect()

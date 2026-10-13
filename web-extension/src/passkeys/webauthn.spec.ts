@@ -428,7 +428,7 @@ describe('software authenticator', () => {
     for (const extensions of [
       { prf: {} },
       { largeBlob: { support: 'required' } },
-      { appid: 'https://example.com' },
+      { appidExclude: 'https://example.com' },
       { enforceCredentialProtectionPolicy: true }
     ]) {
       expect(
@@ -436,6 +436,76 @@ describe('software authenticator', () => {
       ).toBeTruthy()
     }
     expect(getUnsupportedPasskeyReason(creationOptions(), 'create')).toBeNull()
+  })
+
+  it('signs an RP-scoped passkey even when AppID is offered for legacy security keys', async () => {
+    const googleOrigin = 'https://accounts.google.com'
+    const { passkey, credential } = await createPasskey(
+      { ...creationOptions(), rp: { id: 'google.com', name: 'Google' } },
+      googleOrigin,
+      true
+    )
+    const request = {
+      challenge,
+      rpId: 'google.com',
+      allowCredentials: [
+        { type: 'public-key' as const, id: passkey.credentialId }
+      ],
+      userVerification: 'required' as const,
+      extensions: { appid: 'https://www.gstatic.com/securitykey/origins.json' }
+    }
+    expect(getUnsupportedPasskeyReason(request, 'get')).toBeNull()
+    const assertion = await getPasskeyAssertion(
+      passkey,
+      request,
+      googleOrigin,
+      true
+    )
+    expect(assertion.clientExtensionResults).toEqual({ appid: false })
+    const authData = fromBase64url(assertion.response.authenticatorData)
+    const clientData = fromBase64url(assertion.response.clientDataJSON)
+    expect(authData.slice(0, 32)).toEqual(
+      new Uint8Array(
+        await crypto.subtle.digest(
+          'SHA-256',
+          new TextEncoder().encode('google.com')
+        )
+      )
+    )
+    expect(JSON.parse(new TextDecoder().decode(clientData))).toMatchObject({
+      type: 'webauthn.get',
+      challenge,
+      origin: googleOrigin
+    })
+    expect(
+      verify(
+        'sha256',
+        concatBytes(
+          authData,
+          new Uint8Array(await crypto.subtle.digest('SHA-256', clientData))
+        ),
+        createPublicKey({
+          key: Buffer.from(
+            fromBase64url(required(credential.response.publicKey))
+          ),
+          format: 'der',
+          type: 'spki'
+        }),
+        fromBase64url(required(assertion.response.signature))
+      )
+    ).toBe(true)
+    // An AppID must never authorize a different RP or origin.
+    await expect(
+      getPasskeyAssertion(
+        passkey,
+        { ...request, rpId: 'example.com' },
+        'https://example.com',
+        true
+      )
+    ).rejects.toMatchObject({ name: 'NotAllowedError' })
+    await expect(
+      getPasskeyAssertion(passkey, request, 'https://evil.example.com', true)
+    ).rejects.toMatchObject({ name: 'SecurityError' })
   })
 
   it('rejects malformed and oversized inputs at the background boundary', async () => {
