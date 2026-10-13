@@ -26,7 +26,7 @@ export const CodeMessageKind = {
 } as const
 export const CODE_MESSAGE_PREFIX = 'authierVerificationCode'
 
-const emailCodeSchema = z.string().regex(/^[a-zA-Z0-9]{6,8}$/)
+const emailCodeSchema = z.string().regex(/^(?:\d{4,5}|[a-zA-Z0-9]{6,8})$/)
 
 export const gmailCodeCandidateSchema = z.object({
   provider: z.literal('Gmail'),
@@ -130,7 +130,7 @@ export const codeMessageSchema = z.discriminatedUnion('kind', [
 ])
 
 export const maskCode = (code: string) => {
-  // Short SMS codes reveal less, so a glance cannot give most of it away.
+  // Short codes reveal less, so a glance cannot give most of it away.
   const visible = code.length > 5 ? 3 : 1
   return code.slice(0, visible) + '*'.repeat(code.length - visible)
 }

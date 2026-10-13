@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest'
 import smsVectors from '../../../shared/smsVerificationCodeVectors.json'
 import {
+  bazoomVerificationEmailBody,
+  bazoomVerificationEmailSubject
+} from '../../ui-preview/fixtures/bazoomVerificationEmail'
+import {
   cloudflareEmailRoutingBody,
   cloudflareEmailRoutingSubject
 } from '../../ui-preview/fixtures/cloudflareEmailRouting'
@@ -10,7 +14,18 @@ import {
 } from './extractVerificationCode'
 
 describe('extractVerificationCode', () => {
+  it('detects the four-digit Bazoom code instead of its postal footer', () => {
+    expect(
+      extractVerificationCode(
+        bazoomVerificationEmailBody,
+        bazoomVerificationEmailSubject
+      )
+    ).toBe('2222')
+  })
+
   it.each([
+    ['Your verification code is: 2222', '2222'],
+    ['Your security code is 01234', '01234'],
     ['Your verification code is: 213456', '213456'],
     ['Your security code is 001234', '001234'],
     ['12345678 is your login code.', '12345678'],
@@ -21,6 +36,8 @@ describe('extractVerificationCode', () => {
     ['Sign-in code: 123 456', '123456'],
     ['Security code: 1234-5678', '12345678'],
     ['Your sign-in code: ABC-123', 'ABC123'],
+    ['Your sign-in code: 1234 AB', '1234AB'],
+    ['Your sign-in code: 01234 ABC', '01234ABC'],
     ['Your sign-in code: AB CD EF', 'ABCDEF'],
     ['Your verification code: a b c d e f', 'abcdef'],
     ['Your verification code\nabcdef', 'abcdef'],
@@ -55,6 +72,16 @@ describe('extractVerificationCode', () => {
     ).toBeNull()
   })
 
+  it.each(['© 2026', 'Copyright 2026'])(
+    'ignores a footer year while still accepting the same digits as a code: %s',
+    (footer) => {
+      expect(extractVerificationCode(footer, 'Verify your email')).toBeNull()
+      expect(
+        extractVerificationCode(`Your verification code: 2026\n${footer}`)
+      ).toBe('2026')
+    }
+  )
+
   it.each(['CA 94107', 'NY 10001', 'CA94107'])(
     'ignores a city/state/ZIP address near verification language: %s',
     (address) => {
@@ -81,17 +108,17 @@ describe('extractVerificationCode', () => {
     ).toBe('213456')
   })
 
-  it('does not combine the word code with four digits to make an eight-character code', () => {
+  it('keeps the word code separate from a four-digit code', () => {
     expect(
       extractVerificationCode('Your code 1234', 'Your verification code')
-    ).toBeNull()
+    ).toBe('1234')
     expect(
       extractVerificationCode('Your CODE 1234', 'Your verification code')
-    ).toBeNull()
+    ).toBe('1234')
   })
 
-  it('handles every whitespace partition of 6, 7 and 8 numeric characters', () => {
-    for (const code of ['001234', '0123456', '12345678']) {
+  it('handles every whitespace partition of 4–8 numeric characters', () => {
+    for (const code of ['0012', '01234', '001234', '0123456', '12345678']) {
       for (let partition = 0; partition < 2 ** (code.length - 1); partition++) {
         const formatted = [...code]
           .map((character, index) => {
@@ -110,6 +137,11 @@ describe('extractVerificationCode', () => {
   })
 
   it('does not append ordinary prose to a complete code', () => {
+    expect(
+      extractVerificationCode(
+        'Your verification code: 2222 Next step is login.'
+      )
+    ).toBe('2222')
     expect(extractVerificationCode('Your verification code: 123456.')).toBe(
       '123456'
     )
@@ -126,7 +158,9 @@ describe('extractVerificationCode', () => {
     'Your verification code expires in 10 minutes.',
     'Your verification code should arrive soon.',
     'Your verification code\nArrives tomorrow.',
-    'Your verification code: 12345',
+    'Your verification code: 123',
+    'Your verification code: ABCD',
+    'Your verification code: A1234',
     'Your verification code: 123456789',
     'Your verification code: a123456789z',
     'Your verification code: 1 2 3 4 5 6 7 8 9',
@@ -154,8 +188,11 @@ describe('extractSmsVerificationCode', () => {
     expect(extractSmsVerificationCode(text)).toBe(code)
   })
 
-  it('keeps the stricter email rules for short and letter-only codes', () => {
+  it('requires authentication context for email and keeps its letter-only and sender-prefix rules', () => {
     expect(extractVerificationCode('Your Uber code: 1234.')).toBeNull()
+    expect(
+      extractVerificationCode('Your Uber code: 1234.', 'Verify your email')
+    ).toBe('1234')
     expect(extractVerificationCode('Your code: PLATBA', 'Sign in')).toBe(
       'PLATBA'
     )

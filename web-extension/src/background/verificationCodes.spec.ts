@@ -213,6 +213,25 @@ afterEach(() => {
 })
 
 describe('verification code background messages', () => {
+  it.each(['2222', '01234'])(
+    'accepts and stores a short numeric Gmail code: %s',
+    async (code) => {
+      expect(await report(code)).toBe(true)
+      expect(await list()).toEqual([
+        expect.objectContaining({ ...candidate, code })
+      ])
+      expect(setBadgeText).toHaveBeenLastCalledWith({ text: '•' })
+    }
+  )
+
+  it.each(['123', 'ABCD', 'A1234', '123456789'])(
+    'rejects a Gmail code outside the supported formats: %s',
+    async (code) => {
+      expect(await report(code)).toBeNull()
+      expect(await list()).toEqual([])
+    }
+  )
+
   it('accepts a background Gmail tab, badges it, and returns only acknowledgement to the content script', async () => {
     expect(await report()).toBe(true)
     const entries = await list()

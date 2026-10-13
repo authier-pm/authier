@@ -10,18 +10,21 @@ import {
   gmailUnreadVerificationEmail
 } from '../fixtures/gmailVerificationEmail'
 import { gmailCloudflareEmailRouting } from '../fixtures/cloudflareEmailRouting'
+import { gmailBazoomVerificationEmail } from '../fixtures/bazoomVerificationEmail'
 import {
   CodePopupToolbar,
   useCodePreviewBackground
 } from './codePreviewBackground'
 
 export const EmailVerificationCodesPreview = () => {
-  const isEmailRouting = new URLSearchParams(window.location.search).has(
-    'email-routing'
-  )
-  const [email, setEmail] = useState(
-    isEmailRouting ? gmailCloudflareEmailRouting : gmailVerificationEmail
-  )
+  const params = new URLSearchParams(window.location.search)
+  const isEmailRouting = params.has('email-routing')
+  const isBazoom = params.has('bazoom')
+  const [email, setEmail] = useState(() => {
+    if (isEmailRouting) return gmailCloudflareEmailRouting
+    if (isBazoom) return gmailBazoomVerificationEmail
+    return gmailVerificationEmail
+  })
   const ready = useCodePreviewBackground({
     reportUrl: 'https://mail.google.com/mail/u/0/#inbox',
     reportTabId: 42,

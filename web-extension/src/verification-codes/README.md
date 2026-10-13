@@ -29,7 +29,7 @@ nonbreaking spaces, dashes, soft hyphens and zero-width formatting, and reassemb
 characters/groups split across spans, cells or lines. Codes must sit near
 authentication language.
 
-- **Email** codes have 6–8 numeric or alphanumeric characters. Uppercase letter-only
+- **Email** codes have 4–8 digits or 6–8 alphanumeric characters. Uppercase letter-only
   codes are supported; mixed/lowercase letter-only codes require an explicit
   `verification code:`-style label or a standalone line immediately below it.
 - **SMS** codes have 4–8 characters and always contain a digit (4–5 character codes
@@ -44,6 +44,7 @@ merge, so `1 234 CZK` or `je 474230` stay separate.
 Email detection also skips state/ZIP fragments in comma-separated postal addresses,
 so a footer such as `101 Townsend Street, San Francisco, CA 94107` cannot supply
 `CA94107` to a link-only verification email.
+Copyright years such as `© 2026` are excluded as well.
 `android-app/.../SmsCodeExtractor.kt` ports the SMS format. Both implementations are
 tested against `shared/smsVerificationCodeVectors.json`; add cases there.
 

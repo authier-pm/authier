@@ -76,7 +76,7 @@ const ordinaryWords = new Set([
   'WELCOME'
 ])
 
-/** Emails use 6–8 characters. SMS codes are 4–8 characters with at least one digit. */
+/** Emails use 4–8 digits or 6–8 characters. SMS codes contain at least one digit. */
 export type VerificationCodeFormat = 'email' | 'sms'
 
 const normalizeMessageText = (text: string) =>
@@ -112,7 +112,13 @@ const endsGroup = (
   if (/^\s+$/.test(separator)) {
     // A complete numeric code followed by prose must stay separate. Numeric
     // groups can have any length, including an uneven split such as 12345 678.
-    if (/^\d{6,8}$/.test(code) && wordPattern.test(next)) return true
+    // Short numeric groups may still precede uppercase code fragments (1234 AB).
+    if (
+      /^\d{4,8}$/.test(code) &&
+      wordPattern.test(next) &&
+      (code.length >= 6 || !/^[A-Z]{2,4}$/.test(next))
+    )
+      return true
     // Short SMS words ("je", "CZK") must never join an adjacent number.
     if (
       format === 'sms' &&
@@ -169,9 +175,14 @@ const isPostalAddress = (text: string, { start, end }: CodeCandidate) =>
     text.slice(Math.max(0, start - 120), start)
   )
 
+const isCopyrightYear = (text: string, { code, start }: CodeCandidate) =>
+  /^\d{4}$/.test(code) &&
+  /(?:©|\bcopyright\b)\s*$/i.test(text.slice(Math.max(0, start - 20), start))
+
 const hasValidLength = (code: string, format: VerificationCodeFormat) => {
   if (!/^[a-zA-Z0-9]+$/.test(code)) return false
-  if (format === 'email') return code.length >= 6 && code.length <= 8
+  if (format === 'email')
+    return /^\d{4,8}$/.test(code) || (code.length >= 6 && code.length <= 8)
   if (!/\d/.test(code)) return false
   return code.length >= 6
     ? code.length <= 8
@@ -195,7 +206,8 @@ const getCandidates = (
       ordinaryWords.has(candidate.code.toUpperCase()) ||
       !hasCodeBoundaries(text, candidate, format) ||
       isAmountOrCard(text, candidate) ||
-      (format === 'email' && isPostalAddress(text, candidate))
+      (format === 'email' &&
+        (isPostalAddress(text, candidate) || isCopyrightYear(text, candidate)))
     )
       return
     const prefix = text.slice(

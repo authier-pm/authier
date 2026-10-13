@@ -38,6 +38,11 @@ The same suite verifies that its footer postal address does not become a code,
 that the popup and badge stay clear, and that a later genuine code still appears.
 It captures `docs/screenshots/cloudflare-email-routing-no-code.png`.
 
+Add `&bazoom=1` to reproduce the reported Bazoom email with its four-digit `2222`
+code and `Gade 2F` postal footer. The same suite verifies detection, masking,
+copying and badge clearing, and captures
+`docs/screenshots/bazoom-email-verification-code.png`.
+
 The `inline-verification-codes` scenario recreates Shopify's six separate code
 inputs with React-controlled values and runs the production inline picker, fill
 helper, and background handler. The Authier logo opens masked choices on click;

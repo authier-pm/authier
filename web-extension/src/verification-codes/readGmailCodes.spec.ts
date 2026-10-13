@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { webcrypto } from 'node:crypto'
+import { gmailBazoomVerificationEmail } from '../../ui-preview/fixtures/bazoomVerificationEmail'
 import { gmailCloudflareEmailRouting } from '../../ui-preview/fixtures/cloudflareEmailRouting'
 import {
   formattedEmailCodeBodies,
@@ -24,6 +25,13 @@ describe('Gmail email code detection', () => {
   it('pairs an opened email code with its sender, even in a background tab', () => {
     expect(readGmailCodes(document)).toEqual([
       { provider: 'Gmail', sender: 'someone@example.com', code: '213456' }
+    ])
+  })
+
+  it('reports the four-digit Bazoom code instead of the Gade 2F footer fragment', () => {
+    document.body.innerHTML = gmailBazoomVerificationEmail
+    expect(readGmailCodes(document)).toEqual([
+      { provider: 'Gmail', sender: 'info@bazoom.com', code: '2222' }
     ])
   })
 

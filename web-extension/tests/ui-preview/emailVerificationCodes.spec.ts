@@ -19,6 +19,30 @@ test.beforeEach(async ({ page }) => {
   )
 })
 
+test('copies the four-digit Bazoom code instead of its postal footer', async ({
+  page
+}) => {
+  await page.goto('/?scenario=email-verification-codes&bazoom=1')
+  const popup = page.locator('[data-preview-popup]')
+  await expect(page.locator('[data-gmail-fixture]')).toContainText('Gade 2F')
+  await expect(popup.getByText('2***', { exact: true })).toBeVisible()
+  await expect(popup.getByText('Gade2F', { exact: true })).toHaveCount(0)
+  await expect(page.getByLabel('New email verification code')).toBeVisible()
+  await popup
+    .getByRole('button', {
+      name: 'Copy Gmail verification code from info@bazoom.com'
+    })
+    .click()
+  await expect(popup.getByText('2222', { exact: true })).toBeVisible()
+  await expect(popup.getByRole('status')).toHaveText('Copied to clipboard')
+  expect(await page.evaluate(() => navigator.clipboard.readText())).toBe('2222')
+  await expect(page.getByLabel('New email verification code')).toHaveCount(0)
+  await page.screenshot({
+    path: '../docs/screenshots/bazoom-email-verification-code.png',
+    fullPage: true
+  })
+})
+
 test('keeps the popup and badge clear for a link-only Cloudflare Email Routing email', async ({
   page
 }) => {
