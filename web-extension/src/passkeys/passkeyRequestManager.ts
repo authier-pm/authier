@@ -7,10 +7,14 @@ import {
   getUnsupportedPasskeyReason,
   passkeyMatchesRequest,
   requestOptionsSchema,
-  validateRpId,
   type PasskeyCreationOptions,
   type PasskeyRequestOptions
 } from './webauthn'
+import {
+  authorizePasskeyOrigin,
+  parseRpId,
+  type PasskeyOrigin
+} from './relyingParty'
 import type { PasskeyApprovalView, PasskeyReply } from './passkeyApprovalTypes'
 
 export interface PasskeySender {
@@ -49,6 +53,7 @@ type PendingRequest = RequestOptions & {
   windowTitle?: string
   url: string
   origin: string
+  authenticatorOrigin: PasskeyOrigin
   rpId: string
   identity: string
   session: object | null
@@ -118,7 +123,7 @@ export class PasskeyRequestManager {
             operation: 'get',
             options: requestOptionsSchema.parse(request.options)
           }
-    const rpId = validateRpId(
+    const rpId = parseRpId(
       parsed.operation === 'create'
         ? parsed.options.rp.id
         : parsed.options.rpId,
@@ -145,6 +150,7 @@ export class PasskeyRequestManager {
         windowTitle,
         url,
         origin,
+        authenticatorOrigin: origin,
         rpId,
         identity: '',
         session: null,
@@ -179,6 +185,11 @@ export class PasskeyRequestManager {
     }
     pending.identity = identity
     await this.assertCurrent(pending)
+    pending.authenticatorOrigin = await authorizePasskeyOrigin(
+      pending.rpId,
+      pending.origin
+    )
+    await this.assertCurrent(pending)
     if (pending.operation === 'create') {
       const session = this.repository.session()
       if (session && (await this.repository.allowUnlockedCreation())) {
@@ -192,7 +203,11 @@ export class PasskeyRequestManager {
     }
     if (pending.operation === 'get' && this.repository.session()) {
       const matches = (await this.repository.list()).some((passkey) =>
-        passkeyMatchesRequest(passkey, pending.options, pending.origin)
+        passkeyMatchesRequest(
+          passkey,
+          pending.options,
+          pending.authenticatorOrigin
+        )
       )
       await this.assertCurrent(pending)
       if (!matches) {
@@ -276,7 +291,11 @@ export class PasskeyRequestManager {
       if (verified) {
         accounts = passkeys
           .filter((passkey) =>
-            passkeyMatchesRequest(passkey, pending.options, pending.origin)
+            passkeyMatchesRequest(
+              passkey,
+              pending.options,
+              pending.authenticatorOrigin
+            )
           )
           .map(({ credentialId, userName, userDisplayName }) => ({
             credentialId,
@@ -360,10 +379,14 @@ export class PasskeyRequestManager {
           'The vault was locked or verification expired. Please try again.'
         )
       if (pending.operation === 'create') {
-        assertNoExcludedPasskey(passkeys, pending.options, pending.origin)
+        assertNoExcludedPasskey(
+          passkeys,
+          pending.options,
+          pending.authenticatorOrigin
+        )
         const result = await createPasskey(
           pending.options,
-          pending.origin,
+          pending.authenticatorOrigin,
           // The device's opt-in policy accepts its unlocked session as verification for creation.
           true,
           pending.windowTitle
@@ -388,13 +411,17 @@ export class PasskeyRequestManager {
         const passkey = passkeys.find(
           (item) =>
             item.credentialId === credentialId &&
-            passkeyMatchesRequest(item, pending.options, pending.origin)
+            passkeyMatchesRequest(
+              item,
+              pending.options,
+              pending.authenticatorOrigin
+            )
         )
         if (!passkey) throw denied('Choose a passkey for this website.')
         const credential = await getPasskeyAssertion(
           passkey,
           pending.options,
-          pending.origin,
+          pending.authenticatorOrigin,
           true
         )
         await this.assertCurrent(pending)

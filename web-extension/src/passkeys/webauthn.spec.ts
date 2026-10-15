@@ -404,6 +404,31 @@ describe('software authenticator', () => {
     ).toBe(-7)
   })
 
+  it.each([{}, { eval: { first: 'TWV0YVBhc3NrZXlTdGF0aWNQcmZJbnB1dFYx' } }])(
+    'creates without PRF support when registration requests optional PRF %j',
+    async (prf) => {
+      const options = creationOptions()
+      options.extensions = { credProps: true, prf }
+      const { credential } = await createPasskey(options, origin, true)
+      expect(credential.clientExtensionResults).toEqual({
+        credProps: { rk: true },
+        prf: { enabled: false }
+      })
+      expect(
+        getUnsupportedPasskeyReason({ challenge, extensions: { prf } }, 'get')
+      ).toBeTruthy()
+    }
+  )
+
+  it('does not accept authentication-only PRF parameters during creation', () => {
+    expect(
+      getUnsupportedPasskeyReason(
+        { ...creationOptions(), extensions: { prf: { evalByCredential: {} } } },
+        'create'
+      )
+    ).toBeTruthy()
+  })
+
   it('rejects algorithms and mandatory features that need a native authenticator', async () => {
     const unsupported = creationOptions()
     unsupported.pubKeyCredParams = [{ type: 'public-key', alg: -257 }]

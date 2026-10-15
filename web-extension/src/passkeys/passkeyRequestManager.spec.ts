@@ -38,6 +38,10 @@ const start = () =>
 
 beforeEach(() => {
   vi.stubGlobal('crypto', webcrypto)
+  vi.stubGlobal(
+    'fetch',
+    vi.fn(async () => Response.json({ origins: [] }))
+  )
   session = {}
   passkeys = []
   token = ''
@@ -88,6 +92,109 @@ const deferred = <T>() => {
 }
 
 describe('trusted passkey ceremonies', () => {
+  it('creates a Facebook-style passkey with related origin authorization and optional PRF', async () => {
+    const origin = 'https://accountscenter.facebook.com'
+    const facebook = { ...website, url: `${origin}/passkey/management` }
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue(Response.json({ origins: [origin] }))
+    )
+    const result = manager.begin(
+      {
+        requestId: 'facebook',
+        operation: 'create',
+        options: {
+          ...options,
+          rp: { id: 'accounts.meta.com', name: 'Meta' },
+          pubKeyCredParams: [
+            { type: 'public-key', alg: -7 },
+            { type: 'public-key', alg: -257 },
+            { type: 'public-key', alg: -8 }
+          ],
+          authenticatorSelection: {
+            residentKey: 'preferred',
+            userVerification: 'required'
+          },
+          extensions: {
+            prf: { eval: { first: 'TWV0YVBhc3NrZXlTdGF0aWNQcmZJbnB1dFYx' } }
+          },
+          timeout: 600_000
+        }
+      },
+      facebook
+    )
+    await opened()
+    expect(await manager.view(token, approval())).toMatchObject({
+      origin,
+      rpId: 'accounts.meta.com'
+    })
+    await manager.verify(token, 'correct', approval())
+    await manager.approve(token, undefined, approval())
+    const reply = await result
+    if (reply.status !== 'ok') throw new Error('Expected a created credential')
+    expect(reply.credential.clientExtensionResults).toEqual({
+      prf: { enabled: false }
+    })
+    expect(
+      JSON.parse(
+        new TextDecoder().decode(
+          fromBase64url(reply.credential.response.clientDataJSON)
+        )
+      )
+    ).toMatchObject({ origin, crossOrigin: false })
+    expect(passkeys[0]).toMatchObject({
+      rpId: 'accounts.meta.com',
+      url: origin
+    })
+    expect(fetch).toHaveBeenCalledTimes(1)
+
+    // A new ceremony checks authorization again, then offers and signs the same credential.
+    token = ''
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue(Response.json({ origins: [origin] }))
+    )
+    const assertion = manager.begin(
+      {
+        requestId: 'facebook-sign-in',
+        operation: 'get',
+        options: { challenge: options.challenge, rpId: 'accounts.meta.com' }
+      },
+      facebook
+    )
+    await opened()
+    await manager.verify(token, 'correct', approval())
+    expect((await manager.view(token, approval())).accounts).toHaveLength(1)
+    await manager.approve(token, reply.credential.id, approval())
+    expect(await assertion).toMatchObject({
+      status: 'ok',
+      credential: { id: reply.credential.id }
+    })
+    expect(fetch).toHaveBeenCalledTimes(1)
+  })
+
+  it('cancels while checking a related origin without opening approval', async () => {
+    const lookup = deferred<Response>()
+    const fetchDocument = vi.fn(() => lookup.promise)
+    vi.stubGlobal('fetch', fetchDocument)
+    const request = {
+      requestId: 'related',
+      operation: 'create' as const,
+      options: { ...options, rp: { id: 'accounts.meta.com', name: 'Meta' } }
+    }
+    const result = manager.begin(request, website)
+    await vi.waitFor(() => expect(fetchDocument).toHaveBeenCalled())
+    await expect(
+      manager.begin({ ...request, requestId: 'duplicate' }, website)
+    ).rejects.toThrow('already open')
+    manager.cancel('related', website)
+    lookup.resolve(Response.json({ origins: ['https://example.com'] }))
+    expect(await result).toMatchObject({ status: 'error' })
+    await new Promise((resolve) => setTimeout(resolve, 0))
+    expect(windows.open).not.toHaveBeenCalled()
+    expect(repository.save).not.toHaveBeenCalled()
+  })
+
   it('creates with UV set after explicit approval when this device allows an unlocked vault', async () => {
     repository.allowUnlockedCreation = async () => true
     const result = start()
@@ -235,7 +342,8 @@ describe('trusted passkey ceremonies', () => {
         { requestId: 'x', operation: 'create', options },
         { ...website, url: 'https://evil.example.net/' }
       )
-    ).rejects.toThrow('domain')
+    ).resolves.toMatchObject({ status: 'error', name: 'SecurityError' })
+    expect(windows.open).not.toHaveBeenCalled()
     const result = start()
     await opened()
     await expect(manager.verify(token, 'correct', website)).rejects.toThrow(

@@ -10,166 +10,130 @@ import {
 
 // Requires generateManifest + prodBuild first. All network traffic is intercepted;
 // the test never contacts a real Authier backend or database.
-test('built extension approves Google-shaped sign-in under nonce CSP after restoring an encrypted passkey', async ({}, testInfo) => {
-  const context = await chromium.launchPersistentContext(
-    testInfo.outputPath('profile'),
-    {
-      channel: 'chromium',
-      executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH,
-      headless: true,
-      args: [
-        `--disable-extensions-except=${resolve('dist')}`,
-        `--load-extension=${resolve('dist')}`
-      ]
-    }
-  )
-  const errors: string[] = []
-  context.on('weberror', (error) => errors.push(error.error().message))
-  type StoredSecret = {
-    id: string
-    kind: string
-    encrypted: string
-    version: number
-    createdAt: string
-    updatedAt: null
+for (const scenario of [
+  {
+    name: 'localhost',
+    origin: 'http://localhost:9988',
+    rpId: 'localhost',
+    prf: false,
+    appid: ''
+  },
+  {
+    name: 'Facebook related origin with optional PRF',
+    origin: 'https://accountscenter.facebook.com',
+    rpId: 'accounts.meta.com',
+    prf: true,
+    appid: ''
+  },
+  {
+    name: 'Google sign-in with legacy AppID under nonce CSP',
+    origin: 'https://accounts.google.com',
+    rpId: 'google.com',
+    prf: false,
+    appid: 'https://www.gstatic.com/securitykey/origins.json'
   }
-  const stored: StoredSecret[] = []
-  await context.route('**/*', async (route) => {
-    const url = new URL(route.request().url())
-    if (url.protocol === 'chrome-extension:') return route.continue()
-    if (url.hostname === 'accounts.google.com')
-      return route.fulfill({
-        contentType: 'text/html',
-        headers: {
-          'Content-Security-Policy':
-            "default-src 'none'; script-src 'nonce-passkey-test' 'unsafe-inline'"
-        },
-        body: '<!doctype html><title>Passkey test</title><h1>Mock Google passkey flow</h1>'
-      })
-    const payload = route.request().postDataJSON() as {
-      operationName?: string
-      variables?: { secrets?: { kind: string; encrypted: string }[] }
-    } | null
-    if (payload?.operationName === 'addEncryptedSecrets') {
-      for (const secret of payload.variables?.secrets ?? [])
-        stored.push({
-          ...secret,
-          id: crypto.randomUUID(),
-          version: 1,
-          createdAt: new Date().toISOString(),
-          updatedAt: null
+]) {
+  test(`built extension saves and restores a passkey: ${scenario.name}`, async ({}, testInfo) => {
+    const context = await chromium.launchPersistentContext(
+      testInfo.outputPath('profile'),
+      {
+        channel: 'chromium',
+        executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH,
+        headless: true,
+        args: [
+          `--disable-extensions-except=${resolve('dist')}`,
+          `--load-extension=${resolve('dist')}`
+        ]
+      }
+    )
+    const errors: string[] = []
+    context.on('weberror', (error) => errors.push(error.error().message))
+    type StoredSecret = {
+      id: string
+      kind: string
+      encrypted: string
+      version: number
+      createdAt: string
+      updatedAt: null
+    }
+    const stored: StoredSecret[] = []
+    await context.route('**/*', async (route) => {
+      const url = new URL(route.request().url())
+      if (url.protocol === 'chrome-extension:') return route.continue()
+      if (
+        url.origin === `https://${scenario.rpId}` &&
+        url.pathname === '/.well-known/webauthn'
+      )
+        return route.fulfill({
+          contentType: 'application/json',
+          json: { origins: [scenario.origin] }
         })
+      if (url.origin === scenario.origin)
+        return route.fulfill({
+          contentType: 'text/html',
+          headers: {
+            'Content-Security-Policy':
+              "default-src 'none'; script-src 'nonce-passkey-test' 'unsafe-inline'"
+          },
+          body: '<!doctype html><title>Passkey test</title><h1>Passkey test website</h1>'
+        })
+      const payload = route.request().postDataJSON() as {
+        operationName?: string
+        variables?: { secrets?: { kind: string; encrypted: string }[] }
+      } | null
+      if (payload?.operationName === 'addEncryptedSecrets') {
+        for (const secret of payload.variables?.secrets ?? [])
+          stored.push({
+            ...secret,
+            id: crypto.randomUUID(),
+            version: 1,
+            createdAt: new Date().toISOString(),
+            updatedAt: null
+          })
+        return route.fulfill({
+          contentType: 'application/json',
+          json: {
+            data: {
+              me: { __typename: 'UserMutation', addEncryptedSecrets: stored }
+            }
+          }
+        })
+      }
       return route.fulfill({
         contentType: 'application/json',
-        json: {
-          data: {
-            me: { __typename: 'UserMutation', addEncryptedSecrets: stored }
-          }
-        }
+        json: { data: {} }
       })
-    }
-    return route.fulfill({
-      contentType: 'application/json',
-      json: { data: {} }
     })
-  })
-  try {
-    const worker =
-      context.serviceWorkers()[0] ??
-      (await context.waitForEvent('serviceworker'))
-    const extensionId = new URL(worker.url()).hostname
-    const password = 'test-master-password-only'
-    const salt = crypto.getRandomValues(new Uint8Array(16))
-    const key = await generateEncryptionKey(password, salt)
-    const auth = await initLocalDeviceAuthSecret(key, salt)
-    const snapshot = {
-      email: 'alex@example.com',
-      userId: 'test-user',
-      deviceName: 'Test browser',
-      secrets: [],
-      encryptionSalt: bufferToBase64(salt),
-      authSecretEncrypted: auth.addDeviceSecretEncrypted,
-      authSecret: auth.addDeviceSecret,
-      masterEncryptionKey: await cryptoKeyToString(key),
-      vaultLockTimeoutSeconds: 3600,
-      syncTOTP: false,
-      autofillCredentialsEnabled: false,
-      autofillTOTPEnabled: false,
-      autofillForbiddenUrlPatterns: '',
-      uiLanguage: 'en',
-      theme: 'dark',
-      notificationOnVaultUnlock: false,
-      notificationOnWrongPasswordAttempts: 0
-    }
-    // Wait until the built worker is listening, then seed only this disposable profile.
-    await worker.evaluate(async (state) => {
-      const tokenPayload = btoa(
-        JSON.stringify({
-          exp: Math.floor(Date.now() / 1000) + 3600,
-          userId: 'test-user'
-        })
-      )
-      await chrome.storage.session.set({
-        backgroundState: state,
-        'access-token': `e30.${tokenPayload}.test-only`
-      })
-    }, snapshot)
-    const site = await context.newPage()
-    // This origin is fulfilled locally above; no Google account is contacted.
-    await site.goto('https://accounts.google.com/v3/signin/challenge/pk')
-    const popupPromise = context.waitForEvent('page', { timeout: 10_000 })
-    const registration = site.evaluate(async () => {
-      const credential = (await navigator.credentials.create({
-        publicKey: {
-          challenge: new TextEncoder().encode('registration challenge'),
-          rp: { id: 'google.com', name: 'Google' },
-          user: {
-            id: new TextEncoder().encode('user-1'),
-            name: 'alex@example.com',
-            displayName: 'Alex'
-          },
-          pubKeyCredParams: [{ type: 'public-key', alg: -7 }],
-          authenticatorSelection: {
-            residentKey: 'required',
-            userVerification: 'required'
-          },
-          timeout: 50_000
-        }
-      })) as PublicKeyCredential
-      return {
-        id: credential.id,
-        type: credential.type,
-        publicKey: Array.from(
-          new Uint8Array(
-            (
-              credential.response as AuthenticatorAttestationResponse
-            ).getPublicKey()!
-          )
-        ),
-        json: credential.toJSON()
+    try {
+      const worker =
+        context.serviceWorkers()[0] ??
+        (await context.waitForEvent('serviceworker'))
+      const extensionId = new URL(worker.url()).hostname
+      const password = 'test-master-password-only'
+      const salt = crypto.getRandomValues(new Uint8Array(16))
+      const key = await generateEncryptionKey(password, salt)
+      const auth = await initLocalDeviceAuthSecret(key, salt)
+      const snapshot = {
+        email: 'alex@example.com',
+        userId: 'test-user',
+        deviceName: 'Test browser',
+        secrets: [],
+        encryptionSalt: bufferToBase64(salt),
+        authSecretEncrypted: auth.addDeviceSecretEncrypted,
+        authSecret: auth.addDeviceSecret,
+        masterEncryptionKey: await cryptoKeyToString(key),
+        vaultLockTimeoutSeconds: 3600,
+        syncTOTP: false,
+        autofillCredentialsEnabled: false,
+        autofillTOTPEnabled: false,
+        autofillForbiddenUrlPatterns: '',
+        uiLanguage: 'en',
+        theme: 'dark',
+        notificationOnVaultUnlock: false,
+        notificationOnWrongPasswordAttempts: 0
       }
-    })
-    void registration.catch(() => undefined)
-    const popup = await popupPromise
-    await popup.waitForURL('**/js/passkey.html?*')
-    await popup.getByLabel('Master password').fill(password)
-    await popup.getByRole('button', { name: 'Continue', exact: true }).click()
-    await expect(
-      popup.getByText('alex@example.com', { exact: true })
-    ).toBeVisible()
-    await popup
-      .getByRole('button', { name: 'Save passkey', exact: true })
-      .click()
-    const registered = await registration
-    expect(registered.type).toBe('public-key')
-    expect(stored).toHaveLength(1)
-    expect(stored[0].kind).toBe('PASSKEY')
-    expect(stored[0].encrypted).not.toContain('privateKey')
-    expect(JSON.stringify(registered.json)).not.toContain('privateKey')
-
-    // Simulate syncing the ciphertext to a fresh vault session, not a new enrollment.
-    await worker.evaluate(
-      async (state) => {
+      // Wait until the built worker is listening, then seed only this disposable profile.
+      await worker.evaluate(async (state) => {
         const tokenPayload = btoa(
           JSON.stringify({
             exp: Math.floor(Date.now() / 1000) + 3600,
@@ -180,83 +144,171 @@ test('built extension approves Google-shaped sign-in under nonce CSP after resto
           backgroundState: state,
           'access-token': `e30.${tokenPayload}.test-only`
         })
-      },
-      { ...snapshot, secrets: stored }
-    )
-    await site.bringToFront()
-    const assertionPopupPromise = context.waitForEvent('page', {
-      timeout: 10_000
-    })
-    const assertion = site.evaluate(async () => {
-      const credential = (await navigator.credentials.get({
-        publicKey: {
-          challenge: new TextEncoder().encode('fresh authentication challenge'),
-          rpId: 'google.com',
-          userVerification: 'required',
-          extensions: {
-            appid: 'https://www.gstatic.com/securitykey/origins.json'
-          },
-          timeout: 50_000
+      }, snapshot)
+      const site = await context.newPage()
+      await site.goto(`${scenario.origin}/`)
+      const popupPromise = context.waitForEvent('page', { timeout: 10_000 })
+      const registration = site.evaluate(async (scenario) => {
+        const credential = (await navigator.credentials.create({
+          publicKey: {
+            challenge: new TextEncoder().encode('registration challenge'),
+            rp: { id: scenario.rpId, name: 'Test website' },
+            user: {
+              id: new TextEncoder().encode('user-1'),
+              name: 'alex@example.com',
+              displayName: 'Alex'
+            },
+            pubKeyCredParams: [{ type: 'public-key', alg: -7 }],
+            authenticatorSelection: {
+              residentKey: 'required',
+              userVerification: 'required'
+            },
+            extensions: scenario.prf
+              ? {
+                  prf: {
+                    eval: {
+                      first: new TextEncoder().encode(
+                        'MetaPasskeyStaticPrfInputV1'
+                      )
+                    }
+                  }
+                }
+              : {},
+            timeout: 50_000
+          }
+        })) as PublicKeyCredential
+        return {
+          id: credential.id,
+          type: credential.type,
+          publicKey: Array.from(
+            new Uint8Array(
+              (
+                credential.response as AuthenticatorAttestationResponse
+              ).getPublicKey()!
+            )
+          ),
+          json: credential.toJSON(),
+          extensions: credential.getClientExtensionResults(),
+          clientData: JSON.parse(
+            new TextDecoder().decode(credential.response.clientDataJSON)
+          )
         }
-      })) as PublicKeyCredential
-      const response = credential.response as AuthenticatorAssertionResponse
-      return {
-        id: credential.id,
-        json: credential.toJSON(),
-        extensions: credential.getClientExtensionResults(),
-        authenticatorData: Array.from(
-          new Uint8Array(response.authenticatorData)
-        ),
-        clientDataJSON: Array.from(new Uint8Array(response.clientDataJSON)),
-        signature: Array.from(new Uint8Array(response.signature))
-      }
-    })
-    void assertion.catch(() => undefined)
-    const assertionPopup = await assertionPopupPromise
-    await assertionPopup.waitForURL('**/js/passkey.html?*')
-    await assertionPopup.getByLabel('Master password').fill(password)
-    await assertionPopup
-      .getByRole('button', { name: 'Continue', exact: true })
-      .click()
-    await assertionPopup
-      .getByRole('button', { name: 'Sign in', exact: true })
-      .click()
-    const signed = await assertion
-    expect(signed.id).toBe(registered.id)
-    expect(signed.extensions).toEqual({ appid: false })
-    const authenticatorData = Buffer.from(signed.authenticatorData)
-    const clientDataJSON = Buffer.from(signed.clientDataJSON)
-    expect(authenticatorData.subarray(0, 32)).toEqual(
-      createHash('sha256').update('google.com').digest()
-    )
-    expect(authenticatorData[32]).toBe(0x1d)
-    expect(JSON.parse(clientDataJSON.toString())).toMatchObject({
-      type: 'webauthn.get',
-      origin: 'https://accounts.google.com',
-      challenge: Buffer.from('fresh authentication challenge').toString(
-        'base64url'
+      }, scenario)
+      void registration.catch(() => undefined)
+      const popup = await popupPromise
+      await popup.waitForURL('**/js/passkey.html?*')
+      await popup.getByLabel('Master password').fill(password)
+      await popup.getByRole('button', { name: 'Continue', exact: true }).click()
+      await expect(
+        popup.getByText('alex@example.com', { exact: true })
+      ).toBeVisible()
+      await popup
+        .getByRole('button', { name: 'Save passkey', exact: true })
+        .click()
+      const registered = await registration
+      expect(registered.type).toBe('public-key')
+      expect(registered.clientData).toMatchObject({
+        origin: scenario.origin,
+        crossOrigin: false
+      })
+      if (scenario.prf)
+        expect(registered.extensions).toEqual({ prf: { enabled: false } })
+      expect(stored).toHaveLength(1)
+      expect(stored[0].kind).toBe('PASSKEY')
+      expect(stored[0].encrypted).not.toContain('privateKey')
+      expect(JSON.stringify(registered.json)).not.toContain('privateKey')
+
+      // Simulate syncing the ciphertext to a fresh vault session, not a new enrollment.
+      await worker.evaluate(
+        async (state) => {
+          const tokenPayload = btoa(
+            JSON.stringify({
+              exp: Math.floor(Date.now() / 1000) + 3600,
+              userId: 'test-user'
+            })
+          )
+          await chrome.storage.session.set({
+            backgroundState: state,
+            'access-token': `e30.${tokenPayload}.test-only`
+          })
+        },
+        { ...snapshot, secrets: stored }
       )
-    })
-    expect(
-      verify(
-        'sha256',
-        Buffer.concat([
-          authenticatorData,
-          createHash('sha256').update(clientDataJSON).digest()
-        ]),
-        createPublicKey({
-          key: Buffer.from(registered.publicKey),
-          format: 'der',
-          type: 'spki'
-        }),
-        Buffer.from(signed.signature)
+      await site.bringToFront()
+      const assertionPopupPromise = context.waitForEvent('page', {
+        timeout: 10_000
+      })
+      const assertion = site.evaluate(async (scenario) => {
+        const credential = (await navigator.credentials.get({
+          publicKey: {
+            challenge: new TextEncoder().encode(
+              'fresh authentication challenge'
+            ),
+            rpId: scenario.rpId,
+            extensions: scenario.appid ? { appid: scenario.appid } : {},
+            userVerification: 'required',
+            timeout: 50_000
+          }
+        })) as PublicKeyCredential
+        const response = credential.response as AuthenticatorAssertionResponse
+        return {
+          id: credential.id,
+          json: credential.toJSON(),
+          extensions: credential.getClientExtensionResults(),
+          authenticatorData: Array.from(
+            new Uint8Array(response.authenticatorData)
+          ),
+          clientDataJSON: Array.from(new Uint8Array(response.clientDataJSON)),
+          signature: Array.from(new Uint8Array(response.signature))
+        }
+      }, scenario)
+      void assertion.catch(() => undefined)
+      const assertionPopup = await assertionPopupPromise
+      await assertionPopup.waitForURL('**/js/passkey.html?*')
+      await assertionPopup.getByLabel('Master password').fill(password)
+      await assertionPopup
+        .getByRole('button', { name: 'Continue', exact: true })
+        .click()
+      await assertionPopup
+        .getByRole('button', { name: 'Sign in', exact: true })
+        .click()
+      const signed = await assertion
+      expect(signed.id).toBe(registered.id)
+      expect(signed.extensions).toEqual(scenario.appid ? { appid: false } : {})
+      const authenticatorData = Buffer.from(signed.authenticatorData)
+      const clientDataJSON = Buffer.from(signed.clientDataJSON)
+      expect(authenticatorData.subarray(0, 32)).toEqual(
+        createHash('sha256').update(scenario.rpId).digest()
       )
-    ).toBe(true)
-    expect(stored).toHaveLength(1)
-    expect(JSON.stringify(signed.json)).not.toContain('privateKey')
-    expect(extensionId).toHaveLength(32)
-    expect(errors).toEqual([])
-  } finally {
-    await context.close()
-  }
-})
+      expect(authenticatorData[32]).toBe(0x1d)
+      expect(JSON.parse(clientDataJSON.toString())).toMatchObject({
+        type: 'webauthn.get',
+        origin: scenario.origin,
+        challenge: Buffer.from('fresh authentication challenge').toString(
+          'base64url'
+        )
+      })
+      expect(
+        verify(
+          'sha256',
+          Buffer.concat([
+            authenticatorData,
+            createHash('sha256').update(clientDataJSON).digest()
+          ]),
+          createPublicKey({
+            key: Buffer.from(registered.publicKey),
+            format: 'der',
+            type: 'spki'
+          }),
+          Buffer.from(signed.signature)
+        )
+      ).toBe(true)
+      expect(stored).toHaveLength(1)
+      expect(JSON.stringify(signed.json)).not.toContain('privateKey')
+      expect(extensionId).toHaveLength(32)
+      expect(errors).toEqual([])
+    } finally {
+      await context.close()
+    }
+  })
+}

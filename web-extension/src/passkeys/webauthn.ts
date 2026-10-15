@@ -1,6 +1,10 @@
 import { passkeySchema, type PasskeyData } from '@shared/passkeySchema'
-import { getDomainNameAndTldFromUrl } from '@shared/urlUtils'
 import { z } from 'zod'
+import {
+  getPasskeyOrigin,
+  validateRpId,
+  type PasskeyOrigin
+} from './relyingParty'
 import {
   concatBytes,
   encodeCbor,
@@ -8,6 +12,8 @@ import {
   fromBase64url,
   toBase64url
 } from './encoding'
+
+export { validateRpId } from './relyingParty'
 
 const base64urlSchema = z
   .string()
@@ -71,7 +77,11 @@ export type PasskeyCredentialResult = {
   rawId: string
   type: 'public-key'
   authenticatorAttachment: 'platform'
-  clientExtensionResults: { credProps?: { rk: boolean }; appid?: false }
+  clientExtensionResults: {
+    credProps?: { rk: boolean }
+    prf?: { enabled: false }
+    appid?: false
+  }
   response: {
     clientDataJSON: string
     authenticatorData: string
@@ -82,44 +92,6 @@ export type PasskeyCredentialResult = {
     publicKeyAlgorithm?: number
     transports?: string[]
   }
-}
-
-/** Origin must come from the browser's trusted sender metadata, never page data. */
-export const validateRpId = (
-  requestedRpId: string | undefined,
-  origin: string
-): string => {
-  const url = new URL(origin)
-  if (
-    url.protocol !== 'https:' &&
-    !(url.protocol === 'http:' && url.hostname === 'localhost')
-  ) {
-    throw new DOMException('Passkeys require a secure website', 'SecurityError')
-  }
-  const rpId = requestedRpId ?? url.hostname
-  const isDomain =
-    /^(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)*[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$/.test(
-      rpId
-    )
-  if (
-    !isDomain ||
-    rpId.length > 253 ||
-    (rpId !== url.hostname && !url.hostname.endsWith(`.${rpId}`))
-  ) {
-    throw new DOMException(
-      'The passkey domain does not match this website',
-      'SecurityError'
-    )
-  }
-  if (rpId === 'localhost' && url.hostname === 'localhost') return rpId
-  // Includes private suffixes: tenant.github.io must never request rpId github.io.
-  if (!getDomainNameAndTldFromUrl(`https://${rpId}`)) {
-    throw new DOMException(
-      'A passkey domain must be a registrable domain',
-      'SecurityError'
-    )
-  }
-  return rpId
 }
 
 /** Unsupported requests should use the browser's native authenticator instead. */
@@ -147,11 +119,18 @@ export const getUnsupportedPasskeyReason = (
   }
   const extensions = options.extensions
   if (!extensions) return null
+  const prf = extensions.prf
+  if (
+    kind === 'create' &&
+    typeof prf === 'object' &&
+    prf !== null &&
+    'evalByCredential' in prf
+  )
+    return 'PRF evalByCredential is only valid for authentication'
   // appid allows legacy U2F credentials alongside RP-scoped WebAuthn passkeys.
   // Its presence must not send a matching modern passkey to another provider.
   // Authier never uses the AppID for credential matching or signing.
   for (const key of [
-    'prf',
     'largeBlob',
     'appidExclude',
     'hmacCreateSecret',
@@ -160,6 +139,14 @@ export const getUnsupportedPasskeyReason = (
     if (extensions[key] !== undefined && extensions[key] !== false)
       return `The ${key} extension requires another authenticator`
   }
+  // Registration can succeed without PRF support. Assertions asking for PRF
+  // still need a provider that can evaluate it (for example, for encryption).
+  if (
+    kind === 'get' &&
+    extensions.prf !== undefined &&
+    extensions.prf !== false
+  )
+    return 'The prf extension requires another authenticator'
   if (extensions.enforceCredentialProtectionPolicy === true)
     return 'Enforced credential protection requires another authenticator'
   return null
@@ -195,13 +182,13 @@ const validateChallenge = (challenge: string): string => {
 const createClientData = (
   type: 'webauthn.create' | 'webauthn.get',
   challenge: string,
-  origin: string
+  origin: PasskeyOrigin
 ) =>
   new TextEncoder().encode(
     JSON.stringify({
       type,
       challenge: validateChallenge(challenge),
-      origin: new URL(origin).origin,
+      origin: new URL(getPasskeyOrigin(origin)).origin,
       crossOrigin: false
     })
   )
@@ -234,7 +221,7 @@ const matchesDescriptor = (
 export const passkeyMatchesRequest = (
   passkey: PasskeyData,
   options: PasskeyRequestOptions,
-  origin: string
+  origin: PasskeyOrigin
 ): boolean => {
   const rpId = validateRpId(options.rpId, origin)
   return (
@@ -250,7 +237,7 @@ export const passkeyMatchesRequest = (
 export const assertNoExcludedPasskey = (
   passkeys: readonly PasskeyData[],
   options: PasskeyCreationOptions,
-  origin: string
+  origin: PasskeyOrigin
 ) => {
   const rpId = validateRpId(options.rp.id, origin)
   if (
@@ -272,7 +259,7 @@ export const assertNoExcludedPasskey = (
 /** Caller must obtain explicit user approval and persist the encrypted passkey before returning its credential. */
 export const createPasskey = async (
   options: PasskeyCreationOptions,
-  origin: string,
+  origin: PasskeyOrigin,
   userVerified: boolean,
   windowTitle?: string
 ): Promise<{ passkey: PasskeyData; credential: PasskeyCredentialResult }> => {
@@ -310,7 +297,7 @@ export const createPasskey = async (
     userDisplayName: options.user.displayName,
     privateKeyJwk,
     createdAt: new Date().toISOString(),
-    url: new URL(origin).origin,
+    url: new URL(getPasskeyOrigin(origin)).origin,
     label: `${options.user.name} | ${windowTitle?.trim() || options.rp.name}`,
     iconUrl: null
   })
@@ -349,10 +336,13 @@ export const createPasskey = async (
       rawId: credentialId,
       type: 'public-key',
       authenticatorAttachment: 'platform',
-      clientExtensionResults:
-        options.extensions?.credProps === true
-          ? { credProps: { rk: true } }
-          : {},
+      clientExtensionResults: {
+        ...(options.extensions?.credProps === true && {
+          credProps: { rk: true }
+        }),
+        ...(typeof options.extensions?.prf === 'object' &&
+          options.extensions.prf !== null && { prf: { enabled: false } })
+      },
       response: {
         clientDataJSON: toBase64url(clientDataJSON),
         authenticatorData: toBase64url(authenticatorData),
@@ -368,7 +358,7 @@ export const createPasskey = async (
 export const getPasskeyAssertion = async (
   passkey: PasskeyData,
   options: PasskeyRequestOptions,
-  origin: string,
+  origin: PasskeyOrigin,
   userVerified: boolean
 ): Promise<PasskeyCredentialResult> => {
   assertSupported(options, 'get')
