@@ -257,6 +257,15 @@ lazy-loading favicon component. Refresh both native screenshots after icon chang
 `FaviconLoadingTest` uses a local HTTP server and 1,000 synthetic rows to verify
 that off-screen entries do not bulk-fetch and returning to a row uses memory cache.
 
+The Android gallery includes device history and sorting captures:
+`android-devices-history.png`, `android-devices-sort-options.png`, and
+`android-devices-added.png`. Launch the debug demo with `--ez demo true --ei tab 1`
+to show the production device list with synthetic sync and added timestamps.
+Capture the default order, open the sort menu, then choose **Added · newest first**
+to show a never-synced device at the top. `DeviceManagementTest` checks the native
+sort interaction and that a refresh preserves the selection; `DeviceHistoryTest`
+checks both directions, missing sync timestamps, and time zones.
+
 The Android gallery also includes `android-totp-camera-entry.png` and
 `android-totp-camera-review.png`. Capture these from the debug demo vault’s
 **2FA codes → Add item → Scan QR code** flow. The review capture must follow an

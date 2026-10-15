@@ -10,8 +10,8 @@ import org.junit.Test
 class DeviceManagementTest {
     @get:Rule val compose = createComposeRule()
     private val devices = listOf(
-        DeviceInfo("phone", "Pixel", "Android", null, true),
-        DeviceInfo("browser", "Chrome on MacBook", "Browser", null, false),
+        DeviceInfo("phone", "Pixel", "Android", "2026-09-01T12:00:00Z", "2026-10-13T08:42:00Z", true),
+        DeviceInfo("browser", "Chrome on MacBook", "Browser", "2026-10-10T16:15:00Z", null, false),
     )
     private val state = mutableStateOf(VaultUiState(unlocked = true, devices = devices, security = SecurityInfo(masterDeviceId = "phone")))
     private var transfers = emptyList<String>()
@@ -25,6 +25,31 @@ class DeviceManagementTest {
                 })
             }
         }
+    }
+
+    @Test fun showsHistoryAndSortsByAddedWithoutLosingSelectionOnRefresh() {
+        render()
+        compose.onNodeWithText(formatDeviceTimestamp(devices.first().lastSyncAt!!)).assertIsDisplayed()
+        compose.onNodeWithText(formatDeviceTimestamp(devices.first().createdAt)).assertIsDisplayed()
+        compose.onNodeWithText("Never synced").assertIsDisplayed()
+        assertDeviceOrder("Pixel", "Chrome on MacBook")
+
+        compose.onNodeWithText("Sort: Last synced · newest first").performClick()
+        compose.onNodeWithText("Added · newest first").performClick()
+        assertDeviceOrder("Chrome on MacBook", "Pixel")
+        compose.runOnIdle { state.value = state.value.copy(devices = devices.reversed()) }
+        compose.onNodeWithText("Sort: Added · newest first").assertIsDisplayed()
+        assertDeviceOrder("Chrome on MacBook", "Pixel")
+
+        compose.onNodeWithText("Sort: Added · newest first").performClick()
+        compose.onNodeWithText("Added · oldest first").performClick()
+        assertDeviceOrder("Pixel", "Chrome on MacBook")
+    }
+
+    private fun assertDeviceOrder(first: String, second: String) {
+        val firstTop = compose.onNodeWithText(first).fetchSemanticsNode().boundsInRoot.top
+        val secondTop = compose.onNodeWithText(second).fetchSemanticsNode().boundsInRoot.top
+        assertTrue("$first should appear before $second", firstTop < secondTop)
     }
 
     @Test fun transferRequiresConfirmationAndMovesTheBadgeAndControls() {

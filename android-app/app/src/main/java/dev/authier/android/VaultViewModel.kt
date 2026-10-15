@@ -471,6 +471,10 @@ class VaultViewModel(application: Application) : AndroidViewModel(application) {
         state.value = VaultUiState(email = "alex@studio.design", unlocked = !locked, remembered = true, demo = true,
             security = SecurityInfo(masterDeviceId = "demo"),
             lockTimeoutSeconds = 86400, biometricEnabled = locked, items = passwords + codes, lastSyncAt = System.currentTimeMillis(),
-            devices = listOf(DeviceInfo("demo", "Pixel · this device", "Android", null, true), DeviceInfo("browser", "Chrome on MacBook", "Browser", null, false)))
+            devices = listOf(
+                DeviceInfo("demo", "Pixel · this device", "Android", "2026-09-01T12:00:00Z", "2026-10-13T08:42:00Z", true),
+                DeviceInfo("browser", "Chrome on MacBook", "Browser", "2026-10-10T16:15:00Z", "2026-10-12T18:30:00Z", false),
+                DeviceInfo("tablet", "Android tablet", "Android", "2026-10-13T07:10:00Z", null, false),
+            ))
     }
 }

@@ -18,6 +18,9 @@ import associationScreenshot from '../../../docs/screenshots/android-autofill-as
 import masterDevicesScreenshot from '../../../docs/screenshots/android-devices-master.png'
 import transferMasterScreenshot from '../../../docs/screenshots/android-devices-transfer.png'
 import memberDevicesScreenshot from '../../../docs/screenshots/android-devices-member.png'
+import deviceHistoryScreenshot from '../../../docs/screenshots/android-devices-history.png'
+import deviceSortOptionsScreenshot from '../../../docs/screenshots/android-devices-sort-options.png'
+import devicesAddedScreenshot from '../../../docs/screenshots/android-devices-added.png'
 import autofillEnabledScreenshot from '../../../docs/screenshots/android-autofill-settings-enabled.png'
 import autofillDisabledScreenshot from '../../../docs/screenshots/android-autofill-settings-disabled.png'
 
@@ -59,6 +62,24 @@ const screens = [
     image: webAutofillScreenshot,
     description:
       'Match saved logins by exact HTTPS origin in the default browser or a verified embedded web form.'
+  },
+  {
+    title: 'Device sync history',
+    image: deviceHistoryScreenshot,
+    description:
+      'Each device shows its last sync and added date in the phone’s local time. The default order shows the most recently synced devices first.'
+  },
+  {
+    title: 'Device sorting options',
+    image: deviceSortOptionsScreenshot,
+    description:
+      'Choose newest or oldest first for either Last synced or Added. Devices that have never synced stay last when sorting by sync time.'
+  },
+  {
+    title: 'Devices sorted by added date',
+    image: devicesAddedScreenshot,
+    description:
+      'Sorting by Added puts the newest device first even if it has never synced. Changing the order preserves each device’s management actions.'
   },
   {
     title: 'Master device',

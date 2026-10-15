@@ -5,9 +5,11 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.Sort
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -29,6 +31,8 @@ internal fun DeviceManagementScreen(
 ) {
     var removing by remember { mutableStateOf<DeviceInfo?>(null) }
     var newMaster by remember { mutableStateOf<DeviceInfo?>(null) }
+    var sortOrder by rememberSaveable { mutableStateOf(DeviceSortOrder.LAST_SYNC_NEWEST) }
+    val sortedDevices = remember(state.devices, sortOrder) { sortOrder.sort(state.devices) }
     LazyColumn(Modifier.fillMaxSize(), contentPadding = PaddingValues(24.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
         item { ScreenHeading("Your devices", "Choose who can access your encrypted vault.", onRefresh) }
         item {
@@ -53,7 +57,8 @@ internal fun DeviceManagementScreen(
             }
         }
         item { Text("CONNECTED DEVICES", color = Muted, fontSize = 11.sp, letterSpacing = 1.sp) }
-        items(state.devices, key = { it.id }) { device ->
+        item { DeviceSortControl(sortOrder) { sortOrder = it } }
+        items(sortedDevices, key = { it.id }) { device ->
             DeviceCard(device, state, { removing = device }, { newMaster = device })
         }
         if (state.approvals.isEmpty()) item { Text("No pending device requests.", color = Muted, style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(top = 12.dp)) }
@@ -77,6 +82,44 @@ internal fun DeviceManagementScreen(
 }
 
 @Composable
+private fun DeviceSortControl(order: DeviceSortOrder, onSelect: (DeviceSortOrder) -> Unit) {
+    var expanded by remember { mutableStateOf(false) }
+    Box {
+        OutlinedButton({ expanded = true }, modifier = Modifier.fillMaxWidth()) {
+            Icon(Icons.AutoMirrored.Outlined.Sort, null, Modifier.size(18.dp))
+            Spacer(Modifier.width(8.dp))
+            Text("Sort: ${order.label}", modifier = Modifier.weight(1f))
+            Icon(Icons.Outlined.ArrowDropDown, null)
+        }
+        DropdownMenu(expanded, onDismissRequest = { expanded = false }) {
+            DeviceSortOrder.entries.forEach { option ->
+                DropdownMenuItem(
+                    text = { Text(option.label) },
+                    onClick = { onSelect(option); expanded = false },
+                    trailingIcon = { if (option == order) Icon(Icons.Outlined.Check, "Selected") },
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun DeviceHistory(device: DeviceInfo) {
+    Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+        DeviceHistoryRow("Last synced", device.lastSyncAt?.let { formatDeviceTimestamp(it) } ?: "Never synced")
+        DeviceHistoryRow("Added", formatDeviceTimestamp(device.createdAt))
+    }
+}
+
+@Composable
+private fun DeviceHistoryRow(label: String, value: String) {
+    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+        Text(label, color = Muted, style = MaterialTheme.typography.bodySmall, modifier = Modifier.width(80.dp))
+        Text(value, style = MaterialTheme.typography.bodySmall, modifier = Modifier.weight(1f))
+    }
+}
+
+@Composable
 private fun DeviceCard(device: DeviceInfo, state: VaultUiState, onRemove: () -> Unit, onSetMaster: () -> Unit) {
     val isMaster = device.id == state.security.masterDeviceId
     Surface(color = Panel, contentColor = MaterialTheme.colorScheme.onSurface, shape = RoundedCornerShape(16.dp)) {
@@ -95,6 +138,7 @@ private fun DeviceCard(device: DeviceInfo, state: VaultUiState, onRemove: () -> 
                 }
                 if (!device.isCurrent) IconButton(onRemove, enabled = !state.busy && !state.demo) { Icon(Icons.Outlined.Logout, "Remove ${device.name}", tint = Muted) }
             }
+            DeviceHistory(device)
             if (state.canSetMasterDevice(device)) {
                 OutlinedButton(onSetMaster, enabled = !state.busy, modifier = Modifier.fillMaxWidth()) { Text("Make master device") }
             }

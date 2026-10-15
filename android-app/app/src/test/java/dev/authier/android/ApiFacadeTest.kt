@@ -105,10 +105,13 @@ class ApiFacadeTest {
         assertEquals("next-master", api.security().masterDeviceId)
     }
 
-    @Test fun `preserves signed out status so revoked devices cannot be offered as transfer targets`() = runTest {
-        respond("""{"devices":[{"id":"current-device","name":"Pixel","platform":"android","syncTOTP":true,"vaultLockTimeoutSeconds":300,"createdAt":"2026-09-10T10:00:00Z","lastSyncAt":null,"logoutAt":null,"firstIpAddress":"127.0.0.1","lastIpAddress":"127.0.0.1","lastGeoLocation":""},{"id":"old-browser","name":"Old browser","platform":"browser","syncTOTP":true,"vaultLockTimeoutSeconds":300,"createdAt":"2026-09-10T10:00:00Z","lastSyncAt":null,"logoutAt":"2026-09-10T12:00:00Z","firstIpAddress":"127.0.0.1","lastIpAddress":"127.0.0.1","lastGeoLocation":""}]}""")
+    @Test fun `preserves device history and signed out status from the generated client`() = runTest {
+        respond("""{"devices":[{"id":"current-device","name":"Pixel","platform":"android","syncTOTP":true,"vaultLockTimeoutSeconds":300,"createdAt":"2026-09-10T10:00:00Z","lastSyncAt":"2026-10-13T08:42:00Z","logoutAt":null,"firstIpAddress":"127.0.0.1","lastIpAddress":"127.0.0.1","lastGeoLocation":""},{"id":"old-browser","name":"Old browser","platform":"browser","syncTOTP":true,"vaultLockTimeoutSeconds":300,"createdAt":"2026-09-10T10:00:00Z","lastSyncAt":null,"logoutAt":"2026-09-10T12:00:00Z","firstIpAddress":"127.0.0.1","lastIpAddress":"127.0.0.1","lastGeoLocation":""}]}""")
         val devices = api.devices()
         assertTrue(devices.first().isCurrent)
+        assertEquals("2026-09-10T10:00:00Z", devices.first().createdAt)
+        assertEquals("2026-10-13T08:42:00Z", devices.first().lastSyncAt)
+        assertNull(devices.last().lastSyncAt)
         assertNull(devices.first().logoutAt)
         assertFalse(devices.last().isCurrent)
         assertEquals("2026-09-10T12:00:00Z", devices.last().logoutAt)

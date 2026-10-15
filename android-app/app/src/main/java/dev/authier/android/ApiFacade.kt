@@ -131,7 +131,7 @@ class ApiFacade(serverUrl: String, private var currentDeviceId: String? = null) 
 
     override suspend fun devices() = request {
         device.devicesList(emptyInput).devices.map {
-            DeviceInfo(it.id, it.name, it.platform, it.lastSyncAt, it.id == currentDeviceId, it.logoutAt)
+            DeviceInfo(it.id, it.name, it.platform, it.createdAt, it.lastSyncAt, it.id == currentDeviceId, it.logoutAt)
         }
     }
     override suspend fun approvals() = request {
