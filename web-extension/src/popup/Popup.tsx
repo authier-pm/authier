@@ -3,6 +3,7 @@ import { FunctionComponent, useEffect } from 'react'
 import { Route, Switch, useLocation } from 'wouter'
 
 import { PopupNavBar } from '@src/components/PopupNavBar'
+import { ClockSkewWarning } from '@src/components/ClockSkewWarning'
 import { VerificationCodes } from '@src/verification-codes/VerificationCodes'
 import { Home } from '../pages/Home'
 
@@ -25,6 +26,7 @@ export const Popup: FunctionComponent = () => {
   return (
     <>
       <PopupNavBar />
+      <ClockSkewWarning />
       <VerificationCodes />
 
       <Switch location={location}>

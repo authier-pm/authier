@@ -13,6 +13,7 @@ mutation markAsSynced {
 }
 
 query SyncEncryptedSecrets {
+  osTime
   currentDevice {
     id
     encryptedSecretsToSync {
