@@ -13,6 +13,11 @@ import { EncryptedSecretType } from '@shared/generated/graphqlBaseTypes'
 import { device, deviceInitialization, DeviceState } from './ExtensionDevice'
 import { loginSessionManager, resumeRememberedDevice } from './loginSession'
 import { useDeviceState } from '@src/util/useDeviceState'
+import {
+  CLOCK_SKEW_STORAGE_KEY,
+  clockSkewSchema,
+  isClockSkewWarning
+} from '@src/util/clockSkew'
 import type { IBackgroundStateSerializable } from './backgroundPage'
 
 const { loginMutation, query, mutate } = vi.hoisted(() => ({
@@ -171,6 +176,71 @@ it('syncs a freshly installed device and populates the open popup without manual
   expect(mutate).toHaveBeenCalledTimes(1)
   expect(sessionStorage.backgroundState).toMatchObject({ decryptedSecrets: [] })
   expect(JSON.stringify(sessionStorage)).not.toContain('saved-password-value')
+})
+
+it.each([20_000, -20_000])(
+  'checks %ims clock skew during vault sync and clears the warning after correction',
+  async (offsetMs) => {
+    await device.save(snapshot)
+    const sync = async (offset: number) => {
+      query
+        .mockReset()
+        .mockResolvedValueOnce({
+          data: {
+            osTime: new Date(Date.now() - offset).toISOString(),
+            currentDevice: { encryptedSecretsToSync: [] }
+          }
+        })
+        .mockResolvedValueOnce({ data: { webInputs: [] } })
+      await device.state?.backendSync()
+      return clockSkewSchema.parse(sessionStorage[CLOCK_SKEW_STORAGE_KEY])
+    }
+
+    const skewed = await sync(offsetMs)
+    expect(skewed.offsetMs).toBe(offsetMs)
+    expect(isClockSkewWarning(skewed)).toBe(true)
+    expect(query).toHaveBeenNthCalledWith(
+      1,
+      expect.objectContaining({
+        fetchPolicy: 'network-only',
+        context: { queryDeduplication: false }
+      })
+    )
+    expect(isClockSkewWarning(await sync(0))).toBe(false)
+    expect(device.state?.secrets).toEqual(snapshot.secrets)
+  }
+)
+
+it('finishes vault sync when saving the clock check fails', async () => {
+  await device.save(snapshot)
+  const setStorage = vi
+    .mocked(browser.storage.session.set)
+    .getMockImplementation()!
+  vi.mocked(browser.storage.session.set).mockImplementation((values) => {
+    if (CLOCK_SKEW_STORAGE_KEY in values)
+      return Promise.reject(new Error('Clock check storage unavailable'))
+    return setStorage(values)
+  })
+  const warning = vi.spyOn(console, 'warn').mockImplementation(() => {})
+  query
+    .mockReset()
+    .mockResolvedValueOnce({
+      data: {
+        osTime: new Date().toISOString(),
+        currentDevice: { encryptedSecretsToSync: [] }
+      }
+    })
+    .mockResolvedValueOnce({ data: { webInputs: [] } })
+
+  await expect(device.state?.backendSync()).resolves.toEqual({
+    removedSecrets: 0,
+    newAndUpdatedSecrets: 0
+  })
+  expect(warning).toHaveBeenCalledWith(
+    'Could not save the clock check',
+    expect.any(Error)
+  )
+  expect(mutate).toHaveBeenCalledTimes(1)
 })
 
 it('hydrates ciphertext received after login even without another backend request', async () => {

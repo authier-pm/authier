@@ -13,6 +13,7 @@ import debug from 'debug'
 import browser from 'webextension-polyfill'
 import bowser from 'bowser'
 import { removeToken } from '@src/util/accessTokenExtension'
+import { recordClockSkew } from '@src/util/clockSkew'
 import type {
   IBackgroundStateSerializable,
   IBackgroundStateSerializableLocked,
@@ -397,16 +398,31 @@ export class DeviceState implements IBackgroundStateSerializable {
    */
   async backendSync() {
     const syncKey = this.masterEncryptionKey
+    const startedAt = Date.now()
+    const startedMonotonic = performance.now()
     const { data } = await apolloClient.query<
       SyncEncryptedSecretsQuery,
       SyncEncryptedSecretsQueryVariables
     >({
       query: SyncEncryptedSecretsDocument,
-      fetchPolicy: 'network-only'
+      fetchPolicy: 'network-only',
+      // A shared in-flight response could predate this clock measurement.
+      context: { queryDeduplication: false }
     })
+    const finishedAt = Date.now()
+    const elapsedMs = performance.now() - startedMonotonic
     // A lock, login, or password rotation invalidates this response's key.
     if (device.state !== this || this.masterEncryptionKey !== syncKey) return
     if (data) {
+      await recordClockSkew({
+        serverTime: data.osTime,
+        startedAt,
+        finishedAt,
+        elapsedMs
+      }).catch((error: unknown) => {
+        console.warn('Could not save the clock check', error)
+      })
+      if (device.state !== this || this.masterEncryptionKey !== syncKey) return
       const deviceState = device.state
       if (data && deviceState) {
         const backendRemovedSecrets =

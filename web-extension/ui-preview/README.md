@@ -1,5 +1,13 @@
 # Extension UI preview
 
+The `clock-skew` scenario renders the production warning above the real popup
+TOTP list with a synthetic server clock sample. Controls simulate clocks ahead
+and behind, a corrected sync, and closing/reopening the popup. Add `&offset=10000`
+and `&uncertainty=0` to inspect the ten-second boundary. Run
+`pnpm playwright:ui-preview clockSkew.spec.ts` from `web-extension` to verify the
+threshold, directions, persistence, and recovery, and capture
+`docs/screenshots/clock-skew-warning.png`.
+
 The `android-icon` scenario imports the actual standard and round Android launcher
 resources. Run `pnpm playwright:ui-preview androidIcon.spec.ts` from `web-extension`
 to capture `docs/screenshots/android-icon-preview.png`.
