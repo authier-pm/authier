@@ -6,7 +6,8 @@ sync the vault to use the same website credentials there.
 
 ## Using passkeys
 
-1. Install the updated extension and sign in to Authier.
+1. Install the updated extension and sign in to Authier. Meta/Facebook passkey
+   creation requires version **1.2.18 or later**.
 2. Open a website's security settings and choose to add a passkey.
 3. In the separate Authier window, check the website address, enter your master
    password if prompted, and select **Save passkey**.
@@ -48,14 +49,20 @@ sync to move them between browsers.
 - Chromium-based Brave and Edge, Chromium 111 or later; Firefox 128 or later.
   The extension supports both the Chromium Manifest V3 and Firefox Manifest V2
   builds. Firefox's MAIN-world content scripts require Firefox 128.
-- Top-level HTTPS pages, plus `http://localhost` for development.
+- Top-level HTTPS pages, plus `http://localhost` for development. Related domains
+  are supported when the passkey domain explicitly authorizes the requesting
+  origin in its HTTPS `/.well-known/webauthn` document. This includes Meta's
+  shared passkey domain when registering from Facebook.
 - ES256 / P-256, discoverable credentials, account selection, allow/exclude
   credential lists, user verification by master password, and none attestation.
 - Embedded frames and conditional/silent mediation use the native provider.
-  Requests requiring roaming authenticators, enterprise attestation, PRF,
-  largeBlob, legacy AppID exclusion, or unsupported required extension features
+  Requests requiring roaming authenticators, enterprise attestation, PRF
+  evaluation during sign-in, largeBlob, legacy AppID exclusion, or unsupported
+  required extension features
   also use the native provider. Site/browser restrictions on extension injection
   still apply. This does not add a mobile OS passkey provider.
+- Optional PRF inputs during registration do not prevent passkey creation.
+  Authier returns `prf: { enabled: false }`; it does not evaluate PRF inputs.
 - Authentication requests may include the legacy `appid` extension alongside
   modern passkeys. Authier still matches by RP ID and credential ID, signs with
   the RP ID hash, and returns `appid: false`. Legacy U2F-only requests without a
@@ -67,12 +74,32 @@ The bridge preserves the browser's credential API for unsupported requests and
 non-passkey credentials. It returns browser-compatible credential objects,
 ArrayBuffer responses, public-key accessors, and JSON serialization.
 
+## When the approval window does not open
+
+For Facebook's Advanced Protection checkpoint, first check the installed
+extension version. The released 1.2.17 build does not include the related-origin
+and optional-PRF registration fixes. Update to 1.2.18 or later, then reload the
+Facebook page so its credential API uses the updated extension. For an unpacked
+development build, run `pnpm --dir web-extension prodBuild`, reload Authier in
+the browser's extension manager, then reload the website.
+
+Confirm Authier is signed in and has permission to run on the website. A locked
+vault can still open the approval window and ask for the master password.
+
+Console errors mentioning `Failed to apply filter`, `matches-path`, invalid
+regular-expression flags, or `:has-text` selectors concern content-filter rules;
+they do not identify a WebAuthn failure. When reporting a passkey issue, include
+the installed extension version, requesting website, whether Authier's window
+opened, and any WebAuthn error name/message. Do not include private keys, vault
+data, or authentication tokens.
+
 ## Security and persistence
 
 The browser-supplied message sender identifies the requesting origin. RP IDs
-must be that host or a permitted parent domain; public and private suffixes,
-unrelated domains, insecure origins, and embedded frames are rejected. Passkey
-signatures bind the challenge, origin, and RP ID hash.
+must be that host, a permitted parent domain, or a domain that explicitly
+authorizes the origin through its HTTPS well-known document. Public and private
+suffixes, unauthorized domains, insecure origins, and embedded frames are
+rejected. Passkey signatures bind the challenge, origin, and RP ID hash.
 
 A separate extension window shows the trusted origin and obtains explicit
 approval. Each operation verifies the master password by default; creation can
