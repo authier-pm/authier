@@ -1,5 +1,6 @@
 import { fireEvent } from '@testing-library/dom'
 import { h, render } from 'preact'
+import { act } from 'preact/test-utils'
 
 const {
   fillGeneratedPasswordIntoInput,
@@ -50,7 +51,7 @@ describe('PromptPasswordGenerator', () => {
   let container: HTMLDivElement
   let passwordInput: HTMLInputElement
 
-  beforeEach(() => {
+  beforeEach(async () => {
     container = document.createElement('div')
     passwordInput = document.createElement('input')
     passwordInput.type = 'password'
@@ -60,11 +61,15 @@ describe('PromptPasswordGenerator', () => {
     handleGeneratedPasswordAutofill.mockClear()
     removePasswordGenerator.mockClear()
 
-    render(h(PromptPasswordGenerator, { input: passwordInput }), container)
+    await act(() => {
+      render(h(PromptPasswordGenerator, { input: passwordInput }), container)
+    })
   })
 
-  afterEach(() => {
-    render(null, container)
+  afterEach(async () => {
+    await act(() => {
+      render(null, container)
+    })
   })
 
   it('uses the Fill copy', () => {
@@ -75,7 +80,9 @@ describe('PromptPasswordGenerator', () => {
   it('keeps the generator open when filling fails', async () => {
     fillGeneratedPasswordIntoInput.mockResolvedValue(null)
 
-    fireEvent.click(getButton(container, 'Fill'))
+    await act(() => {
+      fireEvent.click(getButton(container, 'Fill'))
+    })
 
     await vi.waitFor(() => {
       expect(container.textContent).toContain(
@@ -89,7 +96,9 @@ describe('PromptPasswordGenerator', () => {
   it('captures and closes only after a verified fill', async () => {
     fillGeneratedPasswordIntoInput.mockResolvedValue(passwordInput)
 
-    fireEvent.click(getButton(container, 'Fill'))
+    await act(() => {
+      fireEvent.click(getButton(container, 'Fill'))
+    })
 
     await vi.waitFor(() => {
       expect(handleGeneratedPasswordAutofill).toHaveBeenCalledWith(
