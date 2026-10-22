@@ -26,6 +26,14 @@ for (const scenario of [
     appid: ''
   },
   {
+    name: 'Facebook Advanced Protection checkpoint with optional PRF',
+    origin: 'https://www.facebook.com',
+    rpId: 'accounts.meta.com',
+    prf: true,
+    appid: '',
+    path: '/checkpoint/advanced_protection/?next=https%3A%2F%2Fwww.facebook.com%2F#'
+  },
+  {
     name: 'Google sign-in with legacy AppID under nonce CSP',
     origin: 'https://accounts.google.com',
     rpId: 'google.com',
@@ -146,23 +154,37 @@ for (const scenario of [
         })
       }, snapshot)
       const site = await context.newPage()
-      await site.goto(`${scenario.origin}/`)
+      await site.goto(`${scenario.origin}${scenario.path ?? '/'}`)
       const popupPromise = context.waitForEvent('page', { timeout: 10_000 })
       const registration = site.evaluate(async (scenario) => {
         const credential = (await navigator.credentials.create({
           publicKey: {
-            challenge: new TextEncoder().encode('registration challenge'),
-            rp: { id: scenario.rpId, name: 'Test website' },
+            // Meta encodes a JSON challenge, requests optional PRF and offers
+            // several algorithms. Keep its request shape covered end to end.
+            challenge: new TextEncoder().encode(
+              JSON.stringify({ challenge: btoa('registration challenge') })
+            ),
+            rp: {
+              id: scenario.rpId,
+              name: scenario.prf ? 'Meta' : 'Test website'
+            },
             user: {
               id: new TextEncoder().encode('user-1'),
               name: 'alex@example.com',
               displayName: 'Alex'
             },
-            pubKeyCredParams: [{ type: 'public-key', alg: -7 }],
+            pubKeyCredParams: [
+              { type: 'public-key', alg: -7 },
+              { type: 'public-key', alg: -257 },
+              { type: 'public-key', alg: -8 }
+            ],
+            excludeCredentials: [],
+            attestation: 'none',
             authenticatorSelection: {
-              residentKey: 'required',
+              residentKey: 'preferred',
               userVerification: 'required'
             },
+            hints: ['client-device'],
             extensions: scenario.prf
               ? {
                   prf: {
@@ -174,7 +196,7 @@ for (const scenario of [
                   }
                 }
               : {},
-            timeout: 50_000
+            timeout: 600_000
           }
         })) as PublicKeyCredential
         return {
@@ -208,6 +230,12 @@ for (const scenario of [
       const registered = await registration
       expect(registered.type).toBe('public-key')
       expect(registered.clientData).toMatchObject({
+        type: 'webauthn.create',
+        challenge: Buffer.from(
+          JSON.stringify({
+            challenge: Buffer.from('registration challenge').toString('base64')
+          })
+        ).toString('base64url'),
         origin: scenario.origin,
         crossOrigin: false
       })
