@@ -31,7 +31,7 @@ export type MarkAsSyncedMutation = { currentDevice: { markAsSynced: string } };
 export type SyncEncryptedSecretsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type SyncEncryptedSecretsQuery = { currentDevice: { id: string, encryptedSecretsToSync: Array<{ id: string, encrypted: string, kind: Types.EncryptedSecretType, createdAt: string, updatedAt: string | null, deletedAt: string | null, version: number }> } };
+export type SyncEncryptedSecretsQuery = { osTime: string, currentDevice: { id: string, encryptedSecretsToSync: Array<{ id: string, encrypted: string, kind: Types.EncryptedSecretType, createdAt: string, updatedAt: string | null, deletedAt: string | null, version: number }> } };
 
 export type SecretExtensionFragment = { id: string, encrypted: string, kind: Types.EncryptedSecretType, createdAt: string, updatedAt: string | null, deletedAt: string | null, version: number };
 
@@ -117,6 +117,7 @@ export type MarkAsSyncedMutationHookResult = ReturnType<typeof useMarkAsSyncedMu
 export type MarkAsSyncedMutationResult = ApolloReactCommon.MutationResult<MarkAsSyncedMutation>;
 export const SyncEncryptedSecretsDocument = gql`
     query SyncEncryptedSecrets {
+  osTime
   currentDevice {
     id
     encryptedSecretsToSync {
