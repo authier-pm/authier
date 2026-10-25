@@ -12,6 +12,12 @@ access to ciphertext or metadata alone does not qualify. Use accounts you contro
 secrets, and demonstrate the attack without supplying the user's master password or legitimate
 decryption keys as inputs. The disclosure policy and scope below apply.
 
+Ideally, demonstrate the hack with a fresh Authier account created solely for the hack demo,
+populated with synthetic secrets.
+
+Your submission must include a Litecoin receiving address where we should send the 10 LTC reward
+if your attack qualifies.
+
 Read the announcement and submission requirements at
 https://www.authier.pm/blog/hack-authier-10-ltc and send your proof to **security@authier.pm**.
 
