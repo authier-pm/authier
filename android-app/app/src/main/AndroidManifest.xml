@@ -1,4 +1,4 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools">
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.USE_BIOMETRIC" />
@@ -31,11 +31,12 @@
             </intent-filter>
             <meta-data android:name="android.autofill" android:resource="@xml/autofill_service" />
         </service>
-        <service android:name=".PasskeyProviderService" android:label="Authier" android:icon="@mipmap/ic_launcher" android:enabled="@bool/passkey_provider_enabled" android:exported="true" android:permission="android.permission.BIND_CREDENTIAL_PROVIDER_SERVICE">
+        <!-- The values-v34 override enables these API 34 components only on Android 14+. -->
+        <service android:name=".PasskeyProviderService" android:label="Authier" android:icon="@mipmap/ic_launcher" android:enabled="@bool/passkey_provider_enabled" android:exported="true" android:permission="android.permission.BIND_CREDENTIAL_PROVIDER_SERVICE" tools:targetApi="34">
             <intent-filter><action android:name="android.service.credentials.CredentialProviderService" /></intent-filter>
             <meta-data android:name="android.credentials.provider" android:resource="@xml/passkey_provider" />
         </service>
-        <activity android:name=".PasskeyActivity" android:exported="false" android:excludeFromRecents="true" android:windowSoftInputMode="adjustResize" />
+        <activity android:name=".PasskeyActivity" android:enabled="@bool/passkey_provider_enabled" android:exported="false" android:excludeFromRecents="true" android:windowSoftInputMode="adjustResize" tools:targetApi="34" />
         <receiver android:name=".SmsCodeReceiver" android:exported="true" android:permission="android.permission.BROADCAST_SMS">
             <intent-filter><action android:name="android.provider.Telephony.SMS_RECEIVED" /></intent-filter>
         </receiver>
