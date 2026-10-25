@@ -1,0 +1,154 @@
+---
+import { hackingPrizePost } from '../../../data/blog'
+import ArticleLayout from '../../../layouts/ArticleLayout.astro'
+---
+
+<ArticleLayout {...hackingPrizePost} eyebrow="The Authier hacking prize">
+  <p>
+    A password manager earns trust by standing up to scrutiny. Today, we are
+    putting a reward behind that idea: <strong>hack Authier and receive 10 LTC
+    (Litecoin)</strong>. The challenge is specific: fully decrypt a user's stored
+    vault secrets and demonstrate the attack programmatically.
+  </p>
+
+  <aside class="prize-card" aria-label="Hacking prize requirements">
+    <p class="prize-label">The reward</p>
+    <p class="prize-amount">10 <span>LTC</span></p>
+    <p class="prize-requirement">
+      Full decryption of stored secrets.<br />
+      Reproducible, programmatic proof.
+    </p>
+    <a href="mailto:security@authier.pm">Submit to security@authier.pm →</a>
+  </aside>
+
+  <h2>What counts as a successful hack?</h2>
+  <p>
+    A qualifying submission must show a vulnerability in Authier that lets an
+    attacker recover the complete plaintext secrets in a user's vault without
+    the user's master password, legitimate decryption keys, or normal authorized
+    unlock. That includes the secret values stored in the test vault, such as
+    passwords and TOTP seeds, rather than only item titles or account metadata.
+  </p>
+  <p>
+    Getting a copy of encrypted data, bypassing a login screen, or showing a
+    screenshot of a claimed compromise does not by itself meet this challenge.
+    The result must be <strong>full decryption of stored secrets</strong>, with
+    working code that demonstrates how the attacker gets there.
+  </p>
+
+  <h2>Show it in code</h2>
+  <p>
+    Send a runnable proof of concept that we can reproduce independently. A
+    script, automated test, or small program is welcome. Include:
+  </p>
+  <ol>
+    <li>
+      <strong>The setup:</strong> the affected Authier version or commit,
+      platform, dependencies, and any access the attacker needs to start.
+    </li>
+    <li>
+      <strong>The attack:</strong> complete source code and exact commands to
+      run it, from the starting conditions through decryption.
+    </li>
+    <li>
+      <strong>The result:</strong> a test vault containing synthetic secrets,
+      with output showing that the program recovered every stored secret
+      correctly. Keep the master password and legitimate decryption keys out of
+      the attack's inputs.
+    </li>
+    <li>
+      <strong>The explanation:</strong> the flaw the program exploits and why
+      it compromises Authier's protection of stored secrets.
+    </li>
+  </ol>
+  <p>
+    We will review the report, reproduce the demonstration, and pay the
+    <strong>10 LTC reward</strong> for a qualifying, verified full-decryption
+    attack. The reward is denominated in Litecoin.
+  </p>
+
+  <h2>Research with accounts you control</h2>
+  <p>
+    Ideally, demonstrate the hack with a <strong>fresh Authier account created
+    solely for the hack demo</strong>, populated with synthetic secrets.
+  </p>
+  <p>
+    Use your own test accounts and synthetic secrets, or accounts whose owners
+    have explicitly permitted the test. You do not need to expose anyone's real
+    passwords to prove that Authier's protections can be broken. Do not access
+    other users' data, disrupt the service, or use phishing or social engineering.
+  </p>
+  <p>
+    Our <a href="https://github.com/authier-pm/authier/blob/main/SECURITY.md">vulnerability
+    disclosure policy</a> describes the supported versions, scope, and research
+    exclusions. Share findings privately and give us time to investigate and
+    address them before public disclosure. Other security reports are welcome
+    at the same address, even when they do not meet this prize's full-decryption
+    requirement.
+  </p>
+
+  <h2>Send your submission</h2>
+  <p>
+    Email <a href="mailto:security@authier.pm">security@authier.pm</a> with the
+    subject <strong>Authier 10 LTC challenge</strong>, your reproduction
+    instructions, and the proof-of-concept source attached or linked privately.
+    Use synthetic data in the report. If you want to encrypt your submission,
+    the disclosure policy includes our PGP key identifier.
+  </p>
+  <p>
+    Your submission <strong>must include a Litecoin receiving address</strong>
+    where we should send the 10 LTC reward if your attack qualifies.
+  </p>
+  <p>
+    Ready to inspect the implementation? Start with the
+    <a href="/security">security architecture</a> and the
+    <a href="https://github.com/authier-pm/authier">open-source repository</a>.
+    We look forward to seeing what you find.
+  </p>
+</ArticleLayout>
+
+<style>
+  .prize-card {
+    margin: 38px 0 48px;
+    padding: clamp(26px, 5vw, 42px);
+    border: 1px solid var(--border-strong);
+    border-radius: 18px;
+    background:
+      radial-gradient(circle at 100% 0, rgba(105, 230, 204, 0.13), transparent 65%),
+      var(--surface);
+  }
+
+  .prize-card .prize-label {
+    margin: 0 0 12px;
+    color: var(--accent);
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .prize-card .prize-amount {
+    margin: 0 0 20px;
+    color: var(--text);
+    font-size: clamp(4rem, 12vw, 6rem);
+    font-weight: 670;
+    letter-spacing: -0.065em;
+    line-height: 1;
+  }
+
+  .prize-amount span {
+    color: var(--accent);
+    font-size: 0.55em;
+    letter-spacing: -0.03em;
+  }
+
+  .prize-card .prize-requirement {
+    margin-bottom: 22px;
+    color: var(--text-muted);
+  }
+
+  .prize-card a {
+    font-size: 0.9rem;
+    overflow-wrap: anywhere;
+  }
+</style>

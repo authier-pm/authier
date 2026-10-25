@@ -2,6 +2,25 @@ Authier believes that working with security researchers across the globe is cruc
 users safe. If you believe you've found a security issue in our product or service, we encourage you to
 notify us. We welcome working with you to resolve the issue promptly. Thanks in advance!
 
+Send security reports to **security@authier.pm**.
+
+## 10 LTC hacking prize
+
+Authier offers a **10 LTC (Litecoin)** reward for a verified attack that fully decrypts a user's
+stored vault secrets. Submissions must include a reproducible, programmatic proof of concept;
+access to ciphertext or metadata alone does not qualify. Use accounts you control and synthetic
+secrets, and demonstrate the attack without supplying the user's master password or legitimate
+decryption keys as inputs. The disclosure policy and scope below apply.
+
+Ideally, demonstrate the hack with a fresh Authier account created solely for the hack demo,
+populated with synthetic secrets.
+
+Your submission must include a Litecoin receiving address where we should send the 10 LTC reward
+if your attack qualifies.
+
+Read the announcement and submission requirements at
+https://www.authier.pm/blog/hack-authier-10-ltc and send your proof to **security@authier.pm**.
+
 # Disclosure Policy
 
 - Let us know as soon as possible upon discovery of a potential security issue, and we'll make every
