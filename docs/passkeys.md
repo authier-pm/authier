@@ -4,6 +4,17 @@ Authier can create and use website passkeys in its encrypted vault. Sign in to
 Authier on another supported browser, approve that Authier device as usual, and
 sync the vault to use the same website credentials there.
 
+The native Android app also supports the same passkeys. On Android 14 or newer,
+enable Authier under **Settings → Passkeys → Set up Android passkeys**, then
+choose Authier when creating or using a passkey in a browser or Android app.
+Verify with your fingerprint or master password and approve the operation.
+Sync existing extension passkeys to the phone before using them; sync newly
+created Android passkeys to the extension before using them there. No new website
+enrollment is needed for an existing synced passkey. All supported Android
+versions can view, rename, delete and sync passkeys in **Vault → Passkeys**.
+See the [Android documentation](../android-app/README.md) for caller verification,
+offline behavior and platform requirements.
+
 ## Using passkeys
 
 1. Install the updated extension and sign in to Authier. Meta/Facebook passkey
@@ -60,7 +71,8 @@ sync to move them between browsers.
   evaluation during sign-in, largeBlob, legacy AppID exclusion, or unsupported
   required extension features
   also use the native provider. Site/browser restrictions on extension injection
-  still apply. This does not add a mobile OS passkey provider.
+  still apply. These browser-bridge limitations are separate from the Android
+  Credential Provider, which is available on Android 14 or newer.
 - Optional PRF inputs during registration do not prevent passkey creation.
   Authier returns `prf: { enabled: false }`; it does not evaluate PRF inputs.
 - Authentication requests may include the legacy `appid` extension alongside

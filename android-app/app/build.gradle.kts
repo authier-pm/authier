@@ -8,6 +8,7 @@ plugins {
 
 val smsTestAssets by tasks.registering(Copy::class) {
     from(rootProject.file("../shared/smsVerificationCodeVectors.json"))
+    from(rootProject.file("../shared/passkeyInteropVectors.json"))
     into(layout.buildDirectory.dir("generated/sms-test-assets"))
 }
 
@@ -62,6 +63,7 @@ tasks.matching { it.name == "mergeDebugAndroidTestAssets" || it.name == "mergeRe
 }
 
 dependencies {
+    implementation("androidx.credentials:credentials:1.5.0")
     implementation("com.microsoft.onnxruntime:onnxruntime-android:1.24.2")
     implementation("com.google.mlkit:language-id:17.0.6")
     implementation(platform("com.google.firebase:firebase-bom:34.19.0"))

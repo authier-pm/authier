@@ -69,19 +69,23 @@ fun VaultScreen(state: VaultUiState, model: VaultViewModel) {
                 Row(Modifier.fillMaxWidth().background(Panel, RoundedCornerShape(12.dp)).padding(4.dp)) {
                     VaultCategory("Passwords", state.items.count { it.record.kind == "LOGIN_CREDENTIALS" }, kind == "LOGIN_CREDENTIALS", Modifier.weight(1f)) { kind = "LOGIN_CREDENTIALS" }
                     VaultCategory("2FA codes", state.items.count { it.record.kind == "TOTP" }, kind == "TOTP", Modifier.weight(1f)) { kind = "TOTP" }
+                    VaultCategory("Passkeys", state.items.count { it.record.kind == "PASSKEY" }, kind == "PASSKEY", Modifier.weight(1f)) { kind = "PASSKEY" }
                 }
                 Spacer(Modifier.height(20.dp))
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                    Text(if (kind == "TOTP") "VERIFICATION CODES" else "ALL PASSWORDS", color = Muted, fontSize = 10.sp, letterSpacing = 1.4.sp, fontWeight = FontWeight.SemiBold)
+                    Text(when (kind) { "TOTP" -> "VERIFICATION CODES"; "PASSKEY" -> "YOUR PASSKEYS"; else -> "ALL PASSWORDS" }, color = Muted, fontSize = 10.sp, letterSpacing = 1.4.sp, fontWeight = FontWeight.SemiBold)
                     Text("${visible.size} items", color = Muted, fontSize = 11.sp)
                 }
+            }
+            if (kind == "PASSKEY") item {
+                Text("The same passkeys as your browser extension. Create a passkey from a website or app, then choose Authier.", color = Muted, style = MaterialTheme.typography.bodySmall)
             }
             items(visible, key = { it.record.id }) { item -> SecretCard(item) { selected = item.record.id } }
             if (visible.isEmpty()) item {
                 Column(Modifier.fillMaxWidth().padding(vertical = 42.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(12.dp)) {
                     Icon(Icons.Outlined.Key, null, tint = Muted, modifier = Modifier.size(40.dp))
                     Text(if (query.isBlank()) "A safe place for your first secret" else "No matching items", fontWeight = FontWeight.SemiBold)
-                    Text(if (query.isBlank()) "Tap Add item to get started." else "Try another name or username.", color = Muted)
+                    Text(when { query.isNotBlank() -> "Try another name or username."; kind == "PASSKEY" -> "Sync your vault or set up passkeys in Settings."; else -> "Tap Add item to get started." }, color = Muted)
                 }
             }
             item {
@@ -92,10 +96,13 @@ fun VaultScreen(state: VaultUiState, model: VaultViewModel) {
                 }
             }
         }
-        ExtendedFloatingActionButton(onClick = { if (!state.busy) { editingId = null; editingKind = kind; editing = SecretContent() } }, modifier = Modifier.align(Alignment.BottomEnd).padding(22.dp), containerColor = Mint, contentColor = Canvas, icon = { Icon(Icons.Outlined.Add, null) }, text = { Text("Add item", fontWeight = FontWeight.Bold) })
+        if (kind != "PASSKEY") ExtendedFloatingActionButton(onClick = { if (!state.busy) { editingId = null; editingKind = kind; editing = SecretContent() } }, modifier = Modifier.align(Alignment.BottomEnd).padding(22.dp), containerColor = Mint, contentColor = Canvas, icon = { Icon(Icons.Outlined.Add, null) }, text = { Text("Add item", fontWeight = FontWeight.Bold) })
     }
     val item = state.items.find { it.record.id == selected && isVisibleInNativeVault(it.record) }
-    if (item != null) SecretDetails(item, state.busy, onDismiss = { selected = null }, onEdit = { editingId = item.record.id; editingKind = item.record.kind; editing = item.content; selected = null }, onDelete = { model.deleteItem(item.record.id); selected = null }, onDiscard = { model.discardLocalChange(item.record.id); selected = null })
+    if (item?.record?.kind == "PASSKEY") PasskeyDetails(item, state.busy, onDismiss = { selected = null },
+        onRename = { model.renamePasskeyItem(item.record.id, it); selected = null },
+        onDelete = { model.deleteItem(item.record.id); selected = null }, onDiscard = { model.discardLocalChange(item.record.id); selected = null })
+    else if (item != null) SecretDetails(item, state.busy, onDismiss = { selected = null }, onEdit = { editingId = item.record.id; editingKind = item.record.kind; editing = item.content; selected = null }, onDelete = { model.deleteItem(item.record.id); selected = null }, onDiscard = { model.discardLocalChange(item.record.id); selected = null })
     editing?.let { content -> SecretEditor(content, editingKind, editingId != null, onDismiss = { editing = null }, onSave = { newKind, newContent -> model.saveItem(editingId, newKind, newContent); editing = null }) }
 }
 

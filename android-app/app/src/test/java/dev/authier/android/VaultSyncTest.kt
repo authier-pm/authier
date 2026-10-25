@@ -44,7 +44,7 @@ class VaultSyncTest {
         val next = applySyncPage(VaultSnapshot(), listOf(passkey, login, code), "3")
         val restored = vaultJson.decodeFromString<VaultSnapshot>(vaultJson.encodeToString(next))
         assertEquals(passkey, restored.secrets.find { it.id == passkey.id })
-        assertEquals(listOf("login", "code"), restored.secrets.filter(::isVisibleInNativeVault).map { it.id })
+        assertEquals(listOf("passkey", "login", "code"), restored.secrets.filter(::isVisibleInNativeVault).map { it.id })
         assertEquals("3", restored.cursor)
         val tombstone = passkey.copy(version = 2, deletedAt = "2026-09-08T10:00:00Z")
         val deleted = applySyncPage(restored, listOf(tombstone), "4")
@@ -61,6 +61,6 @@ class VaultSyncTest {
         val restored = vaultJson.decodeFromString<VaultSnapshot>(vaultJson.encodeToString(next))
         assertEquals(local, restored.secrets.single())
         assertEquals(write, restored.outbox.single())
-        assertTrue(restored.secrets.filter(::isVisibleInNativeVault).isEmpty())
+        assertEquals(listOf(local), restored.secrets.filter(::isVisibleInNativeVault))
     }
 }

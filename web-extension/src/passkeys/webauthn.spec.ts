@@ -2,6 +2,12 @@ import { createPublicKey, verify, webcrypto } from 'node:crypto'
 import { Buffer } from 'node:buffer'
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest'
 import { passkeySchema } from '@shared/passkeySchema'
+import passkeyInteropVectors from '@shared/passkeyInteropVectors.json'
+import {
+  abToCryptoKey,
+  base64ToBuffer,
+  decryptString
+} from '@shared/cryptoUtils'
 import {
   concatBytes,
   es256SignatureToDer,
@@ -587,5 +593,88 @@ describe('WebAuthn binary encoding', () => {
     expect(fromBase64url(toBase64url(data))).toEqual(data)
     for (const invalid of ['AA==', 'A+', 'A/', 'A', 'AB', 'A A'])
       expect(() => fromBase64url(invalid)).toThrow()
+  })
+})
+
+describe('Android and extension passkey interoperability', () => {
+  it.each(['extension', 'android'] as const)(
+    'decrypts and signs with the checked-in %s credential',
+    async (runtime) => {
+      const vector = passkeyInteropVectors[runtime]
+      const key = await abToCryptoKey(
+        base64ToBuffer(passkeyInteropVectors.rawKey)
+      )
+      const restored = passkeySchema.parse(
+        JSON.parse(await decryptString(key, vector.encrypted))
+      )
+      expect(restored).toEqual(passkeySchema.parse(vector.passkey))
+      const options = requestOptionsSchema.parse({
+        ...passkeyInteropVectors.extension.getOptions,
+        allowCredentials: [{ type: 'public-key', id: restored.credentialId }]
+      })
+      const assertion = await getPasskeyAssertion(
+        restored,
+        options,
+        vector.origin,
+        true
+      )
+      const publicKey = createPublicKey({
+        key: restored.privateKeyJwk,
+        format: 'jwk'
+      })
+      for (const response of [vector.assertion.response, assertion.response]) {
+        const authData = fromBase64url(response.authenticatorData)
+        const clientData = fromBase64url(response.clientDataJSON)
+        const hash = new Uint8Array(
+          await crypto.subtle.digest('SHA-256', clientData)
+        )
+        expect(
+          verify(
+            'sha256',
+            concatBytes(authData, hash),
+            publicKey,
+            fromBase64url(required(response.signature))
+          )
+        ).toBe(true)
+        expect(authData[32]).toBe(0x1d)
+        expect(authData.slice(33)).toEqual(new Uint8Array(4))
+        expect(response.userHandle).toBe(restored.userHandle)
+      }
+      expect(assertion.id).toBe(restored.credentialId)
+    }
+  )
+
+  it('validates Android registration attestation and COSE coordinates independently', () => {
+    const { passkey, credential } = passkeyInteropVectors.android
+    const attestation = decodeCbor(
+      fromBase64url(credential.response.attestationObject)
+    )
+    if (!(attestation instanceof Map))
+      throw new Error('Expected CBOR attestation')
+    expect(attestation.get('fmt')).toBe('none')
+    expect(attestation.get('attStmt')).toEqual(new Map())
+    const authData = attestation.get('authData')
+    if (!(authData instanceof Uint8Array))
+      throw new Error('Expected authenticator bytes')
+    expect(authData[32]).toBe(0x5d)
+    expect(authData.slice(33, 53)).toEqual(new Uint8Array(20))
+    expect(authData.slice(55, 87)).toEqual(fromBase64url(passkey.credentialId))
+    expect(decodeCbor(authData.slice(87))).toEqual(
+      new Map<number, number | Uint8Array>([
+        [1, 2],
+        [3, -7],
+        [-1, 1],
+        [-2, fromBase64url(passkey.privateKeyJwk.x)],
+        [-3, fromBase64url(passkey.privateKeyJwk.y)]
+      ])
+    )
+    const publicKey = createPublicKey({
+      key: Buffer.from(credential.response.publicKey, 'base64url'),
+      format: 'der',
+      type: 'spki'
+    })
+    const exported = publicKey.export({ format: 'jwk' })
+    expect(exported.x).toBe(passkey.privateKeyJwk.x)
+    expect(exported.y).toBe(passkey.privateKeyJwk.y)
   })
 })

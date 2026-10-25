@@ -31,6 +31,11 @@
             </intent-filter>
             <meta-data android:name="android.autofill" android:resource="@xml/autofill_service" />
         </service>
+        <service android:name=".PasskeyProviderService" android:label="Authier" android:icon="@mipmap/ic_launcher" android:enabled="@bool/passkey_provider_enabled" android:exported="true" android:permission="android.permission.BIND_CREDENTIAL_PROVIDER_SERVICE">
+            <intent-filter><action android:name="android.service.credentials.CredentialProviderService" /></intent-filter>
+            <meta-data android:name="android.credentials.provider" android:resource="@xml/passkey_provider" />
+        </service>
+        <activity android:name=".PasskeyActivity" android:exported="false" android:excludeFromRecents="true" android:windowSoftInputMode="adjustResize" />
         <receiver android:name=".SmsCodeReceiver" android:exported="true" android:permission="android.permission.BROADCAST_SMS">
             <intent-filter><action android:name="android.provider.Telephony.SMS_RECEIVED" /></intent-filter>
         </receiver>

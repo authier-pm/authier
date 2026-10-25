@@ -53,13 +53,21 @@ Android Autofill supports native app login forms with exact package associations
 
 For registration or password changes, tap **Create a strong password with Authier** in the autofill menu. Unlock if needed, review the username and generated password, regenerate or edit it, then choose **Save and fill**. A new encrypted login is saved locally and queued for sync before any value is returned to Android. Explicit new-password and confirmation fields receive the same value, while current-password fields remain unchanged. Ordinary single password fields also offer creation; fields explicitly marked current-password offer saved logins only. Canceling saves and fills nothing. This creates a separate login; existing vault passwords are never overwritten, and the target form still needs to be submitted by the user. The app offers only fields exposed through Android Autofill, not every password field visible on screen.
 
-Passkeys created by the browser extension remain encrypted in Android's synchronized snapshot, including deletion records. They are excluded from the password/TOTP editor, native Autofill, and unsupported-payload error reporting. This Android version does not list, edit, create, or authenticate with passkeys; manage them in the browser extension. Native sync preserves passkey ciphertext without decoding or reencoding it.
+Passkeys created by the browser extension appear in **Vault → Passkeys** after syncing. You can search, rename or delete them on any supported Android version. The label editor patches the encrypted payload without replacing keys or dropping unknown fields. Passkeys never appear in password Autofill, password copying or TOTP editors.
+
+On **Android 14 or newer**, open **Settings → Passkeys → Set up Android passkeys** and enable Authier in Android's password and passkey settings. When a website or app creates a passkey, choose Authier, verify your fingerprint or master password, and tap **Save passkey**. For sign-in, choose **Use Authier passkeys**, verify your identity and select the account. An already unlocked vault still requires fresh verification. Fingerprint uses the existing authentication-per-use Keystore protection; master password remains available.
+
+Existing extension passkeys work on Android without registering again. Passkeys created on Android work in the extension after syncing. Both use the same credential IDs, user handles, ES256/P-256 JWKs, zero signature counters and backup flags. New registration waits for encrypted backend persistence; a failed upload can be retried with the same operation ID. Canceling after a failed upload leaves an encrypted pending item, which can be synced or discarded in Settings. The website receives no successful registration until upload succeeds. Sign-in with an already synced credential needs no Authier network request. Native Android apps need an HTTPS Digital Asset Links check, so those requests require connectivity; trusted-browser sign-in works offline.
+
+Only certificate-pinned browsers can supply website origins and client-data hashes. The bundled `passkeyBrowsers.json` is Google's [public privileged-app allowlist](https://www.gstatic.com/gpm-passkeys-privileged-apps/apps.json), retrieved on 2026-10-25; update it deliberately when supported browser signing certificates change. Native apps must be authorized for the RP through `delegate_permission/common.get_login_creds` in its `/.well-known/assetlinks.json`. Authier uses their signing-certificate origin. Browser RP validation includes related origins, so existing Meta/Google credentials retain their domain semantics. Unsupported algorithms, enterprise attestation, PRF evaluation and other unsupported required extensions fail without saving a credential; choose another provider for those requests.
+
+Approval activities are private, screenshot-protected and tied to the current account. Verification expires after one minute. Backgrounding, cancellation or activity recreation clears the approval session; deleted or changed local records cannot be signed. Private keys only enter the existing AES-GCM encrypted snapshot/outbox. Deleting a passkey syncs to other Authier devices; also remove its registration in the website's security settings.
 
 Push notifications use Firebase Cloud Messaging. After signing in, allow Android notifications; you can change the permission later in Settings → Notification settings. Tapping a sign-in notification opens Devices after unlocking. Approval requests follow the account policy (master device or any trusted device); accounts allowing sign-in without approval notify existing devices after a new device successfully signs in. Foreground and background notifications use the same device-request channel. Token registration and rotation retry through WorkManager when offline.
 
 The checked-in `app/src/debug/google-services.json` and `app/src/release/google-services.json` contain public Firebase client configuration for the native package IDs. Self-hosted builds should replace these with their own Firebase app configuration, using the same project as the backend service account. The backend must expose `/api/v1/session/updatePushToken` before installing the updated app. No database migration is needed for this endpoint.
 
-This native application does not yet implement Android Credential Provider or encrypted import/export. Device approval checks on the sign-in screen remain explicit through the sign-in button.
+The Credential Provider supports passkeys on Android 14+; password filling continues to use Android Autofill. Encrypted import/export is not implemented. Device approval checks on the sign-in screen remain explicit through the sign-in button.
 
 ## SMS codes to browsers
 
@@ -226,3 +234,32 @@ registration request using a local mock server.
 Run `./gradlew :app:testDebugUnitTest :app:connectedDebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.class=dev.authier.android.PushNotificationsTest` to test the generated token-registration API and Android notification display. Add `-Pandroid.testInstrumentationRunnerArguments.liveFcm=true` on a disposable emulator with Google Play services to obtain an actual FCM token for a delivery smoke test; this writes the token only to the debug app cache (`push-smoke-token`), never to logs.
 
 The debug-only `NotificationPreviewActivity` renders a synthetic sign-in alert with the production notification code. Grant notification permission and launch it with `--ez showNotification true` to capture the notification shade. The checked-in `android-notifications` UI preview displays the captured Android UI.
+
+## Passkey regression checks
+
+```sh
+./gradlew :app:testDebugUnitTest
+./gradlew :app:connectedDebugAndroidTest -Pandroid.testInstrumentationRunnerArguments.class=dev.authier.android.PasskeyProviderTest
+cd ../web-extension
+pnpm test:passkeys
+```
+
+The instrumentation suite requires a clean Android 14+ debug emulator with Chrome
+installed. It supplies Android framework request parcels with the installed Chrome
+signing identity and a synthetic vault. It checks fresh verification, incorrect
+passwords, cancellation, account changes, deleted credentials, caller rejection,
+and retrying encrypted backend persistence through MockWebServer. It does not
+contact a live relying party or production Authier account.
+
+`shared/passkeyInteropVectors.json` contains public, synthetic credentials generated
+by the actual Kotlin and extension implementations. Both clients independently
+verify signatures and decrypt the other client's AES-GCM envelopes; extension
+tests also decode Android's CBOR attestation and COSE public key. Kotlin tests check
+RP isolation, allow/exclude lists, browser client-data hashes, flags/counters,
+unsupported requests, malformed keys, and label editing without losing key fields.
+
+Capture approval screens from the debug-only `PasskeyPreviewActivity` (synthetic
+data, no vault/network access). Use `--ez create true` for registration and
+`--ez locked true` for the verification prompt. The `android-vault` UI-preview
+scenario includes fresh captures of these screens and the real demo vault's
+Passkeys tab.

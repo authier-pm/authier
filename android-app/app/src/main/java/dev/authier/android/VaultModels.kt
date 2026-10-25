@@ -65,13 +65,14 @@ data class SecretContent(
 
 data class VaultItem(val record: SecretRecord, val content: SecretContent, val pending: Boolean = false, val conflict: Boolean = false)
 
-/** Sync preserves every kind; native forms currently understand only these two payloads. */
+/** Passkeys use a separate label-only editor; never coerce their keys into password content. */
 fun isNativeEditableKind(kind: String): Boolean = kind == "LOGIN_CREDENTIALS" || kind == "TOTP"
 
-fun isVisibleInNativeVault(record: SecretRecord): Boolean = record.deletedAt == null && isNativeEditableKind(record.kind)
+fun isVisibleInNativeVault(record: SecretRecord): Boolean = record.deletedAt == null &&
+    (isNativeEditableKind(record.kind) || record.kind == "PASSKEY")
 
 fun requireNativeEditableKind(kind: String) {
-    require(isNativeEditableKind(kind)) { "This item is preserved by vault sync. Manage passkeys in the Authier browser extension." }
+    require(isNativeEditableKind(kind)) { "Use the passkey details screen to manage passkeys." }
 }
 
 data class DeviceInfo(
