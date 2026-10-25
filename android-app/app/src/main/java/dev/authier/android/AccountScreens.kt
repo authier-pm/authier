@@ -24,6 +24,7 @@ fun SettingsScreen(state: VaultUiState, model: VaultViewModel) {
     LazyColumn(Modifier.fillMaxSize(), contentPadding = PaddingValues(24.dp), verticalArrangement = Arrangement.spacedBy(20.dp)) {
         item { ScreenHeading("Vault settings", state.email) }
         item { AndroidAutofillSettings(demo = state.demo) }
+        item { AndroidPasskeySettings(demo = state.demo) }
         item {
             SettingSection("SIGN-IN NOTIFICATIONS", "Get notified when another device signs in or needs your approval. Your device access policy determines which trusted devices receive requests.") {
                 OutlinedButton({ context.startActivity(Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)) }, enabled = !state.demo, modifier = Modifier.fillMaxWidth()) { Text("Notification settings") }

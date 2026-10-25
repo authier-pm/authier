@@ -23,10 +23,31 @@ import deviceSortOptionsScreenshot from '../../../docs/screenshots/android-devic
 import devicesAddedScreenshot from '../../../docs/screenshots/android-devices-added.png'
 import autofillEnabledScreenshot from '../../../docs/screenshots/android-autofill-settings-enabled.png'
 import autofillDisabledScreenshot from '../../../docs/screenshots/android-autofill-settings-disabled.png'
+import passkeysScreenshot from '../../../docs/screenshots/androidPasskeys.png'
+import passkeyCreationScreenshot from '../../../docs/screenshots/androidPasskeyCreation.png'
+import passkeySignInScreenshot from '../../../docs/screenshots/androidPasskeySignIn.png'
 
 // Compose runs in Android, so this scenario displays captures from the actual
 // debug app instead of maintaining a second implementation of its UI in React.
 const screens = [
+  {
+    title: 'Synced passkeys',
+    image: passkeysScreenshot,
+    description:
+      'The native Passkeys tab lists the same encrypted credentials as the browser extension. Open an item to rename or delete it.'
+  },
+  {
+    title: 'Create a passkey',
+    image: passkeyCreationScreenshot,
+    description:
+      'After fingerprint or master-password verification, explicitly save the passkey. Registration waits for encrypted server persistence.'
+  },
+  {
+    title: 'Sign in with a passkey',
+    image: passkeySignInScreenshot,
+    description:
+      'Android 14+ can use an existing extension passkey after vault sync. Account cards show the website favicon alongside the account and domain.'
+  },
   {
     title: 'Autofill set up',
     image: autofillEnabledScreenshot,

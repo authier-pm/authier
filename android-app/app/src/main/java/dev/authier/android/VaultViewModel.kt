@@ -193,7 +193,7 @@ class VaultViewModel(application: Application) : AndroidViewModel(application) {
             snapshot.secrets.filter(::isVisibleInNativeVault).map { record ->
                 runCatching {
                     val plaintext = AuthierCrypto.decrypt(key, record.encrypted)
-                    VaultItem(record, SecretContentDecoder.decode(plaintext, record.kind), pending[record.id] != null, pending[record.id]?.conflict == true)
+                    decodeVaultItem(record, plaintext, pending[record.id])
                 }
             }
         }
@@ -365,11 +365,24 @@ class VaultViewModel(application: Application) : AndroidViewModel(application) {
         syncNow()
     }
 
+    fun renamePasskeyItem(id: String, label: String) = action {
+        require(label.isNotBlank()) { "Give this passkey a name." }
+        if (state.value.demo) {
+            state.value = state.value.copy(items = state.value.items.map {
+                if (it.record.id == id && it.record.kind == "PASSKEY") it.copy(content = it.content.copy(label = label.trim())) else it
+            })
+            return@action
+        }
+        persist(renamePasskey(snapshot, id, label, requireNotNull(masterKey)))
+        rebuildItems()
+        syncNow()
+    }
+
     fun deleteItem(id: String) = action {
         if (state.value.demo) { state.value = state.value.copy(items = state.value.items.filter { it.record.id != id }); return@action }
         require(snapshot.outbox.none { it.id == id }) { "Sync or resolve this item's pending change before deleting it." }
         val record = requireNotNull(snapshot.secrets.find { it.id == id })
-        requireNativeEditableKind(record.kind)
+        require(isVisibleInNativeVault(record)) { "This item cannot be deleted by this version of Authier." }
         persist(snapshot.copy(secrets = snapshot.secrets.filter { it.id != id }, outbox = snapshot.outbox + PendingWrite(operation = "delete", id = id, expectedVersion = record.version)))
         rebuildItems()
         syncNow()
@@ -468,9 +481,13 @@ class VaultViewModel(application: Application) : AndroidViewModel(application) {
         val passwords = names.mapIndexed { index, (label, username) -> VaultItem(SecretRecord("demo-$index", "demo", "LOGIN_CREDENTIALS", 1, "2026-09-01T12:00:00Z"), SecretContent(label = label, username = username, password = "demo-password-" + index, url = if (label == "Linear") "https://linear.app" else "https://${label.lowercase()}.com")) }
         val demoSeeds = listOf("JBSWY3DPEHPK3PXP", "KRUGS4ZANFZSAYJA", "MFRGGZDFMZTWQ2LK")
         val codes = listOf("GitHub", "Google", "Cloudflare").mapIndexed { index, label -> VaultItem(SecretRecord("totp-$index", "demo", "TOTP", 1, "2026-09-01T12:00:00Z"), SecretContent(label = label, secret = demoSeeds[index], url = "https://${label.lowercase()}.com")) }
+        val passkeys = listOf("GitHub" to "alexmorgan", "Google" to "alex.morgan@gmail.com").mapIndexed { index, (label, username) ->
+            VaultItem(SecretRecord("passkey-$index", "demo", "PASSKEY", 1, "2026-10-25T10:00:00Z"),
+                SecretContent(label = "$username | $label", username = username, url = "https://${label.lowercase()}.com"))
+        }
         state.value = VaultUiState(email = "alex@studio.design", unlocked = !locked, remembered = true, demo = true,
             security = SecurityInfo(masterDeviceId = "demo"),
-            lockTimeoutSeconds = 86400, biometricEnabled = locked, items = passwords + codes, lastSyncAt = System.currentTimeMillis(),
+            lockTimeoutSeconds = 86400, biometricEnabled = locked, items = passwords + codes + passkeys, lastSyncAt = System.currentTimeMillis(),
             devices = listOf(
                 DeviceInfo("demo", "Pixel · this device", "Android", "2026-09-01T12:00:00Z", "2026-10-13T08:42:00Z", true),
                 DeviceInfo("browser", "Chrome on MacBook", "Browser", "2026-10-10T16:15:00Z", "2026-10-12T18:30:00Z", false),

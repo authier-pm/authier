@@ -1,0 +1,150 @@
+{
+  "description": "Synthetic public test keys. Never use these credentials for a real account.",
+  "extension": {
+    "options": {
+      "challenge": "AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8",
+      "rp": {
+        "id": "example.com",
+        "name": "Example"
+      },
+      "user": {
+        "id": "AP8ByA",
+        "name": "alex@example.com",
+        "displayName": "Alex"
+      },
+      "pubKeyCredParams": [
+        {
+          "type": "public-key",
+          "alg": -7
+        }
+      ],
+      "extensions": {
+        "credProps": true
+      }
+    },
+    "getOptions": {
+      "challenge": "AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8",
+      "rpId": "example.com",
+      "allowCredentials": [
+        {
+          "type": "public-key",
+          "id": "maWSid8n1QpDwbBUCdtoHxb2h3PTR8FkiF8YCCl9Kc4"
+        }
+      ]
+    },
+    "origin": "https://login.example.com",
+    "passkey": {
+      "credentialId": "maWSid8n1QpDwbBUCdtoHxb2h3PTR8FkiF8YCCl9Kc4",
+      "rpId": "example.com",
+      "rpName": "Example",
+      "userHandle": "AP8ByA",
+      "userName": "alex@example.com",
+      "userDisplayName": "Alex",
+      "privateKeyJwk": {
+        "kty": "EC",
+        "crv": "P-256",
+        "x": "6S3ffXF4blJEkpZxipD9ROCoxHRDipDJwSo6GDeVl58",
+        "y": "THoK3bSAZvcslBfNToqWXOAPBxG-a0c3honMwE-8mw4",
+        "d": "MBaeA3fzGYI4islGd-bERY6BxTmD4alni9txFBZ3e-0",
+        "key_ops": ["sign"],
+        "ext": true
+      },
+      "createdAt": "2026-10-25T10:24:57.288Z",
+      "url": "https://login.example.com",
+      "label": "alex@example.com | Example",
+      "iconUrl": null
+    },
+    "credential": {
+      "id": "maWSid8n1QpDwbBUCdtoHxb2h3PTR8FkiF8YCCl9Kc4",
+      "rawId": "maWSid8n1QpDwbBUCdtoHxb2h3PTR8FkiF8YCCl9Kc4",
+      "type": "public-key",
+      "authenticatorAttachment": "platform",
+      "clientExtensionResults": {
+        "credProps": {
+          "rk": true
+        }
+      },
+      "response": {
+        "clientDataJSON": "eyJ0eXBlIjoid2ViYXV0aG4uY3JlYXRlIiwiY2hhbGxlbmdlIjoiQUFFQ0F3UUZCZ2NJQ1FvTERBME9EeEFSRWhNVUZSWVhHQmthR3h3ZEhoOCIsIm9yaWdpbiI6Imh0dHBzOi8vbG9naW4uZXhhbXBsZS5jb20iLCJjcm9zc09yaWdpbiI6ZmFsc2V9",
+        "authenticatorData": "o3mm9u6vuaVeN4wRgDTidR5oL6ufLTCrE9ISVYbOGUddAAAAAAAAAAAAAAAAAAAAAAAAAAAAIJmlkonfJ9UKQ8GwVAnbaB8W9odz00fBZIhfGAgpfSnOpQECAyYgASFYIOkt331xeG5SRJKWcYqQ_UTgqMR0Q4qQycEqOhg3lZefIlggTHoK3bSAZvcslBfNToqWXOAPBxG-a0c3honMwE-8mw4",
+        "attestationObject": "o2NmbXRkbm9uZWdhdHRTdG10oGhhdXRoRGF0YViko3mm9u6vuaVeN4wRgDTidR5oL6ufLTCrE9ISVYbOGUddAAAAAAAAAAAAAAAAAAAAAAAAAAAAIJmlkonfJ9UKQ8GwVAnbaB8W9odz00fBZIhfGAgpfSnOpQECAyYgASFYIOkt331xeG5SRJKWcYqQ_UTgqMR0Q4qQycEqOhg3lZefIlggTHoK3bSAZvcslBfNToqWXOAPBxG-a0c3honMwE-8mw4",
+        "publicKey": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE6S3ffXF4blJEkpZxipD9ROCoxHRDipDJwSo6GDeVl59MegrdtIBm9yyUF81OipZc4A8HEb5rRzeGiczAT7ybDg",
+        "publicKeyAlgorithm": -7,
+        "transports": ["internal"]
+      }
+    },
+    "assertion": {
+      "id": "maWSid8n1QpDwbBUCdtoHxb2h3PTR8FkiF8YCCl9Kc4",
+      "rawId": "maWSid8n1QpDwbBUCdtoHxb2h3PTR8FkiF8YCCl9Kc4",
+      "type": "public-key",
+      "authenticatorAttachment": "platform",
+      "clientExtensionResults": {},
+      "response": {
+        "clientDataJSON": "eyJ0eXBlIjoid2ViYXV0aG4uZ2V0IiwiY2hhbGxlbmdlIjoiQUFFQ0F3UUZCZ2NJQ1FvTERBME9EeEFSRWhNVUZSWVhHQmthR3h3ZEhoOCIsIm9yaWdpbiI6Imh0dHBzOi8vbG9naW4uZXhhbXBsZS5jb20iLCJjcm9zc09yaWdpbiI6ZmFsc2V9",
+        "authenticatorData": "o3mm9u6vuaVeN4wRgDTidR5oL6ufLTCrE9ISVYbOGUcdAAAAAA",
+        "signature": "MEUCIQDaYnd_9BVHZstYtGLCp0Un4mTHwpMKuo5s7mT7AEgzxQIgObSS2fIYXumd6RwujVS1TOT8hF1OETuWuRln0gUvVuk",
+        "userHandle": "AP8ByA"
+      }
+    },
+    "encrypted": "AAECAwQFBgcICQoLDA0OD+Z5mQXllwtyNjeW2VSVbrtiYq1XgxXfyOA1jtoRPSWlEy7/EKmNxlCNZ6G35FInFjSKuIgaRVDs0LsU/kqo+2vTLip7RcLNUjSEl2aiDTD4IlOOd7hYV/v+C9YdDy1JspqL/dz+IN36sKqJoFpI4POqECXQfWFQD9s2dYYU+sGNoxVQ0cpnY/dKYvyrhESnXmKSXB1zqE6/msytmCcfFgzVTIeKmVnzf9NPYjHNCTOt+8IhWaV4RIAi9DsffssZ4zdxRZuZDLg1G5JJpKHM4h2zLodR8xqdrA82B4Ppfbu9bNbkcMzMifZVxIw1hKy42c1J5RE35+GQfrl7ElIq1cZEX39u3JnB+LS/lCABR6SMTycH+qBV9VPC0BjAI94ECrskn3ZmN1vSV+J1YwW+gnBGye41FPrTu/96FwPBRAaz7jRKPSsmaVlY0qJBwLixE4MCfGV8NpuUrwfqyy94/ru9prHAbvmuScR0oMLs67a/4rSYnosy2TDJ4BrVjGWY8vA9ttJ48QcNhYCUoLFOLJiB6Bvb0r8serQ7usVw4CwVrFt7vg6DwtLNpSfH31UW4mm7pVFD4jVPYHsK8d3a3bSFb8i91LRBiAfVhsKKbNLazJWtBm0JBexvkDUiavD+Hp+zuLHZRVL58XEfd3PP46Da619B6SWF04i8gRNdY9mtaD+vt8J0R6PZf1bSY2ecjD4Ilqrj8fAR+eXX16s2yAaoObsHIKTLWNp+cQ=="
+  },
+  "rawKey": "AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8=",
+  "salt": "AAECAwQFBgcICQoLDA0ODw==",
+  "android": {
+    "passkey": {
+      "credentialId": "MWiTrJ4VBteRAnSJb1gAnpgAzsosIzzvvBaWP8wooss",
+      "rpId": "example.com",
+      "rpName": "Example",
+      "userHandle": "AP8ByA",
+      "userName": "alex@example.com",
+      "userDisplayName": "Alex",
+      "privateKeyJwk": {
+        "kty": "EC",
+        "crv": "P-256",
+        "x": "vx0oepVnKYrqTA45TWe3DL8YnQ-Eo_-arZMa-Q20lMc",
+        "y": "EWTAcdIpXlJkDzi9_DFqbxa_bR58zI4uMfF14tQ7bOU",
+        "d": "8DXn0wP6Trc7V7SbWze_wWyo3oE3svkKwyaV7hV6xh4",
+        "key_ops": ["sign"],
+        "ext": true
+      },
+      "createdAt": "2026-10-25T10:26:22.714681055Z",
+      "url": "https://example.com",
+      "label": "alex@example.com | Example",
+      "iconUrl": null
+    },
+    "credential": {
+      "id": "MWiTrJ4VBteRAnSJb1gAnpgAzsosIzzvvBaWP8wooss",
+      "rawId": "MWiTrJ4VBteRAnSJb1gAnpgAzsosIzzvvBaWP8wooss",
+      "type": "public-key",
+      "authenticatorAttachment": "platform",
+      "clientExtensionResults": {
+        "credProps": {
+          "rk": true
+        }
+      },
+      "response": {
+        "clientDataJSON": "eyJ0eXBlIjoid2ViYXV0aG4uY3JlYXRlIiwiY2hhbGxlbmdlIjoiQUFFQ0F3UUZCZ2NJQ1FvTERBME9EeEFSRWhNVUZSWVhHQmthR3h3ZEhoOCIsIm9yaWdpbiI6Imh0dHBzOi8vbG9naW4uZXhhbXBsZS5jb20iLCJjcm9zc09yaWdpbiI6ZmFsc2V9",
+        "authenticatorData": "o3mm9u6vuaVeN4wRgDTidR5oL6ufLTCrE9ISVYbOGUddAAAAAAAAAAAAAAAAAAAAAAAAAAAAIDFok6yeFQbXkQJ0iW9YAJ6YAM7KLCM877wWlj_MKKLLpQECAyYgASFYIL8dKHqVZymK6kwOOU1ntwy_GJ0PhKP_mq2TGvkNtJTHIlggEWTAcdIpXlJkDzi9_DFqbxa_bR58zI4uMfF14tQ7bOU",
+        "attestationObject": "o2NmbXRkbm9uZWdhdHRTdG10oGhhdXRoRGF0YViko3mm9u6vuaVeN4wRgDTidR5oL6ufLTCrE9ISVYbOGUddAAAAAAAAAAAAAAAAAAAAAAAAAAAAIDFok6yeFQbXkQJ0iW9YAJ6YAM7KLCM877wWlj_MKKLLpQECAyYgASFYIL8dKHqVZymK6kwOOU1ntwy_GJ0PhKP_mq2TGvkNtJTHIlggEWTAcdIpXlJkDzi9_DFqbxa_bR58zI4uMfF14tQ7bOU",
+        "publicKey": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEvx0oepVnKYrqTA45TWe3DL8YnQ-Eo_-arZMa-Q20lMcRZMBx0ileUmQPOL38MWpvFr9tHnzMji4x8XXi1Dts5Q",
+        "publicKeyAlgorithm": -7,
+        "transports": ["internal"]
+      }
+    },
+    "assertion": {
+      "id": "MWiTrJ4VBteRAnSJb1gAnpgAzsosIzzvvBaWP8wooss",
+      "rawId": "MWiTrJ4VBteRAnSJb1gAnpgAzsosIzzvvBaWP8wooss",
+      "type": "public-key",
+      "authenticatorAttachment": "platform",
+      "clientExtensionResults": {},
+      "response": {
+        "clientDataJSON": "eyJ0eXBlIjoid2ViYXV0aG4uZ2V0IiwiY2hhbGxlbmdlIjoiQUFFQ0F3UUZCZ2NJQ1FvTERBME9EeEFSRWhNVUZSWVhHQmthR3h3ZEhoOCIsIm9yaWdpbiI6Imh0dHBzOi8vbG9naW4uZXhhbXBsZS5jb20iLCJjcm9zc09yaWdpbiI6ZmFsc2V9",
+        "authenticatorData": "o3mm9u6vuaVeN4wRgDTidR5oL6ufLTCrE9ISVYbOGUcdAAAAAA",
+        "signature": "MEYCIQDTkFAf8z8X0PeLVsEO9HeUuDmlGwhyC82b2_ZFirtx8QIhAN3MCFub-7hervdm-smw1p3woa1jpbucJ7SXBvLLzjTU",
+        "userHandle": "AP8ByA"
+      }
+    },
+    "origin": "https://login.example.com",
+    "encrypted": "AAECAwQFBgcICQoLDA0OD4Zapy7XaDJXExMwesQZUkUgLQeZjmgqCWQuwqrkt22mw1LaWk9tx5KKck9woEqrK//qgnMSmyzleIHylNlITtMhUmjQc2zzhqoJmtyEuVQ7MlywvuV/his9Aakm2whShqnu5nhfN5S8S8QaCwMGk/ZPg3jmOHXGUz0P/lzEu2krWs/+FGssIJ+fSFXv/hMylPqkGMOcrYGg4wrcCUu/QdX4imNs+y+5jb+c2onlDNNJhqpAyHlTVUOUONFUW2goC1STDLNc0eJF1sAQaScv0MBlBX0VNFjCRiBQOQItUJUlTuZXEJT+xzx0DhmXOhT0TDPA0k+h6DyzKf57C0h+sQG37G37c4k5xSkZGunyvWjHcLNmQ1PDoIEW4EbpCeJ1t8EiqIn2/VO5efNtrNZOTL+lHRJu5dVibbxs0S1OGLweEFD4IOvjIc/53kbGiw5enu6q15/ToSrXoHB1uLIE9uvi+BQDypFoOI0MgAU/b4akd0O5gO7wCpUnea4mwoT29KiQgiIPo8EwsuBznjmTE8NZxwQtOkXTW2K9tlH9cHXXHnpx1eTT1TTEQgVm8DCPNxgUf3tYsDNwU2gtutxXuPb/1ntbkci2i5rx0M4QJ5YqOrEavqmUXX6dUEUuccrzFleI6sSEMHRmeoGobpAGc6LmrM/Q6OV/rMLt3XyGPXIZNToOmcSeM23EaLv0d3EyWi9bdBrNYTu4wzKbXSVBG+f1jtLdiyEV8HqINw=="
+  }
+}
