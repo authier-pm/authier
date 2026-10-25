@@ -1,5 +1,14 @@
 # Extension UI preview
 
+The `hacking-prize-blog` scenario embeds the production 10 LTC security challenge
+announcement. Start the Astro server on port 4321 alongside the preview, then
+open `/?scenario=hacking-prize-blog`. Check the reward, full-decryption criteria,
+programmatic proof requirements, and submission links on desktop and mobile.
+Captures live in `docs/screenshots/hacking-prize-blog-desktop.jpg` and
+`docs/screenshots/hacking-prize-blog-mobile.jpg`.
+Set `VITE_WEBSITE_PREVIEW_ORIGIN` when Astro uses a different port, for example
+`VITE_WEBSITE_PREVIEW_ORIGIN=http://127.0.0.1:4323 pnpm preview:ui --port 4175`.
+
 The `clock-skew` scenario renders the production warning above the real popup
 TOTP list with a synthetic server clock sample. Controls simulate clocks ahead
 and behind, a corrected sync, and closing/reopening the popup. Add `&offset=10000`
