@@ -3,6 +3,7 @@ package dev.authier.android
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Key
 import androidx.compose.material.icons.outlined.VerifiedUser
@@ -60,7 +61,7 @@ fun PasskeyApprovalScreen(state: PasskeyApprovalState, onPassword: (String) -> U
                 } else {
                     item { Text("Choose an account", style = MaterialTheme.typography.titleMedium) }
                     items(state.accounts, key = { it.id }) { account ->
-                        OutlinedButton({ onSelect(account.id) }, enabled = !state.busy, modifier = Modifier.fillMaxWidth()) {
+                        OutlinedButton({ onSelect(account.id) }, enabled = !state.busy, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(8.dp)) {
                             Column(Modifier.fillMaxWidth().padding(vertical = 8.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
                                 Text(account.username.ifBlank { account.label })
                                 Text(account.rpId, color = Muted, style = MaterialTheme.typography.bodySmall)
