@@ -109,7 +109,7 @@ class PasskeyActivity : FragmentActivity() {
             unlockStore.remember(unlocked, verifiedKey)
             verifiedUntil = SystemClock.elapsedRealtime() + 60_000
             choices = available.filter { saved -> getOptions.any { it.options.matches(saved.passkey) } }
-            ui = ui.copy(verified = true, accounts = choices.map { PasskeyAccount(it.record.id, it.passkey.userName, it.passkey.label, it.passkey.rpId) })
+            ui = ui.copy(verified = true, accounts = choices.map { PasskeyAccount(it.record.id, it.passkey.userName, it.passkey.label, it.passkey.rpId, it.passkey.iconUrl) })
         }
     }
 

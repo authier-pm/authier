@@ -46,7 +46,7 @@ const screens = [
     title: 'Sign in with a passkey',
     image: passkeySignInScreenshot,
     description:
-      'Android 14+ can use an existing extension passkey after vault sync. Verify your identity, then choose the account to sign in.'
+      'Android 14+ can use an existing extension passkey after vault sync. Account cards show the website favicon alongside the account and domain.'
   },
   {
     title: 'Autofill set up',

@@ -9,10 +9,11 @@ import androidx.compose.material.icons.outlined.Key
 import androidx.compose.material.icons.outlined.VerifiedUser
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
-data class PasskeyAccount(val id: String, val username: String, val label: String, val rpId: String)
+data class PasskeyAccount(val id: String, val username: String, val label: String, val rpId: String, val iconUrl: String? = null)
 data class PasskeyApprovalState(
     val ready: Boolean = false, val busy: Boolean = false, val creating: Boolean = false,
     val verified: Boolean = false, val biometricEnabled: Boolean = false,
@@ -61,13 +62,7 @@ fun PasskeyApprovalScreen(state: PasskeyApprovalState, onPassword: (String) -> U
                 } else {
                     item { Text("Choose an account", style = MaterialTheme.typography.titleMedium) }
                     items(state.accounts, key = { it.id }) { account ->
-                        OutlinedButton({ onSelect(account.id) }, enabled = !state.busy, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(8.dp)) {
-                            Column(Modifier.fillMaxWidth().padding(vertical = 8.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                                Text(account.username.ifBlank { account.label })
-                                Text(account.rpId, color = Muted, style = MaterialTheme.typography.bodySmall)
-                                Text("Sign in", color = Mint)
-                            }
-                        }
+                        PasskeyAccountCard(account, enabled = !state.busy, onClick = { onSelect(account.id) })
                     }
                     if (state.accounts.isEmpty()) item { Text("No matching passkeys on this phone. Open Authier and sync your vault, then try again.", color = Muted) }
                 }
@@ -75,6 +70,21 @@ fun PasskeyApprovalScreen(state: PasskeyApprovalState, onPassword: (String) -> U
             state.error?.let { message -> item { Text(message, color = MaterialTheme.colorScheme.error) } }
             if (state.busy) item { LinearProgressIndicator(Modifier.fillMaxWidth()) }
             item { TextButton(onCancel, modifier = Modifier.fillMaxWidth()) { Text("Cancel") } }
+        }
+    }
+}
+
+@Composable
+private fun PasskeyAccountCard(account: PasskeyAccount, enabled: Boolean, onClick: () -> Unit) {
+    val content = remember(account) { SecretContent(label = account.label, url = "https://${account.rpId}", iconUrl = account.iconUrl) }
+    OutlinedButton(onClick, enabled = enabled, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(8.dp)) {
+        Row(Modifier.fillMaxWidth().padding(vertical = 8.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(14.dp)) {
+            SecretItemIcon(content)
+            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                Text(account.username.ifBlank { account.label })
+                Text(account.rpId, color = Muted, style = MaterialTheme.typography.bodySmall)
+                Text("Sign in", color = Mint)
+            }
         }
     }
 }
