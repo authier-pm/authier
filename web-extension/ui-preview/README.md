@@ -149,6 +149,11 @@ clearing an empty search restores the list, and resizing updates the visible
 items in Firefox and Chromium. Screenshots are captured under
 `docs/screenshots/vault-scrolling-{table,cards}-{firefox,chromium}.png`.
 
+Add `&selected` to load the vault with two selected credentials. Hover or focus
+the **Delete selected** button to check that its tooltip appears above the card
+without being clipped. The scrolling suite also checks tooltip dismissal with
+Escape and captures `docs/screenshots/vault-delete-tooltip.png`.
+
 The `offline-vault` scenario (`scenarios/offlineVault.ts`) renders the actual built
 extension in a disposable Chromium profile with encrypted synthetic passwords,
 a TOTP and a passkey. All network traffic is intercepted. Run from `web-extension`:

@@ -43,9 +43,12 @@ const credentials: SecretTypeUnion[] = Array.from(
 
 function VaultScenario() {
   const defaults = useContext(DeviceStateContext)
-  const [loaded, setLoaded] = useState(false)
-  const [selectedItems, setSelectedItems] = useState<SecretTypeUnion[]>([])
   const params = new URLSearchParams(location.search)
+  const initiallySelected = params.has('selected')
+  const [loaded, setLoaded] = useState(initiallySelected)
+  const [selectedItems, setSelectedItems] = useState<SecretTypeUnion[]>(() =>
+    initiallySelected ? credentials.slice(0, 2) : []
+  )
   const items = loaded ? credentials : []
   const context = {
     ...defaults,

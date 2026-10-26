@@ -2,6 +2,49 @@ import { expect, test } from '@playwright/test'
 
 test.use({ viewport: { width: 1600, height: 1700 } })
 
+test('bulk delete tooltip appears above the vault card on hover and focus', async ({
+  page
+}, testInfo) => {
+  await page.setViewportSize({ width: 1280, height: 800 })
+  await page.goto('/?scenario=vault-scrolling&selected')
+  const button = page.getByRole('button', { name: 'delete 2 secrets' })
+  const tooltip = page.getByText('delete 2 secrets', { exact: true }).first()
+
+  await button.hover()
+  await expect(tooltip).toBeVisible()
+  const buttonBounds = await button.boundingBox()
+  const tooltipBounds = await tooltip.boundingBox()
+  expect(buttonBounds).not.toBeNull()
+  expect(tooltipBounds).not.toBeNull()
+  expect(tooltipBounds!.y + tooltipBounds!.height).toBeLessThan(buttonBounds!.y)
+  // Visibility alone misses overflow clipping. Check the actual painted layer.
+  await expect
+    .poll(() =>
+      tooltip.evaluate((element) => {
+        const bounds = element.getBoundingClientRect()
+        const painted = document.elementFromPoint(
+          bounds.x + bounds.width / 2,
+          bounds.y + bounds.height / 2
+        )
+        return element.contains(painted)
+      })
+    )
+    .toBe(true)
+  if (testInfo.project.name === 'chromium') {
+    await page.screenshot({
+      path: '../docs/screenshots/vault-delete-tooltip.png'
+    })
+  }
+
+  await page.mouse.move(0, 0)
+  await expect(tooltip).not.toBeVisible()
+  await button.focus()
+  await expect(tooltip).toBeVisible()
+  await expect(button).toHaveAccessibleDescription('delete 2 secrets')
+  await page.keyboard.press('Escape')
+  await expect(tooltip).not.toBeVisible()
+})
+
 for (const view of ['table', 'cards']) {
   test(`${view} fills the viewport after loading and after clearing search`, async ({
     page
