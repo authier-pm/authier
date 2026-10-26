@@ -34,6 +34,7 @@ export interface IBackgroundStateSerializableLocked {
   email: string
   userId: string
   secrets: Array<SecretSerializedType>
+  pendingDeletedSecretIds?: string[]
   encryptionSalt: string
   deviceName: string
   authSecretEncrypted: string

@@ -46,15 +46,14 @@ export const device = {
     }),
     save: async () => undefined,
     backendSync: async () => ({ newAndUpdatedSecrets: 0, removedSecrets: 0 }),
-    removeSecrets: async () => undefined,
-    removeSecret: async () => undefined
+    removeSecrets: async (_secretIds: string[]): Promise<void> => undefined,
+    removeSecret: async (_secretId: string): Promise<void> => undefined
   },
   lock: async () => undefined,
   logout: async () => undefined
 }
 
-export const toast = () => undefined
-export const useAppToast = () => toast
+export { toast, useAppToast } from '../src/providers/ToastProvider'
 export const useThemeMode = () => ({
   colorMode: 'dark',
   toggleColorMode: () => undefined

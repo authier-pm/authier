@@ -35,7 +35,7 @@ export function RefreshSecretsButton({
 
           toast({
             title: t`Sync successful`,
-            description: `added/updated ${res?.newAndUpdatedSecrets}, removed ${res?.removedSecrets}`,
+            description: t`Added/updated: ${res?.newAndUpdatedSecrets ?? 0} · Removed: ${res?.removedSecrets ?? 0}`,
             status: 'success',
             position: 'bottom',
             isClosable: true

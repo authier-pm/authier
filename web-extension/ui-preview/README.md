@@ -154,6 +154,13 @@ the **Delete selected** button to check that its tooltip appears above the card
 without being clipped. The scrolling suite also checks tooltip dismissal with
 Escape and captures `docs/screenshots/vault-delete-tooltip.png`.
 
+The `vault-sync` scenario renders the production table, delete action, sync button,
+and notifications with synthetic Duke and GitHub accounts. Delete Duke, then sync:
+the notification reports `Added/updated: 0 · Removed: 1`. A second sync reports
+zeros because unchanged accounts and historical deletions are not new changes.
+Run `pnpm playwright:ui-preview vaultSync.spec.ts` from `web-extension` to verify
+the flow and capture `docs/screenshots/vault-sync-deletion.png`.
+
 The `offline-vault` scenario (`scenarios/offlineVault.ts`) renders the actual built
 extension in a disposable Chromium profile with encrypted synthetic passwords,
 a TOTP and a passkey. All network traffic is intercepted. Run from `web-extension`:

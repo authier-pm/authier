@@ -78,8 +78,7 @@ export const DeleteSecretButton = ({
             const input = secrets.map(({ id }) => id)
             await removeEncryptedSecrets({ variables: { secrets: input } })
 
-            device.state?.removeSecrets(input)
-            setSelectedItems([])
+            await device.state?.removeSecrets(input)
           } else {
             await deleteEncryptedSecretMutation({
               variables: { id: secrets[0].id }
@@ -90,6 +89,7 @@ export const DeleteSecretButton = ({
               navigate('/')
             }
           }
+          setSelectedItems([])
         }}
       />
     </>

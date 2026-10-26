@@ -71,6 +71,7 @@ export type SecuritySettings = z.infer<typeof settingsSchema>
 export const backgroundStateSerializableLockedSchema = z.object({
   email: z.string(),
   userId: z.string(),
+  pendingDeletedSecretIds: z.array(z.string()).optional(),
   secrets: z.array(
     z.object({
       id: z.string(),

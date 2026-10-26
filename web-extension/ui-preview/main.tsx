@@ -35,6 +35,7 @@ import { SmsVerificationCodesPreview } from './scenarios/SmsVerificationCodesPre
 import { NewDevicePolicyPreview } from './scenarios/NewDevicePolicyPreview'
 import { TotpLabelsPreview } from './scenarios/TotpLabelsPreview'
 import { VaultScrollingPreview } from './scenarios/VaultScrollingPreview'
+import { VaultSyncPreview } from './scenarios/VaultSyncPreview'
 import { ClockSkewPreview } from './scenarios/ClockSkewPreview'
 
 const DEFAULT_SCENARIO = 'autofill-controls'
@@ -64,6 +65,7 @@ const scenarios: Record<string, ComponentType> = {
   'bitfinex-totp': BitfinexTotpPreview,
   'totp-labels': TotpLabelsPreview,
   'vault-scrolling': VaultScrollingPreview,
+  'vault-sync': VaultSyncPreview,
   'clock-skew': ClockSkewPreview,
   'kostkohratky-password': KostkohratkyPasswordPreview,
   'google-password': GooglePasswordPreview
@@ -85,6 +87,7 @@ document.body.classList.toggle(
     requestedScenario !== 'bitfinex-totp' &&
     requestedScenario !== 'totp-labels' &&
     requestedScenario !== 'vault-scrolling' &&
+    requestedScenario !== 'vault-sync' &&
     requestedScenario !== 'clock-skew' &&
     requestedScenario !== 'kostkohratky-password' &&
     requestedScenario !== 'google-password' &&

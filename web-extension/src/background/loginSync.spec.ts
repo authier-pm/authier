@@ -18,7 +18,10 @@ import {
   clockSkewSchema,
   isClockSkewWarning
 } from '@src/util/clockSkew'
-import type { IBackgroundStateSerializable } from './backgroundPage'
+import type {
+  IBackgroundStateSerializable,
+  SecretSerializedType
+} from './backgroundPage'
 
 const { loginMutation, query, mutate } = vi.hoisted(() => ({
   loginMutation: vi.fn(),
@@ -159,6 +162,134 @@ afterEach(() => {
   device.state = null
   loginSessionManager.dispose()
   vi.restoreAllMocks()
+})
+
+function respondWithSecrets(secrets: SecretSerializedType[]) {
+  query
+    .mockReset()
+    .mockResolvedValueOnce({
+      data: {
+        osTime: new Date().toISOString(),
+        currentDevice: { encryptedSecretsToSync: secrets }
+      }
+    })
+    .mockResolvedValueOnce({ data: { webInputs: [] } })
+}
+
+it('does not count unchanged entries or historical deletions in a full snapshot', async () => {
+  await device.save(snapshot)
+  respondWithSecrets([
+    ...snapshot.secrets,
+    {
+      ...snapshot.secrets[0],
+      id: 'previously-deleted',
+      deletedAt: '2026-09-30T00:00:00.000Z'
+    }
+  ])
+  await expect(device.state?.backendSync()).resolves.toEqual({
+    newAndUpdatedSecrets: 0,
+    removedSecrets: 0
+  })
+})
+
+it('counts new, changed and remotely deleted entries against the local vault', async () => {
+  await device.save({
+    ...snapshot,
+    secrets: [
+      ...snapshot.secrets,
+      { ...snapshot.secrets[0], id: 'remotely-deleted' }
+    ]
+  })
+  respondWithSecrets([
+    { ...snapshot.secrets[0], version: 2 },
+    { ...snapshot.secrets[0], id: 'new-account' },
+    {
+      ...snapshot.secrets[0],
+      id: 'remotely-deleted',
+      deletedAt: '2026-09-30T00:00:00.000Z'
+    }
+  ])
+  await expect(device.state?.backendSync()).resolves.toEqual({
+    newAndUpdatedSecrets: 2,
+    removedSecrets: 1
+  })
+  expect(device.state?.secrets.map(({ id }) => id)).toEqual([
+    'saved-password',
+    'new-account'
+  ])
+})
+
+it.each(['single', 'bulk'])(
+  'counts a %s local deletion once, including after reopening the vault',
+  async (mode) => {
+    await device.save(snapshot)
+    const state = device.state!
+    if (mode === 'single') {
+      await state.removeSecret(snapshot.secrets[0].id)
+    } else {
+      await state.removeSecrets([
+        snapshot.secrets[0].id,
+        snapshot.secrets[0].id
+      ])
+    }
+    expect(state.secrets).toEqual([])
+    expect(sessionStorage.backgroundState).toMatchObject({
+      secrets: [],
+      pendingDeletedSecretIds: ['saved-password']
+    })
+    // Storage is the source used by other extension windows and reopened vaults.
+    await device.save(
+      sessionStorage.backgroundState as IBackgroundStateSerializable
+    )
+    const tombstone = {
+      ...snapshot.secrets[0],
+      version: 2,
+      deletedAt: '2026-09-30T00:00:00.000Z'
+    }
+    respondWithSecrets([tombstone])
+    await expect(device.state?.backendSync()).resolves.toEqual({
+      newAndUpdatedSecrets: 0,
+      removedSecrets: 1
+    })
+    expect(sessionStorage.backgroundState).toMatchObject({
+      pendingDeletedSecretIds: []
+    })
+    respondWithSecrets([tombstone])
+    await expect(device.state?.backendSync()).resolves.toEqual({
+      newAndUpdatedSecrets: 0,
+      removedSecrets: 0
+    })
+  }
+)
+
+it('retains local deletions when an older live snapshot arrives or acknowledgement fails', async () => {
+  await device.save(snapshot)
+  await device.state?.removeSecret(snapshot.secrets[0].id)
+  respondWithSecrets(snapshot.secrets)
+  await expect(device.state?.backendSync()).resolves.toEqual({
+    newAndUpdatedSecrets: 0,
+    removedSecrets: 0
+  })
+  expect(device.state?.secrets).toEqual([])
+
+  const tombstone = {
+    ...snapshot.secrets[0],
+    version: 2,
+    deletedAt: '2026-09-30T00:00:00.000Z'
+  }
+  respondWithSecrets([tombstone])
+  mutate.mockRejectedValueOnce(new Error('Sync acknowledgement failed'))
+  await expect(device.state?.backendSync()).rejects.toThrow(
+    'Sync acknowledgement failed'
+  )
+  expect(sessionStorage.backgroundState).toMatchObject({
+    pendingDeletedSecretIds: ['saved-password']
+  })
+  respondWithSecrets([tombstone])
+  await expect(device.state?.backendSync()).resolves.toEqual({
+    newAndUpdatedSecrets: 0,
+    removedSecrets: 1
+  })
 })
 
 it('syncs a freshly installed device and populates the open popup without manual refresh', async () => {

@@ -21,6 +21,7 @@ import type {
 } from './backgroundPage'
 import { EncryptedSecretType } from '../../../shared/generated/graphqlBaseTypes'
 import { reencryptVaultSecrets } from './reencryptVaultSecrets'
+import { mergeSyncedSecrets } from './mergeSyncedSecrets'
 import type { SecuritySettings } from './backgroundSchemas'
 import { apolloClient } from '@src/apollo/apolloClient'
 import {
@@ -172,6 +173,8 @@ export class DeviceState implements IBackgroundStateSerializable {
   encryptionSalt: string
   masterEncryptionKey: string
   secrets: Array<SecretSerializedType>
+  // Completed local deletions to include once in a successful sync summary.
+  pendingDeletedSecretIds: string[] = []
   vaultLockTimeoutSeconds: number
   syncTOTP: boolean
   autofillCredentialsEnabled: boolean
@@ -425,27 +428,12 @@ export class DeviceState implements IBackgroundStateSerializable {
       if (device.state !== this || this.masterEncryptionKey !== syncKey) return
       const deviceState = device.state
       if (data && deviceState) {
-        const backendRemovedSecrets =
-          data.currentDevice.encryptedSecretsToSync.filter(
-            ({ deletedAt }) => deletedAt
-          )
-        const newAndUpdatedSecrets =
-          data.currentDevice.encryptedSecretsToSync.filter(
-            ({ deletedAt }) => !deletedAt
-          )
-
-        const secretsBeforeSync = deviceState.secrets
-        const unchangedSecrets = secretsBeforeSync.filter(
-          ({ id }) =>
-            !backendRemovedSecrets.find(
-              (removedSecret) => id === removedSecret.id
-            ) &&
-            !newAndUpdatedSecrets.find(
-              (updatedSecret) => id === updatedSecret.id
-            )
+        const merged = mergeSyncedSecrets(
+          deviceState.secrets,
+          data.currentDevice.encryptedSecretsToSync,
+          deviceState.pendingDeletedSecretIds
         )
-
-        deviceState.secrets = [...unchangedSecrets, ...newAndUpdatedSecrets]
+        deviceState.secrets = merged.secrets
 
         await this.initialize()
         if (device.state !== this || this.masterEncryptionKey !== syncKey)
@@ -462,16 +450,19 @@ export class DeviceState implements IBackgroundStateSerializable {
           MarkAsSyncedMutationVariables
         >({ mutation: MarkAsSyncedDocument })
 
-        const actuallyRemovedOnThisDevice = backendRemovedSecrets.filter(
-          ({ id: removedId }) => {
-            return secretsBeforeSync.find(({ id }) => removedId === id)
-          }
-        )
-        log('actuallyRemovedOnThisDevice', actuallyRemovedOnThisDevice)
-        return {
-          removedSecrets: actuallyRemovedOnThisDevice.length,
-          newAndUpdatedSecrets: newAndUpdatedSecrets.length
+        if (device.state !== this || this.masterEncryptionKey !== syncKey)
+          return
+        if (
+          this.pendingDeletedSecretIds.some((id) =>
+            merged.confirmedDeletedSecretIds.has(id)
+          )
+        ) {
+          this.pendingDeletedSecretIds = this.pendingDeletedSecretIds.filter(
+            (id) => !merged.confirmedDeletedSecretIds.has(id)
+          )
+          await this.save()
         }
+        return merged.summary
       }
     }
   }
@@ -573,25 +564,20 @@ export class DeviceState implements IBackgroundStateSerializable {
   }
 
   async removeSecret(secretId: string) {
-    browser.storage.session.set({
-      backgroundState: {
-        ...toPersistedBackgroundState(device.state),
-        secrets: device.state?.secrets.filter((s) => s.id !== secretId)
-      }
-    })
-    this.secrets = this.secrets.filter((s) => s.id !== secretId)
-    this.save()
+    await this.removeSecrets([secretId])
   }
 
   async removeSecrets(secretIds: string[]) {
-    browser.storage.session.set({
-      backgroundState: {
-        ...toPersistedBackgroundState(device.state),
-        secrets: device.state?.secrets.filter((s) => !secretIds.includes(s.id))
-      }
-    })
-    this.secrets = this.secrets.filter((s) => !secretIds.includes(s.id))
-    this.save()
+    const deletedIds = new Set(secretIds)
+    const removed = this.secrets.filter(({ id }) => deletedIds.has(id))
+    this.pendingDeletedSecretIds = [
+      ...new Set([
+        ...this.pendingDeletedSecretIds,
+        ...removed.map(({ id }) => id)
+      ])
+    ]
+    this.secrets = this.secrets.filter(({ id }) => !deletedIds.has(id))
+    await this.save()
   }
 
   destroy() {
