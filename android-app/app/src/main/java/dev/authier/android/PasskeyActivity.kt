@@ -73,6 +73,8 @@ class PasskeyActivity : FragmentActivity() {
                 }
                 ui = ui.copy(domain = getOptions.map { it.options.rpId }.distinct().joinToString(", "), origin = getOptions.first().client.origin,
                     requestingApp = caller.packageName)
+                val rememberedKey = withContext(Dispatchers.IO) { unlockStore.restore(unlocked) }
+                if (rememberedKey != null) acceptVerification(rememberedKey, rememberUnlock = false)
             }
             ui = ui.copy(ready = true, biometricEnabled = unlockStore.biometricEnabled(unlocked))
         }
@@ -100,17 +102,23 @@ class PasskeyActivity : FragmentActivity() {
                 val cipher = unlockStore.prepareBiometric(unlocked, enrolling = false)
                 unlockStore.unlockBiometric(unlocked, BiometricUnlock.authenticate(this@PasskeyActivity, cipher, enrolling = false))
             } else withContext(Dispatchers.Default) { AuthierCrypto.deriveMasterKey(requireNotNull(password), unlocked.encryptionSalt) }
-            val available = withContext(Dispatchers.Default) {
-                AuthierCrypto.decrypt(verifiedKey, unlocked.authSecretEncrypted)
-                readPasskeys(unlocked, verifiedKey)
-            }
-            validateAutofillVault(withContext(Dispatchers.IO) { store.read() }, unlocked)
-            key = verifiedKey
-            unlockStore.remember(unlocked, verifiedKey)
-            verifiedUntil = SystemClock.elapsedRealtime() + 60_000
-            choices = available.filter { saved -> getOptions.any { it.options.matches(saved.passkey) } }
-            ui = ui.copy(verified = true, accounts = choices.map { PasskeyAccount(it.record.id, it.passkey.userName, it.passkey.label, it.passkey.rpId, it.passkey.iconUrl) })
+            acceptVerification(verifiedKey, rememberUnlock = true)
         }
+    }
+
+    private suspend fun acceptVerification(verifiedKey: SecretKey, rememberUnlock: Boolean) {
+        val unlocked = requireNotNull(snapshot)
+        val available = withContext(Dispatchers.Default) {
+            AuthierCrypto.decrypt(verifiedKey, unlocked.authSecretEncrypted)
+            readPasskeys(unlocked, verifiedKey)
+        }
+        validateAutofillVault(withContext(Dispatchers.IO) { store.read() }, unlocked)
+        if (rememberUnlock) unlockStore.remember(unlocked, verifiedKey)
+        else if (unlockStore.restore(unlocked) == null) return
+        key = verifiedKey
+        verifiedUntil = SystemClock.elapsedRealtime() + 60_000
+        choices = available.filter { saved -> getOptions.any { it.options.matches(saved.passkey) } }
+        ui = ui.copy(verified = true, accounts = choices.map { PasskeyAccount(it.record.id, it.passkey.userName, it.passkey.label, it.passkey.rpId, it.passkey.iconUrl) })
     }
 
     private fun verificationValid(): Boolean {

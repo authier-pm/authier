@@ -7,7 +7,8 @@ sync the vault to use the same website credentials there.
 The native Android app also supports the same passkeys. On Android 14 or newer,
 enable Authier under **Settings → Passkeys → Set up Android passkeys**, then
 choose Authier when creating or using a passkey in a browser or Android app.
-Verify with your fingerprint or master password and approve the operation.
+An unlocked vault goes straight to account selection for sign-in. Otherwise,
+verify with your fingerprint or master password and approve the operation.
 Sync existing extension passkeys to the phone before using them; sync newly
 created Android passkeys to the extension before using them there. No new website
 enrollment is needed for an existing synced passkey. All supported Android
@@ -22,8 +23,8 @@ offline behavior and platform requirements.
 2. Open a website's security settings and choose to add a passkey.
 3. In the separate Authier window, check the website address, enter your master
    password if prompted, and select **Save passkey**.
-4. On the website's next passkey sign-in, verify your master password in Authier,
-   choose the account, and select **Sign in**.
+4. On the website's next passkey sign-in, choose the account and select **Sign in**.
+   Enter your master password first only if the vault is locked.
 5. On a new browser, sign in to the same Authier vault and sync before signing in
    to the website. You do not need to enroll another website passkey.
 
@@ -31,8 +32,10 @@ In **Settings → Security → Creating passkeys**, choose whether to always ver
 identity (the default) or allow creating new passkeys while this device's vault
 is unlocked. This preference saves automatically in local browser storage and
 does not sync to other devices. Both choices require explicit **Save passkey**
-approval. A locked vault still requires the master password, and passkey sign-in
-always requires verification.
+approval. A locked vault still requires the master password. Passkey sign-in uses
+the current unlocked vault session without asking for the master password again,
+regardless of the creation preference, and still requires explicit **Sign in**
+approval.
 
 Choose the same policy under **Settings → Defaults → Creating passkeys on new
 devices** to set the starting behavior for devices you add later. New devices
@@ -65,7 +68,8 @@ sync to move them between browsers.
   origin in its HTTPS `/.well-known/webauthn` document. This includes Meta's
   shared passkey domain when registering from Facebook.
 - ES256 / P-256, discoverable credentials, account selection, allow/exclude
-  credential lists, user verification by master password, and none attestation.
+  credential lists, user verification by master password or an accepted unlocked
+  vault session, and none attestation.
 - Embedded frames and conditional/silent mediation use the native provider.
   Requests requiring roaming authenticators, enterprise attestation, PRF
   evaluation during sign-in, largeBlob, legacy AppID exclusion, or unsupported
@@ -114,8 +118,9 @@ suffixes, unauthorized domains, insecure origins, and embedded frames are
 rejected. Passkey signatures bind the challenge, origin, and RP ID hash.
 
 A separate extension window shows the trusted origin and obtains explicit
-approval. Each operation verifies the master password by default; creation can
-instead use the unlocked vault when the device-local preference allows it.
+approval. Sign-in accepts the current unlocked vault session; a locked vault
+requires the master password. Creation verifies the master password by default
+and can instead use the unlocked vault when the device-local preference allows it.
 Approval is bound to one
 request, one tab, and the current unlocked vault session, and expires after one
 minute. Navigation, cancellation, timeouts, vault changes, and window closure
@@ -133,9 +138,10 @@ flags. Creation returns the user-verification flag after either a successful
 master-password check or approval using the opted-in unlocked-vault policy,
 including when the website requests required verification. This convenience
 policy accepts the existing unlocked session without a fresh identity check.
-Sign-in still requires a successful master-password check. The authenticator
-uses none attestation and does not claim hardware key protection or biometric
-verification.
+Sign-in also returns the user-verification flag after explicit approval using
+the current unlocked session or after unlocking with the master password. The
+authenticator uses none attestation and does not claim hardware key protection
+or biometric verification.
 
 ## Rollout and development
 
@@ -167,7 +173,8 @@ Google sign-in regression coverage uses a mocked `accounts.google.com` page with
 nonce-only script execution, RP ID `google.com`, and a legacy AppID alongside
 modern passkeys. It checks extension injection, master-password approval,
 encrypted vault restoration, and independent signature verification. These
-fixtures do not contact Google or prove live Google account acceptance.
+fixtures cover sign-in approval without a repeated password prompt in an unlocked
+vault. They do not contact Google or prove live Google account acceptance.
 
 Implementation references: [W3C WebAuthn Level 3](https://www.w3.org/TR/webauthn-3/),
 [Firefox 128 extension changes](https://blog.mozilla.org/addons/2024/07/10/manifest-v3-updates-landed-in-firefox-128/),
