@@ -9,6 +9,8 @@ import { Button } from '@src/components/ui/button'
 import { Tooltip } from '@src/components/ui/tooltip'
 import { SecretTypeUnion } from '@src/background/ExtensionDevice'
 import { DeleteSecretButton } from './DeleteSecretButton'
+import { useContext } from 'react'
+import { DeviceStateContext } from '@src/providers/DeviceStateProvider'
 
 export const EditFormButtons = ({
   secret
@@ -17,10 +19,19 @@ export const EditFormButtons = ({
 }) => {
   const navigate = useNavigate()
   const toast = useAppToast()
-  const { dirty, isSubmitting } = useFormikContext<Record<string, unknown>>()
+  const { dirty, isSubmitting, status } =
+    useFormikContext<Record<string, unknown>>()
+  const { deviceState } = useContext(DeviceStateContext)
+  const pending =
+    !!secret && (deviceState?.pendingSecretIds?.includes(secret.id) ?? false)
 
   return (
     <div className="flex flex-col gap-3 border-t border-[color:var(--color-border)] pt-6 sm:flex-row sm:items-center sm:justify-between">
+      {typeof status === 'string' && (
+        <p role="alert" className="text-sm text-[color:var(--color-danger)]">
+          {status}
+        </p>
+      )}
       <Button
         onClick={() => {
           const canGoBack = window.history.length > 1
@@ -76,7 +87,7 @@ export const EditFormButtons = ({
 
         <Button
           aria-label="Save"
-          disabled={isSubmitting || !dirty}
+          disabled={isSubmitting || !dirty || pending}
           type="submit"
         >
           {isSubmitting ? 'Saving...' : 'Save changes'}

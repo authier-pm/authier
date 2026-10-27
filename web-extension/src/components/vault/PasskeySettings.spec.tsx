@@ -35,7 +35,8 @@ const { state } = vi.hoisted(() => ({
     secrets: [] as SecretSerializedType[],
     encrypt: vi.fn<(value: string) => Promise<string>>(),
     decrypt: vi.fn<(value: string) => Promise<string>>(),
-    save: vi.fn<() => Promise<void>>()
+    save: vi.fn<() => Promise<void>>(),
+    requireSyncedSecrets: vi.fn().mockResolvedValue(undefined)
   }
 }))
 

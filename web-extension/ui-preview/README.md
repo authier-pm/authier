@@ -1,5 +1,14 @@
 # Extension UI preview
 
+The `pendingVault` scenario (`scenarios/pendingVault.ts`) runs in the production
+extension with a synthetic mixed vault, including an unsupported future item.
+Build with `API_URL=https://api.authier.test/graphql pnpm prodBuild`, then run `pnpm exec playwright test --config
+playwrightOfflineVault.config.ts pendingSaves.spec.ts` from `web-extension`.
+It saves a new login offline, checks encrypted local persistence, restarts the
+entire browser, and retries a lost server acknowledgement without a duplicate.
+The production pending-sync and upgrade notices are captured in
+`docs/screenshots/vaultPendingSync.png`.
+
 The `hacking-prize-blog` scenario embeds the production 10 LTC security challenge
 announcement. Start the Astro server on port 4321 alongside the preview, then
 open `/?scenario=hacking-prize-blog`. Check the reward, full-decryption criteria,

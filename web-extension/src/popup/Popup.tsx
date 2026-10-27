@@ -4,6 +4,7 @@ import { Route, Switch, useLocation } from 'wouter'
 
 import { PopupNavBar } from '@src/components/PopupNavBar'
 import { ClockSkewWarning } from '@src/components/ClockSkewWarning'
+import { VaultStorageStatus } from '@src/components/VaultStorageStatus'
 import { VerificationCodes } from '@src/verification-codes/VerificationCodes'
 import { Home } from '../pages/Home'
 
@@ -27,6 +28,7 @@ export const Popup: FunctionComponent = () => {
     <>
       <PopupNavBar />
       <ClockSkewWarning />
+      <VaultStorageStatus />
       <VerificationCodes />
 
       <Switch location={location}>

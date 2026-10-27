@@ -124,7 +124,8 @@ export const tokenPairSchema = z.object({
 export const encryptedSecretRecordSchema = z.object({
   id: z.string().uuid(),
   encrypted: z.string().min(1),
-  kind: encryptedSecretTypeSchema,
+  // Preserve future kinds on reads. Writes still use the closed payload enum.
+  kind: z.string().min(1),
   version: z.number().int().positive(),
   createdAt: z.string(),
   updatedAt: z.string().nullable()

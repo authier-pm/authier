@@ -6,6 +6,7 @@ import {
 } from '@shared/cryptoUtils'
 import type { EncryptedSecretPatchInput } from '@shared/generated/graphqlBaseTypes'
 import type { SecretSerializedType } from './backgroundPage'
+import { isSupportedSecretKind } from '@shared/secretKinds'
 
 export type VersionedSecretPatch = EncryptedSecretPatchInput & {
   expectedVersion: number
@@ -20,6 +21,11 @@ export async function reencryptVaultSecrets(
 ): Promise<VersionedSecretPatch[]> {
   const activeSecrets = secrets.filter((secret) => !secret.deletedAt)
   const versionedSecrets = activeSecrets.map((secret) => {
+    if (!isSupportedSecretKind(secret.kind)) {
+      throw new Error(
+        'Update Authier before changing the master password: this vault contains unsupported item types'
+      )
+    }
     const version = secret.version
     if (
       version === undefined ||
@@ -30,7 +36,7 @@ export async function reencryptVaultSecrets(
         'Synchronize the vault before changing the master password'
       )
     }
-    return { ...secret, version }
+    return { ...secret, kind: secret.kind, version }
   })
   const oldKey = await abToCryptoKey(base64ToBuffer(previousKey))
   const salt = base64ToBuffer(encryptionSalt)
@@ -52,9 +58,7 @@ export function applyPasswordRotation(
   secrets: readonly SecretSerializedType[],
   patches: readonly VersionedSecretPatch[]
 ): SecretSerializedType[] {
-  const previousSecrets = new Map(
-    secrets.map((secret) => [secret.id, secret])
-  )
+  const previousSecrets = new Map(secrets.map((secret) => [secret.id, secret]))
   return patches.map(({ id, encrypted, expectedVersion }) => {
     const previous = previousSecrets.get(id)
     if (!previous || previous.version !== expectedVersion) {

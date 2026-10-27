@@ -48,6 +48,22 @@ beforeAll(async () => {
 afterAll(() => vi.unstubAllGlobals())
 
 describe('password rotation preparation', () => {
+  it('blocks rotation instead of dropping a future item type', async () => {
+    const future = {
+      ...secrets[0],
+      kind: 'FUTURE_SECRET',
+      encrypted: 'opaque-future-envelope'
+    }
+    await expect(
+      reencryptVaultSecrets(
+        [...secrets, future],
+        oldKeySerialized,
+        newKey,
+        saltSerialized
+      )
+    ).rejects.toThrow('Update Authier')
+    expect(future.encrypted).toBe('opaque-future-envelope')
+  })
   it('preserves a synced passkey signing key and version through a mixed-vault rotation', async () => {
     const signingKeys = await crypto.subtle.generateKey(
       { name: 'ECDSA', namedCurve: 'P-256' },
@@ -61,7 +77,10 @@ describe('password rotation preparation', () => {
       userHandle: 'dXNlcg',
       userName: 'alice@example.com',
       userDisplayName: 'Alice',
-      privateKeyJwk: await crypto.subtle.exportKey('jwk', signingKeys.privateKey),
+      privateKeyJwk: await crypto.subtle.exportKey(
+        'jwk',
+        signingKeys.privateKey
+      ),
       createdAt: '2026-09-08T10:00:00.000Z',
       url: 'https://example.com',
       label: 'Example',
@@ -77,21 +96,46 @@ describe('password rotation preparation', () => {
     }
     const mixedSecrets = [...secrets, record]
     const patches = await reencryptVaultSecrets(
-      mixedSecrets, oldKeySerialized, newKey, saltSerialized
+      mixedSecrets,
+      oldKeySerialized,
+      newKey,
+      saltSerialized
     )
     const rotated = applyPasswordRotation(mixedSecrets, patches)
     const rotatedPasskey = rotated[2]
     expect(patches[2].expectedVersion).toBe(9)
-    expect(rotatedPasskey).toMatchObject({ kind: EncryptedSecretType.PASSKEY, version: 10 })
-    const restored = passkeySchema.parse(JSON.parse(await decryptString(newKey, rotatedPasskey.encrypted)))
+    expect(rotatedPasskey).toMatchObject({
+      kind: EncryptedSecretType.PASSKEY,
+      version: 10
+    })
+    const restored = passkeySchema.parse(
+      JSON.parse(await decryptString(newKey, rotatedPasskey.encrypted))
+    )
     expect(restored).toEqual(passkey)
     expect(await decryptString(oldKey, record.encrypted)).toBe(serialized)
     const restoredSigningKey = await crypto.subtle.importKey(
-      'jwk', restored.privateKeyJwk, { name: 'ECDSA', namedCurve: 'P-256' }, false, ['sign']
+      'jwk',
+      restored.privateKeyJwk,
+      { name: 'ECDSA', namedCurve: 'P-256' },
+      false,
+      ['sign']
     )
-    const challenge = new TextEncoder().encode('passkey remains usable after changing the vault password')
-    const signature = await crypto.subtle.sign({ name: 'ECDSA', hash: 'SHA-256' }, restoredSigningKey, challenge)
-    expect(await crypto.subtle.verify({ name: 'ECDSA', hash: 'SHA-256' }, signingKeys.publicKey, signature, challenge)).toBe(true)
+    const challenge = new TextEncoder().encode(
+      'passkey remains usable after changing the vault password'
+    )
+    const signature = await crypto.subtle.sign(
+      { name: 'ECDSA', hash: 'SHA-256' },
+      restoredSigningKey,
+      challenge
+    )
+    expect(
+      await crypto.subtle.verify(
+        { name: 'ECDSA', hash: 'SHA-256' },
+        signingKeys.publicKey,
+        signature,
+        challenge
+      )
+    ).toBe(true)
   })
 
   it('reencrypts multiple records using one stable old key and includes each exact version', async () => {
@@ -125,9 +169,7 @@ describe('password rotation preparation', () => {
         secrets.map(({ encrypted }) => decryptString(oldKey, encrypted))
       )
     ).toEqual(payloads)
-    await expect(
-      decryptString(oldKey, patches[0].encrypted)
-    ).rejects.toThrow()
+    await expect(decryptString(oldKey, patches[0].encrypted)).rejects.toThrow()
     expect(secrets).toEqual(original)
     const applied = applyPasswordRotation(secrets, patches)
     expect(applied.map(({ version }) => version)).toEqual([5, 6])
@@ -151,9 +193,7 @@ describe('password rotation preparation', () => {
       reencryptVaultSecrets(corrupt, oldKeySerialized, newKey, saltSerialized)
     ).rejects.toThrow()
     expect(corrupt).toEqual(original)
-    expect(await decryptString(oldKey, secrets[0].encrypted)).toBe(
-      payloads[0]
-    )
+    expect(await decryptString(oldKey, secrets[0].encrypted)).toBe(payloads[0])
   })
 
   it.each([undefined, 0, -1, 1.5])(
@@ -185,8 +225,8 @@ describe('password rotation preparation', () => {
       saltSerialized
     )
     expect(patches).toHaveLength(1)
-    expect(
-      applyPasswordRotation(secrets, patches).map(({ id }) => id)
-    ).toEqual([secrets[0].id])
+    expect(applyPasswordRotation(secrets, patches).map(({ id }) => id)).toEqual(
+      [secrets[0].id]
+    )
   })
 })

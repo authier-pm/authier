@@ -384,12 +384,8 @@
             "minLength": 1
           },
           "kind": {
-            "enum": [
-              "TOTP",
-              "LOGIN_CREDENTIALS",
-              "PASSKEY"
-            ],
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "version": {
             "type": "integer",
@@ -431,12 +427,8 @@
             "type": "string"
           },
           "kind": {
-            "enum": [
-              "TOTP",
-              "LOGIN_CREDENTIALS",
-              "PASSKEY"
-            ],
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "version": {
             "type": "integer",
@@ -1530,12 +1522,8 @@
                             "minLength": 1
                           },
                           "kind": {
-                            "enum": [
-                              "TOTP",
-                              "LOGIN_CREDENTIALS",
-                              "PASSKEY"
-                            ],
-                            "type": "string"
+                            "type": "string",
+                            "minLength": 1
                           },
                           "version": {
                             "type": "integer",

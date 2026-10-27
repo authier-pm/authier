@@ -353,6 +353,7 @@ export const VaultImportExport = () => {
                   <Button
                     onClick={async () => {
                       const duplicateIds = duplicates.map(({ id }) => id)
+                      await device.state?.requireSyncedSecrets(duplicateIds)
                       await removeEncryptedSecrets({
                         variables: {
                           secrets: duplicateIds

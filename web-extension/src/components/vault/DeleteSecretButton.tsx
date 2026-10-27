@@ -31,7 +31,10 @@ export const DeleteSecretButton = ({
   size,
   ...props
 }: DeleteSecretButtonProps) => {
-  const { setSelectedItems } = useContext(DeviceStateContext)
+  const { setSelectedItems, deviceState } = useContext(DeviceStateContext)
+  const pending = secrets.some(({ id }) =>
+    deviceState?.pendingSecretIds?.includes(id)
+  )
   const [isOpen, setIsOpen] = useState(false)
   const location = useLocation()
   const navigate = useNavigate()
@@ -44,10 +47,13 @@ export const DeleteSecretButton = ({
 
   return (
     <>
-      <Tooltip content={label}>
+      <Tooltip
+        content={pending ? 'Synchronize this item before deleting it' : label}
+      >
         {children ? (
           <Button
             {...props}
+            disabled={props.disabled || pending}
             aria-label={label}
             className={cn('w-full', className)}
             onClick={() => setIsOpen(true)}
@@ -60,6 +66,7 @@ export const DeleteSecretButton = ({
         ) : (
           <Button
             {...props}
+            disabled={props.disabled || pending}
             aria-label={label}
             className={className}
             onClick={() => setIsOpen(true)}
@@ -74,6 +81,7 @@ export const DeleteSecretButton = ({
         isOpen={isOpen}
         onClose={() => setIsOpen(false)}
         deleteItem={async () => {
+          await device.state?.requireSyncedSecrets(secrets.map(({ id }) => id))
           if (secrets.length > 1) {
             const input = secrets.map(({ id }) => id)
             await removeEncryptedSecrets({ variables: { secrets: input } })

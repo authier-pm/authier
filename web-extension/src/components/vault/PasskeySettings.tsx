@@ -12,6 +12,7 @@ export function PasskeySettings({ secret }: { secret: IPasskeySecret }) {
   const saveLabel = async (label: string) => {
     const state = device.state
     if (!state) throw new Error('Unlock your vault to edit this passkey.')
+    await state.requireSyncedSecrets([secret.id])
     const stored = state.secrets.find(({ id }) => id === secret.id)
     if (!stored) throw new Error('This passkey is no longer in your vault.')
     if (stored.kind !== EncryptedSecretType.PASSKEY) {
