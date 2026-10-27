@@ -6,7 +6,7 @@ import {
 import { backgroundStateSerializableLockedSchema } from './backgroundSchemas'
 import { isSupportedSecretKind } from '@shared/secretKinds'
 import {
-  acknowledgePendingSecret,
+  acknowledgePendingSecrets,
   belongsToVaultKey,
   enqueueSecrets,
   pendingSecretRecord,
@@ -293,25 +293,44 @@ export class DeviceState implements IBackgroundStateSerializable {
           userId: this.userId,
           keyId: await pendingSecretKeyId(key)
         }
-        for (const entry of entries) {
-          if (
-            !belongsToVaultKey(entry, owner) ||
-            !isSupportedSecretKind(entry.operation.kind)
-          )
-            continue
-          if (!isCurrentSession()) return
-          const saved = await createQueuedSecret(entry, isCurrentSession)
-          // A late response must not unlock the vault or publish to another user.
-          if (!isCurrentSession()) return
-          this.secrets = [
-            ...this.secrets.filter(({ id }) => id !== saved.id),
-            saved
-          ]
-          await this.save()
-          if (!isCurrentSession()) return
-          await acknowledgePendingSecret(entry)
+        const confirmed = new Map<
+          PendingSecret,
+          Awaited<ReturnType<typeof createQueuedSecret>>
+        >()
+        try {
+          for (const entry of entries) {
+            if (
+              !belongsToVaultKey(entry, owner) ||
+              !isSupportedSecretKind(entry.operation.kind)
+            )
+              continue
+            if (!isCurrentSession()) return
+            const saved = await createQueuedSecret(entry, isCurrentSession)
+            // A late response must not unlock the vault or publish to another user.
+            if (!isCurrentSession()) return
+            confirmed.set(entry, saved)
+          }
+        } finally {
+          // Persist a batch once, including successes before a later failure.
+          // Keep the queue intact until every acknowledgement has been cached.
+          if (confirmed.size && isCurrentSession()) {
+            const records = new Map(
+              this.secrets.map((secret) => [secret.id, secret])
+            )
+            for (const saved of confirmed.values()) {
+              // Idempotent retries return the original create response, which
+              // can predate an update or deletion already received by this device.
+              if ((records.get(saved.id)?.version ?? 0) < saved.version)
+                records.set(saved.id, saved)
+            }
+            this.secrets = [...records.values()]
+            await this.save()
+            if (isCurrentSession()) {
+              await acknowledgePendingSecrets([...confirmed.keys()])
+              if (isCurrentSession()) await this.save()
+            }
+          }
         }
-        if (isCurrentSession()) await this.save()
       })
     )
   }
@@ -497,7 +516,11 @@ export class DeviceState implements IBackgroundStateSerializable {
    * fetches newly added/deleted/updated secrets from the backend and updates the device state
    */
   async backendSync() {
-    await this.flushPendingSecrets()
+    await this.flushPendingSecrets().catch(() => {
+      // A quota or upload failure must not block remote updates and deletions.
+      // The durable queue and pending-save indicator retain the unsent items.
+      console.warn('Some locally saved items are still waiting to synchronize')
+    })
     if (device.state !== this) return
     const syncKey = this.masterEncryptionKey
     const startedAt = Date.now()

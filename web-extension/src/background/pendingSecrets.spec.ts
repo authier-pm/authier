@@ -13,9 +13,11 @@ import {
   readPendingSecrets,
   enqueueSecrets,
   pendingSecretRecord,
-  pendingSecretKeyId
+  pendingSecretKeyId,
+  type PendingSecret
 } from './pendingSecrets'
 import { createQueuedSecret } from './createQueuedSecret'
+import { apolloClient } from '@src/apollo/apolloClient'
 import { readLockedVaultSnapshot } from './lockedVaultStorage'
 import {
   mockPersistentVaultStorage,
@@ -81,6 +83,176 @@ beforeEach(async () => {
 afterEach(() => {
   device.state?.destroy()
   device.state = null
+  vi.restoreAllMocks()
+})
+
+const confirmedRecord = (entry: PendingSecret) => ({
+  ...pendingSecretRecord(entry),
+  version: 1,
+  updatedAt: null,
+  deletedAt: null
+})
+
+async function queueTestSecrets(count = 1) {
+  const encrypted = await device.state!.encrypt(
+    JSON.stringify(input[0].loginCredentials)
+  )
+  const keyId = await pendingSecretKeyId(snapshot.masterEncryptionKey)
+  const entries = Array.from({ length: count }, () => ({
+    userId: snapshot.userId,
+    keyId,
+    createdAt: input[0].createdAt,
+    operation: {
+      id: crypto.randomUUID(),
+      operationId: crypto.randomUUID(),
+      encrypted,
+      kind: EncryptedSecretType.LOGIN_CREDENTIALS
+    }
+  }))
+  await enqueueSecrets(entries)
+  await device.state!.save()
+  return entries
+}
+
+it('downloads remote updates and deletions when a queued upload exceeds the quota', async () => {
+  const [entry] = await queueTestSecrets()
+  const existing = { ...confirmedRecord(entry), id: 'existing' }
+  const removed = { ...existing, id: 'removed' }
+  const updated = {
+    ...existing,
+    version: 2,
+    encrypted: await device.state!.encrypt(
+      JSON.stringify({
+        ...input[0].loginCredentials,
+        password: 'updated-remotely'
+      })
+    )
+  }
+  await device.save({ ...snapshot, secrets: [existing, removed] })
+  vi.mocked(createQueuedSecret).mockRejectedValue(
+    new Error('Credential quota exceeded')
+  )
+  vi.mocked(apolloClient.query)
+    .mockResolvedValueOnce({
+      data: {
+        osTime: new Date().toISOString(),
+        currentDevice: {
+          encryptedSecretsToSync: [
+            updated,
+            { ...removed, version: 2, deletedAt: input[0].createdAt }
+          ]
+        }
+      }
+    })
+    .mockResolvedValueOnce({ data: { webInputs: [] } })
+
+  await expect(device.state!.backendSync()).resolves.toEqual({
+    removedSecrets: 1,
+    newAndUpdatedSecrets: 1
+  })
+  expect(device.state!.secrets).toContainEqual(updated)
+  expect(device.state!.secrets.some(({ id }) => id === removed.id)).toBe(false)
+  expect(device.state!.decryptedSecrets).toContainEqual(
+    expect.objectContaining({
+      id: existing.id,
+      loginCredentials: expect.objectContaining({
+        password: 'updated-remotely'
+      })
+    })
+  )
+  expect(await readPendingSecrets(snapshot.userId)).toEqual([entry])
+  expect(device.state!.pendingSecretIds).toEqual([entry.operation.id])
+  expect(apolloClient.mutate).toHaveBeenCalledTimes(1)
+})
+
+it.each([false, true])(
+  'preserves a newer cached record when retrying a create (deleted: %s)',
+  async (deleted) => {
+    const [entry] = await queueTestSecrets()
+    const newer = {
+      ...confirmedRecord(entry),
+      version: 2,
+      encrypted: await device.state!.encrypt(
+        JSON.stringify({
+          ...input[0].loginCredentials,
+          password: 'updated-remotely'
+        })
+      ),
+      deletedAt: deleted ? input[0].createdAt : null
+    }
+    await device.save({ ...snapshot, secrets: [newer] })
+    vi.mocked(createQueuedSecret).mockResolvedValue(confirmedRecord(entry))
+
+    await device.state!.flushPendingSecrets()
+
+    expect(await readPendingSecrets(snapshot.userId)).toEqual([])
+    expect(device.state!.pendingSecretIds).toEqual([])
+    expect(device.state!.secrets).toEqual([newer])
+    expect((await readLockedVaultSnapshot())?.secrets).toEqual([newer])
+    expect(device.state!.decryptedSecrets).toEqual(
+      deleted
+        ? []
+        : [
+            {
+              ...newer,
+              loginCredentials: {
+                ...input[0].loginCredentials,
+                password: 'updated-remotely'
+              }
+            }
+          ]
+    )
+  }
+)
+
+it('batches full-vault decryption and persistence when draining an imported batch', async () => {
+  const entries = await queueTestSecrets(100)
+  vi.mocked(createQueuedSecret).mockImplementation(async (entry) =>
+    confirmedRecord(entry)
+  )
+  const decrypt = vi.spyOn(device.state!, 'decrypt')
+  vi.mocked(browser.storage.session.set).mockClear()
+  vi.mocked(browser.storage.local.set).mockClear()
+
+  await device.state!.flushPendingSecrets()
+
+  expect(createQueuedSecret).toHaveBeenCalledTimes(entries.length)
+  expect(decrypt.mock.calls.length).toBeLessThanOrEqual(2 * entries.length)
+  const snapshots = vi
+    .mocked(browser.storage.local.set)
+    .mock.calls.filter(([values]) => 'lockedState' in values)
+  expect(snapshots.length).toBeLessThanOrEqual(2)
+  expect(device.state!.secrets).toEqual(entries.map(confirmedRecord))
+  expect((await readLockedVaultSnapshot())?.secrets).toEqual(
+    entries.map(confirmedRecord)
+  )
+  expect(await readPendingSecrets(snapshot.userId)).toEqual([])
+  expect(device.state!.pendingSecretIds).toEqual([])
+})
+
+it('persists acknowledged items when a later upload fails and retries the remaining batch', async () => {
+  const entries = await queueTestSecrets(3)
+  vi.mocked(createQueuedSecret)
+    .mockResolvedValueOnce(confirmedRecord(entries[0]))
+    .mockRejectedValueOnce(new Error('Credential quota exceeded'))
+
+  await expect(device.state!.flushPendingSecrets()).rejects.toThrow(
+    'Credential quota exceeded'
+  )
+
+  expect(await readPendingSecrets(snapshot.userId)).toEqual(entries.slice(1))
+  expect((await readLockedVaultSnapshot())?.secrets).toContainEqual(
+    confirmedRecord(entries[0])
+  )
+  vi.mocked(createQueuedSecret)
+    .mockClear()
+    .mockImplementation(async (entry) => confirmedRecord(entry))
+  await device.state!.flushPendingSecrets()
+  expect(createQueuedSecret).toHaveBeenCalledTimes(2)
+  expect(await readPendingSecrets(snapshot.userId)).toEqual([])
+  expect(device.state!.secrets).toEqual(
+    expect.arrayContaining(entries.map(confirmedRecord))
+  )
 })
 
 it('acknowledges a durable encrypted local save while offline, then restores after browser restart', async () => {
@@ -205,25 +377,62 @@ it('can synchronize after re-login changes the enrollment verifier but retains t
   expect(await readPendingSecrets(snapshot.userId)).toEqual([])
 })
 
-it('retains the operation when caching a server acknowledgement fails', async () => {
-  await device.state!.addSecrets(input)
-  await expect(device.state!.flushPendingSecrets()).rejects.toThrow('offline')
-  const entries = await readPendingSecrets(snapshot.userId)
-  vi.mocked(createQueuedSecret).mockImplementation(async (entry) => ({
-    ...pendingSecretRecord(entry),
-    version: 1,
-    updatedAt: null,
-    deletedAt: null
-  }))
-  vi.mocked(browser.storage.local.set).mockRejectedValueOnce(
-    new Error('disk failure')
-  )
-  await expect(device.state!.flushPendingSecrets()).rejects.toThrow(
-    'disk failure'
-  )
+it.each([1, 3])(
+  'recovers %i queued items after acknowledgement persistence fails and the browser restarts',
+  async (count) => {
+    const entries = await queueTestSecrets(count)
+    vi.mocked(createQueuedSecret).mockImplementation(async (entry) =>
+      confirmedRecord(entry)
+    )
+    vi.mocked(browser.storage.local.set).mockRejectedValueOnce(
+      new Error('disk failure')
+    )
+    await expect(device.state!.flushPendingSecrets()).rejects.toThrow(
+      'disk failure'
+    )
+    expect(await readPendingSecrets(snapshot.userId)).toEqual(entries)
+
+    device.state!.destroy()
+    await browser.storage.session.clear()
+    await device.save(structuredClone(snapshot))
+    expect(device.state!.decryptedSecrets).toHaveLength(count)
+    await device.state!.flushPendingSecrets()
+    expect(await readPendingSecrets(snapshot.userId)).toEqual([])
+    expect((await readLockedVaultSnapshot())?.secrets).toEqual(
+      entries.map(confirmedRecord)
+    )
+  }
+)
+
+it('retains earlier acknowledgements when the vault locks during a batch upload', async () => {
+  const entries = await queueTestSecrets(2)
+  const previous = device.state!
+  let finish!: (value: Awaited<ReturnType<typeof createQueuedSecret>>) => void
+  vi.mocked(createQueuedSecret)
+    .mockResolvedValueOnce(confirmedRecord(entries[0]))
+    .mockImplementationOnce(
+      () =>
+        new Promise((resolve) => {
+          finish = resolve
+        })
+    )
+  const drain = previous.flushPendingSecrets()
+  await vi.waitFor(() => expect(finish).toBeDefined())
+  await device.lock()
+  finish(confirmedRecord(entries[1]))
+  await drain
+
+  expect(device.state).toBeNull()
+  expect(storage.session.backgroundState).toBeNull()
   expect(await readPendingSecrets(snapshot.userId)).toEqual(entries)
+
+  await device.save(structuredClone(snapshot))
+  vi.mocked(createQueuedSecret).mockImplementation(async (entry) =>
+    confirmedRecord(entry)
+  )
   await device.state!.flushPendingSecrets()
   expect(await readPendingSecrets(snapshot.userId)).toEqual([])
+  expect(device.state!.secrets).toEqual(entries.map(confirmedRecord))
 })
 
 it('keeps a late acknowledgement pending after locking and does not resurrect an unlocked session', async () => {

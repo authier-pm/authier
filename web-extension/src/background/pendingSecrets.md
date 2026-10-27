@@ -11,6 +11,12 @@ other's pending saves. The queue is independent of cached vault snapshots, so a
 stale snapshot cannot discard a pending item. Acknowledgements are validated and
 cached before removing the corresponding queue entry. Crashes between the server
 commit and removal are handled by the server's durable operation idempotency.
+Queue drains merge acknowledgements into the latest cached records without
+replacing newer versions or tombstones. They persist the vault once before
+removing the confirmed batch and once afterward to refresh pending status,
+including when a later upload fails. Full-vault decryption and snapshot writes
+therefore do not repeat for every imported item. Failed uploads remain queued
+and do not prevent manual synchronization from downloading remote changes.
 
 Web Locks serialize queue drains across extension contexts. Saves and uploads
 hold shared vault-write locks; password changes hold the exclusive lock through

@@ -77,8 +77,8 @@ export async function enqueueSecrets(entries: PendingSecret[]) {
   )
 }
 
-export const acknowledgePendingSecret = (entry: PendingSecret) =>
-  browser.storage.local.remove(storageKey(entry))
+export const acknowledgePendingSecrets = (entries: PendingSecret[]) =>
+  browser.storage.local.remove(entries.map(storageKey))
 
 export const pendingSecretRecord = (
   entry: PendingSecret
