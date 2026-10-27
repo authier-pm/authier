@@ -56,6 +56,43 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value)
 }
 
+function validatePublishedImage(image: string, label: string, route: string) {
+  const imageUrl = new URL(image)
+
+  if (
+    imageUrl.origin !== 'https://www.authier.pm' ||
+    !existsSync(join(distributionDirectory, imageUrl.pathname))
+  ) {
+    throw new Error(`${route}: ${label} must be a published site asset`)
+  }
+
+  return imageUrl
+}
+
+function validateSchemaImages(value: unknown, route: string) {
+  if (!isRecord(value) || value['@type'] === 'BreadcrumbList') return false
+
+  const images = Array.isArray(value.image) ? value.image : [value.image]
+
+  if (images.length === 0) {
+    throw new Error(`${route}: Schema.org structured data is missing an image`)
+  }
+
+  for (const image of images) {
+    const url = isRecord(image) ? (image.url ?? image.contentUrl) : image
+
+    if (typeof url !== 'string' || url.length === 0) {
+      throw new Error(
+        `${route}: Schema.org structured data is missing an image`
+      )
+    }
+
+    validatePublishedImage(url, 'Schema.org image', route)
+  }
+
+  return true
+}
+
 function validateDatasetMetadata(value: unknown, route: string) {
   if (Array.isArray(value)) {
     for (const item of value) validateDatasetMetadata(item, route)
@@ -125,17 +162,14 @@ for (const file of files) {
     'Twitter image',
     route
   )
-  const socialImageUrl = new URL(socialImage)
+  const socialImageUrl = validatePublishedImage(
+    socialImage,
+    'social image',
+    route
+  )
 
   if (socialImage !== twitterImage) {
     throw new Error(`${route}: Open Graph and Twitter images differ`)
-  }
-
-  if (
-    socialImageUrl.origin !== 'https://www.authier.pm' ||
-    !existsSync(join(distributionDirectory, socialImageUrl.pathname))
-  ) {
-    throw new Error(`${route}: social image must be a published site asset`)
   }
 
   if (
@@ -146,16 +180,26 @@ for (const file of files) {
   }
 
   if (socialImageUrl.pathname.endsWith('.png')) {
-    const image = readFileSync(join(distributionDirectory, socialImageUrl.pathname))
-    for (const [dimension, offset] of [['width', 16], ['height', 20]] as const) {
+    const image = readFileSync(
+      join(distributionDirectory, socialImageUrl.pathname)
+    )
+    for (const [dimension, offset] of [
+      ['width', 16],
+      ['height', 20]
+    ] as const) {
       const declared = requireMatch(
         html,
-        new RegExp(`<meta\\s+property="og:image:${dimension}"\\s+content="([^"]+)"`, 'i'),
+        new RegExp(
+          `<meta\\s+property="og:image:${dimension}"\\s+content="([^"]+)"`,
+          'i'
+        ),
         `social image ${dimension}`,
         route
       )
       if (Number(declared) !== image.readUInt32BE(offset)) {
-        throw new Error(`${route}: social image ${dimension} does not match the PNG`)
+        throw new Error(
+          `${route}: social image ${dimension} does not match the PNG`
+        )
       }
     }
   }
@@ -203,11 +247,19 @@ for (const file of files) {
 
   const jsonLdPattern =
     /<script[^>]+type="application\/ld\+json"[^>]*>(.*?)<\/script>/gis
+  let pageSchemaBlocks = 0
 
   for (const match of html.matchAll(jsonLdPattern)) {
     const structuredData: unknown = JSON.parse(match[1] ?? '')
     validateDatasetMetadata(structuredData, route)
+    if (validateSchemaImages(structuredData, route)) pageSchemaBlocks += 1
     structuredDataBlocks += 1
+  }
+
+  if (pageSchemaBlocks === 0) {
+    throw new Error(
+      `${route}: missing page structured data with a Schema.org image`
+    )
   }
 
   for (const match of html.matchAll(/<a\s[^>]*href="([^"]+)"/gi)) {

@@ -31,7 +31,20 @@ const {
 
 const canonicalUrl = getCanonicalUrl(canonicalPath)
 const imageUrl = new URL(socialImage.path, site.url)
-const schemas = Array.isArray(schema) ? schema : [schema]
+const providedSchemas = [schema].flat()
+const pageSchemas = providedSchemas.length > 0
+  ? providedSchemas
+  : [{
+      '@context': 'https://schema.org',
+      '@type': 'WebPage',
+      name: title,
+      description,
+      url: canonicalUrl.href
+    }]
+const schemas = pageSchemas.map((value) => ({
+  ...value,
+  image: value.image ?? imageUrl.href
+}))
 const fullTitle = title === site.name ? title : `${title} | ${site.name}`
 ---
 
