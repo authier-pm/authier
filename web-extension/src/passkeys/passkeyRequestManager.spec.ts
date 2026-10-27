@@ -35,6 +35,19 @@ const approval = (): PasskeySender => ({
 })
 const start = () =>
   manager.begin({ requestId: 'request', operation: 'create', options }, website)
+const startSignIn = () =>
+  manager.begin(
+    {
+      requestId: 'request',
+      operation: 'get',
+      options: {
+        challenge: 'bmV3LWNoYWxsZW5nZQ',
+        rpId: 'example.com',
+        userVerification: 'required'
+      }
+    },
+    website
+  )
 
 beforeEach(() => {
   vi.stubGlobal('crypto', webcrypto)
@@ -419,39 +432,128 @@ describe('trusted passkey ceremonies', () => {
     })
   })
 
-  it('signs with the selected synced account and exposes no private key', async () => {
-    repository.allowUnlockedCreation = async () => true
+  it.each([false, true])(
+    'signs with the selected unlocked account when unlocked creation is %s',
+    async (allowUnlockedCreation) => {
+      repository.allowUnlockedCreation = vi.fn(
+        async () => allowUnlockedCreation
+      )
+      passkeys.push(
+        (await createPasskey(options, 'https://example.com', true)).passkey
+      )
+      const result = startSignIn()
+      await opened()
+      const view = await manager.view(token, approval())
+      expect(view.verified).toBe(true)
+      expect(view.accounts).toHaveLength(1)
+      expect(JSON.stringify(view)).not.toContain('privateKey')
+      expect(windows.close).not.toHaveBeenCalled()
+      await expect(
+        manager.approve(token, view.accounts[0].credentialId, website)
+      ).rejects.toThrow('Only the Authier')
+      await manager.approve(token, view.accounts[0].credentialId, approval())
+      const reply = await result
+      if (reply.status !== 'ok') throw new Error('Expected a signed credential')
+      expect(reply.credential.id).toBe(passkeys[0].credentialId)
+      expect(
+        fromBase64url(reply.credential.response.authenticatorData)[32] & 0x04
+      ).toBe(0x04)
+      expect(JSON.stringify(reply)).not.toContain('privateKey')
+      expect(repository.verifyPassword).not.toHaveBeenCalled()
+      expect(repository.allowUnlockedCreation).not.toHaveBeenCalled()
+      expect(repository.save).not.toHaveBeenCalled()
+    }
+  )
+
+  it('requires the master password to sign in when the vault is locked', async () => {
+    session = null
     passkeys.push(
       (await createPasskey(options, 'https://example.com', true)).passkey
     )
-    const result = manager.begin(
-      {
-        requestId: 'request',
-        operation: 'get',
-        options: {
-          challenge: 'bmV3LWNoYWxsZW5nZQ',
-          rpId: 'example.com',
-          userVerification: 'required'
-        }
-      },
-      website
-    )
+    const result = startSignIn()
     await opened()
+    expect(await manager.view(token, approval())).toMatchObject({
+      verified: false,
+      accounts: []
+    })
     await expect(
       manager.approve(token, passkeys[0].credentialId, approval())
     ).rejects.toThrow('Verify your master password')
-    expect((await manager.view(token, approval())).accounts).toEqual([])
+    await expect(
+      manager.verify(token, 'incorrect', approval())
+    ).rejects.toThrow('Incorrect master password')
     const view = await manager.verify(token, 'correct', approval())
+    expect(view.verified).toBe(true)
     expect(view.accounts).toHaveLength(1)
-    expect(JSON.stringify(view)).not.toContain('privateKey')
     await manager.approve(token, view.accounts[0].credentialId, approval())
-    const reply = await result
-    expect(reply).toMatchObject({
+    expect(await result).toMatchObject({
       status: 'ok',
       credential: { id: passkeys[0].credentialId }
     })
-    expect(JSON.stringify(reply)).not.toContain('privateKey')
     expect(repository.save).not.toHaveBeenCalled()
+  })
+
+  it.each(['locked', 'new-session', 'expired'])(
+    'invalidates unlocked sign-in when the session is %s before approval',
+    async (change) => {
+      passkeys.push(
+        (await createPasskey(options, 'https://example.com', true)).passkey
+      )
+      const result = startSignIn()
+      await opened()
+      expect((await manager.view(token, approval())).verified).toBe(true)
+      if (change === 'locked') session = null
+      if (change === 'new-session') session = {}
+      if (change === 'expired') {
+        vi.useFakeTimers()
+        vi.setSystemTime(Date.now() + 60_001)
+      }
+      expect(await manager.view(token, approval())).toMatchObject({
+        verified: false,
+        accounts: []
+      })
+      await expect(
+        manager.approve(token, passkeys[0].credentialId, approval())
+      ).rejects.toThrow('Verify your master password')
+      manager.dismiss(token, false, approval())
+      expect(await result).toMatchObject({ status: 'error' })
+    }
+  )
+
+  it('does not authorize a replacement session during the initial sign-in lookup', async () => {
+    passkeys.push(
+      (await createPasskey(options, 'https://example.com', true)).passkey
+    )
+    const listing = deferred<PasskeyData[]>()
+    repository.list = vi.fn(() => listing.promise)
+    const result = startSignIn()
+    await vi.waitFor(() => expect(repository.list).toHaveBeenCalled())
+    session = {}
+    listing.resolve(passkeys)
+    await opened()
+    expect(await manager.view(token, approval())).toMatchObject({
+      verified: false,
+      accounts: []
+    })
+    manager.dismiss(token, false, approval())
+    await result
+  })
+
+  it('withholds an assertion if the vault locks during approval', async () => {
+    passkeys.push(
+      (await createPasskey(options, 'https://example.com', true)).passkey
+    )
+    const result = startSignIn()
+    await opened()
+    repository.list = vi.fn(async () => {
+      session = null
+      return passkeys
+    })
+    await expect(
+      manager.approve(token, passkeys[0].credentialId, approval())
+    ).rejects.toThrow('vault was locked')
+    expect(await result).toMatchObject({ status: 'error' })
+    expect(repository.verifyPassword).not.toHaveBeenCalled()
   })
 
   it('falls back without a matching passkey or an Authier account', async () => {
@@ -502,8 +604,8 @@ describe('trusted passkey ceremonies', () => {
       { ...website, url: `${googleOrigin}/v3/signin/challenge/pk` }
     )
     await opened()
-    expect((await manager.view(token, approval())).accounts).toEqual([])
-    const view = await manager.verify(token, 'correct', approval())
+    const view = await manager.view(token, approval())
+    expect(view.verified).toBe(true)
     expect(view.accounts.map(({ credentialId }) => credentialId)).toEqual([
       passkey.credentialId
     ])
@@ -515,6 +617,7 @@ describe('trusted passkey ceremonies', () => {
         clientExtensionResults: { appid: false }
       }
     })
+    expect(repository.verifyPassword).not.toHaveBeenCalled()
   })
 
   it('leaves an AppID request for an unmatched legacy key with the native provider', async () => {
@@ -663,7 +766,6 @@ describe('trusted passkey ceremonies', () => {
       website
     )
     await opened()
-    await manager.verify(token, 'correct', approval())
     repository.list = vi.fn(async () => {
       session = null
       return passkeys

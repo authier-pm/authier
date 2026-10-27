@@ -293,10 +293,10 @@ for (const scenario of [
       void assertion.catch(() => undefined)
       const assertionPopup = await assertionPopupPromise
       await assertionPopup.waitForURL('**/js/passkey.html?*')
-      await assertionPopup.getByLabel('Master password').fill(password)
-      await assertionPopup
-        .getByRole('button', { name: 'Continue', exact: true })
-        .click()
+      await expect(
+        assertionPopup.getByRole('radio', { name: /alex@example.com/ })
+      ).toBeChecked()
+      await expect(assertionPopup.getByLabel('Master password')).toHaveCount(0)
       await assertionPopup
         .getByRole('button', { name: 'Sign in', exact: true })
         .click()

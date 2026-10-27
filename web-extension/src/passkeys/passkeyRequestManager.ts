@@ -190,15 +190,13 @@ export class PasskeyRequestManager {
       pending.origin
     )
     await this.assertCurrent(pending)
-    if (pending.operation === 'create') {
-      const session = this.repository.session()
-      if (session && (await this.repository.allowUnlockedCreation())) {
-        await this.assertCurrent(pending)
-        if (session === this.repository.session()) {
-          pending.session = session
-          pending.verification = 'unlocked'
-          pending.verifiedUntil = Date.now() + 60_000
-        }
+    const session = this.repository.session()
+    if (session && (await this.allowsUnlockedVault(pending))) {
+      await this.assertCurrent(pending)
+      if (session === this.repository.session()) {
+        pending.session = session
+        pending.verification = 'unlocked'
+        pending.verifiedUntil = Date.now() + 60_000
       }
     }
     if (pending.operation === 'get' && this.repository.session()) {
@@ -260,12 +258,18 @@ export class PasskeyRequestManager {
     }
   }
 
+  private async allowsUnlockedVault(pending: PendingRequest) {
+    return (
+      pending.operation === 'get' ||
+      (await this.repository.allowUnlockedCreation())
+    )
+  }
+
   private async isVerified(pending: PendingRequest) {
     const allowed =
       pending.verification === 'password' ||
       (pending.verification === 'unlocked' &&
-        pending.operation === 'create' &&
-        (await this.repository.allowUnlockedCreation()))
+        (await this.allowsUnlockedVault(pending)))
     return (
       allowed &&
       this.pending.get(pending.token) === pending &&

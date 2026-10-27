@@ -34,7 +34,7 @@ export function PasskeyCreationChoices({
       <p className="text-sm leading-6 text-[color:var(--color-muted)]">
         {isDefault
           ? 'New devices start with this choice. You can change it on each device under Security. Existing devices keep their own setting.'
-          : 'Choose how to approve new passkeys in this browser. Signing in with a passkey still requires identity verification.'}
+          : 'Choose how to approve new passkeys in this browser. Passkey sign-in uses your unlocked vault without asking for the master password again.'}
       </p>
       {choices.map((choice) => (
         <label

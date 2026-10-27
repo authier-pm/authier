@@ -196,6 +196,11 @@ The `passkey-sidebar` scenario shows the production vault navigation with Passke
 selected and its fingerprint icon distinct from the TOTP key icon. The captured
 navigation is saved in `docs/screenshots/passkey-sidebar.png`.
 The `passkey-approval` scenario renders the extension's passkey approval dialog.
+Add `&operation=get&unlocked=1` to show account selection and explicit sign-in
+approval using the unlocked vault, with no master-password input. Run
+`pnpm playwright:ui-preview passkeyApproval.spec.ts` to check unlocked sign-in,
+locked-vault verification, creation and provider fallback, and capture
+`docs/screenshots/passkeySignInUnlocked.png`.
 
 The `android-vault` scenario displays actual emulator captures of the Kotlin app's
 password, TOTP and native autofill screens. Compose cannot be imported into this React harness;

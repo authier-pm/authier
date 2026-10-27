@@ -1,5 +1,24 @@
 import { expect, test } from '@playwright/test'
 
+test('unlocked sign-in chooses an account without asking for the master password', async ({
+  page
+}) => {
+  await page.setViewportSize({ width: 440, height: 760 })
+  await page.goto('/?scenario=passkey-approval&operation=get&unlocked=1')
+  await expect(page.getByLabel('Master password')).toHaveCount(0)
+  await expect(
+    page.getByRole('radio', { name: /alex@example.com/ })
+  ).toBeChecked()
+  await page.getByRole('radio', { name: /alex@work.example/ }).check()
+  const signIn = page.getByRole('button', { name: 'Sign in', exact: true })
+  await expect(signIn).toBeEnabled()
+  await page.screenshot({
+    path: '../docs/screenshots/passkeySignInUnlocked.png'
+  })
+  await signIn.click()
+  await expect(page.getByRole('status')).toHaveText('Continue in your browser.')
+})
+
 test('unlocked creation still requires explicit approval without a password input', async ({
   page
 }) => {

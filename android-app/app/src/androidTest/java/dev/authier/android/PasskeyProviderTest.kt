@@ -25,6 +25,7 @@ import okhttp3.mockwebserver.RecordedRequest
 import org.junit.*
 import org.junit.Assert.*
 import org.junit.Assume.assumeTrue
+import java.io.File
 import java.util.concurrent.TimeUnit
 import javax.crypto.SecretKey
 
@@ -101,6 +102,14 @@ class PasskeyProviderTest {
         return activity.result
     }
 
+    private fun assertionResult(): JsonObject {
+        val result = result()
+        assertEquals(Activity.RESULT_OK, result.resultCode)
+        val response = result.resultData.getParcelableExtra("android.service.credentials.extra.GET_CREDENTIAL_RESPONSE", android.credentials.GetCredentialResponse::class.java)
+        val credential = androidx.credentials.Credential.createFrom(requireNotNull(response).credential.type, response.credential.data) as PublicKeyCredential
+        return vaultJson.parseToJsonElement(credential.authenticationResponseJson).jsonObject
+    }
+
     @Test fun extensionPasskeyRequiresVerificationAndReturnsFrameworkAssertion() {
         launch()
         waitFor("Verify with master password")
@@ -110,15 +119,58 @@ class PasskeyProviderTest {
         waitFor("That master password could not unlock this vault.")
         verify()
         compose.onNodeWithText("Sign in").performClick()
-        val result = result()
-        assertEquals(Activity.RESULT_OK, result.resultCode)
-        val response = result.resultData.getParcelableExtra("android.service.credentials.extra.GET_CREDENTIAL_RESPONSE", android.credentials.GetCredentialResponse::class.java)
-        assertNotNull(response)
-        val credential = androidx.credentials.Credential.createFrom(requireNotNull(response).credential.type, response.credential.data) as PublicKeyCredential
-        val json = vaultJson.parseToJsonElement(credential.authenticationResponseJson).jsonObject
+        val json = assertionResult()
         assertEquals(vector.getValue("passkey").jsonObject["credentialId"], json["id"])
         assertEquals(vector.getValue("passkey").jsonObject["userHandle"], json.getValue("response").jsonObject["userHandle"])
         assertEquals(0, server.requestCount) // Existing credentials work with no Authier network request.
+    }
+
+    @Test fun unlockedVaultSignsInWithoutFreshVerificationOrExtendingTheUnlock() {
+        VaultUnlockStore(context).remember(snapshot, key)
+        val unlockFile = File(context.noBackupFilesDir, "vault-unlock.json")
+        val savedUnlock = unlockFile.readText()
+        launch()
+        waitFor("Sign in")
+        compose.onNodeWithText("Master password").assertDoesNotExist()
+        compose.onNodeWithText("Verify with master password").assertDoesNotExist()
+        compose.onNodeWithText("alex@example.com").assertExists()
+        assertNotEquals(Lifecycle.State.DESTROYED, requireNotNull(scenario).state)
+        assertEquals(savedUnlock, unlockFile.readText())
+        compose.onNodeWithText("Sign in").performClick()
+        val json = assertionResult()
+        assertEquals(vector.getValue("passkey").jsonObject["credentialId"], json["id"])
+        assertEquals(0, server.requestCount)
+    }
+
+    @Test fun expiredUnlockStillRequiresVerificationForSignIn() {
+        val unlockStore = VaultUnlockStore(context)
+        val now = unlockStore.now()
+        val age = snapshot.lockTimeoutSeconds * 1000L + 1
+        unlockStore.remember(snapshot, key, now.copy(wallTime = now.wallTime - age, elapsedTime = now.elapsedTime - age))
+        launch()
+        waitFor("Verify with master password")
+        compose.onNodeWithText("alex@example.com").assertDoesNotExist()
+        compose.onNodeWithText("Sign in").assertDoesNotExist()
+    }
+
+    @Test fun lockingTheVaultWhileChoosingAnAccountRequiresVerificationAgain() {
+        val unlockStore = VaultUnlockStore(context)
+        unlockStore.remember(snapshot, key)
+        launch()
+        waitFor("Sign in")
+        unlockStore.clearSession()
+        waitFor("Verify with master password")
+        compose.onNodeWithText("alex@example.com").assertDoesNotExist()
+        compose.onNodeWithText("Sign in").assertDoesNotExist()
+        compose.onNodeWithText("Cancel").performScrollTo().performClick()
+        assertEquals(Activity.RESULT_CANCELED, result().resultCode)
+    }
+
+    @Test fun creationStillRequiresFreshVerificationWithAnUnlockedVault() {
+        VaultUnlockStore(context).remember(snapshot, key)
+        launch(create = true)
+        waitFor("Verify with master password")
+        compose.onNodeWithText("Save passkey").assertDoesNotExist()
     }
 
     @Test fun cancellationDoesNotCreateOrReturnACredential() {
