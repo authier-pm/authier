@@ -77,4 +77,14 @@ describe('Android publication checks', () => {
     expect(() => verifyAndroidApi(oldApi)).toThrow('missing /vault/sync')
     expect(() => verifyAndroidApi({ message: 'Not Found' })).toThrow()
   })
+  it('requires passkey writes even when read kinds accept future item types', () => {
+    const withoutPasskeyWrites = structuredClone(openapi)
+    const kind =
+      withoutPasskeyWrites.components.schemas.CreateVaultSecretInput.properties
+        .kind
+    kind.enum = kind.enum.filter((value) => value !== 'PASSKEY')
+    expect(() => verifyAndroidApi(withoutPasskeyWrites)).toThrow(
+      'does not support the passkey vault format'
+    )
+  })
 })
