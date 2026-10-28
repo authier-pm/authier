@@ -56,6 +56,10 @@ const refreshToken = () => {
   return pendingRefresh
 }
 
+export const ensureAccessToken = async () => {
+  if (!(await isTokenValid())) await refreshToken()
+}
+
 export const tokenRefresh = new ApolloLink((operation, forward) => {
   return new Observable((observer) => {
     let sub: { unsubscribe(): void } | undefined
@@ -69,11 +73,8 @@ export const tokenRefresh = new ApolloLink((operation, forward) => {
       })
     }
 
-    isTokenValid()
-      .then(async (valid) => {
-        if (!valid) await refreshToken()
-        proceed()
-      })
+    ensureAccessToken()
+      .then(proceed)
       .catch((error: unknown) => observer.error(error))
 
     return () => {

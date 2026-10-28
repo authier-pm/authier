@@ -125,25 +125,14 @@ export const VaultList = ({ tableView }: { tableView: boolean }) => {
                 </Button>
               </Tooltip>
 
-              {error ? (
-                <Tooltip content={t`Connect to Authier to add an item`}>
-                  <span>
-                    <Button disabled size="sm" variant="outline">
-                      <FiPlus className="size-4" />
-                      {t`Add item`}
-                    </Button>
-                  </span>
-                </Tooltip>
-              ) : (
-                <Button
-                  onClick={async () => navigate('/addItem')}
-                  size="sm"
-                  variant="primary"
-                >
-                  <FiPlus className="size-4" />
-                  {t`Add item`}
-                </Button>
-              )}
+              <Button
+                onClick={async () => navigate('/addItem')}
+                size="sm"
+                variant="primary"
+              >
+                <FiPlus className="size-4" />
+                {t`Add item`}
+              </Button>
             </div>
           </div>
         </CardContent>

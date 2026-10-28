@@ -20,6 +20,7 @@ import { device } from '@src/background/ExtensionDevice'
 import { Button } from '@src/components/ui/button'
 import { Card } from '@src/components/ui/card'
 import { ClockSkewWarning } from '@src/components/ClockSkewWarning'
+import { VaultStorageStatus } from '@src/components/VaultStorageStatus'
 import { cn } from '@src/lib/cn'
 import { useThemeMode } from '@src/ExtensionProviders'
 
@@ -131,6 +132,7 @@ export default function SidebarWithHeader({
         </header>
         <main className="flex flex-1 flex-col px-4 py-4 lg:min-h-0 lg:overflow-hidden lg:px-6 lg:py-6">
           <ClockSkewWarning />
+          <VaultStorageStatus />
           {children}
         </main>
       </div>

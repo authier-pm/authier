@@ -175,6 +175,25 @@ class ApiFacadeTest {
         assertNotNull(page.changes.single().deletedAt)
     }
 
+    @Test fun `preserves future kinds through HTTP decoding local storage and tombstones`() = runTest {
+        val future = """{"id":"future-id","encrypted":"opaque-future-ciphertext","kind":"FUTURE_SECRET","version":1,"createdAt":"2026-10-27T10:00:00.000Z","updatedAt":null}"""
+        val password = """{"id":"password-id","encrypted":"password-ciphertext","kind":"LOGIN_CREDENTIALS","version":1,"createdAt":"2026-10-27T10:00:00.000Z","updatedAt":null}"""
+        respond("""{"user":{"id":"account","email":"test@example.com","masterDeviceId":null,"newDevicePolicy":null,"deviceRecoveryCooldownMinutes":60},"currentDevice":{"id":"current-device","name":"Pixel","platform":"android","syncTOTP":false,"vaultLockTimeoutSeconds":300,"createdAt":"2026-10-27T10:00:00.000Z","lastSyncAt":null,"logoutAt":null},"secrets":[$future,$password],"pendingChallenges":[]}""")
+        val records = api.bootstrap().secrets
+        assertEquals(listOf("FUTURE_SECRET", "LOGIN_CREDENTIALS"), records.map { it.kind })
+        val snapshot = VaultSnapshot(secrets = records)
+        val restored = vaultJson.decodeFromString(VaultSnapshot.serializer(), vaultJson.encodeToString(VaultSnapshot.serializer(), snapshot))
+        assertEquals(records, restored.secrets)
+        assertEquals(listOf("password-id"), restored.secrets.filter(::isVisibleInNativeVault).map { it.id })
+        assertFalse(isNativeEditableKind("FUTURE_SECRET"))
+        val tombstone = future.replace("\"version\":1", "\"version\":2").dropLast(1) + """, "deletedAt":"2026-10-27T11:00:00.000Z"}"""
+        respond("""{"changes":[{"cursor":"revision-2","secret":$tombstone}],"nextCursor":"revision-2","hasMore":false}""")
+        val page = api.sync(null)
+        val next = applySyncPage(restored, page.changes, page.nextCursor)
+        assertEquals("opaque-future-ciphertext", next.secrets.first { it.id == "future-id" }.encrypted)
+        assertNotNull(next.secrets.first { it.id == "future-id" }.deletedAt)
+    }
+
     @Test fun `preserves typed error code and conflict status`() = runTest {
         respond("""{"code":"CURSOR_INVALID","status":400,"message":"Start sync again"}""", 400)
         val error = try { api.sync("expired"); error("Expected API failure") } catch (failure: ApiFailure) { failure }

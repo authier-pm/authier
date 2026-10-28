@@ -47,7 +47,8 @@ export const device = {
     save: async () => undefined,
     backendSync: async () => ({ newAndUpdatedSecrets: 0, removedSecrets: 0 }),
     removeSecrets: async () => undefined,
-    removeSecret: async () => undefined
+    removeSecret: async () => undefined,
+    requireSyncedSecrets: async () => undefined
   },
   lock: async () => undefined,
   logout: async () => undefined

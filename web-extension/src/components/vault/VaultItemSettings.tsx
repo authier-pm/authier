@@ -45,6 +45,7 @@ import {
 import { getWebInputsForUrlOfKinds } from '@src/background/getWebInputsForUrl'
 import { evaluatePasswordStrength } from './evaluatePasswordStrength'
 import { cn } from '@src/lib/cn'
+import { submitVaultForm } from '@src/util/submitVaultForm'
 
 const navigateBack = (navigate: ReturnType<typeof useNavigate>) => {
   const canGoBack = window.history.length > 1
@@ -117,36 +118,39 @@ function LoginSecret({ secretProps }: { secretProps: ILoginSecret }) {
         }}
         onSubmit={async (
           values: credentialValues,
-          { setSubmitting }: FormikHelpers<credentialValues>
+          { setSubmitting, setStatus }: FormikHelpers<credentialValues>
         ) => {
-          const secret = device.state?.secrets.find(
-            ({ id }) => id === secretProps.id
-          )
-
-          if (secret && device.state) {
-            secret.encrypted = await device.state.encrypt(
-              JSON.stringify({
-                iconUrl: secretProps.loginCredentials.iconUrl ?? null,
-                label: values.label,
-                password: values.password,
-                url: values.url,
-                username: values.username
-              })
+          await submitVaultForm(async () => {
+            const secret = device.state?.secrets.find(
+              ({ id }) => id === secretProps.id
             )
 
-            await updateSecret({
-              variables: {
-                id: secretProps.id,
-                patch: {
-                  encrypted: secret.encrypted,
-                  kind: secretProps.kind
-                }
-              }
-            })
+            if (secret && device.state) {
+              await device.state.requireSyncedSecrets([secret.id])
+              secret.encrypted = await device.state.encrypt(
+                JSON.stringify({
+                  iconUrl: secretProps.loginCredentials.iconUrl ?? null,
+                  label: values.label,
+                  password: values.password,
+                  url: values.url,
+                  username: values.username
+                })
+              )
 
-            await device.state.save()
-            setSubmitting(false)
-          }
+              await updateSecret({
+                variables: {
+                  id: secretProps.id,
+                  patch: {
+                    encrypted: secret.encrypted,
+                    kind: secretProps.kind
+                  }
+                }
+              })
+
+              await device.state.save()
+              setSubmitting(false)
+            }
+          }, setStatus)
         }}
         validationSchema={PasswordSchema}
       >
@@ -266,35 +270,38 @@ function TotpSecret({ secretProps }: { secretProps: ITOTPSecret }) {
         }}
         onSubmit={async (
           values: totpValues,
-          { setSubmitting }: FormikHelpers<totpValues>
+          { setSubmitting, setStatus }: FormikHelpers<totpValues>
         ) => {
-          const secret = device.state?.secrets.find(
-            ({ id }) => id === secretProps.id
-          )
-
-          if (secret && device.state) {
-            secret.encrypted = await device.state.encrypt(
-              JSON.stringify({
-                ...values,
-                digits: Number(values.digits),
-                iconUrl: secretProps.totp.iconUrl ?? null,
-                period: Number(values.period)
-              })
+          await submitVaultForm(async () => {
+            const secret = device.state?.secrets.find(
+              ({ id }) => id === secretProps.id
             )
 
-            await updateSecret({
-              variables: {
-                id: secret.id,
-                patch: {
-                  encrypted: secret.encrypted,
-                  kind: secret.kind
-                }
-              }
-            })
+            if (secret && device.state) {
+              await device.state.requireSyncedSecrets([secret.id])
+              secret.encrypted = await device.state.encrypt(
+                JSON.stringify({
+                  ...values,
+                  digits: Number(values.digits),
+                  iconUrl: secretProps.totp.iconUrl ?? null,
+                  period: Number(values.period)
+                })
+              )
 
-            await device.state.save()
-            setSubmitting(false)
-          }
+              await updateSecret({
+                variables: {
+                  id: secret.id,
+                  patch: {
+                    encrypted: secret.encrypted,
+                    kind: EncryptedSecretType.TOTP
+                  }
+                }
+              })
+
+              await device.state.save()
+              setSubmitting(false)
+            }
+          }, setStatus)
         }}
         validationSchema={TOTPSchema}
       >

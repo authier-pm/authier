@@ -29,6 +29,13 @@ export function RefreshSecretsButton({
             res = await device.state?.backendSync()
             await onSynced?.()
           } catch {
+            toast({
+              title: 'Could not synchronize the vault',
+              description:
+                'Locally saved items remain encrypted in this browser. Check your connection and try again.',
+              status: 'error',
+              isClosable: true
+            })
             setIsSyncing(false)
             return
           }

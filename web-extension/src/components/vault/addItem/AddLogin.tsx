@@ -26,6 +26,7 @@ import { generate } from 'generate-password'
 import { loginCredentialsSchema } from '@shared/loginCredentialsSchema'
 import { defaultPasswordGeneratorConfig } from '@shared/passwordGenerator'
 import { evaluatePasswordStrength } from '../evaluatePasswordStrength'
+import { submitVaultForm } from '@src/util/submitVaultForm'
 
 export const AddLogin = () => {
   const navigate = useNavigate()
@@ -50,7 +51,7 @@ export const AddLogin = () => {
         validationSchema={PasswordSchema}
         onSubmit={async (
           values: credentialValues,
-          { setSubmitting }: FormikHelpers<credentialValues>
+          { setSubmitting, setStatus }: FormikHelpers<credentialValues>
         ) => {
           const namePassPair = {
             password: values.password,
@@ -59,20 +60,21 @@ export const AddLogin = () => {
             label: values.label,
             iconUrl: null
           }
-          console.log('namePassPair:', namePassPair)
 
           loginCredentialsSchema.parse(namePassPair)
-          await device.state?.addSecrets([
-            {
-              kind: EncryptedSecretType.LOGIN_CREDENTIALS,
-              loginCredentials: namePassPair,
-              //TODO: check up on this
-              encrypted: await device.state.encrypt(
-                JSON.stringify(namePassPair)
-              ),
-              createdAt: new Date().toJSON()
-            }
-          ])
+          const saved = await submitVaultForm(async () => {
+            const state = device.state
+            if (!state) throw new Error('Unlock the vault to save this item')
+            await state.addSecrets([
+              {
+                kind: EncryptedSecretType.LOGIN_CREDENTIALS,
+                loginCredentials: namePassPair,
+                encrypted: '',
+                createdAt: new Date().toJSON()
+              }
+            ])
+          }, setStatus)
+          if (!saved) return
 
           setSubmitting(false)
           navigate(-1)

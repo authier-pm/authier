@@ -6,6 +6,7 @@ import {
 import type { VaultApiOutputs } from '@shared/orpc/contract'
 import { passkeySchema, type PasskeyData } from '@shared/passkeySchema'
 import { z } from 'zod'
+import { isSupportedSecretKind } from '@shared/secretKinds'
 
 type SecretRecord = VaultApiOutputs['session']['bootstrap']['secrets'][number]
 type SecretPayload = Record<string, unknown>
@@ -103,6 +104,9 @@ export const decryptSecretRecord = async (
   secret: SecretRecord,
   masterKey: CryptoKey
 ): Promise<DecryptedVaultSecret> => {
+  if (!isSupportedSecretKind(secret.kind)) {
+    throw new Error('Update Authier to display this item type')
+  }
   const decrypted = await decryptString(masterKey, secret.encrypted)
   const payload = secretPayloadSchema.parse(JSON.parse(decrypted))
 
@@ -122,11 +126,14 @@ export const decryptSecretRecord = async (
     }
   }
 
-  return {
-    ...secret,
-    kind: 'TOTP',
-    totp: normalizeTotpSecret(payload)
+  if (secret.kind === 'TOTP') {
+    return {
+      ...secret,
+      kind: 'TOTP',
+      totp: normalizeTotpSecret(payload)
+    }
   }
+  throw new Error('Unsupported secret type')
 }
 
 export const decryptSecrets = async (

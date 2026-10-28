@@ -4,6 +4,19 @@ import {
   rememberVault
 } from '@shared/rememberedVault'
 import { backgroundStateSerializableLockedSchema } from './backgroundSchemas'
+import { isSupportedSecretKind } from '@shared/secretKinds'
+import {
+  acknowledgePendingSecrets,
+  belongsToVaultKey,
+  enqueueSecrets,
+  pendingSecretRecord,
+  pendingSecretKeyId,
+  isCurrentStoredVaultKey,
+  readPendingSecrets,
+  withVaultWriteLock,
+  type PendingSecret
+} from './pendingSecrets'
+import { createQueuedSecret } from './createQueuedSecret'
 import {
   lockedVaultSnapshotSchema,
   readLockedVaultSnapshot,
@@ -30,9 +43,6 @@ import {
   MarkAsSyncedMutation,
   MarkAsSyncedMutationVariables,
   MarkAsSyncedDocument,
-  AddEncryptedSecretsMutation,
-  AddEncryptedSecretsDocument,
-  AddEncryptedSecretsMutationVariables,
   LogoutMutation,
   LogoutMutationVariables,
   LogoutDocument
@@ -142,6 +152,8 @@ export const getDecryptedSecretProp = (
 
 export class DeviceState implements IBackgroundStateSerializable {
   decryptedSecrets: (ILoginSecret | ITOTPSecret | IPasskeySecret)[] = []
+  pendingSecretIds: string[] = []
+  previousKeyPendingSecretsCount = 0
   #initialization: Promise<void>
 
   get initialized() {
@@ -230,7 +242,106 @@ export class DeviceState implements IBackgroundStateSerializable {
   }
 
   async initialize() {
+    await this.restorePendingSecrets()
     this.decryptedSecrets = await this.getAllSecretsDecrypted()
+  }
+
+  get unsupportedSecretsCount() {
+    return this.secrets.filter(
+      ({ kind, deletedAt }) => !deletedAt && !isSupportedSecretKind(kind)
+    ).length
+  }
+
+  private async restorePendingSecrets() {
+    const entries = await readPendingSecrets(this.userId)
+    if (!entries.length) {
+      this.pendingSecretIds = []
+      this.previousKeyPendingSecretsCount = 0
+      return
+    }
+    const owner = {
+      userId: this.userId,
+      keyId: await pendingSecretKeyId(this.masterEncryptionKey)
+    }
+    const pending = entries.filter((entry) => belongsToVaultKey(entry, owner))
+    this.pendingSecretIds = pending.map(({ operation }) => operation.id)
+    this.previousKeyPendingSecretsCount = entries.length - pending.length
+    const records = new Map(this.secrets.map((secret) => [secret.id, secret]))
+    for (const entry of pending) {
+      // A server-confirmed record wins over an ambiguous create acknowledgement.
+      if (!records.get(entry.operation.id)?.version) {
+        records.set(entry.operation.id, pendingSecretRecord(entry))
+      }
+    }
+    this.secrets = [...records.values()]
+  }
+
+  async flushPendingSecrets() {
+    if (!(await readPendingSecrets(this.userId)).length) return
+    // Web Locks coordinate all extension windows, including a restarted worker.
+    // Idempotency on the backend covers crashes after the server commits.
+    return navigator.locks.request(`authier-pending-sync:${this.userId}`, () =>
+      withVaultWriteLock(this.userId, async () => {
+        const key = this.masterEncryptionKey
+        const isCurrentSession = () =>
+          device.state === this &&
+          this.masterEncryptionKey === key &&
+          key !== ''
+        if (!isCurrentSession()) return
+        const entries = await readPendingSecrets(this.userId)
+        const owner = {
+          userId: this.userId,
+          keyId: await pendingSecretKeyId(key)
+        }
+        const confirmed = new Map<
+          PendingSecret,
+          Awaited<ReturnType<typeof createQueuedSecret>>
+        >()
+        try {
+          for (const entry of entries) {
+            if (
+              !belongsToVaultKey(entry, owner) ||
+              !isSupportedSecretKind(entry.operation.kind)
+            )
+              continue
+            if (!isCurrentSession()) return
+            const saved = await createQueuedSecret(entry, isCurrentSession)
+            // A late response must not unlock the vault or publish to another user.
+            if (!isCurrentSession()) return
+            confirmed.set(entry, saved)
+          }
+        } finally {
+          // Persist a batch once, including successes before a later failure.
+          // Keep the queue intact until every acknowledgement has been cached.
+          if (confirmed.size && isCurrentSession()) {
+            const records = new Map(
+              this.secrets.map((secret) => [secret.id, secret])
+            )
+            for (const saved of confirmed.values()) {
+              // Idempotent retries return the original create response, which
+              // can predate an update or deletion already received by this device.
+              if ((records.get(saved.id)?.version ?? 0) < saved.version)
+                records.set(saved.id, saved)
+            }
+            this.secrets = [...records.values()]
+            await this.save()
+            if (isCurrentSession()) {
+              await acknowledgePendingSecrets([...confirmed.keys()])
+              if (isCurrentSession()) await this.save()
+            }
+          }
+        }
+      })
+    )
+  }
+
+  async requireSyncedSecrets(ids?: readonly string[]) {
+    const entries = await readPendingSecrets(this.userId)
+    if (entries.some(({ operation }) => !ids || ids.includes(operation.id))) {
+      throw new Error(
+        'This item is saved on this device. Synchronize the vault before editing, deleting, or changing the master password.'
+      )
+    }
   }
 
   async setMasterEncryptionKey(masterPassword: string) {
@@ -286,11 +397,11 @@ export class DeviceState implements IBackgroundStateSerializable {
   }
 
   async save() {
-    browser.storage.onChanged.removeListener(this.onStorageChange)
-    device.lockedState = null
     //TODO: Fix perf
+    await this.restorePendingSecrets()
     const decryptedSecrets = await this.getAllSecretsDecrypted()
     if (device.state !== this) return
+    device.lockedState = null
     this.decryptedSecrets = decryptedSecrets
     await Promise.all([
       browser.storage.session.set({
@@ -305,8 +416,6 @@ export class DeviceState implements IBackgroundStateSerializable {
       const icon = browser.runtime.getURL('icon-48.png')
       toolbarAction.setIcon({ path: icon })
     }
-
-    browser.storage.onChanged.addListener(this.onStorageChange)
   }
 
   getSecretDecryptedById(id: string) {
@@ -323,7 +432,11 @@ export class DeviceState implements IBackgroundStateSerializable {
   async getSecretsDecryptedByTLD(host: string) {
     const secrets = this.decryptedSecrets.filter(
       (secret): secret is ILoginSecret | ITOTPSecret => {
-        if (secret.kind === EncryptedSecretType.PASSKEY) return false
+        if (
+          secret.kind !== EncryptedSecretType.LOGIN_CREDENTIALS &&
+          secret.kind !== EncryptedSecretType.TOTP
+        )
+          return false
         const url = getDecryptedSecretProp(secret, 'url')
 
         return matchesCredentialHost(host, url)
@@ -338,13 +451,19 @@ export class DeviceState implements IBackgroundStateSerializable {
 
   getAllSecretsDecrypted() {
     return Promise.all(
-      this.secrets.map((secret) => {
-        return this.decryptSecret(secret)
-      })
+      this.secrets
+        .filter(
+          ({ kind, deletedAt }) => !deletedAt && isSupportedSecretKind(kind)
+        )
+        .map((secret) => {
+          return this.decryptSecret(secret)
+        })
     )
   }
 
   private async decryptSecret(secret: SecretSerializedType) {
+    if (!isSupportedSecretKind(secret.kind))
+      throw new Error('Update Authier to display this item type')
     const decrypted = await this.decrypt(secret.encrypted)
 
     let secretDecrypted: ILoginSecret | ITOTPSecret | IPasskeySecret
@@ -397,6 +516,12 @@ export class DeviceState implements IBackgroundStateSerializable {
    * fetches newly added/deleted/updated secrets from the backend and updates the device state
    */
   async backendSync() {
+    await this.flushPendingSecrets().catch(() => {
+      // A quota or upload failure must not block remote updates and deletions.
+      // The durable queue and pending-save indicator retain the unsent items.
+      console.warn('Some locally saved items are still waiting to synchronize')
+    })
+    if (device.state !== this) return
     const syncKey = this.masterEncryptionKey
     const startedAt = Date.now()
     const startedMonotonic = performance.now()
@@ -496,7 +621,12 @@ export class DeviceState implements IBackgroundStateSerializable {
    * @returns the added secret in base64
    */
   async addSecrets(secrets: AddSecretInput) {
-    const encryptedSecrets = await Promise.all(
+    const key = this.masterEncryptionKey
+    const owner = {
+      userId: this.userId,
+      keyId: await pendingSecretKeyId(key)
+    }
+    const pending: PendingSecret[] = await Promise.all(
       secrets.map(async (secret) => {
         let payload:
           | TotpTypeWithMeta
@@ -516,31 +646,39 @@ export class DeviceState implements IBackgroundStateSerializable {
         const encrypted = await this.encrypt(stringToEncrypt)
 
         return {
-          encrypted,
-          kind: secret.kind
+          ...owner,
+          createdAt: new Date().toISOString(),
+          operation: {
+            id: crypto.randomUUID(),
+            operationId: crypto.randomUUID(),
+            encrypted,
+            kind: secret.kind
+          }
         }
       })
     )
 
-    const { data } = await apolloClient.mutate<
-      AddEncryptedSecretsMutation,
-      AddEncryptedSecretsMutationVariables
-    >({
-      mutation: AddEncryptedSecretsDocument,
-      variables: {
-        secrets: encryptedSecrets
-      }
+    // No network request or successful-save response before durable ciphertext.
+    // Failure here must propagate; the caller still owns its unsaved input.
+    await withVaultWriteLock(this.userId, async () => {
+      if (
+        device.state !== this ||
+        this.masterEncryptionKey !== key ||
+        !(await isCurrentStoredVaultKey(owner))
+      )
+        throw new Error('Unlock the vault to save this item')
+      await enqueueSecrets(pending)
     })
-
-    if (!data) {
-      throw new Error('failed to save secret')
+    if (device.state === this && this.masterEncryptionKey === key) {
+      await this.save().catch(() => {
+        // The durable queue can rebuild the cache after a restart.
+        console.warn('Saved locally; the vault view could not be refreshed')
+      })
+      void this.flushPendingSecrets().catch(() => {
+        // Keep ciphertext and both IDs for the next alarm/manual sync.
+      })
     }
-    const secretsAdded = data.me.addEncryptedSecrets
-
-    this.secrets.push(...secretsAdded)
-    await this.save()
-
-    return secretsAdded
+    return pending.map(pendingSecretRecord)
   }
 
   /**
@@ -550,7 +688,8 @@ export class DeviceState implements IBackgroundStateSerializable {
     const hostnames = this.decryptedSecrets
       .filter(
         (secret): secret is ILoginSecret | ITOTPSecret =>
-          secret.kind !== EncryptedSecretType.PASSKEY
+          secret.kind === EncryptedSecretType.LOGIN_CREDENTIALS ||
+          secret.kind === EncryptedSecretType.TOTP
       )
       .map((s) =>
         s.kind === EncryptedSecretType.TOTP
@@ -573,25 +712,27 @@ export class DeviceState implements IBackgroundStateSerializable {
   }
 
   async removeSecret(secretId: string) {
-    browser.storage.session.set({
+    await this.requireSyncedSecrets([secretId])
+    await browser.storage.session.set({
       backgroundState: {
         ...toPersistedBackgroundState(device.state),
         secrets: device.state?.secrets.filter((s) => s.id !== secretId)
       }
     })
     this.secrets = this.secrets.filter((s) => s.id !== secretId)
-    this.save()
+    await this.save()
   }
 
   async removeSecrets(secretIds: string[]) {
-    browser.storage.session.set({
+    await this.requireSyncedSecrets(secretIds)
+    await browser.storage.session.set({
       backgroundState: {
         ...toPersistedBackgroundState(device.state),
         secrets: device.state?.secrets.filter((s) => !secretIds.includes(s.id))
       }
     })
     this.secrets = this.secrets.filter((s) => !secretIds.includes(s.id))
-    this.save()
+    await this.save()
   }
 
   destroy() {
@@ -887,6 +1028,7 @@ class ExtensionDevice {
     if (!state) {
       throw new Error('device not initialized')
     }
+    await state.requireSyncedSecrets()
     return reencryptVaultSecrets(
       secrets,
       state.masterEncryptionKey,

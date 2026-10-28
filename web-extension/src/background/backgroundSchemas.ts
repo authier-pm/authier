@@ -1,7 +1,4 @@
-import {
-  EncryptedSecretType,
-  WebInputType
-} from '@shared/generated/graphqlBaseTypes'
+import { WebInputType } from '@shared/generated/graphqlBaseTypes'
 import { z } from 'zod'
 
 export const capturedInputSchema = z.object({
@@ -75,7 +72,7 @@ export const backgroundStateSerializableLockedSchema = z.object({
     z.object({
       id: z.string(),
       encrypted: z.string(),
-      kind: z.nativeEnum(EncryptedSecretType),
+      kind: z.string().min(1),
       version: z.number().int().positive().optional(),
       createdAt: z.string(),
       deletedAt: z.string().nullable().optional(),

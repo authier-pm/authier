@@ -127,6 +127,7 @@ vi.mock('@src/background/ExtensionDevice', () => {
         getAllSecretsDecrypted: vi.fn().mockResolvedValue([]),
         getSecretsDecryptedByTLD: vi.fn().mockResolvedValue([]),
         addSecrets: vi.fn().mockResolvedValue([]),
+        requireSyncedSecrets: vi.fn().mockResolvedValue(undefined),
         encrypt: vi.fn().mockResolvedValue('encrypted-string'),
         decrypt: vi.fn().mockResolvedValue('decrypted-string'),
         save: vi.fn().mockResolvedValue(undefined)

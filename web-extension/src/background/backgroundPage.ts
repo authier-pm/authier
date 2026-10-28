@@ -18,14 +18,10 @@ if (process.env.AUTHIER_DEV_RELOAD_URL) {
 // log('background page loaded')
 export type SecretSerializedType = Pick<
   EncryptedSecretQuery,
-  | 'id'
-  | 'encrypted'
-  | 'kind'
-  | 'lastUsedAt'
-  | 'createdAt'
-  | 'deletedAt'
-  | 'updatedAt'
+  'id' | 'encrypted' | 'lastUsedAt' | 'createdAt' | 'deletedAt' | 'updatedAt'
 > & {
+  // The server may know item types this client cannot display yet.
+  kind: string
   // Older persisted snapshots predate optimistic concurrency versions.
   version?: number
 }

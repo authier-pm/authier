@@ -49,7 +49,7 @@ data class SecretRecord (
     val encrypted: kotlin.String,
 
     @SerialName(value = "kind")
-    val kind: SecretRecord.Kind,
+    val kind: kotlin.String,
 
     @SerialName(value = "version")
     val version: kotlin.Int,
@@ -62,16 +62,5 @@ data class SecretRecord (
 
 ) {
 
-    /**
-     *
-     *
-     * Values: TOTP,LOGIN_CREDENTIALS,PASSKEY
-     */
-    @Serializable
-    enum class Kind(val value: kotlin.String) {
-        @SerialName(value = "TOTP") TOTP("TOTP"),
-        @SerialName(value = "LOGIN_CREDENTIALS") LOGIN_CREDENTIALS("LOGIN_CREDENTIALS"),
-        @SerialName(value = "PASSKEY") PASSKEY("PASSKEY");
-    }
 
 }

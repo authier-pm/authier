@@ -1,4 +1,5 @@
 import { handlePasskeyMessage } from '../passkeys/backgroundPasskeys'
+import { initializePendingSecretSync } from './pendingSecretSync'
 import { handleTotpAccountEmailMessage } from './totpAccountEmail'
 import {
   handleVerificationCodeMessage,
@@ -85,6 +86,12 @@ let inputsUrl: string
 
 const tcProcedure = tc.procedure.use(loggerMiddleware)
 
+void initializePendingSecretSync().catch(() => {
+  console.warn(
+    'Automatic synchronization could not be scheduled; use Synchronize vault to retry'
+  )
+})
+
 void initializeVerificationCodes({
   fetchRelayedCodes: fetchRelayedVerificationCodes,
   pollRelayedInBackground: true
@@ -156,7 +163,6 @@ const appRouter = tc.router({
       }
 
       const credentials = input
-      log('addLoginCredentials', credentials)
 
       const encryptedData = createLoginCredentialData({
         fallbackUsername: deviceState.email,
@@ -193,7 +199,6 @@ const appRouter = tc.router({
         }
       })
 
-      // TODO handle scenario where user has reached the limit of secrets, and the secret is not added. We should show a message to the user and remove the secret from local device
       try {
         await apolloClient.mutate<
           AddWebInputsMutationResult,

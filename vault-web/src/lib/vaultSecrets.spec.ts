@@ -8,8 +8,54 @@ import {
   getVaultSecretMetadata
 } from './vaultSecrets'
 import { encryptString, generateEncryptionKey } from '@shared/cryptoUtils'
+import {
+  encryptedSecretRecordSchema,
+  encryptedSecretPayloadSchema
+} from '@shared/orpc/schemas'
 
 describe('vaultSecrets', () => {
+  it('accepts future kinds on the wire without interpreting their payload as TOTP', async () => {
+    const salt = crypto.getRandomValues(new Uint8Array(16))
+    const key = await generateEncryptionKey('compatibility password', salt)
+    const future = encryptedSecretRecordSchema.parse({
+      id: crypto.randomUUID(),
+      kind: 'FUTURE_SECRET',
+      version: 3,
+      createdAt: '2026-10-27T10:00:00.000Z',
+      updatedAt: null,
+      encrypted: await encryptString(
+        key,
+        JSON.stringify({ secret: 'not-a-totp', label: 'Future item' }),
+        salt
+      )
+    })
+    expect(encryptedSecretPayloadSchema.safeParse(future).success).toBe(false)
+    const login = {
+      ...future,
+      id: crypto.randomUUID(),
+      kind: 'LOGIN_CREDENTIALS',
+      encrypted: await encryptString(
+        key,
+        JSON.stringify({
+          label: 'Known login',
+          username: 'alice',
+          password: 'secret'
+        }),
+        salt
+      )
+    }
+    const source = structuredClone([future, login])
+    const result = await decryptSecrets(source, key)
+    expect(result.failedCount).toBe(1)
+    expect(result.secrets.map(({ kind }) => kind)).toEqual([
+      'LOGIN_CREDENTIALS'
+    ])
+    expect(source).toEqual([future, login])
+    // Unsupported formats must be rejected before even trying AES or JSON.
+    await expect(
+      decryptSecretRecord({ ...future, encrypted: 'future-envelope' }, key)
+    ).rejects.toThrow('Update Authier')
+  })
   it('round-trips encrypted login and TOTP records with the shared browser crypto helpers', async () => {
     const salt = crypto.getRandomValues(new Uint8Array(16))
     const masterKey = await generateEncryptionKey('super secure password', salt)

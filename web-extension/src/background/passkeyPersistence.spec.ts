@@ -1,7 +1,12 @@
 import { beforeEach, expect, it, vi } from 'vitest'
 import { webcrypto } from 'node:crypto'
 import { DeviceState, device, getDecryptedSecretProp } from './ExtensionDevice'
-import { apolloClient } from '@src/apollo/apolloClient'
+import { createQueuedSecret } from './createQueuedSecret'
+import { pendingSecretRecord } from './pendingSecrets'
+import {
+  mockPersistentVaultStorage,
+  mockVaultLocks
+} from '../../tests/vaultStorage'
 import { EncryptedSecretType } from '@shared/generated/graphqlBaseTypes'
 import { passkeySchema } from '@shared/passkeySchema'
 import {
@@ -11,6 +16,7 @@ import {
 import { encode } from 'base64-arraybuffer'
 
 vi.unmock('@src/background/ExtensionDevice')
+vi.mock('./createQueuedSecret', () => ({ createQueuedSecret: vi.fn() }))
 vi.mock('@src/apollo/apolloClient', () => ({
   apolloClient: { mutate: vi.fn(), query: vi.fn() }
 }))
@@ -18,6 +24,8 @@ vi.mock('@src/ExtensionProviders', () => ({ toast: vi.fn() }))
 
 beforeEach(() => {
   vi.clearAllMocks()
+  mockPersistentVaultStorage()
+  mockVaultLocks()
   Object.defineProperty(globalThis, 'crypto', {
     value: webcrypto,
     configurable: true
@@ -67,29 +75,19 @@ it('encrypts passkeys for sync, restores their signing key, and excludes them fr
   })
   await state.initialize()
   device.state = state
-  vi.mocked(apolloClient.mutate).mockImplementation(async (options) => {
-    const secrets = options.variables?.secrets
-    if (!Array.isArray(secrets) || typeof secrets[0]?.encrypted !== 'string')
-      throw new Error('Expected encrypted secret')
-    expect(secrets[0].kind).toBe(EncryptedSecretType.PASSKEY)
-    expect(secrets[0].encrypted).not.toContain(passkey.privateKeyJwk.d)
-    expect(secrets[0]).not.toHaveProperty('passkey')
+  await state.save()
+  vi.mocked(createQueuedSecret).mockImplementation(async (entry) => {
+    expect(entry.operation.kind).toBe(EncryptedSecretType.PASSKEY)
+    expect(entry.operation.encrypted).not.toContain(passkey.privateKeyJwk.d)
+    expect(entry.operation).not.toHaveProperty('passkey')
     return {
-      data: {
-        me: {
-          addEncryptedSecrets: [
-            {
-              ...secrets[0],
-              id: 'stored-passkey',
-              createdAt: passkey.createdAt,
-              version: 1
-            }
-          ]
-        }
-      }
+      ...pendingSecretRecord(entry),
+      version: 1,
+      updatedAt: null,
+      deletedAt: null
     }
   })
-  await state.addSecrets([
+  const [saved] = await state.addSecrets([
     {
       kind: EncryptedSecretType.PASSKEY,
       passkey,
@@ -97,7 +95,9 @@ it('encrypts passkeys for sync, restores their signing key, and excludes them fr
       encrypted: ''
     }
   ])
-  const restored = await state.getSecretDecryptedById('stored-passkey')
+  await state.flushPendingSecrets()
+  expect(createQueuedSecret).toHaveBeenCalledTimes(1)
+  const restored = await state.getSecretDecryptedById(saved.id)
   expect(restored?.kind).toBe(EncryptedSecretType.PASSKEY)
   if (restored?.kind !== EncryptedSecretType.PASSKEY)
     throw new Error('Missing restored passkey')

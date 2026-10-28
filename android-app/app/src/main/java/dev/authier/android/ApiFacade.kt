@@ -157,8 +157,8 @@ class ApiFacade(serverUrl: String, private var currentDeviceId: String? = null) 
         currentDeviceId = currentDevice.id
         return BootstrapInfo(user.email.orEmpty(), secrets.map { it.toDomain() }, currentDevice.vaultLockTimeoutSeconds, pendingChallenges.map { it.toDomain() })
     }
-    private fun ApiSecret.toDomain() = SecretRecord(id, encrypted, kind.value, version, createdAt, updatedAt)
-    private fun SyncSecretRecord.toDomain() = SecretRecord(id, encrypted, kind.value, version, createdAt, updatedAt, deletedAt)
+    private fun ApiSecret.toDomain() = SecretRecord(id, encrypted, kind, version, createdAt, updatedAt)
+    private fun SyncSecretRecord.toDomain() = SecretRecord(id, encrypted, kind, version, createdAt, updatedAt, deletedAt)
     private fun PendingDeviceApproval.toDomain() = ApprovalInfo(id, deviceName, ipAddress, createdAt)
     private fun SecurityState.toDomain() = SecurityInfo(newDevicePolicy?.value ?: "ALLOW", deviceRecoveryCooldownMinutes, masterDeviceId)
 

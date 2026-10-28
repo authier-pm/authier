@@ -8,6 +8,7 @@ import { TOTPSchema } from '@shared/formikSharedTypes'
 import { Input } from '@src/components/ui/input'
 import { EditFormButtons } from '../EditFormButtons'
 import { cn } from '@src/lib/cn'
+import { submitVaultForm } from '@src/util/submitVaultForm'
 
 export const AddTOTP = () => {
   const navigate = useNavigate()
@@ -29,16 +30,21 @@ export const AddTOTP = () => {
         // @ts-expect-error
         onSubmit={async (
           values: TotpTypeWithMeta,
-          { setSubmitting }: FormikHelpers<TotpTypeWithMeta>
+          { setSubmitting, setStatus }: FormikHelpers<TotpTypeWithMeta>
         ) => {
-          await device.state?.addSecrets([
-            {
-              kind: EncryptedSecretType.TOTP,
-              totp: values,
-              encrypted: await device.state!.encrypt(JSON.stringify(values)),
-              createdAt: new Date().toJSON()
-            }
-          ])
+          const saved = await submitVaultForm(async () => {
+            const state = device.state
+            if (!state) throw new Error('Unlock the vault to save this item')
+            await state.addSecrets([
+              {
+                kind: EncryptedSecretType.TOTP,
+                totp: values,
+                encrypted: '',
+                createdAt: new Date().toJSON()
+              }
+            ])
+          }, setStatus)
+          if (!saved) return
 
           setSubmitting(false)
           navigate(-1)

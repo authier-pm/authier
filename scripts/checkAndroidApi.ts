@@ -8,7 +8,7 @@ const androidApiSchema = z.object({
   ),
   components: z.object({
     schemas: z.object({
-      SecretRecord: z.object({
+      CreateVaultSecretInput: z.object({
         properties: z.object({
           kind: z.object({ enum: z.array(z.string()) })
         })
@@ -45,7 +45,9 @@ export const verifyAndroidApi = (document: unknown) => {
       )
   }
   if (
-    !api.components.schemas.SecretRecord.properties.kind.enum.includes(
+    // Read kinds are open strings so older clients can retain future items.
+    // The write enum declares which kinds this backend actually supports.
+    !api.components.schemas.CreateVaultSecretInput.properties.kind.enum.includes(
       'PASSKEY'
     )
   )

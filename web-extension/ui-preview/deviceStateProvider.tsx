@@ -16,7 +16,12 @@ type ScreenshotSecuritySettings = {
 type ScreenshotDeviceStateContext = {
   currentTab: { id: number }
   currentURL: string
-  deviceState: ScreenshotSecuritySettings & { secrets: SecretTypeUnion[] }
+  deviceState: ScreenshotSecuritySettings & {
+    secrets: SecretTypeUnion[]
+    pendingSecretIds?: string[]
+    unsupportedSecretsCount?: number
+    previousKeyPendingSecretsCount?: number
+  }
   setSecuritySettings: (settings: ScreenshotSecuritySettings) => Promise<void>
   loginCredentials: SecretTypeUnion[]
   TOTPSecrets: SecretTypeUnion[]
