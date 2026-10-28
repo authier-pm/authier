@@ -1,11 +1,22 @@
-import { Formik, FormikHelpers } from 'formik'
+import { useId, useState } from 'react'
+import { FiRefreshCw } from 'react-icons/fi'
 import {
-  IPasswordGeneratorConfig,
+  type IPasswordGeneratorConfig,
   defaultPasswordGeneratorConfig,
   generate
 } from '@shared/passwordGenerator'
 import { Button } from '@src/components/ui/button'
 import { Input } from '@src/components/ui/input'
+
+const characterGroups = [
+  { name: 'uppercase', label: 'Uppercase', example: 'A–Z' },
+  { name: 'lowercase', label: 'Lowercase', example: 'a–z' },
+  { name: 'numbers', label: 'Numbers', example: '0–9' },
+  { name: 'symbols', label: 'Symbols', example: '!@#' }
+] as const
+
+const minimumLength = 5
+const maximumLength = 128
 
 export const PasswordGenerator = ({
   isOpen,
@@ -14,109 +25,132 @@ export const PasswordGenerator = ({
   isOpen: boolean
   onGenerate: (password: string) => void
 }) => {
-  if (!isOpen) {
-    return null
+  const [config, setConfig] = useState<IPasswordGeneratorConfig>(
+    defaultPasswordGeneratorConfig
+  )
+  const [length, setLength] = useState(String(config.length))
+  const id = useId()
+  const parsedLength = Number(length)
+  const invalidLength =
+    !Number.isInteger(parsedLength) ||
+    parsedLength < minimumLength ||
+    parsedLength > maximumLength
+  let error: string | undefined
+
+  if (invalidLength) {
+    error = `Choose a length between ${minimumLength} and ${maximumLength}.`
+  } else if (!characterGroups.some(({ name }) => config[name])) {
+    error = 'Select at least one character type.'
   }
 
+  const generatePassword = () => {
+    if (!error) onGenerate(generate({ ...config, length: parsedLength }))
+  }
+
+  if (!isOpen) return null
+
   return (
-    <div className="rounded-[var(--radius-md)] border border-[color:var(--color-border)] bg-[color:var(--color-surface-muted)] p-4">
-      <Formik
-        initialValues={defaultPasswordGeneratorConfig}
-        onSubmit={(
-          values: IPasswordGeneratorConfig,
-          { setSubmitting }: FormikHelpers<IPasswordGeneratorConfig>
-        ) => {
-          onGenerate(generate(values))
-          setSubmitting(false)
-        }}
-      >
-        {({ handleSubmit, isSubmitting, setFieldValue, values }) => (
-          <form
-            className="space-y-4"
-            onSubmit={(event) => {
-              event.preventDefault()
-              handleSubmit()
+    <fieldset
+      className="space-y-4 rounded-xl border border-border/60 bg-background/40 p-4"
+      onKeyDown={(event) => {
+        if (event.key === 'Enter' && event.target instanceof HTMLInputElement) {
+          event.preventDefault()
+          generatePassword()
+        }
+      }}
+    >
+      <legend className="sr-only">Password generator</legend>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <span className="text-sm font-medium">Password generator</span>
+        <Button
+          className="rounded-[var(--radius-sm)] border-primary/30 bg-primary/10 text-primary hover:bg-primary/20"
+          disabled={Boolean(error)}
+          onClick={generatePassword}
+          size="sm"
+          type="button"
+          variant="outline"
+        >
+          <FiRefreshCw aria-hidden className="size-3.5" />
+          Generate password
+        </Button>
+      </div>
+
+      <div className="flex items-center gap-3">
+        <label className="text-xs text-muted" htmlFor={`${id}-length`}>
+          Length
+        </label>
+        <input
+          aria-label="Password length slider"
+          className="h-1.5 min-w-12 flex-1 cursor-pointer accent-primary"
+          max={maximumLength}
+          min={minimumLength}
+          onChange={(event) => setLength(event.target.value)}
+          type="range"
+          value={Math.min(
+            maximumLength,
+            Math.max(minimumLength, Number(length) || minimumLength)
+          )}
+        />
+        <Input
+          aria-describedby={error ? `${id}-error` : undefined}
+          aria-invalid={invalidLength}
+          className="h-8 w-16 rounded-[var(--radius-sm)] px-2 text-center tabular-nums"
+          id={`${id}-length`}
+          max={maximumLength}
+          min={minimumLength}
+          onChange={(event) => setLength(event.target.value)}
+          step={1}
+          type="number"
+          value={length}
+        />
+      </div>
+
+      <div className="flex flex-wrap gap-x-5 gap-y-3">
+        {characterGroups.map(({ name, label, example }) => (
+          <GeneratorToggle
+            checked={config[name]}
+            example={example}
+            key={name}
+            label={label}
+            onChange={(checked) => {
+              setConfig((current) => ({ ...current, [name]: checked }))
             }}
-          >
-            <div className="grid gap-4 lg:grid-cols-[120px_minmax(0,1fr)] lg:items-start">
-              <label className="space-y-2">
-                <span className="text-sm font-medium text-[color:var(--color-foreground)]">
-                  Length
-                </span>
-                <Input
-                  min={5}
-                  type="number"
-                  value={values.length}
-                  onChange={(event) => {
-                    setFieldValue('length', Number.parseInt(event.target.value))
-                  }}
-                />
-              </label>
-
-              <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-                <GeneratorToggle
-                  checked={values.numbers}
-                  label="Numbers"
-                  onChange={(checked) => {
-                    setFieldValue('numbers', checked)
-                  }}
-                />
-                <GeneratorToggle
-                  checked={values.symbols}
-                  label="Symbols"
-                  onChange={(checked) => {
-                    setFieldValue('symbols', checked)
-                  }}
-                />
-                <GeneratorToggle
-                  checked={values.uppercase}
-                  label="Uppercase"
-                  onChange={(checked) => {
-                    setFieldValue('uppercase', checked)
-                  }}
-                />
-                <GeneratorToggle
-                  checked={values.lowercase}
-                  label="Lowercase"
-                  onChange={(checked) => {
-                    setFieldValue('lowercase', checked)
-                  }}
-                />
-              </div>
-            </div>
-
-            <div className="flex justify-end">
-              <Button disabled={isSubmitting} size="sm" type="submit">
-                Generate password
-              </Button>
-            </div>
-          </form>
-        )}
-      </Formik>
-    </div>
+          />
+        ))}
+      </div>
+      {error && (
+        <p className="text-xs text-danger" id={`${id}-error`} role="status">
+          {error}
+        </p>
+      )}
+    </fieldset>
   )
 }
 
 function GeneratorToggle({
   checked,
+  example,
   label,
   onChange
 }: {
   checked: boolean
+  example: string
   label: string
   onChange: (checked: boolean) => void
 }) {
   return (
-    <label className="flex items-center gap-3 rounded-[var(--radius-md)] border border-[color:var(--color-border)] bg-[color:var(--color-card)] px-3 py-2 text-sm text-[color:var(--color-foreground)]">
+    <label className="flex cursor-pointer items-center gap-2 text-xs">
       <input
+        aria-label={label}
         checked={checked}
-        className="size-4 accent-[color:var(--color-primary)]"
-        onChange={(event) => {
-          onChange(event.target.checked)
-        }}
+        className="size-3.5 accent-primary"
+        onChange={(event) => onChange(event.target.checked)}
         type="checkbox"
       />
       <span>{label}</span>
+      <span aria-hidden className="font-mono text-muted">
+        {example}
+      </span>
     </label>
   )
 }

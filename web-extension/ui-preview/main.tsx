@@ -37,10 +37,12 @@ import { NewDevicePolicyPreview } from './scenarios/NewDevicePolicyPreview'
 import { TotpLabelsPreview } from './scenarios/TotpLabelsPreview'
 import { VaultScrollingPreview } from './scenarios/VaultScrollingPreview'
 import { ClockSkewPreview } from './scenarios/ClockSkewPreview'
+import { AddItemPreview } from './scenarios/AddItemPreview'
 
 const DEFAULT_SCENARIO = 'autofill-controls'
 const scenarios: Record<string, ComponentType> = {
   [DEFAULT_SCENARIO]: AutofillControlsPreview,
+  'add-item': AddItemPreview,
   'new-device-policy': NewDevicePolicyPreview,
   'master-device-recovery': MasterDeviceRecoveryPreview,
   'master-device-reset-progress': MasterDeviceResetProgressPreview,
@@ -83,6 +85,7 @@ document.body.classList.toggle(
   'extension-popup',
   !requestedScenario.startsWith('master-device-') &&
     requestedScenario !== 'new-device-policy' &&
+    requestedScenario !== 'add-item' &&
     !requestedScenario.startsWith('android-') &&
     requestedScenario !== 'bitfinex-totp' &&
     requestedScenario !== 'totp-labels' &&

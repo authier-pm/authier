@@ -73,13 +73,17 @@ test.describe.serial('Secrets management', () => {
     await expect(page.getByRole('button', { name: 'Generate' })).toBeVisible()
 
     await page
-      .getByPlaceholder('google.com')
+      .getByRole('textbox', { name: 'Website', exact: true })
       .fill('https://websecurity.dev/password-managers/login/')
-    await page.getByPlaceholder('Work email').fill(secretLabel)
-    await page.getByLabel('Username:').fill(secretUsername)
-    await page.getByLabel('Password:').fill(secretPassword)
+    await page
+      .getByRole('textbox', { name: 'Label Optional', exact: true })
+      .fill(secretLabel)
+    await page
+      .getByLabel('Username or email', { exact: true })
+      .fill(secretUsername)
+    await page.getByLabel('Password', { exact: true }).fill(secretPassword)
 
-    await page.getByText('Save').click()
+    await page.getByRole('button', { name: 'Save login', exact: true }).click()
 
     await expect(page.getByText('1 secrets')).toBeVisible()
   })

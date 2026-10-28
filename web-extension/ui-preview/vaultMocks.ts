@@ -1,5 +1,8 @@
 import { EncryptedSecretType } from '@shared/generated/graphqlBaseTypes'
-import type { SecretTypeUnion } from '../src/background/ExtensionDevice'
+import type {
+  AddSecretInput,
+  SecretTypeUnion
+} from '../src/background/ExtensionDevice'
 import type { ISecret, IPasskeySecret } from '../src/util/useDeviceState'
 import { passkeySchema } from '@shared/passkeySchema'
 
@@ -37,6 +40,7 @@ export const device = {
   state: {
     email: 'alex@example.com',
     secrets: [] as ISecret[],
+    addSecrets: async (_secrets: AddSecretInput) => undefined,
     encrypt: async (value: string) => encodePreviewSecret(value),
     decrypt: async (encrypted: string) => decodeURIComponent(atob(encrypted)),
     decryptSecret: async (secret: ISecret): Promise<IPasskeySecret> => ({
