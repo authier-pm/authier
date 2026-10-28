@@ -1,5 +1,15 @@
 # Extension UI preview
 
+The `add-item` scenario renders the production add-item page in the vault shell.
+Its device mock records saves locally and supports `&save-error=1` for a failed
+save and recovery, `&totp-limit=1` for an exhausted authenticator limit, and
+`&logins-only=1` when TOTP sync is disabled. The real URL hash can supply a
+prefilled site, for example `/?scenario=add-item#/addItem?url=https%3A%2F%2Fexample.com`.
+Run `pnpm playwright:ui-preview addItem.spec.ts` from `web-extension` to verify
+generation without submission or navigation, keyboard generation, option
+validation, durable save failures, and responsive scrolling. It captures
+`docs/screenshots/add-item-desktop.png` and `docs/screenshots/add-item-mobile.png`.
+
 The `pendingVault` scenario (`scenarios/pendingVault.ts`) runs in the production
 extension with a synthetic mixed vault, including an unsupported future item.
 Build with `API_URL=https://api.authier.test/graphql pnpm prodBuild`, then run `pnpm exec playwright test --config

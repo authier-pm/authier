@@ -115,10 +115,24 @@ test('durable local save survives browser restart and a lost server acknowledgem
     await page.locator('input[name="url"]').fill('https://new.example.com')
     await page.locator('input[name="label"]').fill('New locally saved login')
     await page.locator('input[name="username"]').fill('alex@example.com')
+    const initialPassword = await page
+      .locator('input[name="password"]')
+      .inputValue()
+    await page
+      .getByRole('button', { name: 'Generate password', exact: true })
+      .click()
+    await expect(page.locator('input[name="password"]')).not.toHaveValue(
+      initialPassword
+    )
+    await expect(page.locator('input[name="label"]')).toHaveValue(
+      'New locally saved login'
+    )
+    await expect(page).toHaveURL(/#\/addItem$/)
+    expect(writes).toHaveLength(0)
     await page
       .locator('input[name="password"]')
       .fill('synthetic-one-time-password')
-    await page.getByRole('button', { name: 'Save', exact: true }).click()
+    await page.getByRole('button', { name: 'Save login', exact: true }).click()
     await expect(
       page.getByText('New locally saved login', { exact: true })
     ).toBeVisible()
