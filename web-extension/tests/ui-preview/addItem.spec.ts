@@ -11,7 +11,7 @@ test.beforeEach(async ({ page }) => {
 
 async function fillLogin(page: Page) {
   await page
-    .getByRole('textbox', { name: 'Name Optional', exact: true })
+    .getByRole('textbox', { name: 'Label Optional', exact: true })
     .fill('Work Google account')
   await page
     .getByRole('textbox', { name: 'Website' })
@@ -32,12 +32,19 @@ test('generates passwords in place and only saves on explicit submission', async
     if (frame === page.mainFrame()) navigations.push(frame.url())
   })
   const password = page.locator('input[name="password"]')
+  const label = page.getByRole('textbox', {
+    name: 'Label Optional',
+    exact: true
+  })
+  await expect(label).toBeEditable()
+  await label.fill('My work Google login')
   const original = await password.inputValue()
   await page.getByRole('spinbutton', { name: 'Length', exact: true }).fill('24')
   await page
     .getByRole('button', { name: 'Generate password', exact: true })
     .click()
   await expect(password).not.toHaveValue(original)
+  await expect(label).toHaveValue('My work Google login')
   expect(await password.inputValue()).toHaveLength(24)
   await expect(page.getByRole('textbox', { name: 'Website' })).toHaveValue(
     'accounts.google.com'
@@ -55,6 +62,7 @@ test('generates passwords in place and only saves on explicit submission', async
     .getByRole('spinbutton', { name: 'Length', exact: true })
     .press('Enter')
   await expect(password).not.toHaveValue(generated)
+  await label.fill('Work Google account — primary')
   expect(navigations).toEqual([])
   await expect(
     page.getByRole('heading', { name: 'New vault item' })
@@ -68,6 +76,12 @@ test('generates passwords in place and only saves on explicit submission', async
   await expect(page.getByTestId('saved-items')).toContainText(
     JSON.stringify(savedPassword)
   )
+  const savedItems = JSON.parse(
+    await page.getByTestId('saved-items').innerText()
+  )
+  expect(savedItems).toMatchObject([
+    { loginCredentials: { label: 'Work Google account — primary' } }
+  ])
 })
 
 test('validates generator options and respects the selected character types', async ({

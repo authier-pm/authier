@@ -76,7 +76,7 @@ test.describe.serial('Secrets management', () => {
       .getByRole('textbox', { name: 'Website', exact: true })
       .fill('https://websecurity.dev/password-managers/login/')
     await page
-      .getByRole('textbox', { name: 'Name Optional', exact: true })
+      .getByRole('textbox', { name: 'Label Optional', exact: true })
       .fill(secretLabel)
     await page
       .getByLabel('Username or email', { exact: true })

@@ -74,7 +74,7 @@ function LoginForm() {
         </div>
         <div className="grid gap-5 sm:grid-cols-2">
           <LoginField
-            label="Name"
+            label="Label"
             name="label"
             optional
             placeholder="e.g. Work Google account"
