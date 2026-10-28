@@ -40,6 +40,9 @@ export const device = {
   state: {
     email: 'alex@example.com',
     secrets: [] as ISecret[],
+    getSecretDecryptedById: async (
+      _id: string
+    ): Promise<SecretTypeUnion | undefined> => undefined,
     addSecrets: async (_secrets: AddSecretInput) => undefined,
     encrypt: async (value: string) => encodePreviewSecret(value),
     decrypt: async (encrypted: string) => decodeURIComponent(atob(encrypted)),

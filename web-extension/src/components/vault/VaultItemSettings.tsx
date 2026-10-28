@@ -160,6 +160,7 @@ function LoginSecret({ secretProps }: { secretProps: ILoginSecret }) {
           return (
             <form
               className="grid w-full gap-5 md:grid-cols-2"
+              noValidate
               onSubmit={(event) => {
                 event.preventDefault()
                 handleSubmit()
