@@ -1,5 +1,12 @@
 # Extension UI preview
 
+The `credential-edit` scenario renders the production credential editor with a
+synthetic encrypted item and a local save mock. Open “Edit credential” to inspect
+the form. Run `pnpm playwright:ui-preview credentialEdit.spec.ts` from
+`web-extension` to verify that invalid generator settings do not block saving
+valid credentials, while Formik still validates required credential fields. It
+captures `docs/screenshots/credential-edit-generator-validation.png`.
+
 The `add-item` scenario renders the production add-item page in the vault shell.
 Its device mock records saves locally and supports `&save-error=1` for a failed
 save and recovery, `&totp-limit=1` for an exhausted authenticator limit, and
