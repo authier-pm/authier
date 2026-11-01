@@ -1,5 +1,6 @@
 import { Button } from '@src/components/ui/button'
 import { useEffect } from 'react'
+import { createPortal } from 'react-dom'
 
 export function DeleteAlert({
   isOpen,
@@ -32,7 +33,7 @@ export function DeleteAlert({
     return null
   }
 
-  return (
+  return createPortal(
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4"
       onClick={onClose}
@@ -76,6 +77,7 @@ export function DeleteAlert({
           </Button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   )
 }

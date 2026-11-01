@@ -177,7 +177,9 @@ Keep reusable preview code and fixtures in this directory. Do not place them in
 
 The `vault-scrolling` scenario renders the production vault with 662 synthetic
 credentials loaded after its initial empty state. Add `&view=cards` to check the
-card layout. Run from `web-extension`:
+card layout. Its first three credentials cover a full URL, a scheme-less URL,
+and a missing URL. Table rows open the production detail page; the icon beside
+each URL opens its website in a new tab. Run from `web-extension`:
 
 ```sh
 pnpm exec playwright test --config playwrightVaultScrolling.config.ts
@@ -187,6 +189,9 @@ It verifies that tall windows fill with rows, the final credential is reachable,
 clearing an empty search restores the list, and resizing updates the visible
 items in Firefox and Chromium. Screenshots are captured under
 `docs/screenshots/vault-scrolling-{table,cards}-{firefox,chromium}.png`.
+Run `pnpm playwright:ui-preview vaultTableNavigation.spec.ts` to verify row and
+keyboard navigation, website links, and independent checkbox, copy, reveal,
+edit, and delete controls. It captures `docs/screenshots/vault-table-navigation.png`.
 
 The `offline-vault` scenario (`scenarios/offlineVault.ts`) renders the actual built
 extension in a disposable Chromium profile with encrypted synthetic passwords,

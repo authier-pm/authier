@@ -2,6 +2,7 @@ import { useContext, useMemo, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { Trans } from '@lingui/react/macro'
 import { t } from '@lingui/core/macro'
+import { FiExternalLink } from 'react-icons/fi'
 import {
   CopyIcon,
   EditIcon,
@@ -18,6 +19,7 @@ import { useAppToast } from '@src/ExtensionProviders'
 import { cn } from '@src/lib/cn'
 import {
   getMaskedSecretValue,
+  getNavigableSecretUrl,
   getSecretCopyValue,
   getSecretIconUrl,
   getSecretKindLabel,
@@ -212,6 +214,7 @@ function SecretTableRow({
   const [isSecretVisible, setIsSecretVisible] = useState(false)
   const toast = useAppToast()
   const secretUrl = getSecretUrl(row)
+  const navigableUrl = getNavigableSecretUrl(row)
   const isTotp = isTotpSecret(row)
   const renderedSecret =
     isSecretVisible || showAllSecrets
@@ -222,7 +225,7 @@ function SecretTableRow({
     <div
       className={cn(
         tableGridClassName,
-        'h-full items-center border-b border-[color:var(--color-border)]/70 py-3 transition',
+        'relative h-full items-center border-b border-[color:var(--color-border)]/70 py-3 transition',
         isSelected
           ? 'bg-[color:var(--color-accent)]/60'
           : 'hover:bg-[color:var(--color-accent)]/35'
@@ -232,7 +235,8 @@ function SecretTableRow({
       <div className="flex items-center justify-center">
         <input
           checked={isSelected}
-          className="size-4 rounded border border-[color:var(--color-border)] accent-[color:var(--color-primary)]"
+          aria-label={t`Select ${getSecretLabel(row)}`}
+          className="relative z-10 size-4 rounded border border-[color:var(--color-border)] accent-[color:var(--color-primary)]"
           onChange={onSelect}
           type="checkbox"
         />
@@ -241,24 +245,44 @@ function SecretTableRow({
       <div className="flex min-w-0 items-center gap-3">
         <SecretItemIcon iconUrl={getSecretIconUrl(row)} url={secretUrl} />
         <div className="min-w-0">
-          <div className="truncate text-sm font-semibold text-[color:var(--color-foreground)]">
-            {getSecretLabel(row)}
-          </div>
+          <Link
+            aria-label={t`View details for ${getSecretLabel(row)}`}
+            className="text-sm font-semibold text-[color:var(--color-foreground)] after:absolute after:inset-0 focus-visible:outline-none focus-visible:after:ring-2 focus-visible:after:ring-inset focus-visible:after:ring-[color:var(--color-ring)]"
+            to={`/secret/${row.id}`}
+          >
+            <span className="block truncate">{getSecretLabel(row)}</span>
+          </Link>
           <div className="mt-1 text-xs text-[color:var(--color-muted)]">
             {getSecretKindLabel(row)}
           </div>
         </div>
       </div>
 
-      <div className="truncate text-sm text-[color:var(--color-muted)]">
-        {secretUrl || '—'}
+      <div className="flex min-w-0 items-center gap-1 text-sm text-[color:var(--color-muted)]">
+        <span className="truncate">{secretUrl || '—'}</span>
+        {navigableUrl && (
+          <Tooltip content={t`Open website`}>
+            <a
+              aria-label={t`Open website for ${getSecretLabel(row)}`}
+              className={cn(
+                buttonVariants({ size: 'icon', variant: 'ghost' }),
+                'relative z-10 shrink-0'
+              )}
+              href={navigableUrl}
+              rel="noopener noreferrer"
+              target="_blank"
+            >
+              <FiExternalLink className="size-4" />
+            </a>
+          </Tooltip>
+        )}
       </div>
 
       <div className="truncate font-mono text-sm text-[color:var(--color-foreground)]">
         {isPasskeySecret(row) ? 'Stored in Authier' : renderedSecret}
       </div>
 
-      <div className="flex items-center justify-end gap-1">
+      <div className="relative z-10 flex items-center justify-end gap-1">
         {!isPasskeySecret(row) && (
           <>
             <Tooltip content={isTotp ? t`Copy token` : t`Copy`}>

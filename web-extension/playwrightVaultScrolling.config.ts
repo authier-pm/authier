@@ -3,7 +3,7 @@ import previewConfig from './playwrightUiPreview.config'
 
 export default defineConfig({
   ...previewConfig,
-  testMatch: 'vaultScrolling.spec.ts',
+  testMatch: ['vaultScrolling.spec.ts', 'vaultTableNavigation.spec.ts'],
   projects: [
     { name: 'firefox', use: { ...devices['Desktop Firefox'] } },
     { name: 'chromium', use: { ...devices['Desktop Chrome'] } }
