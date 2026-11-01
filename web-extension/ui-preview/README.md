@@ -190,8 +190,9 @@ clearing an empty search restores the list, and resizing updates the visible
 items in Firefox and Chromium. Screenshots are captured under
 `docs/screenshots/vault-scrolling-{table,cards}-{firefox,chromium}.png`.
 Run `pnpm playwright:ui-preview vaultTableNavigation.spec.ts` to verify row and
-keyboard navigation, website links, and independent checkbox, copy, reveal,
-edit, and delete controls. It captures `docs/screenshots/vault-table-navigation.png`.
+keyboard navigation, website links, the top-level show/hide-secrets toggle, and
+independent checkbox, copy, edit, and delete controls. Row actions omit a reveal
+button. It captures `docs/screenshots/vault-table-navigation.png`.
 
 The `offline-vault` scenario (`scenarios/offlineVault.ts`) renders the actual built
 extension in a disposable Chromium profile with encrypted synthetic passwords,

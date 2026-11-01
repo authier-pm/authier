@@ -142,9 +142,16 @@ test('keeps selection, reveal, copy, edit and delete independent of row navigati
   await expect(page.getByText('1 selected', { exact: true })).toBeVisible()
   await checkbox.uncheck()
 
-  await row.getByRole('button', { name: 'Show secret', exact: true }).click()
+  await expect(
+    row.getByRole('button', { name: /show|hide.*secret/i })
+  ).toHaveCount(0)
+  await page
+    .getByRole('button', { name: 'Show all secrets', exact: true })
+    .click()
   await expect(row.getByText('preview-password', { exact: true })).toBeVisible()
-  await row.getByRole('button', { name: 'Hide secret', exact: true }).click()
+  await page
+    .getByRole('button', { name: 'Hide all secrets', exact: true })
+    .click()
   await expect(row.getByText('preview-password', { exact: true })).toHaveCount(
     0
   )

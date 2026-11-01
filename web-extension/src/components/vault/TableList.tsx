@@ -35,7 +35,7 @@ import { useScrollContainer, useVirtualWindow } from './useVirtualWindow'
 
 const tableGridStyle = {
   gridTemplateColumns:
-    '40px minmax(280px, 1.5fr) minmax(260px, 1.2fr) minmax(260px, 1fr) 168px'
+    '40px minmax(280px, 1.5fr) minmax(260px, 1.2fr) minmax(260px, 1fr) 128px'
 } as const
 
 const tableGridClassName = 'grid min-w-[940px] gap-4 px-4'
@@ -211,15 +211,13 @@ function SecretTableRow({
   showAllSecrets: boolean
   isBulkMode: boolean
 }) {
-  const [isSecretVisible, setIsSecretVisible] = useState(false)
   const toast = useAppToast()
   const secretUrl = getSecretUrl(row)
   const navigableUrl = getNavigableSecretUrl(row)
   const isTotp = isTotpSecret(row)
-  const renderedSecret =
-    isSecretVisible || showAllSecrets
-      ? getSecretValue(row)
-      : getMaskedSecretValue(row)
+  const renderedSecret = showAllSecrets
+    ? getSecretValue(row)
+    : getMaskedSecretValue(row)
 
   return (
     <div
@@ -284,51 +282,22 @@ function SecretTableRow({
 
       <div className="relative z-10 flex items-center justify-end gap-1">
         {!isPasskeySecret(row) && (
-          <>
-            <Tooltip content={isTotp ? t`Copy token` : t`Copy`}>
-              <Button
-                aria-label={isTotp ? t`Copy token` : t`Copy`}
-                onClick={async () => {
-                  await navigator.clipboard.writeText(getSecretCopyValue(row))
-                  toast({
-                    title: t`Copied to clipboard`,
-                    status: 'success'
-                  })
-                }}
-                size="icon"
-                variant="ghost"
-              >
-                <CopyIcon boxSize={16} />
-              </Button>
-            </Tooltip>
-
-            <Tooltip
-              content={
-                isSecretVisible || showAllSecrets
-                  ? t`Hide secret`
-                  : t`Show secret`
-              }
+          <Tooltip content={isTotp ? t`Copy token` : t`Copy`}>
+            <Button
+              aria-label={isTotp ? t`Copy token` : t`Copy`}
+              onClick={async () => {
+                await navigator.clipboard.writeText(getSecretCopyValue(row))
+                toast({
+                  title: t`Copied to clipboard`,
+                  status: 'success'
+                })
+              }}
+              size="icon"
+              variant="ghost"
             >
-              <Button
-                aria-label={
-                  isSecretVisible || showAllSecrets
-                    ? t`Hide secret`
-                    : t`Show secret`
-                }
-                onClick={() => {
-                  setIsSecretVisible((currentValue) => !currentValue)
-                }}
-                size="icon"
-                variant="ghost"
-              >
-                {isSecretVisible || showAllSecrets ? (
-                  <ViewOffIcon boxSize={16} />
-                ) : (
-                  <ViewIcon boxSize={16} />
-                )}
-              </Button>
-            </Tooltip>
-          </>
+              <CopyIcon boxSize={16} />
+            </Button>
+          </Tooltip>
         )}
         <Tooltip content={t`Edit`}>
           <Link
