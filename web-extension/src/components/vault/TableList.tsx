@@ -3,12 +3,7 @@ import { Link, useLocation } from 'react-router-dom'
 import { Trans } from '@lingui/react/macro'
 import { t } from '@lingui/core/macro'
 import { FiExternalLink } from 'react-icons/fi'
-import {
-  CopyIcon,
-  EditIcon,
-  ViewIcon,
-  ViewOffIcon
-} from '@src/components/ui/icons'
+import { CopyIcon, ViewIcon, ViewOffIcon } from '@src/components/ui/icons'
 import { Button, buttonVariants } from '@src/components/ui/button'
 import { Tooltip } from '@src/components/ui/tooltip'
 import { DeleteSecretButton } from './DeleteSecretButton'
@@ -35,7 +30,7 @@ import { useScrollContainer, useVirtualWindow } from './useVirtualWindow'
 
 const tableGridStyle = {
   gridTemplateColumns:
-    '40px minmax(280px, 1.5fr) minmax(260px, 1.2fr) minmax(260px, 1fr) 128px'
+    '40px minmax(280px, 1.5fr) minmax(260px, 1.2fr) minmax(260px, 1fr) 84px'
 } as const
 
 const tableGridClassName = 'grid min-w-[940px] gap-4 px-4'
@@ -299,18 +294,6 @@ function SecretTableRow({
             </Button>
           </Tooltip>
         )}
-        <Tooltip content={t`Edit`}>
-          <Link
-            aria-label={t`Edit ${getSecretLabel(row)}`}
-            className={buttonVariants({ size: 'icon', variant: 'ghost' })}
-            to={{
-              pathname: `/secret/${row.id}`
-            }}
-          >
-            <EditIcon boxSize={16} />
-          </Link>
-        </Tooltip>
-
         {isBulkMode ? null : <DeleteSecretButton secrets={[row]} size="icon" />}
       </div>
     </div>

@@ -129,7 +129,7 @@ test('opens websites in a separate tab and omits the button when no URL is store
   }
 })
 
-test('keeps selection, reveal, copy, edit and delete independent of row navigation', async ({
+test('keeps selection, visibility, copy and delete independent of row navigation', async ({
   page
 }) => {
   const checkbox = page.getByRole('checkbox', {
@@ -170,7 +170,10 @@ test('keeps selection, reveal, copy, edit and delete independent of row navigati
   await expect(page.getByText('662 results', { exact: true })).toBeVisible()
 
   await row
-    .getByRole('link', { name: 'Edit Saved account 001', exact: true })
+    .getByRole('link', {
+      name: 'View details for Saved account 001',
+      exact: true
+    })
     .click()
   await expect(
     page.getByRole('heading', { name: 'Saved account 001', exact: true })
