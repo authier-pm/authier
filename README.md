@@ -76,6 +76,51 @@ keep in mind that a single package can be in multiple subfolders, so if you upda
 
 Refer to the subproject readmes for client-specific setup. For the new web vault, use [vault-web/README.md](vault-web/README.md).
 
+## API database and deployment
+
+The `authier-api` Cloudflare Worker uses the `HYPERDRIVE` binding to reach the
+self-hosted `authier` PostgreSQL database on `192.168.50.200`. Authier has its own
+`authier_app` role and Hyperdrive configuration. It shares the existing private
+TCP VPC service and Cloudflare Tunnel with Moot. The service verifies the origin
+certificate and hostname (`postgres.moot.fyi`); PostgreSQL needs no public port.
+Hyperdrive query caching is disabled. The role accepts TLS connections only
+from loopback, has a 20-connection limit and a 30-second statement timeout;
+Hyperdrive's origin pool limit is 10. Runtime queries continue to use the
+existing Postgres.js/Drizzle driver, with one connection per Worker invocation,
+including cron jobs and legacy model helpers. Connections close after work ends.
+
+From `backend`, run `pnpm wrdeploy` for production deployments. It applies
+pending migrations through Hyperdrive before deploying, and aborts on failure.
+`pnpm db:check:remote` verifies the private connection without changing schema.
+Production Cloudflare Workers Builds keeps its deploy command set to
+`pnpm run db:migrate && npx wrangler deploy`; `WORKERS_CI=1` selects the same
+remote migration path and ignores any legacy Neon `DATABASE_URL` build secret.
+Build authentication must allow authenticated Worker previews and the existing
+Hyperdrive binding. Preview version uploads remain separate from migrations.
+
+Remote migrations run in a temporary Wrangler preview with no public route or
+permanent deployment. Every run generates a fresh authorization token, verifies
+the target database and role, and stops the preview afterward. The committed
+Drizzle journal is applied atomically under an advisory lock; already applied
+hashes must match, with a pinned exception for the existing Prisma introspection
+baseline that was commented out after it was marked applied. Payloads are
+limited to 1 MiB, 256 migrations and 2,048 SQL
+statements. Wrangler's preview tooling runs under Node via `tsx`; the application
+and existing Bun scripts retain their runtimes.
+
+For local development, override
+`CLOUDFLARE_HYPERDRIVE_LOCAL_CONNECTION_STRING_HYPERDRIVE` with your local
+PostgreSQL URL. Direct local migrations use `pnpm db:migrate` and `DATABASE_URL`
+from the environment or ignored `backend/.env`. Automated tests use PGlite.
+Production database credentials belong in Hyperdrive, not Git or Worker vars.
+
+The Neon cutover pauses source writes, saves a consistent database export, and
+compares every restored table's row count and content checksum, sequence values
+and constraints before switching production. Credentials, exports and manifests
+stay outside Git in protected migration state directories. Keep the Neon source
+read-only after cutover. A rollback must first pause new writes and reconcile
+changes made on the self-hosted database before returning traffic to Neon.
+
 # Contributor financial reward scheme
 
 Authier is a non profit organization. If we ever see any profit from this project, it will be divided at the end each month proportionally according to the latest numbers in `contrib-locs.json`.

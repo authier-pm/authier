@@ -5,6 +5,13 @@ compatibility_date = "2025-06-01"
 compatibility_flags = ["nodejs_compat", "nodejs_compat_populate_process_env"]
 observability = { logs = { enabled = true, invocation_logs = true } }
 
+[[hyperdrive]]
+binding = "HYPERDRIVE"
+id = "24e2d3e4fa10434c8143060a11dace64"
+# Override for local development with
+# CLOUDFLARE_HYPERDRIVE_LOCAL_CONNECTION_STRING_HYPERDRIVE.
+localConnectionString = "postgresql://authier:auth133r@127.0.0.1:5432/authier"
+
 [vars]
 NODE_ENV = "production"
 DISABLE_EMAIL_SENDING = "false"
@@ -16,7 +23,7 @@ crons = ["* * * * *"]
 "graphql/package.json" = "./node_modules/graphql/package.json"
 
 # Configure secrets with:
-# wrangler secret put DATABASE_URL
+# Production database credentials are managed by Hyperdrive.
 # wrangler secret put ACCESS_TOKEN_SECRET
 # wrangler secret put REFRESH_TOKEN_SECRET
 # wrangler secret put COOKIE_SECRET
