@@ -1,0 +1,16 @@
+name = "authier-schema-migration"
+account_id = "fbd16d9252980833034caa69e11aa064"
+main = "scripts/migrationWorker.ts"
+compatibility_date = "2025-06-01"
+compatibility_flags = ["nodejs_compat"]
+workers_dev = false
+
+[limits]
+cpu_ms = 5000
+
+[[hyperdrive]]
+binding = "HYPERDRIVE"
+id = "24e2d3e4fa10434c8143060a11dace64"
+
+[observability]
+enabled = false

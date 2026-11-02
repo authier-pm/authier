@@ -50,8 +50,10 @@ Use `pnpm db:generate` to generate new migrations.
 Run pending migrations before every backend production deployment; abort deployment if migration fails.
 Use `pnpm wrdeploy` from `backend` for local deployments; it runs migrations before Wrangler.
 Production CI deployments run in Cloudflare Workers Builds, independently of `.github/workflows/main.yml`.
-Keep its production deploy command set to `pnpm run db:migrate && npx wrangler deploy` with the production
-`DATABASE_URL` configured as a build secret. Runtime secrets are not available during builds.
+Keep its production deploy command set to `pnpm run db:migrate && npx wrangler deploy`.
+With `WORKERS_CI=1`, migrations use a temporary authenticated Worker preview bound to production Hyperdrive,
+so builds do not need direct LAN access or a `DATABASE_URL` build secret. Local `pnpm wrdeploy` selects the
+same remote migration path explicitly. Runtime database credentials are managed by Hyperdrive.
 Keep preview version uploads separate from production migrations.
 
 ## Marketing
