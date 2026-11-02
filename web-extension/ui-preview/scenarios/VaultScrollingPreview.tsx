@@ -8,18 +8,20 @@ import { ApolloProvider } from '@apollo/client/react'
 import { i18n } from '@lingui/core'
 import { I18nProvider } from '@lingui/react'
 import { useContext, useState } from 'react'
-import { MemoryRouter } from 'react-router-dom'
+import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { QueryParamProvider } from 'use-query-params'
 import { ReactRouter6Adapter } from 'use-query-params/adapters/react-router-6'
 import { EncryptedSecretType } from '@shared/generated/graphqlBaseTypes'
 import { VaultList } from '@src/pages-vault/VaultList'
 import SidebarWithHeader from '@src/components/vault/SidebarWithHeader'
+import { VaultItemSettings } from '@src/components/vault/VaultItemSettings'
 import type { SecretTypeUnion } from '@src/background/ExtensionDevice'
 import {
   DeviceStateContext,
   ScreenshotDeviceStateProvider
 } from '../deviceStateProvider'
 import { messages } from '@src/locale/en/messages'
+import { device } from '../vaultMocks'
 
 i18n.load('en', messages)
 i18n.activate('en')
@@ -35,7 +37,9 @@ const credentials: SecretTypeUnion[] = Array.from(
       label: `Saved account ${String(index + 1).padStart(3, '0')}`,
       username: 'alex@example.com',
       password: 'preview-password',
-      url: `https://account-${index + 1}.example.com`,
+      url:
+        ['https://account-1.example.com', 'account-2.example.com', ''][index] ??
+        `https://account-${index + 1}.example.com`,
       iconUrl: new URL('../fixtures/exampleFavicon.svg', import.meta.url).href
     }
   })
@@ -93,12 +97,23 @@ function VaultScenario() {
     <ApolloProvider client={client}>
       <DeviceStateContext.Provider value={context}>
         <SidebarWithHeader>
-          <VaultList tableView={params.get('view') !== 'cards'} />
+          <Routes>
+            <Route
+              path="*"
+              element={<VaultList tableView={params.get('view') !== 'cards'} />}
+            />
+            <Route path="/secret/:secretId" element={<VaultItemSettings />} />
+          </Routes>
         </SidebarWithHeader>
         {!loaded && (
           <button
             className="fixed bottom-8 right-8 rounded-xl bg-[color:var(--color-primary)] px-4 py-3 text-[color:var(--color-primary-foreground)]"
-            onClick={() => setLoaded(true)}
+            onClick={() => {
+              device.state.secrets = credentials
+              device.state.getSecretDecryptedById = async (id) =>
+                credentials.find((secret) => secret.id === id)
+              setLoaded(true)
+            }}
           >
             Load saved items
           </button>

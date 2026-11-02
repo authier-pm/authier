@@ -15,7 +15,7 @@ test('edits an encrypted passkey label and displays it in the list', async ({
     path: '../docs/screenshots/passkey-vault-list.png'
   })
   await page
-    .getByRole('link', { name: 'Edit alex@example.com | GitHub' })
+    .getByRole('link', { name: 'View details for alex@example.com | GitHub' })
     .click()
   await expect(page.getByText('github.com', { exact: true })).toBeVisible()
   await expect(
@@ -41,7 +41,9 @@ test('edits an encrypted passkey label and displays it in the list', async ({
     page.getByText('alex@example.com | GitHub — Work', { exact: true })
   ).toBeVisible()
   await page
-    .getByRole('link', { name: 'Edit alex@example.com | GitHub — Work' })
+    .getByRole('link', {
+      name: 'View details for alex@example.com | GitHub — Work'
+    })
     .click()
   await expect(label).toHaveValue('alex@example.com | GitHub — Work')
 })
@@ -52,7 +54,7 @@ test('keeps the saved label when sync fails and allows retry', async ({
   await page.setViewportSize({ width: 1280, height: 800 })
   await page.goto('/?scenario=passkey-vault&failSave=1')
   await page
-    .getByRole('link', { name: 'Edit alex@example.com | GitHub' })
+    .getByRole('link', { name: 'View details for alex@example.com | GitHub' })
     .click()
   const label = page.getByRole('textbox', { name: 'Label', exact: true })
   await label.fill('Work account')
