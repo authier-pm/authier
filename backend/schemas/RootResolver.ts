@@ -334,7 +334,11 @@ export class RootResolver {
       where: { id: deviceInput.id }
     })
 
-    log('device', device)
+    // Check ownership before reusing even an already-approved challenge: older
+    // versions could approve another account's device for a single-device user.
+    if (device && device.userId !== user.id) {
+      throw new GraphqlError('Login failed')
+    }
 
     let challenge = await ctx.db.query.decryptionChallenge.findFirst({
       where: {
