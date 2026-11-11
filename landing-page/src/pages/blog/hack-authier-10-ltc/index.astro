@@ -35,6 +35,12 @@ import ArticleLayout from '../../../layouts/ArticleLayout.astro'
     The result must be <strong>full decryption of stored secrets</strong>, with
     working code that demonstrates how the attacker gets there.
   </p>
+  <p>
+    To qualify for the reward, the vulnerability must still be reproducible on
+    the latest commit of
+    <a href="https://github.com/authier-pm/authier/tree/main">Authier's <code>main</code> branch on GitHub</a>
+    when you submit your report.
+  </p>
 
   <h2>Show it in code</h2>
   <p>
@@ -43,7 +49,7 @@ import ArticleLayout from '../../../layouts/ArticleLayout.astro'
   </p>
   <ol>
     <li>
-      <strong>The setup:</strong> the affected Authier version or commit,
+      <strong>The setup:</strong> the <code>main</code> commit SHA you tested,
       platform, dependencies, and any access the attacker needs to start.
     </li>
     <li>
