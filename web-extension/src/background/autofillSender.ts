@@ -40,8 +40,28 @@ export const getAutofillSender = (
     frameId: sender.frameId,
     url: current.href,
     documentId: sender.documentId,
-    key: `${sender.tab.id}:${sender.documentId ?? sender.frameId}`
+    // Keys the unsaved login and captured inputs of this document. Firefox has
+    // no documentId, so the origin keeps them from following the tab elsewhere.
+    key: `${sender.tab.id}:${sender.documentId ?? sender.frameId}:${frame.origin}`
   }
+}
+
+/** Traffic to these hosts never leaves this machine. */
+const isLocalHost = (hostname: string) =>
+  hostname === 'localhost' || hostname === '127.0.0.1'
+
+/**
+ * https, or plain http from this machine (local development).
+ * Anyone on the network can serve or rewrite any other plain-http page and
+ * read what is typed into it.
+ */
+export const isSecureContextUrl = (url: string) => {
+  if (!URL.canParse(url)) return false
+
+  const { protocol, hostname } = new URL(url)
+  return (
+    protocol === 'https:' || (protocol === 'http:' && isLocalHost(hostname))
+  )
 }
 
 export const isExtensionPageSender = (sender?: browser.Runtime.MessageSender) =>

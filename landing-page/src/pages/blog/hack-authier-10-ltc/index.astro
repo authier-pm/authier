@@ -28,12 +28,19 @@ import ArticleLayout from '../../../layouts/ArticleLayout.astro'
     the user's master password, legitimate decryption keys, or normal authorized
     unlock. That includes the secret values stored in the test vault, such as
     passwords and TOTP seeds, rather than only item titles or account metadata.
+    The attack cannot assume access to the vault owner's email account.
   </p>
   <p>
     Getting a copy of encrypted data, bypassing a login screen, or showing a
     screenshot of a claimed compromise does not by itself meet this challenge.
     The result must be <strong>full decryption of stored secrets</strong>, with
     working code that demonstrates how the attacker gets there.
+  </p>
+  <p>
+    To qualify for the reward, the vulnerability must still be reproducible on
+    the latest commit of
+    <a href="https://github.com/authier-pm/authier/tree/main">Authier's <code>main</code> branch on GitHub</a>
+    when you submit your report.
   </p>
 
   <h2>Show it in code</h2>
@@ -43,7 +50,7 @@ import ArticleLayout from '../../../layouts/ArticleLayout.astro'
   </p>
   <ol>
     <li>
-      <strong>The setup:</strong> the affected Authier version or commit,
+      <strong>The setup:</strong> the <code>main</code> commit SHA you tested,
       platform, dependencies, and any access the attacker needs to start.
     </li>
     <li>

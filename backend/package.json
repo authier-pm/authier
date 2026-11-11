@@ -6,11 +6,6 @@
   "overrides": {
     "graphql": "16.8.1"
   },
-  "lint-staged": {
-    "*.{js,jsx,ts,tsx,md,json,yaml,yml}": [
-      "prettier --write"
-    ]
-  },
   "dependencies": {
     "@electric-sql/pglite": "^0.5.8",
     "@elysiajs/cors": "^1.4.2",

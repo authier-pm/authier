@@ -30,8 +30,10 @@ The production pending-sync and upgrade notices are captured in
 The `hacking-prize-blog` scenario embeds the production 84 LTC security challenge
 announcement. Start the Astro server on port 4321 alongside the preview, then
 open `/?scenario=hacking-prize-blog`. Check the 84 LTC headline and reward card,
-full-decryption criteria, programmatic proof requirements, the fresh demo account recommendation, the
-required Litecoin receiving address, and submission links on desktop and mobile.
+full-decryption criteria, the restriction on assuming email account access, and
+the requirement to reproduce on the latest `main` commit when reporting. Check
+the tested commit SHA, fresh demo account recommendation, required Litecoin
+receiving address, and submission links on desktop and mobile.
 Captures live in `docs/screenshots/hacking-prize-blog-desktop.jpg` and
 `docs/screenshots/hacking-prize-blog-mobile.jpg`.
 The account recommendation and Litecoin address requirement are captured in
