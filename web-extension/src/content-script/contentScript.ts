@@ -21,11 +21,14 @@ import {
   autofillEventsDispatched,
   autofillValueIntoInput,
   debouncedAutofill,
+  filledElements,
+  inputTypesFilledForThisPage,
   IDecryptedSecrets
 } from './autofill'
 import {
   recordInputs,
   contentScriptRender,
+  stopRecordingInputs,
   showSavePromptIfAppropriate
 } from './contentScriptRender'
 
@@ -39,6 +42,14 @@ import { WebInputsArrayClientSide } from '../background/WebInputForAutofill'
 import { isAutofillPagePauseRefreshMessage } from '../background/autofillPagePause'
 import { removeLoginCredOption } from './renderLoginCredOption'
 import { startVerificationCodePicker } from './renderVerificationCodePicker'
+import { removeSaveCredentialsForm } from './renderSaveCredentialsForm'
+import { removePasswordGenerator } from './renderPasswordGenerator'
+import { removeItemPopup } from './renderItemPopup'
+import { isVaultLockMessage } from '../util/vaultLockMessage'
+import {
+  contentVaultSignal,
+  invalidateContentVaultSession
+} from './contentVaultSession'
 
 const log = debug('au:contentScript')
 localStorage.debug = localStorage.debug || 'au:*' // enable all debug messages, TODO remove this for production
@@ -105,7 +116,6 @@ const isTotpFillOnClickMessage = (
   )
 }
 
-const formsRegisteredForSubmitEvent = [] as HTMLFormElement[]
 export let stateInitRes: IInitStateRes | null = null
 
 const shouldRecordInput = (targetElement: HTMLInputElement) => {
@@ -140,15 +150,14 @@ const persistCapturedInputs = () => {
 }
 
 export async function initInputWatch(shouldStart: () => boolean = () => true) {
-  const nextState = await trpc.getContentScriptInitialState.query()
+  const signal = contentVaultSignal()
+  const nextState = await trpc.getContentScriptInitialState.query(location.href)
 
-  if (!shouldStart()) {
+  if (signal.aborted || !shouldStart()) {
     return
   }
 
   stateInitRes = nextState
-
-  log('~ stateInitRes', stateInitRes)
 
   if (!stateInitRes) {
     log('no state')
@@ -161,6 +170,7 @@ export async function initInputWatch(shouldStart: () => boolean = () => true) {
     log('no need to do anything-user locked out')
     return
   }
+  const formsRegisteredForSubmitEvent = new Set<HTMLFormElement>()
 
   document.addEventListener('keydown', recordInputs, true)
 
@@ -174,6 +184,7 @@ export async function initInputWatch(shouldStart: () => boolean = () => true) {
   const stopAutofillListener = autofill(stateInitRes)
 
   const onSubmit = (element: HTMLInputElement | HTMLFormElement) => {
+    if (signal.aborted) return
     domRecorder.addInputEvent({
       element,
       eventType: 'submit',
@@ -191,6 +202,7 @@ export async function initInputWatch(shouldStart: () => boolean = () => true) {
   }
 
   const onInputAdded = (input: HTMLInputElement) => {
+    if (signal.aborted) return
     // handle case when password input is added to DOM by javascript
     if (
       input.type === 'password' &&
@@ -211,6 +223,7 @@ export async function initInputWatch(shouldStart: () => boolean = () => true) {
    * this is an issue on github.com for example.
    */
   const debouncedInputEventListener = debounce((ev) => {
+    if (signal.aborted) return
     log('Caught action', ev, ev.type)
     if (autofillEventsDispatched.has(ev)) {
       // this was dispatched by autofill, we don't need to do anything here
@@ -220,13 +233,11 @@ export async function initInputWatch(shouldStart: () => boolean = () => true) {
     const targetElement = ev.target as HTMLInputElement
 
     if (captureInputValue(targetElement) && targetElement.type === 'password') {
-      log('password inputted', targetElement.value)
-
       const form = targetElement.form
 
       if (form) {
         // handle case when this is inside a form
-        if (formsRegisteredForSubmitEvent.includes(targetElement.form)) {
+        if (formsRegisteredForSubmitEvent.has(form)) {
           log('includes')
           return
         }
@@ -236,9 +247,9 @@ export async function initInputWatch(shouldStart: () => boolean = () => true) {
           () => {
             onSubmit(form)
           },
-          { once: true }
+          { once: true, signal }
         )
-        formsRegisteredForSubmitEvent.push(form)
+        formsRegisteredForSubmitEvent.add(form)
       }
 
       // handle when the user uses enter key-custom JS might be listening for keydown as well and trigger submit externally
@@ -254,7 +265,7 @@ export async function initInputWatch(shouldStart: () => boolean = () => true) {
             showSavePromptIfAppropriate(secretsForHost)
           }
         },
-        { once: true }
+        { once: true, signal }
       )
 
       // some login flows don't have any forms, in that case we are listening for click, keydown
@@ -262,12 +273,14 @@ export async function initInputWatch(shouldStart: () => boolean = () => true) {
         'click',
         () => showSavePromptIfAppropriate(secretsForHost),
         {
-          once: true
+          once: true,
+          signal
         }
       )
     }
   }, 400)
   const focusoutEventListener = (ev: FocusEvent) => {
+    if (signal.aborted) return
     const targetElement = ev.target
 
     if (!(targetElement instanceof HTMLInputElement)) {
@@ -286,6 +299,7 @@ export async function initInputWatch(shouldStart: () => boolean = () => true) {
   document.body.addEventListener('focusout', focusoutEventListener, true)
 
   return () => {
+    formsRegisteredForSubmitEvent.clear()
     document.removeEventListener('keydown', recordInputs, true)
     document.body.removeEventListener(
       'input',
@@ -308,11 +322,27 @@ export async function initInputWatch(shouldStart: () => boolean = () => true) {
 let inputWatchCleanup: (() => void) | undefined
 let inputWatchGeneration = 0
 
-export const refreshInputWatch = async () => {
-  const generation = ++inputWatchGeneration
-
+export const clearContentScriptVault = () => {
+  inputWatchGeneration += 1
+  invalidateContentVaultSession()
   inputWatchCleanup?.()
   inputWatchCleanup = undefined
+  debouncedAutofill.cancel()
+  stateInitRes = null
+  domRecorder.clearCapturedEvents()
+  autofillEventsDispatched.clear()
+  filledElements.clear()
+  inputTypesFilledForThisPage.clear()
+  stopRecordingInputs()
+  removeLoginCredOption()
+  removeSaveCredentialsForm()
+  removePasswordGenerator()
+  removeItemPopup()
+}
+
+export const refreshInputWatch = async () => {
+  clearContentScriptVault()
+  const generation = inputWatchGeneration
 
   const nextCleanup = await initInputWatch(
     () => generation === inputWatchGeneration
@@ -327,6 +357,13 @@ export const refreshInputWatch = async () => {
 initializeTotpAccountEmail()
 void refreshInputWatch()
 
+// Frozen back/forward-cache documents may miss background lock messages.
+// Discard plaintext before suspension and re-check the vault when restored.
+window.addEventListener('pagehide', clearContentScriptVault)
+window.addEventListener('pageshow', (event) => {
+  if (event.persisted) void refreshInputWatch()
+})
+
 // For SPA websites https://stackoverflow.com/questions/2844565/is-there-a-javascript-jquery-dom-change-listener/39508954#39508954
 let lastUrl = location.href
 new MutationObserver(() => {
@@ -337,7 +374,12 @@ new MutationObserver(() => {
   }
 }).observe(document, { subtree: true, childList: true })
 
-browser.runtime.onMessage.addListener((message: unknown) => {
+browser.runtime.onMessage.addListener((message: unknown, sender) => {
+  if (sender.id !== browser.runtime.id) return
+  if (isVaultLockMessage(message)) {
+    clearContentScriptVault()
+    return
+  }
   if (isAutofillPagePauseRefreshMessage(message)) {
     void refreshInputWatch()
     return
@@ -346,11 +388,14 @@ browser.runtime.onMessage.addListener((message: unknown) => {
   if (!isTotpFillOnClickMessage(message)) {
     return
   }
+  if (!stateInitRes?.extensionDeviceReady) return
+  const signal = contentVaultSignal()
 
   const totpMessage = message
 
   if (totpMessage.kind === PopupActionsEnum.TOTP_FILL_ON_CLICK) {
     async function elementSelected(event) {
+      if (signal.aborted) return
       event.preventDefault()
       event.stopPropagation() // Stop the event from propagating further
 
@@ -359,6 +404,7 @@ browser.runtime.onMessage.addListener((message: unknown) => {
       const selectedElement = event.target // Correctly gets the clicked element
       if (selectedElement.tagName !== 'INPUT') {
         notyf.error('You must select an input element')
+        return
       }
       selectedElement.style.backgroundColor = 'yellow' // Highlight the selected element
 
@@ -370,6 +416,7 @@ browser.runtime.onMessage.addListener((message: unknown) => {
         url: location.href
       }
       await trpc.addTOTPInput.mutate(webInput)
+      if (signal.aborted) return
       const messageEvent = totpMessage.event
 
       if (messageEvent?.otpCode) {
@@ -380,6 +427,9 @@ browser.runtime.onMessage.addListener((message: unknown) => {
       }
     }
 
-    document.addEventListener('click', elementSelected, true) // Use capturing to handle the event first
+    document.addEventListener('click', elementSelected, {
+      capture: true,
+      signal
+    })
   }
 })

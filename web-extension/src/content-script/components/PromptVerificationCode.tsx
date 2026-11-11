@@ -8,6 +8,7 @@ import {
   type VerificationCodeSuggestion
 } from '../../verification-codes/verificationCodeProtocol'
 import { fillOtpInputs } from '../fillOtpInputs'
+import { contentVaultSignal } from '../contentVaultSession'
 import { isElementVisibleInViewport } from '../isElementInViewport'
 import {
   suggestionFitsTarget,
@@ -130,6 +131,7 @@ export const PromptVerificationCode = ({
     setBusy(true)
     setError('')
     const pageUrl = location.href
+    const signal = contentVaultSignal()
     const response: unknown = await browser.runtime
       .sendMessage({
         kind: CodeMessageKind.GET_FOR_PAGE,
@@ -141,6 +143,7 @@ export const PromptVerificationCode = ({
       )
     const parsed = pageVerificationCodeSchema.safeParse(response)
     if (
+      signal.aborted ||
       !parsed.success ||
       parsed.data.expiresAt <= Date.now() ||
       location.href !== pageUrl ||
@@ -153,7 +156,9 @@ export const PromptVerificationCode = ({
     const filled = await fillOtpInputs(
       target.inputs,
       parsed.data.code,
-      dispatchedEvents
+      dispatchedEvents,
+      undefined,
+      signal
     )
     setBusy(false)
     if (!filled) {

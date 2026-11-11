@@ -11,12 +11,20 @@ import { IDecryptedSecrets } from './autofill'
 import { renderItemPopup } from './renderItemPopup'
 import { recordDiv, renderToast } from './renderToast'
 import { trpc } from './connectTRPC'
+import { contentVaultSignal } from './contentVaultSession'
 
 const log = debug('au:contentScript:renderer')
 localStorage.debug = localStorage.debug || 'au:*' // enable all debug messages, TODO remove this for production
 
 let clickCount = 0
 let recording = false
+
+export const stopRecordingInputs = () => {
+  document.removeEventListener('click', clicked)
+  recordDiv?.remove()
+  clickCount = 0
+  recording = false
+}
 
 const hideToast = () => {
   const x = document.getElementById('toast')
@@ -58,6 +66,7 @@ export function recordInputs(e?: KeyboardEvent) {
 }
 
 async function clicked(e: MouseEvent) {
+  const signal = contentVaultSignal()
   //@ts-expect-error TODO
   if (e.target.type === 'password' || e.target.type === 'text') {
     domRecorder.addInputEvent({
@@ -65,7 +74,6 @@ async function clicked(e: MouseEvent) {
       eventType: 'input',
       kind: getWebInputKind(e.target as HTMLInputElement)
     })
-
     clickCount = clickCount + 1
   }
 
@@ -74,6 +82,7 @@ async function clicked(e: MouseEvent) {
       inputEvents: domRecorder.toJSON(),
       url: document.documentURI
     })
+    if (signal.aborted) return
 
     recordDiv?.remove()
     recording = false
@@ -115,7 +124,7 @@ export const contentScriptRender = (stateInit: IInitStateRes) => {
 export const showSavePromptIfAppropriate = async (
   secretsForHost: IDecryptedSecrets
 ) => {
-  log('showSavePromptIfAppropriate', domRecorder.toJSON(), document.documentURI)
+  const signal = contentVaultSignal()
   if (loginPrompt) {
     return
   }
@@ -124,6 +133,7 @@ export const showSavePromptIfAppropriate = async (
     inputEvents: domRecorder.toJSON(),
     url: document.documentURI
   })
+  if (signal.aborted) return
 
   const username = domRecorder.getUsername()
   const password = domRecorder.getPassword()
@@ -140,6 +150,7 @@ export const showSavePromptIfAppropriate = async (
       // @ts-expect-error
       const fallbackUsernames: string[] =
         await trpc.getFallbackUsernames.query()
+      if (signal.aborted) return
       log('fallbackUsernames', fallbackUsernames)
       renderSaveCredentialsForm(fallbackUsernames[0], password)
     }

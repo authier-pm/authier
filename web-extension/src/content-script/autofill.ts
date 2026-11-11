@@ -5,7 +5,7 @@ import { isElementVisibleInViewport } from './isElementInViewport'
 import { domRecorder, getWebInputKind, IInitStateRes } from './contentScript'
 import { WebInputType } from '../../../shared/generated/graphqlBaseTypes'
 import 'notyf/notyf.min.css'
-import { debounce } from 'lodash'
+import { debounce, type DebouncedFunc } from 'lodash'
 import { renderLoginCredOption } from './renderLoginCredOption'
 
 import {
@@ -49,6 +49,7 @@ import {
   createGeneratedPasswordHistoryEntry
 } from '@src/util/generatedPasswordHistory'
 import { generateTotpTokenSync } from '@shared/totp'
+import { contentVaultSignal } from './contentVaultSession'
 
 const log = debug('au:autofill')
 
@@ -79,13 +80,15 @@ const markTotpFilled = (inputs: HTMLInputElement[]) => {
 async function fillTotpCode(
   inputs: HTMLInputElement[],
   code: string,
-  knownInput?: HTMLInputElement
+  knownInput?: HTMLInputElement,
+  signal = contentVaultSignal()
 ) {
   const filledInputs = await fillOtpInputs(
     inputs,
     code,
     autofillEventsDispatched,
-    knownInput
+    knownInput,
+    signal
   )
   if (!filledInputs) return false
   markTotpFilled(filledInputs)
@@ -103,12 +106,14 @@ export async function handleGeneratedPasswordAutofill(
     showSavePrompt: boolean
   }
 ) {
+  const signal = contentVaultSignal()
   await appendGeneratedPasswordHistoryEntry(
     createGeneratedPasswordHistoryEntry({
       pageUrl: window.location.href,
       password
     })
   )
+  if (signal.aborted) return
 
   let capturedUsername: string | null = null
   if (options.passwordInput) {
@@ -140,6 +145,7 @@ export async function handleGeneratedPasswordAutofill(
       inputEvents: domRecorder.toJSON(),
       url: document.documentURI
     })
+    if (signal.aborted) return
     capturedUsername = capturedUsername ?? domRecorder.getUsername() ?? null
   }
 
@@ -356,9 +362,11 @@ export const resolveLiveGeneratedPasswordInput = (
  */
 const fillGeneratedPasswordCompanions = async (
   primary: HTMLInputElement,
-  password: string
+  password: string,
+  signal: AbortSignal
 ) => {
   for (let attempt = 0; attempt < GENERATED_PASSWORD_FILL_ATTEMPTS; attempt++) {
+    if (signal.aborted) return
     const pendingCompanions = findGeneratedPasswordCompanions(primary).filter(
       (companion) => companion.value !== password
     )
@@ -384,7 +392,9 @@ export const fillGeneratedPasswordIntoInput = async (
   initialInput: HTMLInputElement,
   password: string
 ) => {
+  const signal = contentVaultSignal()
   for (let attempt = 0; attempt < GENERATED_PASSWORD_FILL_ATTEMPTS; attempt++) {
+    if (signal.aborted) return null
     const currentInput = resolveLiveGeneratedPasswordInput(initialInput)
     if (!currentInput) {
       return null
@@ -392,11 +402,12 @@ export const fillGeneratedPasswordIntoInput = async (
 
     autofillValueIntoInput(currentInput, password)
     await wait(0)
+    if (signal.aborted) return null
 
     const verifiedInput = resolveLiveGeneratedPasswordInput(currentInput)
     if (verifiedInput?.value === password) {
-      await fillGeneratedPasswordCompanions(verifiedInput, password)
-      return verifiedInput
+      await fillGeneratedPasswordCompanions(verifiedInput, password, signal)
+      return signal.aborted ? null : verifiedInput
     }
 
     filledElements.delete(currentInput)
@@ -458,8 +469,6 @@ export const getElementCoordinates = (el: HTMLElement) => {
   }
 }
 
-let onInputAddedHandler = (_inputEl: any) => {}
-
 /**
  * tracks which input types have been autofilled for this page, so we don't autofill them again
  */
@@ -483,9 +492,12 @@ export const autofill = (
   { userInitiated = false }: { userInitiated?: boolean } = {}
 ) => {
   let stopped = false
+  const signal = contentVaultSignal()
+  const isActive = () => !stopped && !signal.aborted
+  let onInputAddedHandler:
+    | DebouncedFunc<(input: HTMLInputElement) => Promise<void>>
+    | undefined
   const { secretsForHost, webInputs } = initState
-
-  log('init autofill', initState)
 
   let firstLoginCred: ILoginSecret | undefined =
     secretsForHost.loginCredentials[0]
@@ -500,6 +512,7 @@ export const autofill = (
   const offerCredentialPicker = (
     classification: PasswordFormClassification
   ) => {
+    if (!isActive()) return
     if (secretsForHost.loginCredentials.length === 0) {
       return
     }
@@ -537,6 +550,7 @@ export const autofill = (
    * @returns array of all useful inputs on the page
    */
   const scanKnownWebInputsAndFillWhenFound = async () => {
+    if (!isActive()) return
     const { body } = document
     /**
      * filter text, email, password, tel
@@ -551,21 +565,24 @@ export const autofill = (
 
     if (usefulInputs.length === 0) {
       await wait(400)
+      if (!isActive()) return
 
       usefulInputs = filterUselessInputs(body)
     }
 
     if (usefulInputs.length === 0) {
-      const filledInputs = (await trpc.executeMainWorldAutofillFunction.mutate(
-        secretsForHost.loginCredentials.map((cred) => ({
+      const filledInputs = (await trpc.executeMainWorldAutofillFunction.mutate({
+        url: location.href,
+        credentials: secretsForHost.loginCredentials.map((cred) => ({
           username: cred.loginCredentials.username,
           password: cred.loginCredentials.password,
           lastUsedAt: cred.lastUsedAt ?? null
         }))
-      )) as Array<{
+      })) as Array<{
         webInputType: WebInputType | null
         username: string | null
       }>
+      if (!isActive()) return
 
       const filled = filledInputs.find(
         (input) => input.webInputType === WebInputType.PASSWORD
@@ -580,9 +597,13 @@ export const autofill = (
     if (totpSecret && !inputTypesFilledForThisPage.has(WebInputType.TOTP)) {
       // generate first, so a segmented widget only matches at one box per digit
       const totpCode = safeGenerateTotpCode(totpSecret)
-      if (totpCode && (await fillTotpCode(usefulInputs, totpCode))) {
+      if (
+        totpCode &&
+        (await fillTotpCode(usefulInputs, totpCode, undefined, signal))
+      ) {
         return
       }
+      if (!isActive()) return
     }
 
     /**
@@ -596,7 +617,7 @@ export const autofill = (
       localClassification,
       webInputs
     )
-    if (stopped || !classification.scope.isConnected) return
+    if (!isActive() || !classification.scope.isConnected) return
     const storedPasswordTarget =
       selectStoredPasswordAutofillTarget(classification)
 
@@ -692,7 +713,8 @@ export const autofill = (
           if (!totpCode) {
             return
           }
-          await fillTotpCode(usefulInputs, totpCode, inputEl)
+          await fillTotpCode(usefulInputs, totpCode, inputEl, signal)
+          if (!isActive()) return
         }
 
         if (filledElements.size >= 2) {
@@ -718,11 +740,13 @@ export const autofill = (
       secretsForHost.loginCredentials.length > 0
     ) {
       const autofillResult = await searchInputsAndAutofill(body, classification)
+      if (!isActive()) return
       if (autofillResult) {
         await trpc.saveCapturedInputEvents.mutate({
           inputEvents: domRecorder.toJSON(),
           url: document.documentURI
         })
+        if (!isActive()) return
       }
       log('autofillResult', autofillResult)
     } else if (secretsForHost.loginCredentials.length > 1) {
@@ -736,14 +760,13 @@ export const autofill = (
      * login form.
      */
     function armInputAddedHandler() {
-      if (onInputAddedHandler) {
-        bodyInputChangeEmitter.off('inputAdded', onInputAddedHandler)
-      }
+      onInputAddedHandler?.cancel()
 
       //TODO: write a test for this
       // Catch new inputs
       onInputAddedHandler = debounce(
         async (inputEl) => {
+          if (!isActive()) return
           log('onInputAddedHandler received input', {
             id: inputEl?.id,
             type: inputEl?.type,
@@ -758,7 +781,8 @@ export const autofill = (
           if (looksLikeOtp && !dynamicTotpSecret) {
             try {
               const refreshedState =
-                await trpc.getContentScriptInitialState.query()
+                await trpc.getContentScriptInitialState.query(location.href)
+              if (!isActive()) return
               dynamicTotpSecret =
                 refreshedState?.secretsForHost?.totpSecrets?.[0] ??
                 dynamicTotpSecret
@@ -784,10 +808,16 @@ export const autofill = (
             const totpCode = safeGenerateTotpCode(dynamicTotpSecret)
             if (
               totpCode &&
-              (await fillTotpCode(filterUselessInputs(document.body), totpCode))
+              (await fillTotpCode(
+                filterUselessInputs(document.body),
+                totpCode,
+                undefined,
+                signal
+              ))
             ) {
               return
             }
+            if (!isActive()) return
           }
 
           for (const filledElement of filledElements) {
@@ -915,6 +945,7 @@ export const autofill = (
       documentBody: HTMLElement,
       formClassification: PasswordFormClassification
     ) {
+      if (!isActive()) return false
       const storedPasswordTarget =
         selectStoredPasswordAutofillTarget(formClassification)
       // only look inside the credential form - a flat scan of the whole document
@@ -1049,10 +1080,11 @@ export const autofill = (
   }
 
   const onInputAddedRelay = (inputEl: HTMLInputElement) => {
-    onInputAddedHandler(inputEl)
+    if (isActive()) onInputAddedHandler?.(inputEl)
   }
 
   const initAutofill = () => {
+    if (!isActive()) return
     scanKnownWebInputsAndFillWhenFound()
 
     //If input shows on loaded page
@@ -1061,12 +1093,16 @@ export const autofill = (
   }
   const initTimeout = setTimeout(initAutofill, 150) // let's wait a bit for the page to load
 
-  return () => {
+  const stop = () => {
     stopped = true
+    onInputAddedHandler?.cancel()
+    signal.removeEventListener('abort', stop)
     bodyInputChangeEmitter.off('inputAdded', onInputAddedRelay)
     clearTimeout(initTimeout)
     inputTypesFilledForThisPage.clear()
   }
+  signal.addEventListener('abort', stop, { once: true })
+  return stop
 }
 
 export const debouncedAutofill = debounce(autofill, 300, {

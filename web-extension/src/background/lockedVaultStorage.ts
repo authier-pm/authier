@@ -6,7 +6,8 @@ import { backgroundStateSerializableLockedSchema } from './backgroundSchemas'
 export const lockedVaultSnapshotSchema =
   backgroundStateSerializableLockedSchema.omit({
     masterEncryptionKey: true,
-    authSecret: true
+    authSecret: true,
+    lockTimeEnd: true
   })
 
 const legacyCredentialKeys = [

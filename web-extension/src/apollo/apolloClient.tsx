@@ -30,7 +30,16 @@ const authLink = setContext(async (_, { headers }) => {
   }
 })
 export const apolloClient = new ApolloClient({
-  link: ApolloLink.from([tokenRefresh, errorLink, authLink, httpLink]),
+  // Refresh depends on the device, which imports this client. Resolve that link
+  // when a request starts, after the circular module initialization completes.
+  link: ApolloLink.from([
+    new ApolloLink((operation, forward) =>
+      tokenRefresh.request(operation, forward)
+    ),
+    errorLink,
+    authLink,
+    httpLink
+  ]),
   cache: apolloCache,
   queryDeduplication: true
 })

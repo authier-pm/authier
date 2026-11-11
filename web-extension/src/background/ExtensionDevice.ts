@@ -18,6 +18,12 @@ import {
 } from './pendingSecrets'
 import { createQueuedSecret } from './createQueuedSecret'
 import {
+  isVaultLockExpired,
+  newVaultLockDeadline,
+  normalizeVaultLockTimeout
+} from './vaultLockDeadline'
+import { vaultLockTimeoutSchema } from '@shared/orpc/schemas'
+import {
   lockedVaultSnapshotSchema,
   readLockedVaultSnapshot,
   saveLockedVaultSnapshot
@@ -113,8 +119,7 @@ export const isRunningInBgServiceWorker =
   typeof window === 'undefined' ||
   location.pathname.endsWith('/backgroundPage.html')
 
-const isVault = location.href.includes('vault.html')
-const isPopup = location.href.includes('popup.html')
+export const VAULT_LOCK_ALARM = 'lock-authier-vault'
 
 export type SecretTypeUnion = ILoginSecret | ITOTPSecret | IPasskeySecret
 
@@ -159,13 +164,16 @@ export class DeviceState implements IBackgroundStateSerializable {
   get initialized() {
     return this.#initialization
   }
-  lockTimeEnd: number
+  lockTimeEnd: number | null = null
   webInputs: WebInputForAutofill[]
   constructor(
     parameters: IBackgroundStateSerializable,
     { listenToStorage = true } = {}
   ) {
     Object.assign(this, parameters)
+    this.vaultLockTimeoutSeconds = normalizeVaultLockTimeout(
+      parameters.vaultLockTimeoutSeconds
+    )
     this.autofillCredentialsEnabled =
       parameters.autofillCredentialsEnabled ?? true
     this.autofillForbiddenUrlPatterns =
@@ -203,6 +211,7 @@ export class DeviceState implements IBackgroundStateSerializable {
     if (areaName !== 'session' || !changes.backgroundState || !device.state)
       return
     if (!changes.backgroundState.newValue) {
+      void device.clearLockInterval()
       device.state.masterEncryptionKey = ''
       device.state.authSecret = ''
       device.state.decryptedSecrets = []
@@ -212,6 +221,7 @@ export class DeviceState implements IBackgroundStateSerializable {
         changes.lockedState?.newValue
       )
       device.lockedState = lockedSnapshot.success ? lockedSnapshot.data : null
+      device.listenForUserLogin()
       return
     }
     const nextSnapshot = backgroundStateSerializableLockedSchema.parse(
@@ -231,6 +241,7 @@ export class DeviceState implements IBackgroundStateSerializable {
       // Passkey approvals are bound to this exact session object. A rotation
       // arriving from another extension window must invalidate that approval.
       device.state = new DeviceState(nextSnapshot)
+      void device.restoreVaultLockTimer()
       return
     }
     // Never overwrite the in-memory plaintext cache from disk: persisted
@@ -239,6 +250,7 @@ export class DeviceState implements IBackgroundStateSerializable {
       .newValue as Record<string, unknown>
     void _ignored
     Object.assign(device.state, rest)
+    void device.restoreVaultLockTimer()
   }
 
   async initialize() {
@@ -752,7 +764,25 @@ class ExtensionDevice {
   name: string
   initCallbacks: (() => void)[] = []
   isInitialized = false
-  lockInterval: ReturnType<typeof setInterval> | null
+  lockInterval: ReturnType<typeof setInterval> | null = null
+  private lockTimerGeneration = 0
+  private loginListener:
+    | ((
+        changes: Record<string, browser.Storage.StorageChange>,
+        areaName: string
+      ) => void)
+    | null = null
+
+  constructor() {
+    if (isRunningInBgServiceWorker) {
+      browser.alarms?.onAlarm.addListener((alarm) => {
+        if (alarm.name !== VAULT_LOCK_ALARM) return
+        this.onInitDone(() => {
+          void this.ensureUnlocked()
+        })
+      })
+    }
+  }
 
   async startLockInterval(lockTime: number) {
     await extensionDeviceTrpc.setLockInterval.mutate({ time: lockTime })
@@ -774,6 +804,8 @@ class ExtensionDevice {
    */
   async initialize() {
     this.isInitialized = false
+    this.state?.destroy()
+    this.state = null
     const [id, storage, persistedLockedState, rememberedSnapshot] =
       await Promise.all([
         this.getDeviceId(),
@@ -796,6 +828,21 @@ class ExtensionDevice {
       storedState = storage.backgroundState
     } else if (storage.lockedState) {
       this.lockedState = storage.lockedState
+      storedState = null
+    }
+
+    // Never decrypt or re-persist a timed-out snapshot, including legacy
+    // snapshots which cannot establish when the vault was last unlocked.
+    if (storedState && isVaultLockExpired(storedState)) {
+      this.lockedState = lockedVaultSnapshotSchema.parse({
+        ...storedState,
+        vaultLockTimeoutSeconds: normalizeVaultLockTimeout(
+          storedState.vaultLockTimeoutSeconds
+        )
+      })
+      storedState = null
+      await forgetRememberedVault()
+      await saveLockedVaultSnapshot(this.lockedState)
     }
 
     if (storedState) {
@@ -803,6 +850,7 @@ class ExtensionDevice {
       this.name = storedState.deviceName
       await this.state.save()
     } else {
+      this.listenForUserLogin()
       if (this.lockedState) {
         await browser.storage.session.set({
           backgroundState: null,
@@ -811,17 +859,10 @@ class ExtensionDevice {
       } else {
         // no state and no locked state, this is a new device
         this.name = this.generateDeviceName()
-        this.listenForUserLogin()
       }
     }
 
-    if (
-      this.state &&
-      (isVault || isPopup) &&
-      this.state.vaultLockTimeoutSeconds
-    ) {
-      this.startLockInterval(this.state.vaultLockTimeoutSeconds)
-    }
+    await this.restoreVaultLockTimer()
 
     this.fireToken = null // TODO: remove this
     this.isInitialized = true
@@ -831,8 +872,9 @@ class ExtensionDevice {
     log('Extension device initialized with id ', this.id)
   }
 
-  private listenForUserLogin() {
+  listenForUserLogin() {
     this.state = null
+    if (this.loginListener) return
     const onStorageChangeLogin = (
       changes: Record<string, browser.Storage.StorageChange>,
       areaName: string
@@ -845,13 +887,15 @@ class ExtensionDevice {
           this.state = new DeviceState(
             nextBackgroundState as IBackgroundStateSerializable
           )
+          void this.restoreVaultLockTimer()
         }
         browser.storage.onChanged.removeListener(onStorageChangeLogin)
+        this.loginListener = null
       } else if (areaName === 'session' && nextLockedState) {
         this.lockedState = nextLockedState as IBackgroundStateSerializableLocked
-        browser.storage.onChanged.removeListener(onStorageChangeLogin)
       }
     }
+    this.loginListener = onStorageChangeLogin
     browser.storage.onChanged.addListener(onStorageChangeLogin)
   }
 
@@ -859,11 +903,19 @@ class ExtensionDevice {
     return `${browserInfo.getOSName()} ${browserInfo.getBrowserName()} extension`
   }
   async clearLocalStorage() {
+    const state = this.state
+    this.state = null
+    state?.destroy()
+    if (state) {
+      state.masterEncryptionKey = ''
+      state.authSecret = ''
+      state.decryptedSecrets = []
+    }
+    await this.clearLockInterval()
     const [deviceId, autofillCredentialsEnabled] = await Promise.all([
       this.getDeviceId(),
       getAutofillCredentialsEnabled()
     ])
-    this.state?.destroy()
     await forgetRememberedVault()
     await browser.storage.session.clear()
     await browser.storage.local.remove('lockedState')
@@ -928,12 +980,8 @@ class ExtensionDevice {
   }
 
   async lock() {
-    if (!this.state) {
-      throw new Error('no state to lock')
-    }
-
-    await forgetRememberedVault()
-    this.clearLockInterval()
+    const stateToLock = this.state
+    if (!stateToLock) return
 
     if (isRunningInBgServiceWorker) {
       const lockIcon = browser.runtime.getURL('icon-lock-48.png')
@@ -957,7 +1005,7 @@ class ExtensionDevice {
       authSecretEncrypted,
       notificationOnWrongPasswordAttempts,
       notificationOnVaultUnlock
-    } = this.state
+    } = stateToLock
 
     this.lockedState = {
       email,
@@ -976,13 +1024,17 @@ class ExtensionDevice {
       uiLanguage,
       theme
     }
-    await saveLockedVaultSnapshot(this.lockedState)
-    const stateToLock = this.state
     stateToLock.destroy()
     stateToLock.masterEncryptionKey = ''
     stateToLock.authSecret = ''
     stateToLock.decryptedSecrets = []
     this.state = null
+    this.listenForUserLogin()
+    // Invalidate the live session before any asynchronous persistence. An
+    // in-flight save or request must observe that the vault is already locked.
+    await this.clearLockInterval()
+    await forgetRememberedVault()
+    await saveLockedVaultSnapshot(this.lockedState)
     await browser.storage.session.set({
       lockedState: this.lockedState,
       backgroundState: null
@@ -1054,13 +1106,28 @@ class ExtensionDevice {
       config.notificationOnWrongPasswordAttempts
     this.state.notificationOnVaultUnlock = config.notificationOnVaultUnlock
 
-    device.setLockTime(config.vaultLockTimeoutSeconds)
-
-    await this.state.save()
+    await this.setLockTime(config.vaultLockTimeoutSeconds)
   }
 
   async save(deviceState: IBackgroundStateSerializable) {
-    this.state = new DeviceState(deviceState)
+    const previous = this.state
+    const sameAccount = previous?.userId === deviceState.userId
+    let deadline = deviceState.lockTimeEnd
+    if (normalizeVaultLockTimeout(deviceState.vaultLockTimeoutSeconds) === 0) {
+      deadline = null
+    } else if (deadline === undefined || deadline === null) {
+      deadline =
+        sameAccount && previous.lockTimeEnd
+          ? previous.lockTimeEnd
+          : newVaultLockDeadline(deviceState.vaultLockTimeoutSeconds)
+    }
+    this.state = new DeviceState({
+      ...deviceState,
+      lockTimeEnd: deadline
+    })
+    previous?.destroy()
+    await this.restoreVaultLockTimer()
+    if (!this.state) return
     await this.state.save()
   }
 
@@ -1093,36 +1160,54 @@ class ExtensionDevice {
     })
   }
 
-  startVaultLockTimer() {
+  async ensureUnlocked() {
+    if (this.state && isVaultLockExpired(this.state)) await this.lock()
+    return Boolean(this.state?.masterEncryptionKey)
+  }
+
+  async restoreVaultLockTimer() {
+    if (!isRunningInBgServiceWorker) return
+    const generation = ++this.lockTimerGeneration
+    if (this.lockInterval) clearInterval(this.lockInterval)
+    this.lockInterval = null
+    const unlocked = await this.ensureUnlocked()
+    if (generation !== this.lockTimerGeneration) return
+    if (!unlocked || !this.state?.lockTimeEnd) {
+      await browser.alarms?.clear(VAULT_LOCK_ALARM)
+      return
+    }
+    // Alarms wake suspended MV3 service workers. The persisted absolute
+    // deadline also protects restarts and delays while the computer sleeps.
+    await browser.alarms?.create(VAULT_LOCK_ALARM, {
+      when: this.state.lockTimeEnd
+    })
+    if (generation !== this.lockTimerGeneration) return
     this.lockInterval = setInterval(() => {
-      const now = Date.now()
-      if (this.state?.lockTimeEnd && this.state.lockTimeEnd <= now) {
-        console.log(`Vault locked at ${now}`)
-        device.lock()
-      }
-    }, 5000)
+      void this.ensureUnlocked()
+    }, 1000)
   }
 
   // null is when user disables the vault lock
-  setLockTime(lockTime: number) {
+  async setLockTime(lockTime: number) {
     if (!this.state) {
       console.warn('cannot set device settings, device not initialized')
       return
     }
+    vaultLockTimeoutSchema.parse(lockTime)
     this.state.vaultLockTimeoutSeconds = lockTime
-
-    this.clearLockInterval()
-    if (lockTime > 0) {
-      this.state.lockTimeEnd = Date.now() + lockTime * 1000
-      this.startVaultLockTimer()
-    }
+    this.state.lockTimeEnd = newVaultLockDeadline(lockTime)
+    await this.restoreVaultLockTimer()
+    await this.state?.save()
   }
 
   async clearLockInterval() {
+    this.lockTimerGeneration++
     if (this.lockInterval) {
       clearInterval(this.lockInterval)
     }
     this.lockInterval = null
+    if (isRunningInBgServiceWorker)
+      await browser.alarms?.clear(VAULT_LOCK_ALARM)
   }
 
   async setWebInputs(inputs: WebInputForAutofill[]) {

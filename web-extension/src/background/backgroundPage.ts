@@ -47,6 +47,7 @@ export interface IBackgroundStateSerializableLocked {
 export interface IBackgroundStateSerializable extends IBackgroundStateSerializableLocked {
   authSecret: string
   masterEncryptionKey: string
+  lockTimeEnd?: number | null
 }
 
 export interface Coord {

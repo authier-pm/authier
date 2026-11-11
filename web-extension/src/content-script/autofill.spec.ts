@@ -9,6 +9,9 @@ import {
   type PasswordFormSnapshot
 } from '@shared/passwordFormClassification'
 import * as passwordFormClassification from './resolvePasswordFormClassification'
+import { autofill } from './autofill'
+import { invalidateContentVaultSession } from './contentVaultSession'
+import { fillOtpInputs } from './fillOtpInputs'
 
 const {
   renderSaveCredentialsForm,
@@ -185,6 +188,7 @@ beforeAll(() => {
 })
 
 beforeEach(() => {
+  invalidateContentVaultSession()
   passwordFormClassification.resetPasswordFormClassificationRequests()
   resolveClassification.mockClear()
   vi.useFakeTimers()
@@ -200,7 +204,52 @@ beforeEach(() => {
 })
 
 afterEach(() => {
+  invalidateContentVaultSession()
   vi.useRealTimers()
+})
+
+describe('locking cancels asynchronous autofill', () => {
+  it('does not fill after a pending form classification resolves', async () => {
+    setPage(
+      '<form><input id="user" autocomplete="username"><input id="pw" type="password" autocomplete="current-password"><button type="submit">Sign in</button></form>',
+      { url: '/login' }
+    )
+    let release!: () => void
+    const pending = new Promise<void>((resolve) => {
+      release = resolve
+    })
+    resolveClassification.mockImplementationOnce(async (classification) => {
+      await pending
+      return classification
+    })
+    const stop = autofill(initState())
+    await vi.advanceTimersByTimeAsync(150)
+    expect(resolveClassification).toHaveBeenCalled()
+    invalidateContentVaultSession()
+    release()
+    await vi.advanceTimersByTimeAsync(1000)
+    expect(inputById('pw').value).toBe('')
+    expect(inputById('user').value).toBe('')
+    expect(renderLoginCredOption).not.toHaveBeenCalled()
+    stop()
+  })
+  it('does not write remaining OTP digits after locking during an awaited paste fallback', async () => {
+    setPage(
+      '<form aria-label="verification code">' +
+        Array.from(
+          { length: 6 },
+          (_, i) =>
+            `<input id="digit-${i}" inputmode="numeric" maxlength="1" aria-label="Digit ${i + 1}">`
+        ).join('') +
+        '</form>'
+    )
+    const inputs = Array.from(document.querySelectorAll('input'))
+    const filling = fillOtpInputs(inputs, TOTP_CODE, new Set())
+    invalidateContentVaultSession()
+    await vi.advanceTimersByTimeAsync(300)
+    expect(await filling).toBeNull()
+    expect(inputs.map((input) => input.value).join('')).toBe('')
+  })
 })
 
 describe('autofill on a login page', () => {

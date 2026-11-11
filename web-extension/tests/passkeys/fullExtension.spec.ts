@@ -63,6 +63,7 @@ for (const scenario of [
       version: number
       createdAt: string
       updatedAt: null
+      deletedAt: null
     }
     const stored: StoredSecret[] = []
     await context.route('**/*', async (route) => {
@@ -85,27 +86,26 @@ for (const scenario of [
           },
           body: '<!doctype html><title>Passkey test</title><h1>Passkey test website</h1>'
         })
-      const payload = route.request().postDataJSON() as {
-        operationName?: string
-        variables?: { secrets?: { kind: string; encrypted: string }[] }
-      } | null
-      if (payload?.operationName === 'addEncryptedSecrets') {
-        for (const secret of payload.variables?.secrets ?? [])
-          stored.push({
-            ...secret,
-            id: crypto.randomUUID(),
+      if (url.pathname === '/api/v1/vault/create') {
+        const operation = route.request().postDataJSON() as {
+          id: string
+          kind: string
+          encrypted: string
+        }
+        let saved = stored.find((secret) => secret.id === operation.id)
+        if (!saved) {
+          saved = {
+            id: operation.id,
+            kind: operation.kind,
+            encrypted: operation.encrypted,
             version: 1,
             createdAt: new Date().toISOString(),
-            updatedAt: null
-          })
-        return route.fulfill({
-          contentType: 'application/json',
-          json: {
-            data: {
-              me: { __typename: 'UserMutation', addEncryptedSecrets: stored }
-            }
+            updatedAt: null,
+            deletedAt: null
           }
-        })
+          stored.push(saved)
+        }
+        return route.fulfill({ json: saved })
       }
       return route.fulfill({
         contentType: 'application/json',
@@ -131,6 +131,7 @@ for (const scenario of [
         authSecret: auth.addDeviceSecret,
         masterEncryptionKey: await cryptoKeyToString(key),
         vaultLockTimeoutSeconds: 3600,
+        lockTimeEnd: Date.now() + 3600_000,
         syncTOTP: false,
         autofillCredentialsEnabled: false,
         autofillTOTPEnabled: false,
@@ -241,7 +242,7 @@ for (const scenario of [
       })
       if (scenario.prf)
         expect(registered.extensions).toEqual({ prf: { enabled: false } })
-      expect(stored).toHaveLength(1)
+      await expect.poll(() => stored.length).toBe(1)
       expect(stored[0].kind).toBe('PASSKEY')
       expect(stored[0].encrypted).not.toContain('privateKey')
       expect(JSON.stringify(registered.json)).not.toContain('privateKey')

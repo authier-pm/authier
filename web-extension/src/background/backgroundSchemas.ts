@@ -84,6 +84,7 @@ export const backgroundStateSerializableLockedSchema = z.object({
   authSecretEncrypted: z.string(),
   authSecret: z.string(),
   vaultLockTimeoutSeconds: z.number().nullable(),
+  lockTimeEnd: z.number().nullable().optional(),
   autofillCredentialsEnabled: z.boolean().nullable(),
   autofillTOTPEnabled: z.boolean().nullable(),
   autofillForbiddenUrlPatterns: z.string().default(''),
