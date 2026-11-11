@@ -10,7 +10,6 @@ import {
   appendGeneratedPasswordHistoryEntry,
   generatedPasswordHistoryEntrySchema
 } from '@src/util/generatedPasswordHistory'
-import debug from 'debug'
 import { apolloClient } from '@src/apollo/apolloClient'
 import {
   AddWebInputsDocument,
@@ -38,6 +37,13 @@ import {
   webInputElementSchema
 } from './backgroundSchemas'
 import { z } from 'zod'
+import { TRPCError } from '@trpc/server'
+import { getAutofillSender, isExtensionPageSender } from './autofillSender'
+import {
+  capturedInputsByDocument,
+  saveLoginModalsStates
+} from './autofillPageState'
+import { synchronizeAutofillSession } from './autofillInvalidation'
 import { openVaultTab } from '@src/AuthLinkPage'
 import { tc } from './tc'
 import { loggerMiddleware } from './loggerMiddleware'
@@ -58,8 +64,6 @@ import {
   setAutofillPausedForPage
 } from './autofillPagePause'
 
-const log = debug('au:chListener')
-
 if (!isRunningInBgServiceWorker) {
   throw new Error('this file should only be imported in the background page')
 }
@@ -78,13 +82,20 @@ export interface ISaveLoginModalState {
 }
 
 //NOTE: temporary storage for not yet saved credentials. (during page rerender)
-export const saveLoginModalsStates = new Map<number, ISaveLoginModalState>()
-
 export const noHandsLogin = false
-let capturedInputEvents: ICapturedInput[] = []
-let inputsUrl: string
 
 const tcProcedure = tc.procedure.use(loggerMiddleware)
+const extensionProcedure = tcProcedure.use(({ ctx, next }) => {
+  if (!isExtensionPageSender(ctx.sender))
+    throw new TRPCError({ code: 'FORBIDDEN' })
+  return next()
+})
+const contentProcedure = tcProcedure.use(async ({ ctx, next }) => {
+  const autofillSender = getAutofillSender(ctx.sender)
+  if (!autofillSender || !(await device.ensureUnlocked()))
+    throw new TRPCError({ code: 'FORBIDDEN' })
+  return next({ ctx: { ...ctx, autofillSender } })
+})
 
 void initializePendingSecretSync().catch(() => {
   console.warn(
@@ -104,6 +115,9 @@ void loginSessionManager.initialize().catch((error: unknown) => {
 })
 
 browser.storage.onChanged.addListener((changes, areaName) => {
+  if (areaName === 'session' && changes.backgroundState) {
+    void synchronizeAutofillSession(changes.backgroundState)
+  }
   if (areaName === 'session' && changes.backgroundState?.newValue) {
     void loginSessionManager.resetLogin().catch((error: unknown) => {
       console.error('Failed to clear the completed login session', error)
@@ -127,18 +141,22 @@ browser.runtime.onMessage.addListener((message: unknown, sender) => {
 })
 
 const appRouter = tc.router({
-  getLoginSession: tcProcedure.query(() => loginSessionManager.getSnapshot()),
-  updateLoginDraft: tcProcedure
+  getLoginSession: extensionProcedure.query(() =>
+    loginSessionManager.getSnapshot()
+  ),
+  updateLoginDraft: extensionProcedure
     .input(loginDraftSchema)
     .mutation(({ input }) => loginSessionManager.updateDraft(input)),
-  startLogin: tcProcedure
+  startLogin: extensionProcedure
     .input(loginDraftSchema)
     .mutation(({ input }) => loginSessionManager.startLogin(input)),
-  resetLogin: tcProcedure.mutation(() => loginSessionManager.resetLogin()),
-  initiateLoginMasterDeviceReset: tcProcedure.mutation(() =>
+  resetLogin: extensionProcedure.mutation(() =>
+    loginSessionManager.resetLogin()
+  ),
+  initiateLoginMasterDeviceReset: extensionProcedure.mutation(() =>
     loginSessionManager.initiateMasterDeviceReset()
   ),
-  addLoginCredentials: tcProcedure
+  addLoginCredentials: contentProcedure
     .input(loginCredentialsFromContentScriptSchema)
     .mutation(async ({ ctx, input }) => {
       const tab = ctx.sender?.tab
@@ -149,7 +167,7 @@ const appRouter = tc.router({
 
       const deviceState = device.state
 
-      const { url } = tab
+      const { url } = ctx.autofillSender
 
       if (!url || !deviceState) {
         return false // we can't do anything without a valid url
@@ -187,14 +205,12 @@ const appRouter = tc.router({
         return false
       }
 
-      if (tab.id) {
-        saveLoginModalsStates.delete(tab.id)
-      }
+      saveLoginModalsStates.delete(ctx.autofillSender.key)
       const webInputs = credentials.capturedInputEvents.map((captured) => {
         return {
           domPath: captured.cssSelector,
           kind: captured.kind,
-          url: inputsUrl,
+          url,
           domOrdinal: captured.domOrdinal
         }
       })
@@ -217,22 +233,23 @@ const appRouter = tc.router({
         openVaultTab(`/secret/${secret.id}`)
       }
     }),
-  saveCapturedInputEvents: tcProcedure
+  saveCapturedInputEvents: contentProcedure
     .input(capturedEventsPayloadSchema)
-    .mutation(async ({ input }) => {
+    .mutation(async ({ input, ctx }) => {
+      const sender = getAutofillSender(ctx.sender, input.url)
+      if (!sender) return
       if (navigator.onLine === false) {
         console.log('ignoring saving of inputs because we are offline')
         return
       }
 
-      capturedInputEvents = input.inputEvents
-      inputsUrl = input.url
+      capturedInputsByDocument.set(ctx.autofillSender.key, input.inputEvents)
 
-      const newWebInputs = capturedInputEvents.map((captured) => {
+      const newWebInputs = input.inputEvents.map((captured) => {
         return {
           domPath: captured.cssSelector,
           kind: captured.kind,
-          url: inputsUrl,
+          url: sender.url,
           domOrdinal: captured.domOrdinal
         }
       })
@@ -249,26 +266,18 @@ const appRouter = tc.router({
         errorPolicy: 'ignore'
       })
     }),
-  saveLoginCredentialsModalShown: tcProcedure
+  saveLoginCredentialsModalShown: contentProcedure
     .input(loginCredentialSchema)
     .mutation(async ({ input, ctx }) => {
-      const tab = ctx.sender?.tab
-      const currentTabId = tab?.id
-
-      if (currentTabId) {
-        saveLoginModalsStates.set(currentTabId, input)
-      }
+      saveLoginModalsStates.set(ctx.autofillSender.key, input)
     }),
-  hideLoginCredentialsModal: tcProcedure.mutation(async ({ ctx }) => {
-    const tab = ctx.sender?.tab
-    const currentTabId = tab?.id
-    if (currentTabId) {
-      saveLoginModalsStates.delete(currentTabId)
-    }
+  hideLoginCredentialsModal: contentProcedure.mutation(async ({ ctx }) => {
+    saveLoginModalsStates.delete(ctx.autofillSender.key)
   }),
-  addTOTPInput: tcProcedure
+  addTOTPInput: contentProcedure
     .input(webInputElementSchema)
-    .mutation(async ({ input }) => {
+    .mutation(async ({ input, ctx }) => {
+      if (!getAutofillSender(ctx.sender, input.url)) return
       const hostname = constructURL(input.url).hostname
 
       const res = await apolloClient.mutate<
@@ -296,69 +305,89 @@ const appRouter = tc.router({
   classifyPasswordForm: tcProcedure
     .input(passwordFormSnapshotSchema)
     .mutation(async ({ ctx, input }) => {
-      const tabId = ctx.sender?.tab?.id
-      const senderUrl = ctx.sender?.url ?? ctx.sender?.tab?.url
-      if (
-        !tabId ||
-        !senderUrl ||
-        normalizePasswordFormUrl(senderUrl) !== input.url
-      )
+      const sender = getAutofillSender(ctx.sender, input.url)
+      if (!sender || normalizePasswordFormUrl(sender.url) !== input.url)
         return null
-      const state = await getContentScriptInitialState(senderUrl, tabId)
+      const state = await getContentScriptInitialState(
+        sender.url,
+        sender.tabId,
+        sender.key
+      )
       if (!state.extensionDeviceReady || !state.autofillEnabled) return null
       return classifyPasswordForm(input)
     }),
   executeMainWorldAutofillFunction: tcProcedure
     .input(
-      z.array(
-        loginCredentialSchema.extend({ lastUsedAt: z.string().nullable() })
-      )
+      z.object({
+        url: z.string().url(),
+        credentials: z.array(
+          loginCredentialSchema.extend({ lastUsedAt: z.string().nullable() })
+        )
+      })
     )
     .mutation(async ({ ctx, input }) => {
-      const tab = ctx.sender?.tab
-      if (!tab?.id) return []
+      const sender = getAutofillSender(ctx.sender, input.url)
+      if (!sender) return []
+      const session = device.state
+      const initialState = await getContentScriptInitialState(
+        sender.url,
+        sender.tabId,
+        sender.key
+      )
+      if (!initialState.autofillEnabled || !session || device.state !== session)
+        return []
+      // Do not let a stale content script inject cached credentials after locking,
+      // switching accounts, or navigating to a different credential origin.
+      const credentials = initialState.secretsForHost.loginCredentials
+        .filter(({ loginCredentials }) =>
+          input.credentials.some(
+            (requested) =>
+              requested.username === loginCredentials.username &&
+              requested.password === loginCredentials.password
+          )
+        )
+        .map(({ loginCredentials, lastUsedAt }) => ({
+          username: loginCredentials.username,
+          password: loginCredentials.password,
+          lastUsedAt: lastUsedAt ?? null
+        }))
+      if (credentials.length === 0) return []
 
-      const results = await browser.scripting.executeScript({
-        target: { tabId: tab.id },
-        world: 'MAIN',
-        func: mainWorldAutofillFunction,
-        args: [input]
-      })
+      const results = await browser.scripting
+        .executeScript({
+          target: sender.documentId
+            ? { tabId: sender.tabId, documentIds: [sender.documentId] }
+            : { tabId: sender.tabId, frameIds: [sender.frameId] },
+          world: 'MAIN',
+          func: mainWorldAutofillFunction,
+          args: [credentials, sender.url]
+        })
+        .catch(() => []) // The frame can disappear between validation and injection.
 
       return results[0]?.result || []
     }),
-  getFallbackUsernames: tcProcedure.query(async () => {
-    const deviceState = device.state
-    log('Getting fallback usernames', deviceState?.email)
-    return [deviceState?.email]
+  getFallbackUsernames: tcProcedure.query(async ({ ctx }) => {
+    if (!getAutofillSender(ctx.sender) || !(await device.ensureUnlocked()))
+      return []
+    return [device.state?.email]
   }),
-  getContentScriptInitialState: tcProcedure.query(async ({ ctx }) => {
-    const tab = ctx.sender?.tab
-    const currentTabId = tab?.id
-    const tabUrl = tab?.url
-    const deviceState = device.state
-
-    log('GEtting initial state from BG', tab?.url, tab?.pendingUrl)
-    if (!tabUrl || !deviceState || !currentTabId) {
-      log(
-        '~ chromeRuntimeListener We do not have tabURL or deviceState or tabId',
-        {
-          tabUrl,
-          deviceState,
-          currentTabId
-        }
-      )
-      return null
-    } else {
-      //We will have to get webInputs for current URL from DB and send it to content script for resetting after new DOM path save
-      return getContentScriptInitialState(tabUrl, currentTabId)
+  getContentScriptInitialState: tcProcedure
+    .input(z.string().url().optional())
+    .query(async ({ ctx, input }) => {
+      const sender = getAutofillSender(ctx.sender, input)
+      if (!sender) return null
+      return getContentScriptInitialState(sender.url, sender.tabId, sender.key)
+    }),
+  getCapturedInputEvents: tcProcedure.query(async ({ ctx }) => {
+    const sender = getAutofillSender(ctx.sender)
+    if (!sender || !(await device.ensureUnlocked()))
+      return { capturedInputEvents: [], inputsUrl: undefined }
+    return {
+      capturedInputEvents: capturedInputsByDocument.get(sender.key) ?? [],
+      inputsUrl: sender.url
     }
   }),
-  getCapturedInputEvents: tcProcedure.query(async ({ ctx }) => {
-    const tab = ctx.sender?.tab
-    return { capturedInputEvents, inputsUrl: tab?.url }
-  }),
-  securitySettings: tcProcedure
+  securitySettings: extensionProcedure
     .input(settingsSchema)
     .mutation(async ({ input }) => {
       const deviceState = device.state
@@ -369,18 +398,16 @@ const appRouter = tc.router({
 
       return true
     }),
-  setLockInterval: tcProcedure
-    .input(z.object({ time: z.number() }))
+  setLockInterval: extensionProcedure
+    .input(z.object({ time: z.number().int().min(0).max(31_536_000) }))
     .mutation(async ({ input }) => {
-      device.setLockTime(
-        input.time ? Date.now() + input.time * 1000 : input.time
-      )
+      await device.setLockTime(input.time)
       return true
     }),
-  setDeviceState: tcProcedure
+  setDeviceState: extensionProcedure
     .input(backgroundStateSerializableLockedSchema)
     .mutation(async ({ input }) => {
-      device.save(input)
+      await device.save(input)
       return true
     })
 })
@@ -410,6 +437,8 @@ browser.runtime.onMessage.addListener((request: unknown, sender) => {
   const passkeyResponse = handlePasskeyMessage(request, sender)
   if (passkeyResponse) return passkeyResponse
 
+  if (!isExtensionPageSender(sender)) return
+
   if (isAutofillPagePauseGetMessage(request)) {
     return isAutofillPausedForPage(request.tabId, request.url)
   }
@@ -423,12 +452,12 @@ browser.runtime.onMessage.addListener((request: unknown, sender) => {
 
   return browser.tabs
     .query({ active: true, currentWindow: true })
-    .then((tabs) => {
-      const firstTabId = tabs[0].id
+    .then(async (tabs) => {
+      const firstTabId = tabs[0]?.id
 
-      if (!firstTabId) {
+      if (firstTabId === undefined || !(await device.ensureUnlocked())) {
         return
       }
-      browser.tabs.sendMessage(firstTabId, request)
+      return browser.tabs.sendMessage(firstTabId, request, { frameId: 0 })
     })
 })

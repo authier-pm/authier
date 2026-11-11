@@ -2,26 +2,35 @@
 import { render } from 'preact'
 import { PromptPassword } from './components/PromptPassword'
 import { trpc } from './connectTRPC'
+import { contentVaultSignal } from './contentVaultSession'
 import {
   getSingleVisibleEmailFromPage,
   getUsernameFromCapturedInputs
 } from './DOMEventsRecorder'
 
 export let loginPrompt: HTMLDivElement | null
+let promptContainer: HTMLDivElement | null = null
+
+export const removeSaveCredentialsForm = () => {
+  if (promptContainer) render(null, promptContainer)
+  loginPrompt?.remove()
+  loginPrompt = null
+  promptContainer = null
+}
 
 export async function renderSaveCredentialsForm(
   username: string | null,
   password: string
 ) {
+  const signal = contentVaultSignal()
   const inputEvents = await trpc.getCapturedInputEvents.query()
+  if (signal.aborted) return
   const resolvedUsername =
     username ??
     getUsernameFromCapturedInputs(inputEvents.capturedInputEvents) ??
     getSingleVisibleEmailFromPage(document.body.innerText, location.hostname) ??
     null
-  if (loginPrompt) {
-    loginPrompt.remove() // remove if already in the page
-  }
+  removeSaveCredentialsForm()
 
   const newDiv = document.createElement('div')
   newDiv.id = 'authier-save-prompt'
@@ -44,6 +53,7 @@ export async function renderSaveCredentialsForm(
 
   // Create container for Preact render
   const container = document.createElement('div')
+  promptContainer = container
   shadow.appendChild(container)
 
   render(

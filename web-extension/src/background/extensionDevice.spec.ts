@@ -136,6 +136,7 @@ describe('ExtensionDevice', () => {
         masterEncryptionKey: 'remembered-key',
         secrets: [],
         vaultLockTimeoutSeconds: 3600,
+        lockTimeEnd: Date.now() + 3600_000,
         syncTOTP: true,
         autofillCredentialsEnabled: true,
         autofillTOTPEnabled: true,
@@ -156,7 +157,7 @@ describe('ExtensionDevice', () => {
       )
     })
 
-    it('should initialize the device and start the lock interval if a device state is present in storage', async () => {
+    it('restores a live device without extending its original lock deadline', async () => {
       // Mock getDeviceId
       const mockGetDeviceId = vi.fn().mockResolvedValue('mock-device-id')
       device.getDeviceId = mockGetDeviceId
@@ -178,6 +179,7 @@ describe('ExtensionDevice', () => {
           notificationOnVaultUnlock: false,
           notificationOnWrongPasswordAttempts: 3,
           vaultLockTimeoutSeconds: 1234,
+          lockTimeEnd: Date.now() + 600_000,
           secrets: []
         }
       })
@@ -194,6 +196,8 @@ describe('ExtensionDevice', () => {
       expect(mockStorageGet).toHaveBeenCalled()
       expect(mockGetDeviceId).toHaveBeenCalled()
       expect(device.id).toBe('mock-device-id')
+      expect(device.state?.lockTimeEnd).toBe(Date.now() + 600_000)
+      expect(mockStartLockInterval).not.toHaveBeenCalled()
     })
 
     it('should initialize the device in a locked state if a locked state is present in storage', async () => {
@@ -327,7 +331,10 @@ describe('ExtensionDevice', () => {
     it('invalidates a passkey approval session when another extension window rotates the key', async () => {
       const previous = previousState()
       device.state = previous
-      previous.onStorageChange({ backgroundState: { newValue: nextSnapshot } }, 'session')
+      previous.onStorageChange(
+        { backgroundState: { newValue: nextSnapshot } },
+        'session'
+      )
       const replacement = device.state
       expect(replacement).not.toBe(previous)
       expect(replacement?.masterEncryptionKey).toBe('new-key')
@@ -341,7 +348,12 @@ describe('ExtensionDevice', () => {
     it('keeps the approval session identity for ordinary same-key synchronization', () => {
       const previous = previousState()
       device.state = previous
-      previous.onStorageChange({ backgroundState: { newValue: { ...previousSnapshot, theme: 'light' } } }, 'session')
+      previous.onStorageChange(
+        {
+          backgroundState: { newValue: { ...previousSnapshot, theme: 'light' } }
+        },
+        'session'
+      )
       expect(device.state).toBe(previous)
       expect(device.state?.theme).toBe('light')
       expect(previous.masterEncryptionKey).toBe('old-key')

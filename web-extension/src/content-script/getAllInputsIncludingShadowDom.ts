@@ -72,8 +72,11 @@ export function mainWorldAutofillFunction(
     username: string
     password: string
     lastUsedAt: string | null
-  }[]
+  }[],
+  expectedDocumentUrl?: string
 ) {
+  if (expectedDocumentUrl && window.location.href !== expectedDocumentUrl)
+    return []
   function isElementInViewport(el: HTMLElement): boolean {
     const rect = el.getBoundingClientRect()
 

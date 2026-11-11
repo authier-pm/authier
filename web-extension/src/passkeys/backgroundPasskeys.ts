@@ -73,7 +73,7 @@ export const passkeyRequestManager = new PasskeyRequestManager(
           'The vault changed. Please try again.',
           'NotAllowedError'
         )
-      device.setLockTime(snapshot.vaultLockTimeoutSeconds ?? 0)
+      await device.setLockTime(snapshot.vaultLockTimeoutSeconds ?? 0)
       return verifiedSession
     },
     list: async () => {

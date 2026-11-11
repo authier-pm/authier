@@ -1,6 +1,6 @@
 import { IInitStateRes } from '@src/content-script/contentScript'
 import { EncryptedSecretType } from '../../../shared/generated/graphqlBaseTypes'
-import { saveLoginModalsStates } from './chromeRuntimeListener'
+import { saveLoginModalsStates } from './autofillPageState'
 import { SecretTypeUnion, device } from './ExtensionDevice'
 import { ILoginSecret, ITOTPSecret } from '@src/util/useDeviceState'
 
@@ -14,15 +14,17 @@ const log = debug('au:getContentScriptInitialState')
 
 export const getContentScriptInitialState = async (
   tabUrl: string,
-  currentTabId: number
+  currentTabId: number,
+  documentKey = `${currentTabId}:0`
 ): Promise<IInitStateRes> => {
-  log('tabUrl', tabUrl)
+  if (!(await device.ensureUnlocked())) return emptyContentScriptState()
+  const session = device.state
   const hostname = constructURL(tabUrl).hostname
 
   let decrypted: SecretTypeUnion[]
   if (hostname) {
-    if (device.state) {
-      decrypted = await device.state.getSecretsDecryptedByTLD(hostname)
+    if (session) {
+      decrypted = await session.getSecretsDecryptedByTLD(hostname)
 
       const initialLoginCount = decrypted.filter(
         ({ kind }) => kind === EncryptedSecretType.LOGIN_CREDENTIALS
@@ -41,13 +43,14 @@ export const getContentScriptInitialState = async (
       // Retry once with a refreshed decrypted cache if TOTP is unexpectedly missing.
       if (
         initialTotpCount === 0 &&
-        device.state.secrets.some(
+        session.secrets.some(
           (secret) => secret.kind === EncryptedSecretType.TOTP
         )
       ) {
-        device.state.decryptedSecrets =
-          await device.state.getAllSecretsDecrypted()
-        decrypted = await device.state.getSecretsDecryptedByTLD(hostname)
+        const refreshed = await session.getAllSecretsDecrypted()
+        if (device.state !== session) return emptyContentScriptState()
+        session.decryptedSecrets = refreshed
+        decrypted = await session.getSecretsDecryptedByTLD(hostname)
 
         log('host-matched secrets after cache refresh', {
           hostname,
@@ -88,10 +91,10 @@ export const getContentScriptInitialState = async (
   if (
     totpSecretsForHost.length === 0 &&
     loginCredentialsForHost.length > 0 &&
-    device.state
+    session
   ) {
     const urlLessTotpCandidates = (
-      device.state.decryptedSecrets.filter(
+      session.decryptedSecrets.filter(
         (secret) =>
           secret.kind === EncryptedSecretType.TOTP && !secret.totp?.url
       ) as ITOTPSecret[]
@@ -117,19 +120,33 @@ export const getContentScriptInitialState = async (
     }
   }
 
+  // Never return plaintext produced by a session that locked while we awaited
+  // decryption or browser storage. A newly unlocked session is a different object.
+  if (!(await device.ensureUnlocked()) || device.state !== session)
+    return emptyContentScriptState()
+  if (
+    !autofillCredentialsEnabled ||
+    isPausedForPage ||
+    isAutofillForbiddenForUrl(
+      tabUrl,
+      session?.autofillForbiddenUrlPatterns ?? ''
+    )
+  )
+    return { ...emptyContentScriptState(), extensionDeviceReady: true }
+
   return {
-    extensionDeviceReady: !!device.state?.masterEncryptionKey,
+    extensionDeviceReady: !!session?.masterEncryptionKey,
     //TODO: Add autofill for TOTP
     autofillEnabled:
       autofillCredentialsEnabled &&
       !isPausedForPage &&
       !isAutofillForbiddenForUrl(
         tabUrl,
-        device.state?.autofillForbiddenUrlPatterns ?? ''
+        session?.autofillForbiddenUrlPatterns ?? ''
       ),
     webInputs: webInputs,
     passwordCount:
-      device.state?.secrets.filter(
+      session?.secrets.filter(
         (i) => i.kind === EncryptedSecretType.LOGIN_CREDENTIALS
       ).length ?? 0,
     secretsForHost: {
@@ -137,7 +154,18 @@ export const getContentScriptInitialState = async (
       totpSecrets: totpSecretsForHost
     },
     saveLoginModalsState: currentTabId
-      ? saveLoginModalsStates.get(currentTabId)
+      ? saveLoginModalsStates.get(documentKey)
       : null
+  }
+}
+
+function emptyContentScriptState(): IInitStateRes {
+  return {
+    extensionDeviceReady: false,
+    autofillEnabled: false,
+    passwordCount: 0,
+    webInputs: [],
+    secretsForHost: { loginCredentials: [], totpSecrets: [] },
+    saveLoginModalsState: null
   }
 }

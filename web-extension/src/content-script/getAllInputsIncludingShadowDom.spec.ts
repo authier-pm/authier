@@ -45,6 +45,18 @@ beforeEach(() => {
 })
 
 describe('main-world autofill fallback', () => {
+  it('refuses credentials after the receiving document navigates', () => {
+    document.body.innerHTML =
+      '<form><input id="user" autocomplete="username"><input id="pw" type="password" autocomplete="current-password"></form>'
+    const result = mainWorldAutofillFunction(
+      credentials(),
+      'https://original.example/login'
+    )
+    expect(result).toEqual([])
+    expect(inputById('user').value).toBe('')
+    expect(inputById('pw').value).toBe('')
+  })
+
   it('fills an explicit username and current-password login', () => {
     document.body.innerHTML = `<form>
       <input id="user" autocomplete="username" />

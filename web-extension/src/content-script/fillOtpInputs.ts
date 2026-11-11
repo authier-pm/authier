@@ -5,6 +5,7 @@ import {
 } from './findOtpInputs'
 import { isElementVisibleInViewport } from './isElementInViewport'
 import { wait } from './wait'
+import { contentVaultSignal } from './contentVaultSession'
 
 /** Write once: synthetic keystrokes also reach document-level OTP handlers. */
 const writeOtpValue = (
@@ -67,8 +68,10 @@ export const fillOtpInputs = async (
   inputs: HTMLInputElement[],
   code: string,
   dispatchedEvents: Set<Event>,
-  knownInput?: HTMLInputElement
+  knownInput?: HTMLInputElement,
+  signal = contentVaultSignal()
 ): Promise<HTMLInputElement[] | null> => {
+  if (signal.aborted) return null
   const segmented = findSegmentedOtpInputs(inputs, code.length)
   if (!segmented) {
     const input = findSingleOtpInput(inputs, code.length)?.input ?? knownInput
@@ -83,6 +86,7 @@ export const fillOtpInputs = async (
       return null
     writeOtpValue(input, code, dispatchedEvents)
     await wait(50)
+    if (signal.aborted) return null
     return input.isConnected && input.value === code ? [input] : null
   }
 
@@ -95,6 +99,7 @@ export const fillOtpInputs = async (
   if (entryBox) {
     writeOtpValue(entryBox, code, dispatchedEvents)
     await wait(50)
+    if (signal.aborted) return null
     if (hasExactCode()) return boxes
   }
 
@@ -103,13 +108,16 @@ export const fillOtpInputs = async (
   // page consumed the paste, never send a second input sequence into its state.
   const pasteHandled = pasteOtpCode(boxes[0], code, dispatchedEvents)
   await wait(50)
+  if (signal.aborted) return null
   if (hasExactCode()) return boxes
   if (pasteHandled) return null
 
   for (const [index, box] of boxes.entries()) {
+    if (signal.aborted) return null
     writeOtpValue(box, code[index], dispatchedEvents)
     await wait(0)
   }
   await wait(50)
+  if (signal.aborted) return null
   return hasExactCode() ? boxes : null
 }
