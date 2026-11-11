@@ -357,10 +357,14 @@ render the updated gallery.
 The `new-device-policy` scenario renders the production existing-account onboarding
 with an in-memory Apollo transport and synthetic vault background. Add `&error=1`
 for a failed save followed by a successful retry, or `&configured=1` for an account
-that has already chosen a policy. Run `pnpm playwright:ui-preview newDevicePolicy.spec.ts`
-to check radio selection, saving, keyboard focus, dark/light themes, and scrolling
-on small screens. Captures: `docs/screenshots/new-device-policy-dark.png`,
-`new-device-policy-light.png`, and `new-device-policy-mobile.png`.
+that has already chosen a policy. Add `&configured=1&settings=1` to edit an existing
+choice, or `&pending=1&emailApproved=1` to show a login waiting for the second
+required approval. Run `pnpm playwright:ui-preview newDevicePolicy.spec.ts` to check
+mandatory method selection, email/device options, either/both approval modes,
+settings changes, retry behavior, keyboard focus, dark/light themes, and mobile
+scrolling. Captures: `docs/screenshots/new-device-policy-dark.png`,
+`new-device-policy-light.png`, `new-device-policy-mobile.png`, and
+`new-device-approval-pending.png`.
 
 The `totp-labels` scenario decodes a rendered synthetic Microsoft QR code through
 the production scanner and builds an account-first label. The `source` query

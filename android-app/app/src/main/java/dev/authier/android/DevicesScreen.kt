@@ -49,8 +49,17 @@ internal fun DeviceManagementScreen(
                     Text(approval.deviceName, fontWeight = FontWeight.SemiBold)
                     Text("IP address: ${approval.ipAddress}", color = Muted, style = MaterialTheme.typography.bodySmall)
                     Text("Approve only a device you are signing in to right now.", style = MaterialTheme.typography.bodySmall)
+                    approval.progress?.let { progress ->
+                        if (progress.policy.requiresBoth) {
+                            Text(if (progress.emailApprovedAt == null) "Email approval is also required." else "Email approved. Waiting for the device approval.", color = Muted, style = MaterialTheme.typography.bodySmall)
+                        }
+                        if (!progress.policy.allowsOtherDevice) Text("This account uses email approval. Check the approval email to allow this sign-in.", color = Muted, style = MaterialTheme.typography.bodySmall)
+                        if (progress.deviceApprovedAt != null) Text("Device approval recorded. Waiting for email approval.", color = Muted, style = MaterialTheme.typography.bodySmall)
+                    }
                     Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                        Button({ onDecideApproval(approval.id, true) }, enabled = !state.busy) { Text("Approve") }
+                        if (approval.progress?.policy?.allowsOtherDevice != false) {
+                            Button({ onDecideApproval(approval.id, true) }, enabled = !state.busy && approval.progress?.deviceApprovedAt == null) { Text("Approve") }
+                        }
                         OutlinedButton({ onDecideApproval(approval.id, false) }, enabled = !state.busy) { Text("Reject") }
                     }
                 }
@@ -72,7 +81,7 @@ internal fun DeviceManagementScreen(
         AlertDialog(
             onDismissRequest = { newMaster = null },
             title = { Text("Make ${device.name} the master device?") },
-            text = { Text("This device will lose its master role. Future master-device changes must be made from ${device.name}. If master-device approval is enabled, new sign-ins will also need approval there.") },
+            text = { Text("This device will lose its master role. Future master-device and approval-setting changes must be made from ${device.name}.") },
             confirmButton = {
                 TextButton({ onSetMaster(device.id); newMaster = null }, enabled = !state.busy) { Text("Transfer master role") }
             },

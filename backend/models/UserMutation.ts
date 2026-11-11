@@ -1,3 +1,7 @@
+import {
+  hasCurrentDeviceApproval,
+  invalidateNewDeviceApprovals
+} from '../lib/newDeviceEmailApproval'
 import { updateResetConfig } from '../lib/masterDeviceReset'
 import type { MasterDeviceResetConfig } from '../../shared/masterDeviceResetConfig'
 import { runVaultTransaction } from '../vault/vaultWrites'
@@ -132,33 +136,60 @@ export class UserMutation extends UserBase {
       description: 'Firebase token is only used for mobile app'
     })
     firebaseToken: string | null,
-    @Ctx() ctx: IContext
+    @Ctx() ctx: IContextAuthenticated
   ) {
-    const ipAddress: string = ctx.getIpAddress()
+    return ctx.db.transaction(async (tx) => {
+      const [user] = await tx
+        .select()
+        .from(userSchema)
+        .where(eq(userSchema.id, ctx.jwtPayload.userId))
+        .for('update')
+      if (!user || user.id !== this.id) throw new GraphqlError('User not found')
+      const [challenge] = await tx
+        .select()
+        .from(decryptionChallengeSchema)
+        .where(
+          and(
+            eq(decryptionChallengeSchema.userId, user.id),
+            eq(decryptionChallengeSchema.deviceId, deviceParams.id)
+          )
+        )
+        .for('update')
+      if (
+        !challenge ||
+        !(await hasCurrentDeviceApproval(tx, challenge, user))
+      ) {
+        throw new GraphqlError(
+          'Complete the configured new-device approvals first'
+        )
+      }
+      const ipAddress: string = ctx.getIpAddress()
 
-    const deviceDefaultSettings =
-      (await ctx.db.query.defaultSettings.findFirst({
-        where: { userId: this.id }
-      })) ?? defaultDeviceSettingSystemValues
+      const deviceDefaultSettings =
+        (await tx.query.defaultSettings.findFirst({
+          where: { userId: this.id }
+        })) ?? defaultDeviceSettingSystemValues
 
-    const res = await ctx.db
-      .insert(deviceSchema)
-      .values({
-        platform: deviceParams.platform,
-        name: deviceParams.name,
-        id: deviceParams.id,
-        firebaseToken: firebaseToken,
-        firstIpAddress: ipAddress,
-        userId: this.id,
-        lastIpAddress: ipAddress,
-        vaultLockTimeoutSeconds: deviceDefaultSettings.vaultLockTimeoutSeconds,
-        autofillTOTPEnabled: deviceDefaultSettings.autofillTOTPEnabled,
-        passkeyCreationVerificationRequired:
-          deviceDefaultSettings.passkeyCreationVerificationRequired,
-        syncTOTP: deviceDefaultSettings.syncTOTP
-      })
-      .returning()
-    return res[0]
+      const res = await tx
+        .insert(deviceSchema)
+        .values({
+          platform: deviceParams.platform,
+          name: deviceParams.name,
+          id: deviceParams.id,
+          firebaseToken: firebaseToken,
+          firstIpAddress: ipAddress,
+          userId: this.id,
+          lastIpAddress: ipAddress,
+          vaultLockTimeoutSeconds:
+            deviceDefaultSettings.vaultLockTimeoutSeconds,
+          autofillTOTPEnabled: deviceDefaultSettings.autofillTOTPEnabled,
+          passkeyCreationVerificationRequired:
+            deviceDefaultSettings.passkeyCreationVerificationRequired,
+          syncTOTP: deviceDefaultSettings.syncTOTP
+        })
+        .returning()
+      return res[0]
+    })
   }
 
   @Field(() => EncryptedSecretMutation)
@@ -442,6 +473,8 @@ export class UserMutation extends UserBase {
             )
           )
 
+        await invalidateNewDeviceApprovals(tx, this.id)
+
         for (const { id, expectedVersion, ...patch } of input.secrets) {
           await writer.update([id], patch, { expectedVersion })
         }
@@ -479,6 +512,8 @@ export class UserMutation extends UserBase {
         .where(eq(userSchema.id, this.id))
         .returning()
       const updatedUser = res[0]
+      if (updatedUser.email !== oldEmail)
+        await invalidateNewDeviceApprovals(trx, updatedUser.id)
 
       await sendEmail(oldEmail!, {
         Subject: 'Your login email has been changed',
@@ -511,23 +546,35 @@ export class UserMutation extends UserBase {
     newDevicePolicy: UserNewDevicePolicyGQL,
     @Ctx() ctx: IContextAuthenticated
   ) {
-    if (
-      this.newDevicePolicy !== null &&
-      ctx.device.id !== this.masterDeviceId
-    ) {
-      throw new GraphqlError(
-        'newDevicePolicy can be set only from master device'
-      )
-    }
-
-    const res = await ctx.db
-      .update(userSchema)
-      .set({
-        newDevicePolicy: newDevicePolicy as any
-      })
-      .where(eq(userSchema.id, this.id))
-      .returning()
-    return res[0]
+    return ctx.db.transaction(async (tx) => {
+      const [currentUser] = await tx
+        .select()
+        .from(userSchema)
+        .where(eq(userSchema.id, ctx.jwtPayload.userId))
+        .for('update')
+      if (!currentUser || currentUser.id !== this.id) {
+        throw new GraphqlError('User not found')
+      }
+      if (
+        currentUser.newDevicePolicy !== null &&
+        ctx.device.id !== currentUser.masterDeviceId
+      ) {
+        throw new GraphqlError(
+          'newDevicePolicy can be set only from master device'
+        )
+      }
+      const [updated] = await tx
+        .update(userSchema)
+        .set({ newDevicePolicy })
+        .where(eq(userSchema.id, currentUser.id))
+        .returning()
+      if (currentUser.newDevicePolicy !== newDevicePolicy) {
+        // A previous method must not authorize a new device after the user
+        // changes their choices, including partially completed AND approvals.
+        await invalidateNewDeviceApprovals(tx, currentUser.id)
+      }
+      return updated
+    })
   }
 
   @Field(() => UserGQL)

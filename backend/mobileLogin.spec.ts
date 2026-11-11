@@ -44,7 +44,7 @@ beforeAll(async () => {
       loginCredentialsLimit: 100,
       TOTPlimit: 100,
       deviceRecoveryCooldownMinutes: 960,
-      newDevicePolicy: 'REQUIRE_MASTER_DEVICE_APPROVAL'
+      newDevicePolicy: 'OTHER_DEVICE'
     })
     await db.insert(schema.device).values({
       id: account.masterId,

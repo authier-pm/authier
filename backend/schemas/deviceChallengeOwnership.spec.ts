@@ -15,10 +15,7 @@ vi.mock('../lib/getGeoIpLocation', () => ({
 }))
 
 // testEnv creates an in-memory PGlite database beforeAll and closes it afterAll.
-const policies = [
-  'REQUIRE_MASTER_DEVICE_APPROVAL',
-  'REQUIRE_ANY_DEVICE_APPROVAL'
-] as const
+const policies = ['OTHER_DEVICE', 'EMAIL_AND_OTHER_DEVICE'] as const
 
 describe.each(policies)('device challenge ownership with %s', (policy) => {
   const resolver = new RootResolver()

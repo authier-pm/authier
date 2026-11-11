@@ -9,21 +9,22 @@ import * as ApolloReactCommon from '@apollo/client/react';
 import * as ApolloReactHooks from '@apollo/client/react';
 const defaultOptions = {} as const;
 export type UserNewDevicePolicy =
-  | 'ALLOW'
-  | 'REQUIRE_ANY_DEVICE_APPROVAL'
-  | 'REQUIRE_MASTER_DEVICE_APPROVAL';
+  | 'EMAIL'
+  | 'EMAIL_AND_OTHER_DEVICE'
+  | 'EMAIL_OR_OTHER_DEVICE'
+  | 'OTHER_DEVICE';
 
 export type UpdateNewDevicePolicyMutationVariables = Exact<{
   newDevicePolicy: Types.UserNewDevicePolicy;
 }>;
 
 
-export type UpdateNewDevicePolicyMutation = { me: { setNewDevicePolicy: { id: string, newDevicePolicy: Types.UserNewDevicePolicy | null } } };
+export type UpdateNewDevicePolicyMutation = { me: { setNewDevicePolicy: { id: string, newDevicePolicy: Types.UserNewDevicePolicy | null, masterDeviceId: string | null } } };
 
 export type GetUserNewDevicePolicyQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetUserNewDevicePolicyQuery = { me: { id: string, newDevicePolicy: Types.UserNewDevicePolicy | null } };
+export type GetUserNewDevicePolicyQuery = { me: { id: string, newDevicePolicy: Types.UserNewDevicePolicy | null, masterDeviceId: string | null } };
 
 
 export const UpdateNewDevicePolicyDocument = gql`
@@ -32,6 +33,7 @@ export const UpdateNewDevicePolicyDocument = gql`
     setNewDevicePolicy(newDevicePolicy: $newDevicePolicy) {
       id
       newDevicePolicy
+      masterDeviceId
     }
   }
 }
@@ -65,6 +67,7 @@ export const GetUserNewDevicePolicyDocument = gql`
   me {
     id
     newDevicePolicy
+    masterDeviceId
   }
 }
     `;

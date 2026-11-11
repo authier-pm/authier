@@ -1,4 +1,6 @@
 import { MasterDeviceResetProgress } from '../../../shared/MasterDeviceResetProgress'
+import { allowsDeviceApproval } from '@shared/newDeviceApproval'
+import { NewDeviceApprovalProgress } from '@shared/NewDeviceApprovalStatus'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { Button } from '@/components/ui/button'
 import {
@@ -14,6 +16,10 @@ import { useVaultSession } from '@/providers/VaultSessionProvider'
 export function DevicesPage() {
   const { session } = useVaultSession()
   const devicesQuery = useQuery(orpc.devices.list.queryOptions({ input: {} }))
+  const securityQuery = useQuery(orpc.security.get.queryOptions({ input: {} }))
+  const deviceApprovalEnabled = allowsDeviceApproval(
+    securityQuery.data?.security.newDevicePolicy ?? null
+  )
   const challengesQuery = useQuery(
     orpc.devices.listPendingChallenges.queryOptions({ input: {} })
   )
@@ -45,6 +51,11 @@ export function DevicesPage() {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
+          {!deviceApprovalEnabled && (
+            <p className="text-sm text-[color:var(--color-muted)]">
+              New device logins are approved through your account email.
+            </p>
+          )}
           {challengesQuery.data?.challenges?.map((challenge) => (
             <Card
               className="border-dashed border-white/10 bg-[color:var(--color-surface-muted)]"
@@ -61,10 +72,20 @@ export function DevicesPage() {
                   </p>
                 </div>
                 <MasterDeviceResetProgress status={challenge.resetStatus} />
+                {!challenge.resetStatus && (
+                  <NewDeviceApprovalProgress
+                    policy={challenge.approvalPolicy}
+                    emailApprovedAt={challenge.emailApprovedAt}
+                    deviceApprovedAt={challenge.deviceApprovedAt}
+                  />
+                )}
                 <div className="flex gap-2">
                   <Button
                     disabled={
                       approveMutation.isPending ||
+                      (!challenge.resetStatus && !deviceApprovalEnabled) ||
+                      (!challenge.resetStatus &&
+                        Boolean(challenge.deviceApprovedAt)) ||
                       Boolean(
                         challenge.resetStatus &&
                         session?.currentDevice.id ===

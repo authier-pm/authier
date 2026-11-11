@@ -31,6 +31,8 @@ data class VaultUiState(
     val errorDetails: ApiErrorDetails? = null,
     val notice: String? = null,
     val pendingApproval: Boolean = false,
+    val approvalProgress: LoginApprovalProgress? = null,
+    val requiresApprovalSetup: Boolean = false,
     val items: List<VaultItem> = emptyList(),
     val devices: List<DeviceInfo> = emptyList(),
     val approvals: List<ApprovalInfo> = emptyList(),
@@ -60,7 +62,8 @@ class VaultViewModel(application: Application) : AndroidViewModel(application) {
     private var automaticBiometricAttempted = false
     private val state = MutableStateFlow(VaultUiState(email = snapshot.email, serverUrl = snapshot.serverUrl,
         remembered = snapshot.authSecretEncrypted.isNotBlank(), pendingWrites = snapshot.outbox.size,
-        lastSyncAt = snapshot.lastSyncAt, lockTimeoutSeconds = snapshot.lockTimeoutSeconds, smsRelayEnabled = snapshot.relaySmsCodes))
+        lastSyncAt = snapshot.lastSyncAt, lockTimeoutSeconds = snapshot.lockTimeoutSeconds, smsRelayEnabled = snapshot.relaySmsCodes,
+        requiresApprovalSetup = snapshot.requiresApprovalSetup))
     val ui = state.asStateFlow()
 
     init {
@@ -111,6 +114,7 @@ class VaultViewModel(application: Application) : AndroidViewModel(application) {
             masterKey = key
             state.value = state.value.copy(unlocked = true)
             rebuildItems()
+            authenticated { api -> applySecurityInfo(api.security()) }
         }
     }
 
@@ -232,7 +236,7 @@ class VaultViewModel(application: Application) : AndroidViewModel(application) {
         } else {
             val challenge = api.challenge(normalizedEmail, snapshot.deviceId, deviceName)
             if (challenge.status != "approved") {
-                state.value = state.value.copy(pendingApproval = true, notice = "Approve this Android device from an existing Authier device, then check again.")
+                state.value = state.value.copy(pendingApproval = true, approvalProgress = challenge.approvalProgress)
                 return@action
             }
             salt = requireNotNull(challenge.encryptionSalt)
@@ -254,8 +258,12 @@ class VaultViewModel(application: Application) : AndroidViewModel(application) {
         val timeout = if (snapshot.email == normalizedEmail && snapshot.serverUrl == origin && snapshot.authSecretEncrypted.isNotBlank())
             snapshot.lockTimeoutSeconds else session.bootstrap.lockTimeoutSeconds.coerceIn(0, 86400)
         persist(snapshot.copy(email = normalizedEmail, serverUrl = origin, encryptionSalt = salt, authSecretEncrypted = encryptedAuthSecret,
-            sealedTokens = sealed, cursor = null, secrets = records, outbox = pending, lockTimeoutSeconds = timeout))
-        state.value = state.value.copy(email = normalizedEmail, serverUrl = origin, remembered = true, pendingApproval = false, approvals = session.bootstrap.approvals)
+            sealedTokens = sealed, cursor = null, secrets = records, outbox = pending, lockTimeoutSeconds = timeout,
+            requiresApprovalSetup = session.bootstrap.newDevicePolicy == null))
+        state.value = state.value.copy(email = normalizedEmail, serverUrl = origin, remembered = true, pendingApproval = false,
+            approvalProgress = null, approvals = session.bootstrap.approvals,
+            security = SecurityInfo(session.bootstrap.newDevicePolicy, masterDeviceId = session.bootstrap.masterDeviceId),
+            requiresApprovalSetup = session.bootstrap.newDevicePolicy == null)
         openVault(key)
         PushTokenWorker.enqueue(getApplication())
         syncNow()
@@ -332,6 +340,7 @@ class VaultViewModel(application: Application) : AndroidViewModel(application) {
                 more = page.hasMore
             } while (more)
             persist(snapshot.copy(lastSyncAt = System.currentTimeMillis()))
+            applySecurityInfo(api.security())
         }
         rebuildItems()
         val conflicts = snapshot.outbox.count { it.conflict }
@@ -400,7 +409,7 @@ class VaultViewModel(application: Application) : AndroidViewModel(application) {
         authenticated { api ->
             // Approval actions must remain available if optional device metadata cannot load.
             state.value = state.value.copy(approvals = api.approvals())
-            state.value = state.value.copy(security = api.security())
+            applySecurityInfo(api.security())
             state.value = state.value.copy(devices = api.devices())
         }
     }
@@ -431,8 +440,17 @@ class VaultViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    fun changePolicy(policy: String) = action {
-        authenticated { api -> state.value = state.value.copy(security = api.updatePolicy(policy)) }
+    fun changePolicy(policy: NewDeviceApprovalPolicy) = action {
+        authenticated { api ->
+            applySecurityInfo(api.updatePolicy(policy))
+            state.value = state.value.copy(notice = "New device approval settings saved.")
+        }
+    }
+
+    private suspend fun applySecurityInfo(security: SecurityInfo) {
+        val requiresSetup = security.newDevicePolicy == null
+        if (snapshot.requiresApprovalSetup != requiresSetup) persist(snapshot.copy(requiresApprovalSetup = requiresSetup))
+        state.value = state.value.copy(security = security, requiresApprovalSetup = requiresSetup)
     }
 
     fun changeTimeout(seconds: Int) = action {
@@ -486,7 +504,7 @@ class VaultViewModel(application: Application) : AndroidViewModel(application) {
                 SecretContent(label = "$username | $label", username = username, url = "https://${label.lowercase()}.com"))
         }
         state.value = VaultUiState(email = "alex@studio.design", unlocked = !locked, remembered = true, demo = true,
-            security = SecurityInfo(masterDeviceId = "demo"),
+            security = SecurityInfo(NewDeviceApprovalPolicy.OTHER_DEVICE, masterDeviceId = "demo"),
             lockTimeoutSeconds = 86400, biometricEnabled = locked, items = passwords + codes + passkeys, lastSyncAt = System.currentTimeMillis(),
             devices = listOf(
                 DeviceInfo("demo", "Pixel · this device", "Android", "2026-09-01T12:00:00Z", "2026-10-13T08:42:00Z", true),

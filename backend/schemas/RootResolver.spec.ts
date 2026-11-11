@@ -141,7 +141,7 @@ describe('RootResolver', () => {
         email: fakeData.email,
         addDeviceSecret: await hashDeviceSecret(fakeData.addDeviceSecret),
         addDeviceSecretEncrypted: fakeData.addDeviceSecretEncrypted,
-        newDevicePolicy: 'REQUIRE_MASTER_DEVICE_APPROVAL',
+        newDevicePolicy: 'OTHER_DEVICE',
         encryptionSalt: fakeData.encryptionSalt,
         ...userSecurityProps
       })

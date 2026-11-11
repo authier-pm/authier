@@ -297,9 +297,10 @@
             "anyOf": [
               {
                 "enum": [
-                  "ALLOW",
-                  "REQUIRE_ANY_DEVICE_APPROVAL",
-                  "REQUIRE_MASTER_DEVICE_APPROVAL"
+                  "EMAIL",
+                  "OTHER_DEVICE",
+                  "EMAIL_OR_OTHER_DEVICE",
+                  "EMAIL_AND_OTHER_DEVICE"
                 ],
                 "type": "string"
               },
@@ -686,6 +687,45 @@
       "PendingChallenge": {
         "type": "object",
         "properties": {
+          "approvalPolicy": {
+            "enum": [
+              "EMAIL",
+              "OTHER_DEVICE",
+              "EMAIL_OR_OTHER_DEVICE",
+              "EMAIL_AND_OTHER_DEVICE"
+            ],
+            "type": "string"
+          },
+          "emailApprovalSentAt": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "emailApprovedAt": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "deviceApprovedAt": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "resetStatus": {
             "anyOf": [
               {
@@ -813,6 +853,10 @@
           }
         },
         "required": [
+          "approvalPolicy",
+          "emailApprovalSentAt",
+          "emailApprovedAt",
+          "deviceApprovedAt",
           "status",
           "challengeId",
           "pushNotificationsSentCount",
@@ -843,6 +887,45 @@
       "PendingDeviceApproval": {
         "type": "object",
         "properties": {
+          "approvalPolicy": {
+            "enum": [
+              "EMAIL",
+              "OTHER_DEVICE",
+              "EMAIL_OR_OTHER_DEVICE",
+              "EMAIL_AND_OTHER_DEVICE"
+            ],
+            "type": "string"
+          },
+          "emailApprovalSentAt": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "emailApprovedAt": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "deviceApprovedAt": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "resetStatus": {
             "anyOf": [
               {
@@ -981,6 +1064,10 @@
           }
         },
         "required": [
+          "approvalPolicy",
+          "emailApprovalSentAt",
+          "emailApprovedAt",
+          "deviceApprovedAt",
           "id",
           "createdAt",
           "deviceName",
@@ -1031,9 +1118,10 @@
             "anyOf": [
               {
                 "enum": [
-                  "ALLOW",
-                  "REQUIRE_ANY_DEVICE_APPROVAL",
-                  "REQUIRE_MASTER_DEVICE_APPROVAL"
+                  "EMAIL",
+                  "OTHER_DEVICE",
+                  "EMAIL_OR_OTHER_DEVICE",
+                  "EMAIL_AND_OTHER_DEVICE"
                 ],
                 "type": "string"
               },
@@ -3519,9 +3607,10 @@
                 "properties": {
                   "newDevicePolicy": {
                     "enum": [
-                      "ALLOW",
-                      "REQUIRE_ANY_DEVICE_APPROVAL",
-                      "REQUIRE_MASTER_DEVICE_APPROVAL"
+                      "EMAIL",
+                      "OTHER_DEVICE",
+                      "EMAIL_OR_OTHER_DEVICE",
+                      "EMAIL_AND_OTHER_DEVICE"
                     ],
                     "type": "string"
                   }

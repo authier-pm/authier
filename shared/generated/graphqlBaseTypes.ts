@@ -74,10 +74,14 @@ export type DecryptionChallengeApprovedAddNewDeviceForUserArgs = {
 
 export type DecryptionChallengeForApproval = {
   __typename?: 'DecryptionChallengeForApproval'
+  approvalPolicy: UserNewDevicePolicy
   createdAt: Scalars['DateTime']['output']
+  deviceApprovedAt?: Maybe<Scalars['DateTime']['output']>
   deviceId: Scalars['ID']['output']
   deviceLocationFromIp?: Maybe<DeviceLocation>
   deviceName: Scalars['String']['output']
+  emailApprovalSentAt?: Maybe<Scalars['DateTime']['output']>
+  emailApprovedAt?: Maybe<Scalars['DateTime']['output']>
   id: Scalars['Int']['output']
   ipAddress: Scalars['String']['output']
   ipGeoLocation?: Maybe<Scalars['JSON']['output']>
@@ -760,9 +764,10 @@ export type UserMutationUpdateSettingsArgs = {
 }
 
 export enum UserNewDevicePolicy {
-  ALLOW = 'ALLOW',
-  REQUIRE_ANY_DEVICE_APPROVAL = 'REQUIRE_ANY_DEVICE_APPROVAL',
-  REQUIRE_MASTER_DEVICE_APPROVAL = 'REQUIRE_MASTER_DEVICE_APPROVAL'
+  EMAIL = 'EMAIL',
+  EMAIL_AND_OTHER_DEVICE = 'EMAIL_AND_OTHER_DEVICE',
+  EMAIL_OR_OTHER_DEVICE = 'EMAIL_OR_OTHER_DEVICE',
+  OTHER_DEVICE = 'OTHER_DEVICE'
 }
 
 export type UserPaidProductsGql = {

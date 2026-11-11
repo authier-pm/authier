@@ -10,7 +10,7 @@ The account's master device can change the policy in settings. `User.masterDevic
 2. Confirm the single-use link sent to the account email within 24 hours. The full waiting period starts at confirmation. Its expiry does not invalidate an already confirmed reset.
 3. Other signed-in devices approve through Devices. Only devices registered before the request, excluding the lost master and requesting device, are eligible. Each counts once; logged-out or removed devices do not count at completion.
 4. Any signed-in device can reject the request. The cron rechecks cancellation, the original master, the deadline and the approval quorum under row locks.
-5. Once eligible, the old master device is deleted. Normal login with the vault password enrolls a new master. Ciphertext is retained.
+5. Once eligible, the old master device is deleted and only this reset's challenge receives recovery approval. Other new devices remain pending. Normal login with the vault password enrolls a new master. Ciphertext is retained.
 
 Pending requests snapshot their policy and eligible devices. Later configuration changes do not alter them. Expired unconfirmed requests can be replaced. Completion is idempotent. Notifications for request, confirmation, approval, cancellation and completion go to the account email and all configured notification addresses (deduplicated). Additional addresses receive notifications, not the confirmation token.
 
@@ -18,6 +18,6 @@ Pending requests snapshot their policy and eligible devices. Later configuration
 
 The existing `authier-api` Worker scheduled handler runs every minute via Cron Triggers; no separate workflow is needed. Completion occurs on the first successful run after all conditions are satisfied. Notifications are persisted in `MasterDeviceResetEmail`, delivered by the cron, and retried after failures. Delivery is at-least-once if a process dies after the email provider accepts a message.
 
-Run `pnpm wrdeploy` from `backend`. It applies migrations before deploying and aborts on migration failure. Production Cloudflare Workers Builds must retain `pnpm run db:migrate && npx wrangler deploy`, with `DATABASE_URL` configured as a build secret. Preview uploads must not run production migrations. Runtime email delivery requires the existing Mailjet secrets and `DISABLE_EMAIL_SENDING=false`.
+Run `pnpm wrdeploy` from `backend`. It applies migrations before deploying and aborts on migration failure. Production Cloudflare Workers Builds must retain `pnpm run db:migrate && npx wrangler deploy`; `WORKERS_CI=1` uses an authenticated preview with production Hyperdrive rather than a database build secret. Preview uploads must not run production migrations. Runtime email delivery requires the existing Mailjet secrets and `DISABLE_EMAIL_SENDING=false`.
 
 Validation: `pnpm --dir backend exec vitest run lib/masterDeviceReset.spec.ts`; UI captures: `pnpm --dir web-extension playwright:ui-preview masterDeviceRecovery.spec.ts`.

@@ -9,9 +9,10 @@ import * as ApolloReactCommon from '@apollo/client/react';
 import * as ApolloReactHooks from '@apollo/client/react';
 const defaultOptions = {} as const;
 export type UserNewDevicePolicy =
-  | 'ALLOW'
-  | 'REQUIRE_ANY_DEVICE_APPROVAL'
-  | 'REQUIRE_MASTER_DEVICE_APPROVAL';
+  | 'EMAIL'
+  | 'EMAIL_AND_OTHER_DEVICE'
+  | 'EMAIL_OR_OTHER_DEVICE'
+  | 'OTHER_DEVICE';
 
 export type RejectChallengeMutationVariables = Exact<{
   id: number;
@@ -30,7 +31,7 @@ export type ApproveChallengeMutation = { me: { decryptionChallenge: { approve: {
 export type DevicesRequestsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type DevicesRequestsQuery = { me: { id: string, masterDeviceId: string | null, newDevicePolicy: Types.UserNewDevicePolicy | null, decryptionChallengesWaiting: Array<{ id: number, createdAt: string, deviceName: string, deviceId: string, ipAddress: string, pushNotificationsSentCount: number, pushNotificationsFailedCount: number, masterDeviceResetRequestedAt: string | null, masterDeviceResetProcessAt: string | null, masterDeviceResetConfirmedAt: string | null, masterDeviceResetRejectedAt: string | null, deviceLocationFromIp: { city: string, countryName: string } | null, resetStatus: { requiredApprovals: number, approvalCount: number, processAt: string, expiresAt: string, confirmedAt: string | null, completedAt: string | null, rejectedAt: string | null } | null }> } };
+export type DevicesRequestsQuery = { me: { id: string, masterDeviceId: string | null, newDevicePolicy: Types.UserNewDevicePolicy | null, decryptionChallengesWaiting: Array<{ id: number, approvalPolicy: Types.UserNewDevicePolicy, emailApprovalSentAt: string | null, emailApprovedAt: string | null, deviceApprovedAt: string | null, createdAt: string, deviceName: string, deviceId: string, ipAddress: string, pushNotificationsSentCount: number, pushNotificationsFailedCount: number, masterDeviceResetRequestedAt: string | null, masterDeviceResetProcessAt: string | null, masterDeviceResetConfirmedAt: string | null, masterDeviceResetRejectedAt: string | null, deviceLocationFromIp: { city: string, countryName: string } | null, resetStatus: { requiredApprovals: number, approvalCount: number, processAt: string, expiresAt: string, confirmedAt: string | null, completedAt: string | null, rejectedAt: string | null } | null }> } };
 
 export type LogoutDeviceMutationVariables = Exact<{
   id: string;
@@ -156,6 +157,10 @@ export const DevicesRequestsDocument = gql`
     newDevicePolicy
     decryptionChallengesWaiting {
       id
+      approvalPolicy
+      emailApprovalSentAt
+      emailApprovedAt
+      deviceApprovedAt
       createdAt
       deviceName
       deviceId

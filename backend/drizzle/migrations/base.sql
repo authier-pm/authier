@@ -6,7 +6,7 @@ CREATE TYPE "EncryptedSecretType" AS ENUM('TOTP', 'LOGIN_CREDENTIALS', 'PASSKEY'
 --> statement-breakpoint
 CREATE TYPE "TokenType" AS ENUM('EMAIL', 'API');
 --> statement-breakpoint
-CREATE TYPE "UserNewDevicePolicy" AS ENUM('ALLOW', 'REQUIRE_ANY_DEVICE_APPROVAL', 'REQUIRE_MASTER_DEVICE_APPROVAL');
+CREATE TYPE "UserNewDevicePolicy" AS ENUM('EMAIL', 'OTHER_DEVICE', 'EMAIL_OR_OTHER_DEVICE', 'EMAIL_AND_OTHER_DEVICE');
 --> statement-breakpoint
 CREATE TYPE "WebInputType" AS ENUM('TOTP', 'USERNAME', 'EMAIL', 'USERNAME_OR_EMAIL', 'PASSWORD', 'NEW_PASSWORD', 'NEW_PASSWORD_CONFIRMATION', 'SUBMIT_BUTTON', 'CUSTOM');
 --> statement-breakpoint
@@ -14,6 +14,11 @@ CREATE TABLE "DecryptionChallenge" (
 	"id" serial PRIMARY KEY,
 	"ipAddress" inet NOT NULL,
 	"approvedAt" timestamp(3),
+	"emailApprovalTokenHash" text,
+	"emailApprovalExpiresAt" timestamp(3),
+	"emailApprovalSentAt" timestamp(3),
+	"emailApprovedAt" timestamp(3),
+	"deviceApprovedAt" timestamp(3),
 	"userId" uuid NOT NULL,
 	"deviceId" text NOT NULL,
 	"approvedFromDeviceId" text,

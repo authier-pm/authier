@@ -9,9 +9,10 @@ import * as ApolloReactCommon from '@apollo/client/react';
 import * as ApolloReactHooks from '@apollo/client/react';
 const defaultOptions = {} as const;
 export type UserNewDevicePolicy =
-  | 'ALLOW'
-  | 'REQUIRE_ANY_DEVICE_APPROVAL'
-  | 'REQUIRE_MASTER_DEVICE_APPROVAL';
+  | 'EMAIL'
+  | 'EMAIL_AND_OTHER_DEVICE'
+  | 'EMAIL_OR_OTHER_DEVICE'
+  | 'OTHER_DEVICE';
 
 export type UserNewDevicePolicyQueryQueryVariables = Exact<{ [key: string]: never; }>;
 

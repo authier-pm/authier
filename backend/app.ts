@@ -1,3 +1,10 @@
+import {
+  confirmNewDeviceEmailApproval,
+  newDeviceEmailApprovalPage,
+  newDeviceEmailApprovalResult,
+  reviewNewDeviceEmailApproval
+} from './lib/newDeviceEmailApproval'
+import { getBackendOrigin } from './utils/getBackendOrigin'
 import 'reflect-metadata'
 
 import { Elysia, serializeCookie } from 'elysia'
@@ -240,6 +247,45 @@ export const buildApp = (app = new Elysia()) => {
       const reply = createLegacyReplyAdapter(ctx)
       await healthReportHandler(undefined, reply)
       return reply.getPayload()
+    })
+    .get('/approve-new-device', () => newDeviceEmailApprovalPage())
+    .post('/approve-new-device/review', async ({ body, headers }) => {
+      if (headers.origin && headers.origin !== getBackendOrigin()) {
+        return newDeviceEmailApprovalResult('invalid')
+      }
+      const token =
+        typeof body === 'object' &&
+        body !== null &&
+        'token' in body &&
+        typeof body.token === 'string'
+          ? body.token
+          : ''
+      const requestDb = createRequestDb()
+      try {
+        return await reviewNewDeviceEmailApproval(requestDb.db, token)
+      } finally {
+        await requestDb.close()
+      }
+    })
+    .post('/approve-new-device', async ({ body, headers }) => {
+      if (headers.origin && headers.origin !== getBackendOrigin()) {
+        return newDeviceEmailApprovalResult('invalid')
+      }
+      const token =
+        typeof body === 'object' &&
+        body !== null &&
+        'token' in body &&
+        typeof body.token === 'string'
+          ? body.token
+          : ''
+      const requestDb = createRequestDb()
+      try {
+        return newDeviceEmailApprovalResult(
+          await confirmNewDeviceEmailApproval(requestDb.db, token)
+        )
+      } finally {
+        await requestDb.close()
+      }
     })
     .get('/confirm-master-device-reset', async ({ query, redirect }) => {
       const token =

@@ -48,9 +48,10 @@ export const emailVerificationType = pgEnum('EmailVerificationType', [
   'CONTACT'
 ])
 export const userNewDevicePolicy = pgEnum('UserNewDevicePolicy', [
-  'ALLOW',
-  'REQUIRE_ANY_DEVICE_APPROVAL',
-  'REQUIRE_MASTER_DEVICE_APPROVAL'
+  'EMAIL',
+  'OTHER_DEVICE',
+  'EMAIL_OR_OTHER_DEVICE',
+  'EMAIL_AND_OTHER_DEVICE'
 ])
 
 export const prismaMigrations = pgTable('_prisma_migrations', {
@@ -72,6 +73,11 @@ export const decryptionChallenge = pgTable(
     id: serial().primaryKey(),
     ipAddress: inet().notNull(),
     approvedAt: timestamp({ precision: 3 }),
+    emailApprovalTokenHash: text(),
+    emailApprovalExpiresAt: timestamp({ precision: 3 }),
+    emailApprovalSentAt: timestamp({ precision: 3 }),
+    emailApprovedAt: timestamp({ precision: 3 }),
+    deviceApprovedAt: timestamp({ precision: 3 }),
     userId: uuid()
       .notNull()
       .references((): AnyPgColumn => user.id, {

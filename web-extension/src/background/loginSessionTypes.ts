@@ -1,9 +1,14 @@
 import type { ResetProgressStatus } from '@shared/MasterDeviceResetProgress'
+import type { NewDeviceApprovalPolicy } from '@shared/newDeviceApproval'
 export const LOGIN_DECRYPTION_CHALLENGE_REFETCH_INTERVAL = 6000
 
 export type LoginSessionStatus = 'editing' | 'awaiting-approval' | 'completing'
 
 export type LoginApprovalChallenge = {
+  approvalPolicy: NewDeviceApprovalPolicy
+  emailApprovalSentAt: string | null
+  emailApprovedAt: string | null
+  deviceApprovedAt: string | null
   resetStatus?: ResetProgressStatus | null
   type: 'awaiting-approval'
   id: number

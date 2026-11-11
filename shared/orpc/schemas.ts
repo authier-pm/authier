@@ -4,14 +4,11 @@ import {
 } from '../masterDeviceResetConfig'
 import { MAX_RELAYED_CODE_CIPHERTEXT_LENGTH } from '../relayedVerificationCode'
 import { z } from 'zod'
+import { newDeviceApprovalPolicies } from '../newDeviceApproval'
 
 export const emptyInputSchema = z.object({})
 
-export const userNewDevicePolicySchema = z.enum([
-  'ALLOW',
-  'REQUIRE_ANY_DEVICE_APPROVAL',
-  'REQUIRE_MASTER_DEVICE_APPROVAL'
-])
+export const userNewDevicePolicySchema = z.enum(newDeviceApprovalPolicies)
 
 export const encryptedSecretTypeSchema = z.enum([
   'TOTP',
@@ -163,7 +160,14 @@ export const resetStatusSchema = z.object({
   rejectedAt: z.string().nullable()
 })
 
-export const pendingChallengeSchema = z.object({
+export const deviceApprovalProgressSchema = z.object({
+  approvalPolicy: userNewDevicePolicySchema,
+  emailApprovalSentAt: z.string().nullable(),
+  emailApprovedAt: z.string().nullable(),
+  deviceApprovedAt: z.string().nullable()
+})
+
+export const pendingChallengeSchema = deviceApprovalProgressSchema.extend({
   resetStatus: resetStatusSchema.nullable().optional(),
   id: z.number().int().positive(),
   createdAt: z.string(),
@@ -224,17 +228,19 @@ export const approvedChallengeSchema = z.object({
   encryptionSalt: z.string().min(1)
 })
 
-export const pendingChallengeResultSchema = z.object({
-  resetStatus: resetStatusSchema.nullable().optional(),
-  status: z.literal('pending'),
-  challengeId: z.number().int().positive(),
-  pushNotificationsSentCount: z.number().int().nonnegative(),
-  pushNotificationsFailedCount: z.number().int().nonnegative(),
-  masterDeviceResetRequestedAt: z.string().nullable(),
-  masterDeviceResetProcessAt: z.string().nullable(),
-  masterDeviceResetConfirmedAt: z.string().nullable(),
-  masterDeviceResetRejectedAt: z.string().nullable()
-})
+export const pendingChallengeResultSchema = deviceApprovalProgressSchema.extend(
+  {
+    resetStatus: resetStatusSchema.nullable().optional(),
+    status: z.literal('pending'),
+    challengeId: z.number().int().positive(),
+    pushNotificationsSentCount: z.number().int().nonnegative(),
+    pushNotificationsFailedCount: z.number().int().nonnegative(),
+    masterDeviceResetRequestedAt: z.string().nullable(),
+    masterDeviceResetProcessAt: z.string().nullable(),
+    masterDeviceResetConfirmedAt: z.string().nullable(),
+    masterDeviceResetRejectedAt: z.string().nullable()
+  }
+)
 
 export const requestDeviceChallengeResultSchema = z.discriminatedUnion(
   'status',
