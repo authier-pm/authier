@@ -330,8 +330,11 @@ export class RootResolver {
       )
     }
 
+    // The device id comes from the client. Only a device already enrolled in
+    // this account counts: anyone can sign up and present their own device id
+    // with someone else's email.
     const device = await ctx.db.query.device.findFirst({
-      where: { id: deviceInput.id }
+      where: { id: deviceInput.id, userId: user.id }
     })
 
     log('device', device)
@@ -343,7 +346,8 @@ export class RootResolver {
       }
     })
 
-    //TODO: Check this condition, not sure what is this doing
+    // Registration does not create a challenge, so the account's first device
+    // has none when it signs in again.
     if (device) {
       if (!challenge) {
         const deviceCountResult = await ctx.db
@@ -351,7 +355,6 @@ export class RootResolver {
           .from(schema.device)
           .where(eq(schema.device.userId, user.id))
         const deviceCount = deviceCountResult[0]?.count ?? 0
-        //FIX: This is not working, we need to check if the device is already approved
         if (deviceCount === 1) {
           // user has only one device
           const [created] = await ctx.db
