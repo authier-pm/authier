@@ -5,59 +5,38 @@ import {
   newDeviceEmailApprovalResult
 } from '../../../backend/lib/newDeviceEmailApproval'
 
-const origin = 'https://approval.example.test'
-const token = 'a'.repeat(64)
+import {
+  emailApprovalOrigin as origin,
+  emailApprovalToken as token,
+  prepareNewDeviceEmailApprovalScenario
+} from '../../ui-preview/scenarios/newDeviceEmailApproval'
+
+const renderers = {
+  review: newDeviceEmailApprovalPage,
+  result: newDeviceEmailApprovalResult
+}
 
 for (const requiresBoth of [false, true]) {
   test(`email confirmation requires a click and keeps the token out of URLs (both=${requiresBoth})`, async ({
     page
   }) => {
-    const requests: { method: string; url: string }[] = []
-    let approvals = 0
     const pageErrors: string[] = []
     page.on('pageerror', (error) => pageErrors.push(error.message))
-    await page.route('**/*', async (route) => {
-      const request = route.request()
-      requests.push({ method: request.method(), url: request.url() })
-      const url = new URL(request.url())
-      if (url.origin !== origin) return route.abort()
-      if (request.method() === 'GET') {
-        const response = newDeviceEmailApprovalPage()
-        return route.fulfill({
-          status: response.status,
-          headers: Object.fromEntries(response.headers),
-          body: await response.text()
-        })
-      }
-      if (url.pathname.endsWith('/review')) {
-        expect(request.postDataJSON()).toEqual({ token })
-        return route.fulfill({
-          json: {
-            deviceName: 'Chrome on Linux',
-            ipAddress: '192.0.2.10',
-            requiresBoth
-          }
-        })
-      }
-      expect(new URLSearchParams(request.postData() ?? '').get('token')).toBe(
-        token
-      )
-      approvals++
-      const response = newDeviceEmailApprovalResult(
-        requiresBoth ? 'waiting-for-device' : 'approved'
-      )
-      return route.fulfill({
-        status: response.status,
-        headers: Object.fromEntries(response.headers),
-        body: await response.text()
-      })
-    })
-    await page.goto(`${origin}/approve-new-device#token=${token}`)
+    const scenario = await prepareNewDeviceEmailApprovalScenario(
+      page,
+      renderers,
+      { requiresBoth }
+    )
+    const { requests, decisions } = scenario
+    await page.goto(scenario.url)
     const approve = page.getByRole('button', { name: 'Approve this device' })
     await expect(approve).toBeEnabled()
+    await expect(
+      page.getByRole('button', { name: 'Reject this device' })
+    ).toBeEnabled()
     await expect(page.getByText('Chrome on Linux')).toBeVisible()
     expect(page.url()).toBe(`${origin}/approve-new-device`)
-    expect(approvals).toBe(0)
+    expect(decisions).toEqual([])
     expect(requests.map((request) => request.method)).toEqual(['GET', 'POST'])
     expect(requests.every((request) => !request.url.includes(token))).toBe(true)
     await expect(page.locator('#approval-instructions')).toContainText(
@@ -66,7 +45,7 @@ for (const requiresBoth of [false, true]) {
     await expect(page.locator('#approval-instructions')).toContainText(
       requiresBoth
         ? 'another Authier device'
-        : 'If this was not you, close this page.'
+        : 'Your master password is still required'
     )
     await page.screenshot({
       path: resolve(
@@ -81,28 +60,72 @@ for (const requiresBoth of [false, true]) {
         name: requiresBoth ? 'Email approval confirmed' : 'Device approved'
       })
     ).toBeVisible()
-    expect(approvals).toBe(1)
+    expect(decisions).toEqual(['approve'])
     expect(pageErrors).toEqual([])
   })
 }
 
 test('expired links cannot be approved', async ({ page }) => {
-  let approvals = 0
-  await page.route('**/*', async (route) => {
-    if (route.request().method() === 'GET') {
-      const response = newDeviceEmailApprovalPage()
-      return route.fulfill({
-        headers: Object.fromEntries(response.headers),
-        body: await response.text()
-      })
-    }
-    if (!route.request().url().endsWith('/review')) approvals++
-    return route.fulfill({ status: 400, body: 'Expired approval' })
-  })
-  await page.goto(`${origin}/approve-new-device#token=${token}`)
+  const scenario = await prepareNewDeviceEmailApprovalScenario(
+    page,
+    renderers,
+    { expired: true }
+  )
+  const { decisions } = scenario
+  await page.goto(scenario.url)
   await expect(page.getByRole('status')).toContainText('expired')
   await expect(
     page.getByRole('button', { name: 'Approve this device' })
   ).toBeDisabled()
-  expect(approvals).toBe(0)
+  await expect(
+    page.getByRole('button', { name: 'Reject this device' })
+  ).toBeDisabled()
+  expect(decisions).toEqual([])
+  expect(scenario.requests.map((request) => request.method)).toEqual([
+    'GET',
+    'POST'
+  ])
 })
+
+for (const rejectIntent of [false, true]) {
+  test(`email rejection needs an explicit click (rejection link=${rejectIntent})`, async ({
+    page
+  }) => {
+    const scenario = await prepareNewDeviceEmailApprovalScenario(
+      page,
+      renderers,
+      {
+        requiresBoth: true,
+        rejectIntent,
+        unrecognizedDevice: true
+      }
+    )
+    const { requests, decisions } = scenario
+    await page.goto(scenario.url)
+    const reject = page.getByRole('button', { name: 'Reject this device' })
+    await expect(reject).toBeEnabled()
+    await expect(
+      page.getByRole('heading', {
+        name: rejectIntent
+          ? 'Reject this new device?'
+          : 'Approve this new device?'
+      })
+    ).toBeVisible()
+    expect(decisions).toEqual([])
+    expect(requests.map((request) => request.method)).toEqual(['GET', 'POST'])
+    expect(page.url()).toBe(`${origin}/approve-new-device`)
+    await page.screenshot({
+      path: resolve(
+        '../docs/screenshots',
+        `new-device-email-rejection${rejectIntent ? '-link' : ''}.png`
+      ),
+      fullPage: true
+    })
+    await reject.click()
+    await expect(
+      page.getByRole('heading', { name: 'Device rejected' })
+    ).toBeVisible()
+    expect(decisions).toEqual(['reject'])
+    expect(requests.every((request) => !request.url.includes(token))).toBe(true)
+  })
+}

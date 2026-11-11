@@ -2,6 +2,7 @@ import {
   confirmNewDeviceEmailApproval,
   newDeviceEmailApprovalPage,
   newDeviceEmailApprovalResult,
+  rejectNewDeviceEmailApproval,
   reviewNewDeviceEmailApproval
 } from './lib/newDeviceEmailApproval'
 import { getBackendOrigin } from './utils/getBackendOrigin'
@@ -218,6 +219,34 @@ const handleOrpcRequest = async (ctx: LegacyElysiaContext, openApi = false) => {
   }
 }
 
+const handleDeviceEmailDecision = async (
+  body: unknown,
+  origin: string | undefined,
+  decision: 'review' | 'approve' | 'reject'
+) => {
+  if (origin && origin !== getBackendOrigin())
+    return newDeviceEmailApprovalResult('invalid')
+  const token =
+    typeof body === 'object' &&
+    body !== null &&
+    'token' in body &&
+    typeof body.token === 'string'
+      ? body.token
+      : ''
+  const requestDb = createRequestDb()
+  try {
+    if (decision === 'review')
+      return await reviewNewDeviceEmailApproval(requestDb.db, token)
+    const result =
+      decision === 'reject'
+        ? await rejectNewDeviceEmailApproval(requestDb.db, token)
+        : await confirmNewDeviceEmailApproval(requestDb.db, token)
+    return newDeviceEmailApprovalResult(result)
+  } finally {
+    await requestDb.close()
+  }
+}
+
 export const buildApp = (app = new Elysia()) => {
   const allowedOrigins = [
     'https://vault.authier.pm',
@@ -249,44 +278,15 @@ export const buildApp = (app = new Elysia()) => {
       return reply.getPayload()
     })
     .get('/approve-new-device', () => newDeviceEmailApprovalPage())
-    .post('/approve-new-device/review', async ({ body, headers }) => {
-      if (headers.origin && headers.origin !== getBackendOrigin()) {
-        return newDeviceEmailApprovalResult('invalid')
-      }
-      const token =
-        typeof body === 'object' &&
-        body !== null &&
-        'token' in body &&
-        typeof body.token === 'string'
-          ? body.token
-          : ''
-      const requestDb = createRequestDb()
-      try {
-        return await reviewNewDeviceEmailApproval(requestDb.db, token)
-      } finally {
-        await requestDb.close()
-      }
-    })
-    .post('/approve-new-device', async ({ body, headers }) => {
-      if (headers.origin && headers.origin !== getBackendOrigin()) {
-        return newDeviceEmailApprovalResult('invalid')
-      }
-      const token =
-        typeof body === 'object' &&
-        body !== null &&
-        'token' in body &&
-        typeof body.token === 'string'
-          ? body.token
-          : ''
-      const requestDb = createRequestDb()
-      try {
-        return newDeviceEmailApprovalResult(
-          await confirmNewDeviceEmailApproval(requestDb.db, token)
-        )
-      } finally {
-        await requestDb.close()
-      }
-    })
+    .post('/approve-new-device/review', ({ body, headers }) =>
+      handleDeviceEmailDecision(body, headers.origin, 'review')
+    )
+    .post('/approve-new-device', ({ body, headers }) =>
+      handleDeviceEmailDecision(body, headers.origin, 'approve')
+    )
+    .post('/reject-new-device', ({ body, headers }) =>
+      handleDeviceEmailDecision(body, headers.origin, 'reject')
+    )
     .get('/confirm-master-device-reset', async ({ query, redirect }) => {
       const token =
         typeof query?.token === 'string' && query.token.length > 0

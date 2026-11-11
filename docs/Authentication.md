@@ -72,7 +72,7 @@ stateDiagram-v2
 
 `EMAIL` requires an email confirmation. `OTHER_DEVICE` requires approval from an already signed-in Authier device and is the recommended choice. `EMAIL_OR_OTHER_DEVICE` allows either method; `EMAIL_AND_OTHER_DEVICE` requires both. Email is the most convenient and least secure standalone option, since access to the mailbox allows approval. Policy changes remain restricted to the master device after the initial choice.
 
-Email links contain a random 256-bit token in the URL fragment, which is not transmitted in HTTP request URLs. Only its SHA-256 hash is stored. The confirmation page reviews the request through a read-only POST and requires an explicit button click to approve, so GET requests from email scanners do not grant access. Tokens expire after 15 minutes and are consumed once. Login polling reuses a live token rather than sending another email. Rejection and changes to policy, email or master password invalidate pending approval material.
+Email includes approval and rejection links containing a random 256-bit token in the URL fragment, which is not transmitted in HTTP request URLs. Only its SHA-256 hash is stored. The confirmation page reviews the request through a read-only POST and requires an explicit button click to approve or reject, so GET requests from email scanners cannot decide a login. Rejection cancels the request, clears partial approvals and blocks that request's IP, matching rejection from an Authier device. Tokens expire after 15 minutes and are consumed once by either decision. Login polling reuses a live token rather than sending another email. Rejection and changes to policy, email or master password invalidate pending approval material.
 
 ## Rollout
 

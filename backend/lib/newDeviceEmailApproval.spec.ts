@@ -48,7 +48,14 @@ const cases = {
   releaseRace: 'EMAIL',
   revoked: 'EMAIL',
   foreign: 'EMAIL',
-  otherOnly: 'OTHER_DEVICE'
+  otherOnly: 'OTHER_DEVICE',
+  emailReject: 'EMAIL',
+  andReject: 'EMAIL_AND_OTHER_DEVICE',
+  rejectExpired: 'EMAIL',
+  rejectOrigin: 'EMAIL',
+  rejectScanner: 'EMAIL',
+  rejectApproved: 'EMAIL',
+  decisionRace: 'EMAIL'
 } satisfies Record<string, NewDeviceApprovalPolicy | null>
 
 const fixtures = Object.fromEntries(
@@ -97,8 +104,8 @@ beforeAll(async () => {
   }
 })
 
-const requestChallenge = async (fixture: Fixture) => {
-  const response = await app.handle(
+const requestChallengeResponse = (fixture: Fixture) =>
+  app.handle(
     new Request('https://api.authier.pm/api/v1/auth/requestDeviceChallenge', {
       method: 'POST',
       headers: {
@@ -115,6 +122,9 @@ const requestChallenge = async (fixture: Fixture) => {
       })
     })
   )
+
+const requestChallenge = async (fixture: Fixture) => {
+  const response = await requestChallengeResponse(fixture)
   expect(response.status, await response.clone().text()).toBe(200)
   return requestDeviceChallengeResultSchema.parse(await response.json())
 }
@@ -150,6 +160,15 @@ const confirm = (token: string) =>
         'content-type': 'application/x-www-form-urlencoded',
         origin: 'https://api.authier.pm'
       },
+      body: new URLSearchParams({ token })
+    })
+  )
+
+const rejectFromEmail = (token: string, origin = 'https://api.authier.pm') =>
+  app.handle(
+    new Request('https://api.authier.pm/reject-new-device', {
+      method: 'POST',
+      headers: { 'content-type': 'application/x-www-form-urlencoded', origin },
       body: new URLSearchParams({ token })
     })
   )
@@ -526,5 +545,179 @@ describe('new device email approval', () => {
       )
     ).rejects.toThrow('Login failed')
     expect(rejected).toBe(true)
+  })
+  it.each(['emailReject', 'andReject'])(
+    'rejects the exact request and clears its approvals with %s',
+    async (name) => {
+      const fixture = fixtures[name]
+      const pending = assertPending(await requestChallenge(fixture))
+      const token = latestToken(fixture)
+      const message = sentEmails
+        .flatMap((mail) => mail.Messages)
+        .filter((mail) => mail.To[0]?.Email === `${fixture.userId}@test.com`)
+        .at(-1)
+      expect(message?.TextPart).toContain(
+        `/approve-new-device#token=${token}&action=reject`
+      )
+      expect(message?.HTMLPart).toContain('reject this device</a>')
+      if (name === 'andReject')
+        await approveFromDevice(fixture, pending.challengeId)
+      const [unrelated] = await db
+        .insert(schema.decryptionChallenge)
+        .values({
+          userId: fixture.userId,
+          deviceId: crypto.randomUUID(),
+          deviceName: 'Another request',
+          ipAddress: '127.0.0.2'
+        })
+        .returning()
+      const response = await rejectFromEmail(token)
+      expect(response.status).toBe(200)
+      expect(await response.text()).toContain('Device rejected')
+      expect(
+        await db.query.decryptionChallenge.findFirst({
+          where: { id: pending.challengeId }
+        })
+      ).toMatchObject({
+        rejectedAt: expect.any(Date),
+        blockIp: true,
+        approvedAt: null,
+        emailApprovedAt: null,
+        deviceApprovedAt: null,
+        approvedFromDeviceId: null,
+        approvedByRecovery: false,
+        emailApprovalTokenHash: null,
+        emailApprovalExpiresAt: null
+      })
+      expect(
+        await db.query.decryptionChallenge.findFirst({
+          where: { id: unrelated.id }
+        })
+      ).toEqual(unrelated)
+      expect((await rejectFromEmail(token)).status).toBe(400)
+      expect((await confirm(token)).status).toBe(400)
+      const poll = await requestChallengeResponse(fixture)
+      expect(poll.status).toBe(400)
+      const body = await poll.text()
+      expect(body).not.toContain('encryptionSalt')
+      expect(body).not.toContain('addDeviceSecretEncrypted')
+    }
+  )
+
+  it('does not reject on GET or a read-only review request', async () => {
+    const fixture = fixtures.rejectScanner
+    const pending = assertPending(await requestChallenge(fixture))
+    const token = latestToken(fixture)
+    const page = await app.handle(
+      new Request('https://api.authier.pm/approve-new-device')
+    )
+    expect(page.status).toBe(200)
+    const html = await page.text()
+    expect(html).toContain('formaction="/reject-new-device"')
+    expect(html).not.toContain(token)
+    const review = await app.handle(
+      new Request('https://api.authier.pm/approve-new-device/review', {
+        method: 'POST',
+        headers: {
+          'content-type': 'application/json',
+          origin: 'https://api.authier.pm'
+        },
+        body: JSON.stringify({ token, action: 'reject' })
+      })
+    )
+    expect(review.status).toBe(200)
+    expect(
+      await db.query.decryptionChallenge.findFirst({
+        where: { id: pending.challengeId }
+      })
+    ).toMatchObject({
+      approvedAt: null,
+      rejectedAt: null,
+      blockIp: null,
+      emailApprovalTokenHash: hashDeviceApprovalToken(token)
+    })
+  })
+
+  it('rejects expired and forged rejection tokens without changing the request', async () => {
+    const fixture = fixtures.rejectExpired
+    const pending = assertPending(await requestChallenge(fixture))
+    const token = latestToken(fixture)
+    const forged = token.slice(0, -1) + (token.endsWith('a') ? 'b' : 'a')
+    expect((await rejectFromEmail(forged)).status).toBe(400)
+    expect((await rejectFromEmail('not-a-token')).status).toBe(400)
+    await db
+      .update(schema.decryptionChallenge)
+      .set({ emailApprovalExpiresAt: new Date(Date.now() - 1) })
+      .where(eq(schema.decryptionChallenge.id, pending.challengeId))
+    expect((await rejectFromEmail(token)).status).toBe(400)
+    expect(
+      await db.query.decryptionChallenge.findFirst({
+        where: { id: pending.challengeId }
+      })
+    ).toMatchObject({
+      approvedAt: null,
+      rejectedAt: null,
+      blockIp: null,
+      emailApprovalTokenHash: hashDeviceApprovalToken(token)
+    })
+  })
+
+  it('rejects foreign origins without consuming the rejection token', async () => {
+    const fixture = fixtures.rejectOrigin
+    const pending = assertPending(await requestChallenge(fixture))
+    const token = latestToken(fixture)
+    expect(
+      (await rejectFromEmail(token, 'https://attacker.example')).status
+    ).toBe(400)
+    expect(
+      await db.query.decryptionChallenge.findFirst({
+        where: { id: pending.challengeId }
+      })
+    ).toMatchObject({
+      rejectedAt: null,
+      emailApprovalTokenHash: hashDeviceApprovalToken(token)
+    })
+    expect((await rejectFromEmail(token)).status).toBe(200)
+  })
+
+  it('does not turn a consumed approval token into a device revocation token', async () => {
+    const fixture = fixtures.rejectApproved
+    const pending = assertPending(await requestChallenge(fixture))
+    const token = latestToken(fixture)
+    expect((await confirm(token)).status).toBe(200)
+    expect((await rejectFromEmail(token)).status).toBe(400)
+    expect(
+      await db.query.decryptionChallenge.findFirst({
+        where: { id: pending.challengeId }
+      })
+    ).toMatchObject({
+      approvedAt: expect.any(Date),
+      rejectedAt: null,
+      blockIp: null
+    })
+    expect((await requestChallenge(fixture)).status).toBe('approved')
+  })
+
+  it('commits only one decision when approval and rejection race', async () => {
+    const fixture = fixtures.decisionRace
+    const pending = assertPending(await requestChallenge(fixture))
+    const token = latestToken(fixture)
+    const responses = await Promise.all([
+      confirm(token),
+      rejectFromEmail(token)
+    ])
+    expect(responses.map((response) => response.status).sort()).toEqual([
+      200, 400
+    ])
+    const row = await db.query.decryptionChallenge.findFirst({
+      where: { id: pending.challengeId }
+    })
+    expect(
+      Number(Boolean(row?.approvedAt)) + Number(Boolean(row?.rejectedAt))
+    ).toBe(1)
+    expect(row?.emailApprovalTokenHash).toBeNull()
+    expect(Boolean(row?.rejectedAt)).toBe(row?.blockIp === true)
+    expect((await confirm(token)).status).toBe(400)
+    expect((await rejectFromEmail(token)).status).toBe(400)
   })
 })
