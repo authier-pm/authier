@@ -1,7 +1,8 @@
 type CreateLoginCredentialDataInput = {
   fallbackUsername: string
   favIconUrl?: string | null
-  hostname: string
+  /** The document the login was typed into. */
+  pageUrl: URL
   password: string
   username: string | null
 }
@@ -9,17 +10,20 @@ type CreateLoginCredentialDataInput = {
 export const createLoginCredentialData = ({
   fallbackUsername,
   favIconUrl,
-  hostname,
+  pageUrl,
   password,
   username
 }: CreateLoginCredentialDataInput) => {
   const resolvedUsername = username ?? fallbackUsername
+  const { protocol, hostname } = pageUrl
 
   return {
     username: resolvedUsername,
     password,
     iconUrl: favIconUrl ?? null,
-    url: hostname,
+    // A saved URL without a scheme counts as https, which plain-http pages do
+    // not get. Keep the scheme so the login is offered on this page again.
+    url: protocol === 'http:' ? `http://${hostname}` : hostname,
     label: `${resolvedUsername} | ${hostname}`
   }
 }

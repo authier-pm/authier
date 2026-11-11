@@ -1,5 +1,9 @@
 import browser from 'webextension-polyfill'
-import { getAutofillSender, isExtensionPageSender } from './autofillSender'
+import {
+  getAutofillSender,
+  isExtensionPageSender,
+  isSecureContextUrl
+} from './autofillSender'
 
 const sender = (
   patch: Partial<browser.Runtime.MessageSender> = {}
@@ -70,4 +74,51 @@ it('allows SPA path changes without allowing the page to claim a different origi
     getAutofillSender(sender(), 'https://example.com/next-step')?.url
   ).toBe('https://example.com/next-step')
   expect(getAutofillSender(sender(), 'https://another.test/login')).toBeNull()
+})
+
+it('keys page state by document, and by origin where there is no document id', () => {
+  // Firefox gives no documentId, so a tab's top-level documents share frame 0.
+  const topDocumentKey = (url: string) =>
+    getAutofillSender(
+      sender({
+        url,
+        origin: new URL(url).origin,
+        tab: { ...sender().tab!, url }
+      })
+    )?.key
+
+  expect(topDocumentKey('https://example.com/welcome')).toBe(
+    topDocumentKey('https://example.com/login')
+  )
+  expect(topDocumentKey('http://example.com/login')).not.toBe(
+    topDocumentKey('https://example.com/login')
+  )
+  expect(topDocumentKey('https://unrelated.test/login')).not.toBe(
+    topDocumentKey('https://example.com/login')
+  )
+  expect(
+    getAutofillSender(sender({ documentId: 'next-document' }))?.key
+  ).not.toBe(getAutofillSender(sender({ documentId: 'login-document' }))?.key)
+})
+
+it.each([
+  'https://example.com/login',
+  'http://localhost:3000/login',
+  'http://127.0.0.1:8080/',
+  'http://127.1/',
+  'http://[::1]:5173/'
+])('treats %s as a secure context', (url) => {
+  expect(isSecureContextUrl(url)).toBe(true)
+})
+
+it.each([
+  'http://example.com/login',
+  'http://192.168.1.1/',
+  'http://localhost.example.com/',
+  'http://127.0.0.1.nip.io/',
+  'file:///home/alex/login.html',
+  'about:blank',
+  'not a url'
+])('does not treat %s as a secure context', (url) => {
+  expect(isSecureContextUrl(url)).toBe(false)
 })
