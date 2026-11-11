@@ -62,8 +62,12 @@ fun AuthScreen(state: VaultUiState, model: VaultViewModel) {
         PasswordField(password, { password = it }, "Master password")
         if (state.pendingApproval) Surface(color = Mint.copy(alpha = .1f), shape = RoundedCornerShape(16.dp)) {
             Column(Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                Text("Waiting for device approval", color = Mint, fontWeight = FontWeight.SemiBold)
-                Text("Open Devices in an existing Authier app and approve this phone. Then check again.", style = MaterialTheme.typography.bodyMedium)
+                Text("Waiting for sign-in approval", color = Mint, fontWeight = FontWeight.SemiBold)
+                Text(state.approvalProgress?.instructions ?: "Complete the approval you chose for this account, then check again.", style = MaterialTheme.typography.bodyMedium)
+                state.approvalProgress?.let { progress ->
+                    if (progress.policy.allowsEmail) Text(if (progress.emailApprovedAt != null) "Email: approved" else "Email: waiting for approval", style = MaterialTheme.typography.bodySmall)
+                    if (progress.policy.allowsOtherDevice) Text(if (progress.deviceApprovedAt != null) "Another Authier device: approved" else "Another Authier device: waiting for approval", style = MaterialTheme.typography.bodySmall)
+                }
             }
         }
         signupError?.let { Text(it, color = MaterialTheme.colorScheme.error) }

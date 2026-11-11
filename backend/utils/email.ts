@@ -71,7 +71,8 @@ export const sendEmail = async (
     Subject: string
     TextPart: string
     HTMLPart?: string
-  }
+  },
+  options: { requireDelivery?: boolean } = {}
 ) => {
   const payload: MailjetSendPayload = {
     Messages: [
@@ -91,6 +92,9 @@ export const sendEmail = async (
   }
 
   if (shouldDisableSending) {
+    if (options.requireDelivery && process.env.NODE_ENV !== 'test') {
+      throw new Error('Email approval delivery is disabled')
+    }
     console.log(
       `would have sent emails to ${payload.Messages.map((message) => message.To[0]?.Email).join(', ')}`
     )

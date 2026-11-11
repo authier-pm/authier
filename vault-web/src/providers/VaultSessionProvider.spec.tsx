@@ -72,7 +72,7 @@ const createSession = ({
     id: 'user-1',
     email: 'capaj@test.com',
     masterDeviceId: 'device-1',
-    newDevicePolicy: 'ALLOW',
+    newDevicePolicy: 'EMAIL',
     deviceRecoveryCooldownMinutes: 960
   },
   currentDevice: {
@@ -306,7 +306,7 @@ describe('VaultSessionProvider', () => {
           id: 'user-1',
           email: 'capaj@test.com',
           masterDeviceId: 'device-1',
-          newDevicePolicy: 'ALLOW',
+          newDevicePolicy: 'EMAIL',
           deviceRecoveryCooldownMinutes: 960
         },
         currentDevice: {
@@ -562,7 +562,7 @@ describe('VaultSessionProvider', () => {
         id: 'user-1',
         email: 'capaj@test.com',
         masterDeviceId: 'device-1',
-        newDevicePolicy: 'ALLOW',
+        newDevicePolicy: 'EMAIL',
         deviceRecoveryCooldownMinutes: 960
       },
       currentDevice: {
@@ -749,7 +749,7 @@ describe('VaultSessionProvider', () => {
           id: '11111111-1111-1111-1111-111111111111',
           email: 'capaj@test.com',
           masterDeviceId: 'device-1',
-          newDevicePolicy: 'ALLOW',
+          newDevicePolicy: 'EMAIL',
           deviceRecoveryCooldownMinutes: 960
         },
         currentDevice: {

@@ -33,7 +33,7 @@ const faqSchema = {
       name: 'Is trusted-device approval mandatory in Authier?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'No. Authier lets an account allow immediate enrollment, require any approved device, or require the master device.'
+        text: 'Every new device needs approval. Choose email approval, approval from another Authier device, or both methods. When both are enabled, choose whether either approval is sufficient or both are required. Another Authier device alone is recommended.'
       }
     }
   ]
@@ -57,6 +57,8 @@ const faqSchema = {
 
   <h2>Why enrollment deserves its own control</h2>
 
+  <p>For master-device-only approval, only your current master device can approve a new login and receive its approval notification. This choice does not allow email or another device to approve instead.</p>
+
   <p>
     A synchronized password manager has to decide when a new browser or phone may
     receive encrypted vault data. If possession of an email address and master
@@ -71,17 +73,9 @@ const faqSchema = {
     inspect and accept or reject the request before enrollment completes.
   </p>
 
-  <h2>Authier’s three policy choices</h2>
+  <h2>Choose your approval methods</h2>
 
-  <h3>Allow immediately</h3>
-
-  <p>
-    The new client can complete enrollment without another device approving it.
-    This is the least restrictive option and can be useful when one-device access
-    or simple recovery matters more than the extra check.
-  </p>
-
-  <h3>Require any approved device</h3>
+  <h3>Another Authier device — recommended</h3>
 
   <p>
     A connected device must approve the pending request. This is convenient when
@@ -89,18 +83,19 @@ const faqSchema = {
     new browser.
   </p>
 
-  <h3>Require the master device</h3>
+  <h3>Email — most convenient, least secure</h3>
 
   <p>
-    The account’s designated master device controls the approval decision. This
-    creates a clearer security anchor, while increasing the importance of
-    protecting and recovering that device.
+    Review and confirm a link sent to your account email. This works without a
+    second Authier device, but anyone who gains access to your mailbox can approve
+    a login. Your master password is still required afterward.
   </p>
 
   <p>
-    Authier exposes these as choices because no single recovery model is right for
-    everyone. The marketing site should not imply that device approval is active
-    when an account has selected immediate enrollment.
+    You can enable both methods. Choose “Either approval is enough” for a fallback
+    through email, or “Require both approvals” to require email confirmation and
+    approval from another Authier device. No new device receives the account salt
+    or encrypted enrollment secret until its required approvals are complete.
   </p>
 
   <h2>What approval can stop</h2>

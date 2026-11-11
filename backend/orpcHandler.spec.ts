@@ -1,3 +1,5 @@
+import { sentEmails } from './utils/email'
+import { confirmNewDeviceEmailApproval } from './lib/newDeviceEmailApproval'
 import { db } from './prisma/prismaClient'
 import { describe, expect, it, afterEach, vi } from 'vitest'
 import { createORPCClient } from '@orpc/client'
@@ -213,12 +215,10 @@ describe('oRPC handler', () => {
 
     const updatedPolicy =
       await masterBrowser.client.security.updateNewDevicePolicy({
-        newDevicePolicy: 'REQUIRE_MASTER_DEVICE_APPROVAL'
+        newDevicePolicy: 'OTHER_DEVICE'
       })
 
-    expect(updatedPolicy.security.newDevicePolicy).toBe(
-      'REQUIRE_MASTER_DEVICE_APPROVAL'
-    )
+    expect(updatedPolicy.security.newDevicePolicy).toBe('OTHER_DEVICE')
 
     const updatedCooldown =
       await masterBrowser.client.security.updateRecoveryCooldown({
@@ -300,28 +300,68 @@ describe('oRPC handler', () => {
     expect(refreshed.refreshToken).not.toBe(browser.session.refreshToken)
   })
 
-  it('persists automatic approval before completing a login for default and ALLOW policies', async () => {
+  it('requires email approval before completing a login for default and EMAIL policies', async () => {
     const app = buildApp()
-    const primary = await registerBrowser(app, `auto-approval-${crypto.randomUUID()}@test.com`, 'synthetic-auto-approval-password', {
-      id: crypto.randomUUID(), name: 'Primary browser', platform: 'web'
-    })
+    const primary = await registerBrowser(
+      app,
+      `auto-approval-${crypto.randomUUID()}@test.com`,
+      'synthetic-auto-approval-password',
+      {
+        id: crypto.randomUUID(),
+        name: 'Primary browser',
+        platform: 'web'
+      }
+    )
     const secondary = createVaultClient(app, createAuthState())
-    for (const policy of [null, 'ALLOW'] as const) {
-      if (policy) await primary.client.security.updateNewDevicePolicy({ newDevicePolicy: policy })
-      const device = { id: crypto.randomUUID(), name: 'Automatically approved Android', platform: 'android' }
-      const challenge = await secondary.auth.requestDeviceChallenge({ email: primary.email, deviceInput: device })
+    for (const policy of [null, 'EMAIL'] as const) {
+      if (policy)
+        await primary.client.security.updateNewDevicePolicy({
+          newDevicePolicy: policy
+        })
+      const device = {
+        id: crypto.randomUUID(),
+        name: 'Automatically approved Android',
+        platform: 'android'
+      }
+      const pending = await secondary.auth.requestDeviceChallenge({
+        email: primary.email,
+        deviceInput: device
+      })
+      expect(pending.status).toBe('pending')
+      expect(pending).not.toHaveProperty('encryptionSalt')
+      expect(pending).not.toHaveProperty('addDeviceSecretEncrypted')
+      const token = sentEmails
+        .at(-1)
+        ?.Messages[0]?.TextPart.match(/token=([a-f0-9]{64})/)?.[1]
+      if (!token) throw new Error('Missing email approval token')
+      expect(await confirmNewDeviceEmailApproval(db, token)).toBe('approved')
+      const challenge = await secondary.auth.requestDeviceChallenge({
+        email: primary.email,
+        deviceInput: device
+      })
       expect(challenge.status).toBe('approved')
-      if (challenge.status !== 'approved') throw new Error('Expected automatic approval')
-      const stored = await db.query.decryptionChallenge.findFirst({ where: { id: challenge.challengeId } })
+      if (challenge.status !== 'approved')
+        throw new Error('Expected automatic approval')
+      const stored = await db.query.decryptionChallenge.findFirst({
+        where: { id: challenge.challengeId }
+      })
       expect(stored?.approvedAt).toBeInstanceOf(Date)
       const salt = base64ToBuffer(challenge.encryptionSalt)
       const key = await generateEncryptionKey(primary.password, salt)
-      const currentAddDeviceSecret = await decryptString(key, challenge.addDeviceSecretEncrypted)
+      const currentAddDeviceSecret = await decryptString(
+        key,
+        challenge.addDeviceSecretEncrypted
+      )
       const secrets = await initLocalDeviceAuthSecret(key, salt)
       const login = await secondary.auth.completeDeviceLogin({
         challengeId: challenge.challengeId,
         currentAddDeviceSecret,
-        input: { ...secrets, encryptionSalt: challenge.encryptionSalt, firebaseToken: null, devicePlatform: device.platform }
+        input: {
+          ...secrets,
+          encryptionSalt: challenge.encryptionSalt,
+          firebaseToken: null,
+          devicePlatform: device.platform
+        }
       })
       expect(login.session.currentDevice.id).toBe(device.id)
     }
@@ -341,7 +381,7 @@ describe('oRPC handler', () => {
     )
 
     await masterBrowser.client.security.updateNewDevicePolicy({
-      newDevicePolicy: 'REQUIRE_MASTER_DEVICE_APPROVAL'
+      newDevicePolicy: 'OTHER_DEVICE'
     })
 
     const secondaryState = createAuthState()

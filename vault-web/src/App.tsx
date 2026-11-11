@@ -1,5 +1,6 @@
 import { Navigate, Route, Routes } from 'react-router-dom'
 import { AppShell } from '@/components/AppShell'
+import { NewDeviceApprovalOnboarding } from '@/components/NewDeviceApprovalSettings'
 import { useVaultSession } from '@/providers/VaultSessionProvider'
 import { AwaitingApprovalPage } from '@/routes/AwaitingApprovalPage'
 import { DevicesPage } from '@/routes/DevicesPage'
@@ -24,6 +25,7 @@ function ProtectedArea() {
 
   return (
     <AppShell>
+      <NewDeviceApprovalOnboarding />
       <Routes>
         <Route element={<VaultListPage />} path="/vault" />
         <Route

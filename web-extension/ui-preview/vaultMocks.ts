@@ -37,6 +37,7 @@ export const decodePreviewPasskey = (encrypted: string) =>
   passkeySchema.parse(JSON.parse(decodeURIComponent(atob(encrypted))))
 
 export const device = {
+  id: 'preview-current-device',
   state: {
     email: 'alex@example.com',
     secrets: [] as ISecret[],

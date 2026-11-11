@@ -40,8 +40,8 @@ stateDiagram-v2
 #### Login
 
 1. Get password from user
-2. call `deviceDecryptionChallenge` mutation, which creates decryptionChallange and wait for master device confirmation
-3. Master device confirm challange
+2. Request a device challenge. A new device stays pending without the account salt or encrypted enrollment secret.
+3. Complete the account's configured approvals: email, another Authier device, either method, or both methods. The Chrome extension, Android app and web vault show the progress and require an explicit choice of policy when the account is unconfigured.
 4. Use PBDFK2 for password encryption (masterEncryptionKey)
 5. Try to decrypt `addDeviceSecretEncrypted` (from decryptionChallange) with masterEncryptionKey and parsed `userId`
    (If is decrypted deviceSecret same as the one from decryptionChallange, we know that the master password is correct)
@@ -63,10 +63,22 @@ stateDiagram-v2
 2. Check if is user blocked
 3. Check decryption challenge count
 4. Get current device with challenge
-5. If we find only one device in DB witout challenge, we create one challenge and mark it as approved
-6. Check if is challenge rejected
-7. If we dont find any challenge, we check for firebaseToken. If it has ont we send notification and create challenge
-8. Check if is challenge approved and return `addDeviceSecretEncrypted` with `encryptionSalt`
+5. Reject device IDs owned by another account. The original already-enrolled, active master device can bootstrap its own first challenge; an unknown device never inherits that approval.
+6. Reject cancelled or blocked challenges.
+7. Create a pending challenge and send the configured email and/or device notifications. An unconfigured account requires email approval until its owner saves a policy.
+8. Return `addDeviceSecretEncrypted` and `encryptionSalt` only after the required approvals. With both approvals required, the first approval remains pending. Master-password verification is still required to finish login.
+
+## Approval methods
+
+`EMAIL` requires an email confirmation. `OTHER_DEVICE` requires approval from an already signed-in Authier device and is the recommended choice. `EMAIL_OR_OTHER_DEVICE` allows either method; `EMAIL_AND_OTHER_DEVICE` requires both. `MASTER_DEVICE` permits approval only from the current active master device and sends the approval push only to that device. It has no email or other-device fallback. Transferring the master role clears pending grants so the new master must approve them. Email is the most convenient and least secure standalone option, since access to the mailbox allows approval. Policy changes remain restricted to the master device after the initial choice.
+
+Email includes approval and rejection links containing a random 256-bit token in the URL fragment, which is not transmitted in HTTP request URLs. Only its SHA-256 hash is stored. The confirmation page reviews the request through a read-only POST and requires an explicit button click to approve or reject, so GET requests from email scanners cannot decide a login. Rejection cancels the request, clears partial approvals and blocks that request's IP, matching rejection from an Authier device. Tokens expire after 15 minutes and are consumed once by either decision. Login polling reuses a live token rather than sending another email. Rejection and changes to policy, email or master password invalidate pending approval material.
+
+## Rollout
+
+Apply migration `20261111161247_condemned_zombie` through the normal backend deployment command (`pnpm wrdeploy` from `backend`) before deploying the new backend. The migration removes `ALLOW`, maps `REQUIRE_ANY_DEVICE_APPROVAL` to `OTHER_DEVICE` and preserves `REQUIRE_MASTER_DEVICE_APPROVAL` as `MASTER_DEVICE`, and prompts formerly unprotected accounts to choose a new policy. It revokes legacy automatic grants for devices that were never enrolled. Existing enrolled devices and deliberate recovery approvals remain available. The generated follow-up migration `20261111165107_daily_excalibur` also adds `MASTER_DEVICE` to development databases that applied the earlier four-policy schema; such databases cannot reconstruct the old master-only preference after it was converted, so it must be selected again there.
+
+Release the updated Chrome extension, Android app and web vault together with the API contract change. Old clients cannot save the removed policy values. Email approval requires `MJ_APIKEY_PUBLIC`, `MJ_APIKEY_PRIVATE`, a valid configured `BACKEND_URL`, and `DISABLE_EMAIL_SENDING=false`; delivery failures never grant approval. Tests capture synthetic email and use PGlite, without contacting a production database or sending real email.
 
 ## addNewDevice
 

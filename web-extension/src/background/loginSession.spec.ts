@@ -17,6 +17,10 @@ const deviceInfo = {
 }
 
 const approvalChallenge: LoginApprovalChallenge = {
+  approvalPolicy: 'OTHER_DEVICE',
+  emailApprovalSentAt: null,
+  emailApprovedAt: null,
+  deviceApprovedAt: null,
   type: 'awaiting-approval',
   id: 42,
   pushNotificationsSentCount: 1,

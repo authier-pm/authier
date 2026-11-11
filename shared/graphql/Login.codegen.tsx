@@ -28,6 +28,13 @@ export type EncryptedSecretType =
   | 'PASSKEY'
   | 'TOTP';
 
+export type UserNewDevicePolicy =
+  | 'EMAIL'
+  | 'EMAIL_AND_OTHER_DEVICE'
+  | 'EMAIL_OR_OTHER_DEVICE'
+  | 'MASTER_DEVICE'
+  | 'OTHER_DEVICE';
+
 export type AddNewDeviceForUserMutationVariables = Exact<{
   email: string;
   deviceInput: Types.DeviceInput;
@@ -50,7 +57,7 @@ export type DeviceDecryptionChallengeMutationVariables = Exact<{
 
 export type DeviceDecryptionChallengeMutation = { deviceDecryptionChallenge:
     | { __typename: 'DecryptionChallengeApproved', id: number, addDeviceSecretEncrypted: string, encryptionSalt: string, userId: string, approvedAt: string | null, deviceId: string, deviceName: string }
-    | { __typename: 'DecryptionChallengeForApproval', id: number, pushNotificationsSentCount: number, pushNotificationsFailedCount: number, masterDeviceResetRequestedAt: string | null, masterDeviceResetProcessAt: string | null, masterDeviceResetConfirmedAt: string | null, masterDeviceResetRejectedAt: string | null, resetStatus: { requiredApprovals: number, approvalCount: number, processAt: string, expiresAt: string, confirmedAt: string | null, completedAt: string | null, rejectedAt: string | null } | null }
+    | { __typename: 'DecryptionChallengeForApproval', id: number, approvalPolicy: Types.UserNewDevicePolicy, emailApprovalSentAt: string | null, emailApprovedAt: string | null, deviceApprovedAt: string | null, pushNotificationsSentCount: number, pushNotificationsFailedCount: number, masterDeviceResetRequestedAt: string | null, masterDeviceResetProcessAt: string | null, masterDeviceResetConfirmedAt: string | null, masterDeviceResetRejectedAt: string | null, resetStatus: { requiredApprovals: number, approvalCount: number, processAt: string, expiresAt: string, confirmedAt: string | null, completedAt: string | null, rejectedAt: string | null } | null }
    | null };
 
 export type InitiateMasterDeviceResetMutationVariables = Exact<{
@@ -151,6 +158,10 @@ export const DeviceDecryptionChallengeDocument = gql`
     }
     ... on DecryptionChallengeForApproval {
       id
+      approvalPolicy
+      emailApprovalSentAt
+      emailApprovedAt
+      deviceApprovedAt
       pushNotificationsSentCount
       pushNotificationsFailedCount
       resetStatus {

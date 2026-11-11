@@ -32,6 +32,10 @@ import kotlinx.serialization.Contextual
 /**
  *
  *
+ * @param approvalPolicy
+ * @param emailApprovalSentAt
+ * @param emailApprovedAt
+ * @param deviceApprovedAt
  * @param status
  * @param challengeId
  * @param pushNotificationsSentCount
@@ -45,6 +49,18 @@ import kotlinx.serialization.Contextual
 @Serializable
 
 data class PendingChallenge (
+
+    @SerialName(value = "approvalPolicy")
+    val approvalPolicy: PendingChallenge.ApprovalPolicy,
+
+    @SerialName(value = "emailApprovalSentAt")
+    val emailApprovalSentAt: kotlin.String?,
+
+    @SerialName(value = "emailApprovedAt")
+    val emailApprovedAt: kotlin.String?,
+
+    @SerialName(value = "deviceApprovedAt")
+    val deviceApprovedAt: kotlin.String?,
 
     @SerialName(value = "status")
     val status: PendingChallenge.Status,
@@ -75,6 +91,19 @@ data class PendingChallenge (
 
 ) {
 
+    /**
+     *
+     *
+     * Values: EMAIL,OTHER_DEVICE,EMAIL_OR_OTHER_DEVICE,EMAIL_AND_OTHER_DEVICE,MASTER_DEVICE
+     */
+    @Serializable
+    enum class ApprovalPolicy(val value: kotlin.String) {
+        @SerialName(value = "EMAIL") EMAIL("EMAIL"),
+        @SerialName(value = "OTHER_DEVICE") OTHER_DEVICE("OTHER_DEVICE"),
+        @SerialName(value = "EMAIL_OR_OTHER_DEVICE") EMAIL_OR_OTHER_DEVICE("EMAIL_OR_OTHER_DEVICE"),
+        @SerialName(value = "EMAIL_AND_OTHER_DEVICE") EMAIL_AND_OTHER_DEVICE("EMAIL_AND_OTHER_DEVICE"),
+        @SerialName(value = "MASTER_DEVICE") MASTER_DEVICE("MASTER_DEVICE");
+    }
     /**
      *
      *

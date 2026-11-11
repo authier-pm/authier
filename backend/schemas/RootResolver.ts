@@ -1,4 +1,13 @@
 import {
+  allowsDeviceApproval,
+  allowsEmailApproval,
+  canDeviceApproveNewLogin
+} from '../../shared/newDeviceApproval'
+import {
+  hasCurrentDeviceApproval,
+  sendNewDeviceApprovalEmail
+} from '../lib/newDeviceEmailApproval'
+import {
   defaultMasterDeviceResetConfig,
   masterDeviceResetConfigSchema
 } from '../../shared/masterDeviceResetConfig'
@@ -273,6 +282,7 @@ export class RootResolver {
       where: { email },
       columns: {
         id: true,
+        email: true,
         addDeviceSecretEncrypted: true,
         encryptionSalt: true,
         newDevicePolicy: true,
@@ -286,17 +296,6 @@ export class RootResolver {
       )
     }
 
-    // Fetch masterDevice separately since it's not a relation but a FK column
-    const masterDevice = user.masterDeviceId
-      ? await ctx.db.query.device.findFirst({
-          where: { id: user.masterDeviceId }
-        })
-      : null
-    const userHasNoMasterDevice = !user.masterDeviceId
-    const allowsAutomaticApproval =
-      userHasNoMasterDevice ||
-      user.newDevicePolicy === 'ALLOW' ||
-      user.newDevicePolicy === null
     const isBlocked = await ctx.db.query.decryptionChallenge.findFirst({
       where: {
         userId: user.id,
@@ -330,14 +329,15 @@ export class RootResolver {
       )
     }
 
-    // The device id comes from the client. Only a device already enrolled in
-    // this account counts: anyone can sign up and present their own device id
-    // with someone else's email.
     const device = await ctx.db.query.device.findFirst({
-      where: { id: deviceInput.id, userId: user.id }
+      where: { id: deviceInput.id }
     })
 
-    log('device', device)
+    // Check ownership before reusing even an already-approved challenge: older
+    // versions could approve another account's device for a single-device user.
+    if (device && device.userId !== user.id) {
+      throw new GraphqlError('Login failed')
+    }
 
     let challenge = await ctx.db.query.decryptionChallenge.findFirst({
       where: {
@@ -346,46 +346,29 @@ export class RootResolver {
       }
     })
 
-    // Registration does not create a challenge, so the account's first device
-    // has none when it signs in again.
-    if (device) {
-      if (!challenge) {
-        const deviceCountResult = await ctx.db
-          .select({ count: count() })
-          .from(schema.device)
-          .where(eq(schema.device.userId, user.id))
-        const deviceCount = deviceCountResult[0]?.count ?? 0
-        if (deviceCount === 1) {
-          // user has only one device
-          const [created] = await ctx.db
-            .insert(schema.decryptionChallenge)
-            .values({
-              deviceId: deviceInput.id,
-              deviceName: deviceInput.name,
-              userId: user.id,
-              ipAddress,
-              approvedAt: device.createdAt
-            })
-            .returning()
-          challenge = created
-        }
-      }
-    }
-
-    if (challenge?.rejectedAt) {
-      // someone tried to login with this device and it was rejected in the past, we don't want to create a new challenge
-      throw new GraphqlError('login failed')
-    }
-
-    if (challenge && allowsAutomaticApproval && !challenge.approvedAt) {
-      const [updatedChallenge] = await ctx.db
-        .update(schema.decryptionChallenge)
-        .set({
-          approvedAt: new Date()
+    // Registration enrolls the original master before it has a login challenge.
+    // Only that existing active device may bootstrap its first challenge.
+    if (
+      !challenge &&
+      device?.id === user.masterDeviceId &&
+      !device.logoutAt &&
+      !device.deletedAt
+    ) {
+      const [created] = await ctx.db
+        .insert(schema.decryptionChallenge)
+        .values({
+          deviceId: device.id,
+          deviceName: device.name,
+          userId: user.id,
+          ipAddress,
+          approvedAt: device.createdAt
         })
-        .where(eq(schema.decryptionChallenge.id, challenge.id))
         .returning()
-      challenge = updatedChallenge
+      challenge = created
+    }
+
+    if (challenge?.rejectedAt || challenge?.blockIp) {
+      throw new GraphqlError('Login failed')
     }
 
     if (!challenge) {
@@ -394,12 +377,7 @@ export class RootResolver {
         pushNotificationsFailedCount: 0
       }
 
-      let approvedAt: Date | undefined
-
-      if (allowsAutomaticApproval) {
-        approvedAt = new Date()
-      } else {
-        // TODO: send email notifications
+      if (allowsDeviceApproval(user.newDevicePolicy)) {
         const geoIp = await getGeoIpLocation
           .memoized(ipAddress)
           .catch((_error) => null)
@@ -416,24 +394,25 @@ export class RootResolver {
           notificationBody = `New device is trying to log in from ${ipAddress} (${geoLocation}).`
         }
 
-        let devicesToNotify: { firebaseToken: string | null }[] = []
-
-        if (user.newDevicePolicy === 'REQUIRE_ANY_DEVICE_APPROVAL') {
-          devicesToNotify = await ctx.db.query.device.findMany({
-            where: {
-              userId: user.id,
-              logoutAt: { isNull: true },
-              deletedAt: { isNull: true }
-            },
-            columns: { firebaseToken: true }
-          })
-        } else if (masterDevice?.firebaseToken) {
-          devicesToNotify = [{ firebaseToken: masterDevice.firebaseToken }]
-        }
+        const devicesToNotify = await ctx.db.query.device.findMany({
+          where: {
+            userId: user.id,
+            logoutAt: { isNull: true },
+            deletedAt: { isNull: true }
+          },
+          columns: { id: true, firebaseToken: true }
+        })
 
         const firebaseTokens = [
           ...new Set(
             devicesToNotify
+              .filter((device) =>
+                canDeviceApproveNewLogin(
+                  user.newDevicePolicy,
+                  device.id,
+                  user.masterDeviceId
+                )
+              )
               .map((device) => device.firebaseToken)
               .filter(
                 (firebaseToken): firebaseToken is string => !!firebaseToken
@@ -454,8 +433,7 @@ export class RootResolver {
           deviceId: deviceInput.id,
           deviceName: deviceInput.name,
           userId: user.id,
-          ipAddress: ctx.getIpAddress(),
-          approvedAt,
+          ipAddress,
           pushNotificationsSentCount:
             pushNotificationCounts.pushNotificationsSentCount,
           pushNotificationsFailedCount:
@@ -465,65 +443,95 @@ export class RootResolver {
       challenge = created
     }
 
-    if (userHasNoMasterDevice) {
+    if (!challenge.approvedAt && allowsEmailApproval(user.newDevicePolicy)) {
+      await sendNewDeviceApprovalEmail(ctx.db, challenge.id)
+      challenge = await ctx.db.query.decryptionChallenge.findFirst({
+        where: { id: challenge.id, userId: user.id }
+      })
+      if (!challenge) throw new GraphqlError('Login failed')
+    }
+
+    return ctx.db.transaction(async (tx) => {
+      const [currentUser] = await tx
+        .select()
+        .from(schema.user)
+        .where(eq(schema.user.id, user.id))
+        .for('update')
+      const [currentChallenge] = await tx
+        .select()
+        .from(schema.decryptionChallenge)
+        .where(
+          and(
+            eq(schema.decryptionChallenge.id, challenge.id),
+            eq(schema.decryptionChallenge.userId, user.id)
+          )
+        )
+        .for('update')
+      if (
+        !currentUser ||
+        !currentChallenge ||
+        currentChallenge.rejectedAt ||
+        currentChallenge.blockIp
+      ) {
+        throw new GraphqlError('Login failed')
+      }
+      const currentDevice = await tx.query.device.findFirst({
+        where: { id: currentChallenge.deviceId }
+      })
+      if (currentDevice && currentDevice.userId !== currentUser.id)
+        throw new GraphqlError('Login failed')
+      const [masterDeviceResetRequest] = await tx
+        .select({
+          requestedAt: schema.masterDeviceResetRequest.createdAt,
+          processAt: schema.masterDeviceResetRequest.processAt,
+          confirmedAt: schema.masterDeviceResetRequest.confirmedAt,
+          rejectedAt: schema.masterDeviceResetRequest.rejectedAt
+        })
+        .from(schema.masterDeviceResetRequest)
+        .where(
+          eq(
+            schema.masterDeviceResetRequest.decryptionChallengeId,
+            currentChallenge.id
+          )
+        )
+        .limit(1)
+
+      if (
+        !(await hasCurrentDeviceApproval(tx, currentChallenge, currentUser))
+      ) {
+        return plainToClass(DecryptionChallengeForApproval, {
+          id: currentChallenge.id,
+          ipAddress: currentChallenge.ipAddress,
+          rejectedAt: currentChallenge.rejectedAt,
+          createdAt: currentChallenge.createdAt,
+          deviceName: currentChallenge.deviceName,
+          deviceId: currentChallenge.deviceId,
+          pushNotificationsSentCount:
+            currentChallenge.pushNotificationsSentCount,
+          pushNotificationsFailedCount:
+            currentChallenge.pushNotificationsFailedCount,
+          approvalPolicy: currentUser.newDevicePolicy ?? 'EMAIL',
+          emailApprovalSentAt: currentChallenge.emailApprovalSentAt,
+          emailApprovedAt: currentChallenge.emailApprovedAt,
+          deviceApprovedAt: currentChallenge.deviceApprovedAt,
+          masterDeviceResetRequestedAt:
+            masterDeviceResetRequest?.requestedAt ?? null,
+          masterDeviceResetProcessAt: masterDeviceResetRequest?.confirmedAt
+            ? masterDeviceResetRequest.processAt
+            : null,
+          masterDeviceResetConfirmedAt:
+            masterDeviceResetRequest?.confirmedAt ?? null,
+          masterDeviceResetRejectedAt:
+            masterDeviceResetRequest?.rejectedAt ?? null
+        })
+      }
+
+      // user has approved this device in the past, we can return the challenge including salt and encrypted secret
       return plainToClass(DecryptionChallengeApproved, {
-        ...challenge,
-        addDeviceSecretEncrypted: user.addDeviceSecretEncrypted,
-        encryptionSalt: user.encryptionSalt,
-        approvedAt: challenge!.approvedAt || challenge!.createdAt
+        ...currentChallenge,
+        addDeviceSecretEncrypted: currentUser.addDeviceSecretEncrypted,
+        encryptionSalt: currentUser.encryptionSalt
       })
-    }
-
-    if (user.newDevicePolicy === 'ALLOW' || user.newDevicePolicy === null) {
-      // user has allowed new devices, we can return the challenge including salt and encrypted secret
-      return plainToClass(DecryptionChallengeApproved, {
-        ...challenge,
-        addDeviceSecretEncrypted: user.addDeviceSecretEncrypted,
-        encryptionSalt: user.encryptionSalt,
-        approvedAt: challenge!.approvedAt || challenge!.createdAt
-      })
-    }
-
-    const [masterDeviceResetRequest] = await ctx.db
-      .select({
-        requestedAt: schema.masterDeviceResetRequest.createdAt,
-        processAt: schema.masterDeviceResetRequest.processAt,
-        confirmedAt: schema.masterDeviceResetRequest.confirmedAt,
-        rejectedAt: schema.masterDeviceResetRequest.rejectedAt
-      })
-      .from(schema.masterDeviceResetRequest)
-      .where(
-        eq(schema.masterDeviceResetRequest.decryptionChallengeId, challenge!.id)
-      )
-      .limit(1)
-
-    if (!challenge!.approvedAt) {
-      return plainToClass(DecryptionChallengeForApproval, {
-        id: challenge!.id,
-        ipAddress: challenge!.ipAddress,
-        rejectedAt: challenge!.rejectedAt,
-        createdAt: challenge!.createdAt,
-        deviceName: challenge!.deviceName,
-        deviceId: challenge!.deviceId,
-        pushNotificationsSentCount: challenge!.pushNotificationsSentCount,
-        pushNotificationsFailedCount: challenge!.pushNotificationsFailedCount,
-        masterDeviceResetRequestedAt:
-          masterDeviceResetRequest?.requestedAt ?? null,
-        masterDeviceResetProcessAt: masterDeviceResetRequest?.confirmedAt
-          ? masterDeviceResetRequest.processAt
-          : null,
-        masterDeviceResetConfirmedAt:
-          masterDeviceResetRequest?.confirmedAt ?? null,
-        masterDeviceResetRejectedAt:
-          masterDeviceResetRequest?.rejectedAt ?? null
-      })
-    }
-
-    // user has approved this device in the past, we can return the challenge including salt and encrypted secret
-    return plainToClass(DecryptionChallengeApproved, {
-      ...challenge,
-      addDeviceSecretEncrypted: user.addDeviceSecretEncrypted,
-      encryptionSalt: user.encryptionSalt
     })
   }
 
