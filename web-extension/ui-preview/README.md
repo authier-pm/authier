@@ -27,10 +27,10 @@ entire browser, and retries a lost server acknowledgement without a duplicate.
 The production pending-sync and upgrade notices are captured in
 `docs/screenshots/vaultPendingSync.png`.
 
-The `hacking-prize-blog` scenario embeds the production 10 LTC security challenge
+The `hacking-prize-blog` scenario embeds the production 84 LTC security challenge
 announcement. Start the Astro server on port 4321 alongside the preview, then
-open `/?scenario=hacking-prize-blog`. Check the reward, full-decryption criteria,
-programmatic proof requirements, the fresh demo account recommendation, the
+open `/?scenario=hacking-prize-blog`. Check the 84 LTC headline and reward card,
+full-decryption criteria, programmatic proof requirements, the fresh demo account recommendation, the
 required Litecoin receiving address, and submission links on desktop and mobile.
 Captures live in `docs/screenshots/hacking-prize-blog-desktop.jpg` and
 `docs/screenshots/hacking-prize-blog-mobile.jpg`.
