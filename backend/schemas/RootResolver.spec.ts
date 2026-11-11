@@ -7,7 +7,10 @@ import type { RegisterNewAccountInput } from '../models/AuthInputs'
 import { describe, expect, it } from 'vitest'
 
 import { makeFakeCtx } from '../tests/makeFakeCtx'
-import type { DecryptionChallengeForApproval } from '../models/DecryptionChallenge'
+import {
+  DecryptionChallengeApproved,
+  DecryptionChallengeForApproval
+} from '../models/DecryptionChallenge'
 import { WebInputTypeGQL } from '../models/types/WebInputType'
 import { fakeUserAndContext } from './__test__/fakeUserAndContext'
 import { makeRegisterAccountInput } from './__test__/makeRegisterAccountInput'
@@ -133,8 +136,14 @@ describe('RootResolver', () => {
   })
 
   describe('deviceDecryptionChallenge', () => {
-    it('should return a DecryptionChallengeForApproval', async () => {
+    /**
+     * A user who requires approval for new devices and owns exactly one device.
+     * The master device must exist, otherwise the resolver auto-approves and
+     * returns addDeviceSecretEncrypted.
+     */
+    const insertApprovalRequiringUser = async () => {
       const userId = crypto.randomUUID()
+      const masterDeviceId = crypto.randomUUID()
       const fakeData: RegisterNewAccountInput = makeRegisterAccountInput()
       await db.insert(schema.user).values({
         id: userId,
@@ -145,11 +154,6 @@ describe('RootResolver', () => {
         encryptionSalt: fakeData.encryptionSalt,
         ...userSecurityProps
       })
-
-      // Insert a master device and set masterDeviceId on user so
-      // userHasNoMasterDevice is false, otherwise the resolver
-      // auto-approves and returns addDeviceSecretEncrypted
-      const masterDeviceId = crypto.randomUUID()
       await db.insert(schema.device).values({
         id: masterDeviceId,
         platform: 'iOS',
@@ -165,20 +169,57 @@ describe('RootResolver', () => {
         .set({ masterDeviceId })
         .where(eq(schema.user.id, userId))
 
-      const data = (await resolver.deviceDecryptionChallenge(
-        fakeData.email,
+      return { userId, masterDeviceId, email: fakeData.email }
+    }
+
+    it('should return a DecryptionChallengeForApproval', async () => {
+      const { userId, email } = await insertApprovalRequiringUser()
+
+      const data = await resolver.deviceDecryptionChallenge(
+        email,
         {
           id: crypto.randomUUID(),
           name: 'chrome ',
           platform: 'macOS'
         },
         makeFakeCtx({ userId })
-      )) as DecryptionChallengeForApproval
+      )
 
-      expect(
-        (data as { addDeviceSecretEncrypted?: string })
-          ?.addDeviceSecretEncrypted
-      ).toBe(undefined)
+      expect(data).toBeInstanceOf(DecryptionChallengeForApproval)
+      expect(data).not.toHaveProperty('addDeviceSecretEncrypted')
+    })
+
+    it("approves a returning login on the account's only device", async () => {
+      const { userId, masterDeviceId, email } =
+        await insertApprovalRequiringUser()
+
+      const data = await resolver.deviceDecryptionChallenge(
+        email,
+        { id: masterDeviceId, name: 'master device', platform: 'iOS' },
+        makeFakeCtx({ userId })
+      )
+
+      expect(data).toBeInstanceOf(DecryptionChallengeApproved)
+    })
+
+    it('does not approve a device registered to another account', async () => {
+      const victim = await insertApprovalRequiringUser()
+      // Anyone can sign up, so an attacker always knows one valid device id.
+      const attacker = await insertApprovalRequiringUser()
+
+      const data = await resolver.deviceDecryptionChallenge(
+        victim.email,
+        { id: attacker.masterDeviceId, name: 'chrome', platform: 'macOS' },
+        makeFakeCtx({ userId: attacker.userId })
+      )
+
+      expect(data).toBeInstanceOf(DecryptionChallengeForApproval)
+      expect(data).not.toHaveProperty('addDeviceSecretEncrypted')
+      expect(data).not.toHaveProperty('encryptionSalt')
+      const challenge = await db.query.decryptionChallenge.findFirst({
+        where: { userId: victim.userId, deviceId: attacker.masterDeviceId }
+      })
+      expect(challenge?.approvedAt).toBeNull()
     })
 
     it("should show 'Too many decryption challenges, wait for cooldown'", async () => {
