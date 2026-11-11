@@ -10,7 +10,8 @@ Authier offers an **84 LTC (Litecoin)** reward for a verified attack that fully 
 stored vault secrets. Submissions must include a reproducible, programmatic proof of concept;
 access to ciphertext or metadata alone does not qualify. Use accounts you control and synthetic
 secrets, and demonstrate the attack without supplying the user's master password or legitimate
-decryption keys as inputs. The disclosure policy and scope below apply.
+decryption keys as inputs. The attack must be performed over the network and cannot assume access
+to the vault owner's machine or email account. The disclosure policy and scope below apply.
 
 To qualify for the reward, the vulnerability must still be reproducible on the latest commit of
 [Authier's `main` branch on GitHub](https://github.com/authier-pm/authier/tree/main) when you submit
