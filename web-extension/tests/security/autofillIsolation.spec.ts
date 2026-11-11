@@ -6,11 +6,45 @@ import {
   type Worker
 } from '@playwright/test'
 import { resolve } from 'node:path'
+import {
+  abToCryptoKey,
+  base64ToBuffer,
+  encryptString
+} from '../../../shared/cryptoUtils'
+import { EncryptedSecretType } from '../../../shared/generated/graphqlBaseTypes'
 import { createOfflineVaultSnapshot } from '../../ui-preview/scenarios/offlineVault'
 
 const trustedOrigin = 'https://mail.example.com'
 const foreignOrigin = 'https://unrelated.example.net'
+const plainHttpOrigin = 'http://mail.example.com'
+const intranetOrigin = 'http://intranet.example.org'
+const localOrigin = 'http://localhost:4173'
 const savedPassword = 'mail-preview-password'
+
+type Login = {
+  label: string
+  username: string
+  password: string
+  url: string
+  iconUrl: null
+}
+
+const intranetLogin: Login = {
+  label: 'Intranet',
+  username: 'admin@intranet.example.org',
+  password: 'intranet-preview-password',
+  url: intranetOrigin,
+  iconUrl: null
+}
+
+// The save prompt stores the hostname alone.
+const localLogin: Login = {
+  label: 'Local app',
+  username: 'dev@example.com',
+  password: 'local-preview-password',
+  url: 'localhost',
+  iconUrl: null
+}
 const loginForm = `
   <form action="/login" onsubmit="event.preventDefault()">
     <h1>Sign in</h1>
@@ -33,10 +67,27 @@ type VaultBrowser = {
 
 // The built extension runs unchanged in a disposable profile. Every network
 // request is intercepted; these tests never contact a real backend or website.
-const test = base.extend<{ vaultBrowser: VaultBrowser }>({
-  vaultBrowser: async ({}, use, testInfo) => {
+const test = base.extend<{ vaultLogins: Login[]; vaultBrowser: VaultBrowser }>({
+  // Logins saved next to the one for https://mail.example.com.
+  vaultLogins: [[], { option: true }],
+  vaultBrowser: async ({ vaultLogins }, use, testInfo) => {
     const snapshot = await createOfflineVaultSnapshot()
-    snapshot.secrets = snapshot.secrets.slice(0, 1)
+    const key = await abToCryptoKey(
+      base64ToBuffer(snapshot.masterEncryptionKey)
+    )
+    const salt = base64ToBuffer(snapshot.encryptionSalt)
+    snapshot.secrets = [
+      snapshot.secrets[0],
+      ...(await Promise.all(
+        vaultLogins.map(async (login, index) => ({
+          id: `security-login-${index}`,
+          kind: EncryptedSecretType.LOGIN_CREDENTIALS,
+          createdAt: snapshot.secrets[0].createdAt,
+          version: 1,
+          encrypted: await encryptString(key, JSON.stringify(login), salt)
+        }))
+      ))
+    ]
     snapshot.autofillCredentialsEnabled = true
     const context = await chromium.launchPersistentContext(
       testInfo.outputPath('profile'),
@@ -47,14 +98,24 @@ const test = base.extend<{ vaultBrowser: VaultBrowser }>({
         viewport: { width: 1440, height: 980 },
         args: [
           `--disable-extensions-except=${resolve('dist')}`,
-          `--load-extension=${resolve('dist')}`
+          `--load-extension=${resolve('dist')}`,
+          // Keep plain-http pages on http instead of upgrading them to https.
+          '--disable-features=HttpsUpgrades'
         ]
       }
     )
     await context.route('**/*', async (route) => {
       const url = new URL(route.request().url())
       if (url.protocol === 'chrome-extension:') return route.continue()
-      if ([trustedOrigin, foreignOrigin].includes(url.origin)) {
+      if (
+        [
+          trustedOrigin,
+          foreignOrigin,
+          plainHttpOrigin,
+          intranetOrigin,
+          localOrigin
+        ].includes(url.origin)
+      ) {
         const body =
           url.pathname === '/frames'
             ? `<iframe title="Trusted login" src="${trustedOrigin}/login"></iframe>
@@ -213,4 +274,35 @@ test('the extension RPC honors a timeout in seconds and locks existing page scri
   }, loginForm)
   await page.waitForTimeout(1000)
   await expect(page.locator('input[type="password"]')).toHaveValue('')
+})
+
+test.describe('plain-http pages', () => {
+  // An array value has to be wrapped, or Playwright reads it as [value, options].
+  test.use({ vaultLogins: [[intranetLogin, localLogin], { scope: 'test' }] })
+
+  test('get no logins, while local development still autofills', async ({
+    vaultBrowser
+  }) => {
+    const page = await vaultBrowser.context.newPage()
+    for (const { origin, password } of [
+      { origin: trustedOrigin, password: savedPassword },
+      { origin: localOrigin, password: localLogin.password }
+    ]) {
+      await page.goto(`${origin}/login`)
+      await expect(page).toHaveURL(`${origin}/login`)
+      await expect(page.locator('input[type="password"]')).toHaveValue(password)
+    }
+
+    // Anyone on the network can serve these pages, so no saved login goes in,
+    // not even one saved with an http:// URL.
+    for (const origin of [plainHttpOrigin, intranetOrigin]) {
+      await page.goto(`${origin}/login`)
+      await expect(page).toHaveURL(`${origin}/login`)
+      // The pages above were filled by now; give this one the same chance.
+      await page.waitForTimeout(1000)
+      await expect(page.locator('input[type="password"]')).toHaveValue('')
+      await expect(page.locator('input[name="username"]')).toHaveValue('')
+      await expect(page.locator('.authier-dropdown-content a')).toHaveCount(0)
+    }
+  })
 })

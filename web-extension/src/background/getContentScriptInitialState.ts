@@ -10,7 +10,12 @@ import { isAutofillForbiddenForUrl } from '@shared/autofillForbiddenUrlPatterns'
 import { getWebInputsForUrl } from './getWebInputsForUrl'
 import { isAutofillPausedForPage } from './autofillPagePause'
 import { getAutofillCredentialsEnabled } from '@src/util/autofillCredentialsPreference'
+import { isSecureContextUrl } from './autofillSender'
 const log = debug('au:getContentScriptInitialState')
+
+const byMostRecentUse = (a: SecretTypeUnion, b: SecretTypeUnion) =>
+  new Date(b.lastUsedAt ?? b.createdAt).getTime() -
+  new Date(a.lastUsedAt ?? a.createdAt).getTime()
 
 export const getContentScriptInitialState = async (
   tabUrl: string,
@@ -22,7 +27,9 @@ export const getContentScriptInitialState = async (
   const hostname = constructURL(tabUrl).hostname
 
   let decrypted: SecretTypeUnion[]
-  if (hostname) {
+  // Every saved secret counts as https. A plain-http page, which anyone on the
+  // network can serve, gets none; http on this machine (localhost) is exempt.
+  if (hostname && isSecureContextUrl(tabUrl)) {
     if (session) {
       decrypted = await session.getSecretsDecryptedByTLD(hostname)
 
@@ -76,34 +83,27 @@ export const getContentScriptInitialState = async (
   ])
 
   const loginCredentialsForHost = decrypted
-    .filter(({ kind }) => kind === EncryptedSecretType.LOGIN_CREDENTIALS)
-    .sort((a, b) => {
-      return (
-        new Date(b.lastUsedAt ?? b.createdAt).getTime() -
-        new Date(a.lastUsedAt ?? a.createdAt).getTime()
-      )
-    }) as ILoginSecret[]
+    .filter(
+      (secret): secret is ILoginSecret =>
+        secret.kind === EncryptedSecretType.LOGIN_CREDENTIALS
+    )
+    .sort(byMostRecentUse)
 
   let totpSecretsForHost = decrypted.filter(
-    ({ kind }) => kind === EncryptedSecretType.TOTP
-  ) as ITOTPSecret[]
+    (secret): secret is ITOTPSecret => secret.kind === EncryptedSecretType.TOTP
+  )
 
   if (
     totpSecretsForHost.length === 0 &&
     loginCredentialsForHost.length > 0 &&
     session
   ) {
-    const urlLessTotpCandidates = (
-      session.decryptedSecrets.filter(
-        (secret) =>
+    const urlLessTotpCandidates = session.decryptedSecrets
+      .filter(
+        (secret): secret is ITOTPSecret =>
           secret.kind === EncryptedSecretType.TOTP && !secret.totp?.url
-      ) as ITOTPSecret[]
-    ).sort((a, b) => {
-      return (
-        new Date(b.lastUsedAt ?? b.createdAt).getTime() -
-        new Date(a.lastUsedAt ?? a.createdAt).getTime()
       )
-    })
+      .sort(byMostRecentUse)
 
     if (urlLessTotpCandidates.length === 1) {
       totpSecretsForHost = [urlLessTotpCandidates[0]]
