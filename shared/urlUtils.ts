@@ -15,13 +15,6 @@ export const matchesCredentialHost = (host: string, credentialUrl: string) => {
   return target.hostname === domain || target.hostname.endsWith(`.${domain}`)
 }
 
-/**
- * Whether a secret was saved for plain http. Saved URLs without a scheme count
- * as https, the way constructURL reads them.
- */
-export const isSavedForPlainHttp = (savedUrl: string) =>
-  constructURL(savedUrl).protocol === 'http:'
-
 export type ConstructURLReturnType =
   | URL
   | {
@@ -31,7 +24,6 @@ export type ConstructURLReturnType =
       origin: null
       pathname: null
       port: null
-      protocol: null
     }
 
 /**
@@ -52,8 +44,7 @@ export const constructURL = (url: string): ConstructURLReturnType => {
       host: null,
       origin: null,
       pathname: null,
-      port: null,
-      protocol: null
+      port: null
     }
   }
 }

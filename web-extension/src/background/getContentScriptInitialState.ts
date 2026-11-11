@@ -5,23 +5,13 @@ import { SecretTypeUnion, device } from './ExtensionDevice'
 import { ILoginSecret, ITOTPSecret } from '@src/util/useDeviceState'
 
 import debug from 'debug'
-import { constructURL, isSavedForPlainHttp } from '@shared/urlUtils'
+import { constructURL } from '@shared/urlUtils'
 import { isAutofillForbiddenForUrl } from '@shared/autofillForbiddenUrlPatterns'
 import { getWebInputsForUrl } from './getWebInputsForUrl'
 import { isAutofillPausedForPage } from './autofillPagePause'
 import { getAutofillCredentialsEnabled } from '@src/util/autofillCredentialsPreference'
 import { isSecureContextUrl } from './autofillSender'
 const log = debug('au:getContentScriptInitialState')
-
-/**
- * A document that is not a secure context, such as a plain-http page that
- * anyone on the network can serve, only gets secrets saved for http. Saved
- * URLs without a scheme count as https, and so do secrets without a URL.
- */
-const mayOfferSavedUrl = (
-  secureContext: boolean,
-  savedUrl: string | null | undefined
-) => secureContext || isSavedForPlainHttp(savedUrl ?? '')
 
 const byMostRecentUse = (a: SecretTypeUnion, b: SecretTypeUnion) =>
   new Date(b.lastUsedAt ?? b.createdAt).getTime() -
@@ -37,7 +27,9 @@ export const getContentScriptInitialState = async (
   const hostname = constructURL(tabUrl).hostname
 
   let decrypted: SecretTypeUnion[]
-  if (hostname) {
+  // Every saved secret counts as https. A plain-http page, which anyone on the
+  // network can serve, gets none; http on this machine (localhost) is exempt.
+  if (hostname && isSecureContextUrl(tabUrl)) {
     if (session) {
       decrypted = await session.getSecretsDecryptedByTLD(hostname)
 
@@ -90,23 +82,15 @@ export const getContentScriptInitialState = async (
     getAutofillCredentialsEnabled()
   ])
 
-  const secureContext = isSecureContextUrl(tabUrl)
-  if (!secureContext) {
-    log('not a secure context, offering only secrets saved for http', tabUrl)
-  }
-
   const loginCredentialsForHost = decrypted
     .filter(
       (secret): secret is ILoginSecret =>
-        secret.kind === EncryptedSecretType.LOGIN_CREDENTIALS &&
-        mayOfferSavedUrl(secureContext, secret.loginCredentials.url)
+        secret.kind === EncryptedSecretType.LOGIN_CREDENTIALS
     )
     .sort(byMostRecentUse)
 
   let totpSecretsForHost = decrypted.filter(
-    (secret): secret is ITOTPSecret =>
-      secret.kind === EncryptedSecretType.TOTP &&
-      mayOfferSavedUrl(secureContext, secret.totp.url)
+    (secret): secret is ITOTPSecret => secret.kind === EncryptedSecretType.TOTP
   )
 
   if (
@@ -117,9 +101,7 @@ export const getContentScriptInitialState = async (
     const urlLessTotpCandidates = session.decryptedSecrets
       .filter(
         (secret): secret is ITOTPSecret =>
-          secret.kind === EncryptedSecretType.TOTP &&
-          !secret.totp?.url &&
-          mayOfferSavedUrl(secureContext, secret.totp?.url)
+          secret.kind === EncryptedSecretType.TOTP && !secret.totp?.url
       )
       .sort(byMostRecentUse)
 

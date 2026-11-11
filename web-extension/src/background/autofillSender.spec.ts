@@ -105,8 +105,7 @@ it.each([
   'https://example.com/login',
   'http://localhost:3000/login',
   'http://127.0.0.1:8080/',
-  'http://127.1/',
-  'http://[::1]:5173/'
+  'http://127.1/'
 ])('treats %s as a secure context', (url) => {
   expect(isSecureContextUrl(url)).toBe(true)
 })
@@ -114,6 +113,7 @@ it.each([
 it.each([
   'http://example.com/login',
   'http://192.168.1.1/',
+  'http://[::1]:5173/',
   'http://localhost.example.com/',
   'http://127.0.0.1.nip.io/',
   'file:///home/alex/login.html',

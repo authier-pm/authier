@@ -161,12 +161,12 @@ const useVault = (secrets: (ILoginSecret | ITOTPSecret)[]) => {
 }
 
 describe('a plain-http page, which anyone on the network can serve', () => {
-  it('gets no secrets saved for https or without a scheme', async () => {
-    // The save prompt used to store the hostname alone, which counts as https.
-    const savedFromPrompt = loginFor('example.com', 'prompt@example.com')
+  it('gets no secrets, whatever scheme they were saved with', async () => {
     const httpsLogin = loginFor('https://example.com')
-    const totp = totpFor('https://example.com')
-    useVault([httpsLogin, savedFromPrompt, totp])
+    const schemeLess = loginFor('example.com', 'prompt@example.com')
+    const httpLogin = loginFor('http://example.com', 'http@example.com')
+    const totp = totpFor('http://example.com')
+    useVault([httpsLogin, schemeLess, httpLogin, totp])
 
     const state = await getContentScriptInitialState(
       'http://example.com/login',
@@ -177,61 +177,16 @@ describe('a plain-http page, which anyone on the network can serve', () => {
       loginCredentials: [],
       totpSecrets: []
     })
+    expect(decrypt).not.toHaveBeenCalled()
 
     const httpsState = await getContentScriptInitialState(
       'https://example.com/login',
       9
     )
     expect(httpsState.secretsForHost).toEqual({
-      loginCredentials: [httpsLogin, savedFromPrompt],
+      loginCredentials: [httpsLogin, schemeLess, httpLogin],
       totpSecrets: [totp]
     })
-  })
-
-  it('gets the secrets saved for http, which https pages get too', async () => {
-    const httpLogin = loginFor('http://intranet.example.org')
-    const httpTotp = totpFor('http://intranet.example.org')
-    const httpsLogin = loginFor('https://intranet.example.org', 'admin@test')
-    useVault([httpLogin, httpTotp, httpsLogin])
-
-    const state = await getContentScriptInitialState(
-      'http://intranet.example.org/login',
-      9
-    )
-    expect(state.secretsForHost).toEqual({
-      loginCredentials: [httpLogin],
-      totpSecrets: [httpTotp]
-    })
-
-    const httpsState = await getContentScriptInitialState(
-      'https://intranet.example.org/login',
-      9
-    )
-    expect(httpsState.secretsForHost).toEqual({
-      loginCredentials: [httpLogin, httpsLogin],
-      totpSecrets: [httpTotp]
-    })
-  })
-
-  it('does not fall back to a TOTP secret without a URL', async () => {
-    const httpLogin = loginFor('http://intranet.example.org')
-    const urlLessTotp = totpFor(null)
-    useVault([httpLogin, urlLessTotp])
-
-    const state = await getContentScriptInitialState(
-      'http://intranet.example.org/login',
-      9
-    )
-    expect(state.secretsForHost).toEqual({
-      loginCredentials: [httpLogin],
-      totpSecrets: []
-    })
-
-    const httpsState = await getContentScriptInitialState(
-      'https://intranet.example.org/login',
-      9
-    )
-    expect(httpsState.secretsForHost.totpSecrets).toEqual([urlLessTotp])
   })
 })
 

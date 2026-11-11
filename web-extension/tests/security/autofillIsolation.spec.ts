@@ -37,7 +37,7 @@ const intranetLogin: Login = {
   iconUrl: null
 }
 
-// The save prompt used to store the hostname alone, which counts as https.
+// The save prompt stores the hostname alone.
 const localLogin: Login = {
   label: 'Local app',
   username: 'dev@example.com',
@@ -280,13 +280,12 @@ test.describe('plain-http pages', () => {
   // An array value has to be wrapped, or Playwright reads it as [value, options].
   test.use({ vaultLogins: [[intranetLogin, localLogin], { scope: 'test' }] })
 
-  test('get only logins saved for http, while local development still autofills', async ({
+  test('get no logins, while local development still autofills', async ({
     vaultBrowser
   }) => {
     const page = await vaultBrowser.context.newPage()
     for (const { origin, password } of [
       { origin: trustedOrigin, password: savedPassword },
-      { origin: intranetOrigin, password: intranetLogin.password },
       { origin: localOrigin, password: localLogin.password }
     ]) {
       await page.goto(`${origin}/login`)
@@ -294,13 +293,16 @@ test.describe('plain-http pages', () => {
       await expect(page.locator('input[type="password"]')).toHaveValue(password)
     }
 
-    // Anyone on the network can serve this page, so the https login stays out.
-    await page.goto(`${plainHttpOrigin}/login`)
-    await expect(page).toHaveURL(`${plainHttpOrigin}/login`)
-    // The pages above were filled by now; give this one the same chance.
-    await page.waitForTimeout(1000)
-    await expect(page.locator('input[type="password"]')).toHaveValue('')
-    await expect(page.locator('input[name="username"]')).toHaveValue('')
-    await expect(page.locator('.authier-dropdown-content a')).toHaveCount(0)
+    // Anyone on the network can serve these pages, so no saved login goes in,
+    // not even one saved with an http:// URL.
+    for (const origin of [plainHttpOrigin, intranetOrigin]) {
+      await page.goto(`${origin}/login`)
+      await expect(page).toHaveURL(`${origin}/login`)
+      // The pages above were filled by now; give this one the same chance.
+      await page.waitForTimeout(1000)
+      await expect(page.locator('input[type="password"]')).toHaveValue('')
+      await expect(page.locator('input[name="username"]')).toHaveValue('')
+      await expect(page.locator('.authier-dropdown-content a')).toHaveCount(0)
+    }
   })
 })

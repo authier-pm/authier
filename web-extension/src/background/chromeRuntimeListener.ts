@@ -185,7 +185,7 @@ const appRouter = tc.router({
       const encryptedData = createLoginCredentialData({
         fallbackUsername: deviceState.email,
         favIconUrl: tab.favIconUrl,
-        pageUrl: urlParsed,
+        hostname: urlParsed.hostname,
         password: credentials.password,
         username: credentials.username
       })
