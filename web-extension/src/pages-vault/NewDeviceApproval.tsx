@@ -11,7 +11,10 @@ import {
   useDevicesRequestsQuery,
   useRejectChallengeMutation
 } from '@shared/graphql/AccountDevices.codegen'
-import { allowsDeviceApproval } from '@shared/newDeviceApproval'
+import {
+  allowsDeviceApproval,
+  canDeviceApproveNewLogin
+} from '@shared/newDeviceApproval'
 import { NewDeviceApprovalProgress } from '@shared/NewDeviceApprovalStatus'
 import { LOGIN_DECRYPTION_CHALLENGE_REFETCH_INTERVAL } from '@src/background/loginSessionTypes'
 import { useDevicesListWithDataQuery } from './Devices.codegen'
@@ -29,6 +32,11 @@ export const NewDevicesApprovalStack = () => {
 
   const deviceApprovalEnabled = allowsDeviceApproval(
     devicesRequests?.me.newDevicePolicy ?? null
+  )
+  const canApprove = canDeviceApproveNewLogin(
+    devicesRequests?.me.newDevicePolicy ?? null,
+    device.id,
+    devicesRequests?.me.masterDeviceId
   )
 
   return (
@@ -96,7 +104,7 @@ export const NewDevicesApprovalStack = () => {
                     disabled={
                       challengeToApprove.resetStatus
                         ? device.id === devicesRequests?.me.masterDeviceId
-                        : !deviceApprovalEnabled ||
+                        : !canApprove ||
                           Boolean(challengeToApprove.deviceApprovedAt)
                     }
                     onClick={async () => {

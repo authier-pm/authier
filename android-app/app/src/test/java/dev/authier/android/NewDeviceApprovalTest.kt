@@ -6,15 +6,28 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
 class NewDeviceApprovalTest {
-    @Test fun `requires a choice and supports all four protection combinations`() {
+    @Test fun `requires a choice and supports all five protection choices`() {
         assertNull(NewDeviceApprovalSelection().policy)
         assertEquals(NewDeviceApprovalPolicy.OTHER_DEVICE, NewDeviceApprovalSelection(otherDevice = true).policy)
         assertEquals(NewDeviceApprovalPolicy.EMAIL, NewDeviceApprovalSelection(email = true).policy)
         assertEquals(NewDeviceApprovalPolicy.EMAIL_OR_OTHER_DEVICE, NewDeviceApprovalSelection(email = true, otherDevice = true).policy)
         assertEquals(NewDeviceApprovalPolicy.EMAIL_AND_OTHER_DEVICE, NewDeviceApprovalSelection(email = true, otherDevice = true, requireBoth = true).policy)
+        assertEquals(NewDeviceApprovalPolicy.MASTER_DEVICE, NewDeviceApprovalSelection(masterOnly = true).policy)
         NewDeviceApprovalPolicy.entries.forEach { policy ->
             assertEquals(policy, NewDeviceApprovalSelection.from(policy).policy)
         }
+    }
+
+    @Test fun `master-only approval cannot fall back to email or another device`() {
+        val policy = NewDeviceApprovalPolicy.MASTER_DEVICE
+        val selection = NewDeviceApprovalSelection.from(policy)
+        assertTrue(selection.masterOnly)
+        assertFalse(selection.email)
+        assertFalse(selection.otherDevice)
+        assertFalse(policy.allowsEmail)
+        assertFalse(policy.canApproveFromDevice(false))
+        assertTrue(policy.canApproveFromDevice(true))
+        assertTrue(LoginApprovalProgress(policy).instructions.contains("Only your master device receives"))
     }
 
     @Test fun `both-required login still asks for the outstanding approval`() {

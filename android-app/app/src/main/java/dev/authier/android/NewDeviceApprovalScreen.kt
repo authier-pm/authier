@@ -24,12 +24,17 @@ internal fun NewDeviceApprovalChoices(
             "Another Authier device · Recommended",
             "Approve from a device already signed in. Choose this alone for the recommended protection.",
             selection.otherDevice, enabled,
-        ) { onChange(selection.copy(otherDevice = it)) }
+        ) { onChange(selection.copy(otherDevice = it, masterOnly = false)) }
+        ApprovalMethodChoice(
+            "Master device only",
+            "Only your current master device can approve new logins and receives approval notifications. Selecting this replaces the other methods.",
+            selection.masterOnly, enabled,
+        ) { onChange(NewDeviceApprovalSelection(masterOnly = it)) }
         ApprovalMethodChoice(
             "Email · Most convenient, least secure",
             "Approve using a link sent to your account email. Anyone with access to that mailbox can approve a new device.",
             selection.email, enabled,
-        ) { onChange(selection.copy(email = it)) }
+        ) { onChange(selection.copy(email = it, masterOnly = false)) }
         if (selection.email && selection.otherDevice) {
             Text("When both methods are enabled", fontWeight = FontWeight.SemiBold)
             ApprovalRuleChoice("Either approval is enough", !selection.requireBoth, enabled) {

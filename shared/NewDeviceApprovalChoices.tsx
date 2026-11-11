@@ -42,6 +42,13 @@ export function NewDeviceApprovalChoices({ value, onChange, disabled }: Props) {
         onChange={(checked) => setMethods(email, checked)}
       />
       <ApprovalMethod
+        title="Master device only"
+        description="Only your current master device can approve new logins and receives approval notifications. Selecting this replaces the other methods."
+        badge="Master only"
+        checked={value === 'MASTER_DEVICE'}
+        onChange={(checked) => onChange(checked ? 'MASTER_DEVICE' : null)}
+      />
+      <ApprovalMethod
         title="Email"
         description="Approve through a link sent to your account email. Email alone is the least secure option: anyone with access to your mailbox can approve a login."
         checked={email}
@@ -97,12 +104,14 @@ function ApprovalMethod({
   title,
   description,
   recommended = false,
+  badge = 'Most convenient',
   checked,
   onChange
 }: {
   title: string
   description: string
   recommended?: boolean
+  badge?: string
   checked: boolean
   onChange: (checked: boolean) => void
 }) {
@@ -127,7 +136,7 @@ function ApprovalMethod({
                 : 'rounded-full bg-[color:var(--color-surface-muted)] px-2 py-0.5 text-[11px] text-[color:var(--color-muted)]'
             }
           >
-            {recommended ? 'Recommended' : 'Most convenient'}
+            {recommended ? 'Recommended' : badge}
           </span>
         </span>
         <span

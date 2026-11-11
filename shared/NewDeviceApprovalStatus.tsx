@@ -20,6 +20,16 @@ export function NewDeviceApprovalStatus({
   emailApprovedAt,
   deviceApprovedAt
 }: Props) {
+  const deviceName =
+    policy === 'MASTER_DEVICE' ? 'Master device' : 'Authier device'
+  const deviceInstructions =
+    policy === 'MASTER_DEVICE'
+      ? 'Open Devices on your current master device and approve this request. Only that device receives the approval notification.'
+      : 'Open Devices in a vault that is already signed in and approve this request.'
+  const deviceAction =
+    policy === 'MASTER_DEVICE'
+      ? 'Approve from your master device'
+      : 'Approve from another Authier device'
   return (
     <div className="space-y-3 text-sm" aria-live="polite">
       <p>
@@ -44,14 +54,11 @@ export function NewDeviceApprovalStatus({
       {allowsDeviceApproval(policy) && (
         <div className="rounded-xl border border-[color:var(--color-border)] p-3">
           <p className="font-semibold">
-            {deviceApprovedAt
-              ? 'Authier device approved'
-              : 'Approve from another Authier device'}
+            {deviceApprovedAt ? `${deviceName} approved` : deviceAction}
           </p>
           {!deviceApprovedAt && (
             <p className="mt-1 text-[color:var(--color-muted)]">
-              Open Devices in a vault that is already signed in and approve this
-              request.
+              {deviceInstructions}
             </p>
           )}
         </div>
@@ -69,6 +76,12 @@ export function NewDeviceApprovalProgress({
   emailApprovedAt,
   deviceApprovedAt
 }: Pick<Props, 'policy' | 'emailApprovedAt' | 'deviceApprovedAt'>) {
+  if (policy === 'MASTER_DEVICE')
+    return (
+      <p className="text-sm text-[color:var(--color-muted)]">
+        Only the master device can approve this login.
+      </p>
+    )
   if (!requiresBothApprovals(policy)) return null
   return (
     <p className="text-sm text-[color:var(--color-muted)]" aria-live="polite">

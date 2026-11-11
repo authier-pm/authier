@@ -63,6 +63,14 @@ beforeAll(async () => {
     'utf8'
   )
   await client.exec(`BEGIN;\n${migration}\nCOMMIT;`)
+  const masterPolicyMigration = await readFile(
+    new URL(
+      './migrations/20261111165107_daily_excalibur/migration.sql',
+      import.meta.url
+    ),
+    'utf8'
+  )
+  await client.exec(masterPolicyMigration)
 })
 
 afterAll(async () => {
@@ -70,12 +78,12 @@ afterAll(async () => {
 })
 
 describe('device approval migration', () => {
-  it('requires a fresh choice for disabled approval and preserves device approval', async () => {
+  it('requires a fresh choice for disabled approval and preserves any-device and master-only approval', async () => {
     for (const [index, expected] of [
       null,
       null,
       'OTHER_DEVICE',
-      'OTHER_DEVICE'
+      'MASTER_DEVICE'
     ].entries()) {
       const result = await client.query<{ newDevicePolicy: string | null }>(
         'SELECT "newDevicePolicy" FROM "User" WHERE id = $1',
@@ -90,7 +98,8 @@ describe('device approval migration', () => {
       'EMAIL',
       'OTHER_DEVICE',
       'EMAIL_OR_OTHER_DEVICE',
-      'EMAIL_AND_OTHER_DEVICE'
+      'EMAIL_AND_OTHER_DEVICE',
+      'MASTER_DEVICE'
     ])
   })
 

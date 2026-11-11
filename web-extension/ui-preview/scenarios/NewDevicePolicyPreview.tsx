@@ -50,7 +50,8 @@ function createPreviewClient() {
                 selected !== UserNewDevicePolicy.EMAIL &&
                 selected !== UserNewDevicePolicy.OTHER_DEVICE &&
                 selected !== UserNewDevicePolicy.EMAIL_OR_OTHER_DEVICE &&
-                selected !== UserNewDevicePolicy.EMAIL_AND_OTHER_DEVICE
+                selected !== UserNewDevicePolicy.EMAIL_AND_OTHER_DEVICE &&
+                selected !== UserNewDevicePolicy.MASTER_DEVICE
               ) {
                 observer.error(new Error('Unexpected device policy'))
                 return
@@ -98,7 +99,9 @@ export function NewDevicePolicyPreview() {
         <section className="w-full max-w-xl space-y-5 rounded-3xl border border-[color:var(--color-border)] bg-[color:var(--color-card)] p-6">
           <h1 className="text-2xl font-bold">Approve this browser</h1>
           <NewDeviceApprovalStatus
-            policy="EMAIL_AND_OTHER_DEVICE"
+            policy={
+              params.has('master') ? 'MASTER_DEVICE' : 'EMAIL_AND_OTHER_DEVICE'
+            }
             email="alex@example.com"
             emailApprovalSentAt="2026-11-11T12:00:00Z"
             emailApprovedAt={

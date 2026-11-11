@@ -159,6 +159,68 @@ test('configured accounts can change approval methods in Security settings', asy
   await expect(page.getByTestId('saved-policy')).toHaveText('OTHER_DEVICE')
 })
 
+test('master-only approval replaces email and other-device methods and can be changed back', async ({
+  page
+}) => {
+  await page.setViewportSize({ width: 1280, height: 1000 })
+  await page.goto('/?scenario=new-device-policy&configured=1&settings=1')
+  const master = page.getByRole('checkbox', {
+    name: 'Master device only',
+    exact: true
+  })
+  const email = page.getByRole('checkbox', { name: 'Email', exact: true })
+  const other = page.getByRole('checkbox', {
+    name: 'Another Authier device',
+    exact: true
+  })
+  await other.check()
+  await page.getByRole('radio', { name: /Require both approvals/ }).check()
+  await master.check()
+  await expect(email).not.toBeChecked()
+  await expect(other).not.toBeChecked()
+  await expect(page.getByRole('radio')).toHaveCount(0)
+  await page.getByRole('button', { name: 'Save approval methods' }).click()
+  await expect(page.getByTestId('saved-policy')).toHaveText('MASTER_DEVICE')
+  await page
+    .locator('section')
+    .filter({
+      has: page.getByRole('heading', {
+        name: 'New device approval',
+        exact: true
+      })
+    })
+    .screenshot({
+      animations: 'disabled',
+      path: screenshot('new-device-policy-master.png')
+    })
+  await email.check()
+  await expect(master).not.toBeChecked()
+  await page.getByRole('button', { name: 'Save approval methods' }).click()
+  await expect(page.getByTestId('saved-policy')).toHaveText('EMAIL')
+})
+
+test('master-only onboarding and waiting screen identify the required device', async ({
+  page
+}) => {
+  await page.goto('/?scenario=new-device-policy')
+  await page
+    .getByRole('checkbox', { name: 'Master device only', exact: true })
+    .check()
+  await page.getByRole('button', { name: 'Save approval methods' }).click()
+  await expect(page.getByRole('dialog')).not.toBeVisible()
+  await expect(page.getByTestId('saved-policy')).toHaveText('MASTER_DEVICE')
+  await page.goto('/?scenario=new-device-policy&pending=1&master=1')
+  await expect(
+    page.getByText('Approve from your master device', { exact: true })
+  ).toBeVisible()
+  await expect(
+    page.getByText(/Only that device receives the approval notification/)
+  ).toBeVisible()
+  await expect(page.getByText('Check your email', { exact: true })).toHaveCount(
+    0
+  )
+})
+
 test('both-required waiting state shows the outstanding approval', async ({
   page
 }) => {

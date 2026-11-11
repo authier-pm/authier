@@ -1,6 +1,7 @@
 import { hasCurrentDeviceApproval } from '../lib/newDeviceEmailApproval'
 import {
   allowsDeviceApproval,
+  canDeviceApproveNewLogin,
   allowsEmailApproval,
   isNewDeviceApprovalComplete
 } from '../../shared/newDeviceApproval'
@@ -348,6 +349,15 @@ export class DecryptionChallengeMutation extends DecryptionChallengeGQL {
         )
       if (!allowsDeviceApproval(userData.newDevicePolicy)) {
         throw new GraphqlError('Approval from another device is not enabled')
+      }
+      if (
+        !canDeviceApproveNewLogin(
+          userData.newDevicePolicy,
+          ctx.device.id,
+          userData.masterDeviceId
+        )
+      ) {
+        throw new GraphqlError('Only the master device can approve this login')
       }
       const approvingDevice = await tx.query.device.findFirst({
         where: {

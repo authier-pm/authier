@@ -1,5 +1,8 @@
 import { MasterDeviceResetProgress } from '../../../shared/MasterDeviceResetProgress'
-import { allowsDeviceApproval } from '@shared/newDeviceApproval'
+import {
+  allowsDeviceApproval,
+  canDeviceApproveNewLogin
+} from '@shared/newDeviceApproval'
 import { NewDeviceApprovalProgress } from '@shared/NewDeviceApprovalStatus'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { Button } from '@/components/ui/button'
@@ -20,6 +23,11 @@ export function DevicesPage() {
   const deviceApprovalEnabled = allowsDeviceApproval(
     securityQuery.data?.security.newDevicePolicy ?? null
   )
+  const canApprove = canDeviceApproveNewLogin(
+    securityQuery.data?.security.newDevicePolicy ?? null,
+    session?.currentDevice.id,
+    securityQuery.data?.security.masterDeviceId
+  )
   const challengesQuery = useQuery(
     orpc.devices.listPendingChallenges.queryOptions({ input: {} })
   )
@@ -39,7 +47,11 @@ export function DevicesPage() {
   })
 
   const refreshLists = () =>
-    Promise.all([devicesQuery.refetch(), challengesQuery.refetch()])
+    Promise.all([
+      devicesQuery.refetch(),
+      challengesQuery.refetch(),
+      securityQuery.refetch()
+    ])
 
   return (
     <div className="grid gap-4 lg:grid-cols-[1.1fr,0.9fr]">
@@ -83,7 +95,7 @@ export function DevicesPage() {
                   <Button
                     disabled={
                       approveMutation.isPending ||
-                      (!challenge.resetStatus && !deviceApprovalEnabled) ||
+                      (!challenge.resetStatus && !canApprove) ||
                       (!challenge.resetStatus &&
                         Boolean(challenge.deviceApprovedAt)) ||
                       Boolean(

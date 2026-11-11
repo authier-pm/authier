@@ -7,11 +7,12 @@ ALTER TABLE "User" ALTER COLUMN "newDevicePolicy" SET DATA TYPE text;--> stateme
 -- Require an explicit new choice from accounts that previously disabled approval.
 -- Unconfigured accounts use email approval until that choice is saved.
 UPDATE "User" SET "newDevicePolicy" = CASE
-  WHEN "newDevicePolicy" IN ('REQUIRE_ANY_DEVICE_APPROVAL', 'REQUIRE_MASTER_DEVICE_APPROVAL') THEN 'OTHER_DEVICE'
+  WHEN "newDevicePolicy" = 'REQUIRE_ANY_DEVICE_APPROVAL' THEN 'OTHER_DEVICE'
+  WHEN "newDevicePolicy" = 'REQUIRE_MASTER_DEVICE_APPROVAL' THEN 'MASTER_DEVICE'
   ELSE NULL
 END;--> statement-breakpoint
 DROP TYPE "UserNewDevicePolicy";--> statement-breakpoint
-CREATE TYPE "UserNewDevicePolicy" AS ENUM('EMAIL', 'OTHER_DEVICE', 'EMAIL_OR_OTHER_DEVICE', 'EMAIL_AND_OTHER_DEVICE');--> statement-breakpoint
+CREATE TYPE "UserNewDevicePolicy" AS ENUM('EMAIL', 'OTHER_DEVICE', 'EMAIL_OR_OTHER_DEVICE', 'EMAIL_AND_OTHER_DEVICE', 'MASTER_DEVICE');--> statement-breakpoint
 ALTER TABLE "User" ALTER COLUMN "newDevicePolicy" SET DATA TYPE "UserNewDevicePolicy" USING "newDevicePolicy"::"UserNewDevicePolicy";--> statement-breakpoint
 UPDATE "DecryptionChallenge" SET "deviceApprovedAt" = "approvedAt"
 WHERE "approvedFromDeviceId" IS NOT NULL;--> statement-breakpoint

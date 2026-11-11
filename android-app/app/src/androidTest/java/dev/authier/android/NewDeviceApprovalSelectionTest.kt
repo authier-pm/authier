@@ -33,6 +33,35 @@ class NewDeviceApprovalSelectionTest {
         compose.onNodeWithText("Either approval is enough").performClick()
         compose.onNodeWithText("Save approval settings").performClick()
         compose.runOnIdle { assertEquals(NewDeviceApprovalPolicy.EMAIL_OR_OTHER_DEVICE, saved.last()) }
+        compose.onNodeWithText("Master device only").performClick()
+        compose.onNodeWithText("Master device only").assertIsOn()
+        compose.onNodeWithText("Email · Most convenient, least secure").assertIsOff()
+        compose.onNodeWithText("Another Authier device · Recommended").assertIsOff()
+        compose.onNodeWithText("Require both approvals").assertDoesNotExist()
+        compose.onNodeWithText("Save approval settings").performClick()
+        compose.runOnIdle { assertEquals(NewDeviceApprovalPolicy.MASTER_DEVICE, saved.last()) }
+        compose.onNodeWithText("Another Authier device · Recommended").performClick()
+        compose.onNodeWithText("Master device only").assertIsOff()
+    }
+
+    @Test fun setupCanSaveMasterOnlyApproval() {
+        var saved: NewDeviceApprovalPolicy? = null
+        compose.setContent {
+            AuthierTheme { Surface(color = Canvas) {
+                NewDeviceApprovalSetupScreen(VaultUiState(unlocked = true, requiresApprovalSetup = true), { saved = it }, {})
+            } }
+        }
+        compose.onNodeWithText("Master device only").performScrollTo().performClick()
+        compose.onNodeWithText("Save approval settings").performScrollTo().assertIsEnabled()
+        compose.mainClock.advanceTimeBy(600)
+        compose.waitForIdle()
+        Thread.sleep(800)
+        val screenshot = File(InstrumentationRegistry.getInstrumentation().targetContext.cacheDir, "new-device-approval-master-android.png")
+        screenshot.outputStream().use { stream ->
+            compose.onRoot().captureToImage().asAndroidBitmap().compress(Bitmap.CompressFormat.PNG, 100, stream)
+        }
+        compose.onNodeWithText("Save approval settings").performClick()
+        compose.runOnIdle { assertEquals(NewDeviceApprovalPolicy.MASTER_DEVICE, saved) }
     }
 
     @Test fun setupRequiresAChoiceAndShowsBothApprovalRequirements() {

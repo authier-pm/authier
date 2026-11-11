@@ -32,6 +32,7 @@ export type UserNewDevicePolicy =
   | 'EMAIL'
   | 'EMAIL_AND_OTHER_DEVICE'
   | 'EMAIL_OR_OTHER_DEVICE'
+  | 'MASTER_DEVICE'
   | 'OTHER_DEVICE';
 
 export type AddNewDeviceForUserMutationVariables = Exact<{

@@ -138,6 +138,38 @@ describe('new device approval choices', () => {
     expect(api.update).not.toHaveBeenCalled()
   })
 
+  it('saves master-only approval without retaining email or other-device approval', async () => {
+    renderApproval('EMAIL_AND_OTHER_DEVICE')
+    await userEvent.click(
+      await screen.findByRole('checkbox', { name: 'Master device only' })
+    )
+    expect(screen.getByRole('checkbox', { name: 'Email' })).not.toBeChecked()
+    expect(
+      screen.getByRole('checkbox', { name: 'Another Authier device' })
+    ).not.toBeChecked()
+    expect(screen.queryByRole('radio')).not.toBeInTheDocument()
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Save approval methods' })
+    )
+    expect(api.update).toHaveBeenCalledWith({
+      newDevicePolicy: 'MASTER_DEVICE'
+    })
+    await waitFor(() =>
+      expect(
+        screen.getByRole('button', { name: 'Save approval methods' })
+      ).toBeDisabled()
+    )
+    expect(
+      screen.getByRole('checkbox', { name: 'Master device only' })
+    ).toBeChecked()
+    await userEvent.click(
+      screen.getByRole('checkbox', { name: 'Another Authier device' })
+    )
+    expect(
+      screen.getByRole('checkbox', { name: 'Master device only' })
+    ).not.toBeChecked()
+  })
+
   it('still allows an unconfigured account to choose from another enrolled device', async () => {
     api.currentDeviceId = 'other-device'
     renderApproval(null, true)

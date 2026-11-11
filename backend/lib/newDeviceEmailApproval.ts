@@ -50,7 +50,10 @@ export const invalidateNewDeviceApprovals = async (
 export const hasCurrentDeviceApproval = async (
   db: Pick<DbType, 'query'>,
   challenge: InferSelectModel<typeof schema.decryptionChallenge>,
-  user: Pick<InferSelectModel<typeof schema.user>, 'id' | 'newDevicePolicy'>
+  user: Pick<
+    InferSelectModel<typeof schema.user>,
+    'id' | 'newDevicePolicy' | 'masterDeviceId'
+  >
 ) => {
   if (
     !challenge.approvedAt ||
@@ -67,10 +70,26 @@ export const hasCurrentDeviceApproval = async (
   // A previously enrolled device already passed approval. Login still requires
   // its current master-password-encrypted enrollment secret.
   if (existingDevice && !existingDevice.deletedAt) return true
+  let deviceApproved = Boolean(challenge.deviceApprovedAt)
+  if (deviceApproved && user.newDevicePolicy === 'MASTER_DEVICE') {
+    deviceApproved = Boolean(
+      user.masterDeviceId &&
+      challenge.approvedFromDeviceId === user.masterDeviceId &&
+      (await db.query.device.findFirst({
+        where: {
+          id: user.masterDeviceId,
+          userId: user.id,
+          deletedAt: { isNull: true },
+          logoutAt: { isNull: true }
+        },
+        columns: { id: true }
+      }))
+    )
+  }
   if (
     isNewDeviceApprovalComplete(user.newDevicePolicy, {
       emailApproved: Boolean(challenge.emailApprovedAt),
-      deviceApproved: Boolean(challenge.deviceApprovedAt)
+      deviceApproved
     })
   )
     return true

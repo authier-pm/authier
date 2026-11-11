@@ -606,13 +606,27 @@ export class UserMutation extends UserBase {
     @Ctx() ctx: IContextAuthenticated,
     @Arg('newMasterDeviceId', () => String) newMasterDeviceId: string
   ) {
-    if (ctx.device.id !== ctx.masterDeviceId) {
-      throw new GraphqlError('This can be done only from master device')
-    }
-
-    let updatedUser: any
-
-    await ctx.db.transaction(async (tx) => {
+    return ctx.db.transaction(async (tx) => {
+      const [currentUser] = await tx
+        .select()
+        .from(userSchema)
+        .where(eq(userSchema.id, ctx.jwtPayload.userId))
+        .for('update')
+      if (!currentUser || ctx.device.id !== currentUser.masterDeviceId) {
+        throw new GraphqlError('This can be done only from master device')
+      }
+      const nextMaster = await tx.query.device.findFirst({
+        where: {
+          id: newMasterDeviceId,
+          userId: currentUser.id,
+          deletedAt: { isNull: true },
+          logoutAt: { isNull: true }
+        }
+      })
+      if (!nextMaster)
+        throw new GraphqlError(
+          'Master device must be an active device on this account'
+        )
       const res = await tx
         .update(userSchema)
         .set({
@@ -620,7 +634,13 @@ export class UserMutation extends UserBase {
         })
         .where(eq(userSchema.id, ctx.jwtPayload.userId))
         .returning()
-      updatedUser = res[0]
+      const updatedUser = res[0]
+      if (
+        currentUser.newDevicePolicy === 'MASTER_DEVICE' &&
+        currentUser.masterDeviceId !== newMasterDeviceId
+      ) {
+        await invalidateNewDeviceApprovals(tx, currentUser.id)
+      }
 
       await tx
         .delete(masterDeviceResetRequestSchema)
@@ -629,7 +649,7 @@ export class UserMutation extends UserBase {
             eq(masterDeviceResetRequestSchema.userId, ctx.jwtPayload.userId),
             eq(
               masterDeviceResetRequestSchema.targetMasterDeviceId,
-              ctx.masterDeviceId!
+              currentUser.masterDeviceId
             ),
             isNull(masterDeviceResetRequestSchema.completedAt),
             isNull(masterDeviceResetRequestSchema.rejectedAt)
@@ -638,14 +658,13 @@ export class UserMutation extends UserBase {
 
       await tx.insert(masterDeviceChangeSchema).values({
         id: uuidv4(),
-        oldDeviceId: ctx.masterDeviceId!,
+        oldDeviceId: currentUser.masterDeviceId,
         newDeviceId: newMasterDeviceId,
         processAt: new Date(),
         userId: ctx.jwtPayload.userId
       })
+      return updatedUser
     })
-
-    return updatedUser
   }
 
   @Field(() => String)

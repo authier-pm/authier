@@ -1,6 +1,7 @@
 import {
   allowsDeviceApproval,
-  allowsEmailApproval
+  allowsEmailApproval,
+  canDeviceApproveNewLogin
 } from '../../shared/newDeviceApproval'
 import {
   hasCurrentDeviceApproval,
@@ -393,20 +394,25 @@ export class RootResolver {
           notificationBody = `New device is trying to log in from ${ipAddress} (${geoLocation}).`
         }
 
-        let devicesToNotify: { firebaseToken: string | null }[] = []
-
-        devicesToNotify = await ctx.db.query.device.findMany({
+        const devicesToNotify = await ctx.db.query.device.findMany({
           where: {
             userId: user.id,
             logoutAt: { isNull: true },
             deletedAt: { isNull: true }
           },
-          columns: { firebaseToken: true }
+          columns: { id: true, firebaseToken: true }
         })
 
         const firebaseTokens = [
           ...new Set(
             devicesToNotify
+              .filter((device) =>
+                canDeviceApproveNewLogin(
+                  user.newDevicePolicy,
+                  device.id,
+                  user.masterDeviceId
+                )
+              )
               .map((device) => device.firebaseToken)
               .filter(
                 (firebaseToken): firebaseToken is string => !!firebaseToken

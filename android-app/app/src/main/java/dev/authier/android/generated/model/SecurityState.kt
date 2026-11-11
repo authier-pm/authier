@@ -62,14 +62,15 @@ data class SecurityState (
     /**
      *
      *
-     * Values: EMAIL,OTHER_DEVICE,EMAIL_OR_OTHER_DEVICE,EMAIL_AND_OTHER_DEVICE
+     * Values: EMAIL,OTHER_DEVICE,EMAIL_OR_OTHER_DEVICE,EMAIL_AND_OTHER_DEVICE,MASTER_DEVICE
      */
     @Serializable
     enum class NewDevicePolicy(val value: kotlin.String) {
         @SerialName(value = "EMAIL") EMAIL("EMAIL"),
         @SerialName(value = "OTHER_DEVICE") OTHER_DEVICE("OTHER_DEVICE"),
         @SerialName(value = "EMAIL_OR_OTHER_DEVICE") EMAIL_OR_OTHER_DEVICE("EMAIL_OR_OTHER_DEVICE"),
-        @SerialName(value = "EMAIL_AND_OTHER_DEVICE") EMAIL_AND_OTHER_DEVICE("EMAIL_AND_OTHER_DEVICE");
+        @SerialName(value = "EMAIL_AND_OTHER_DEVICE") EMAIL_AND_OTHER_DEVICE("EMAIL_AND_OTHER_DEVICE"),
+        @SerialName(value = "MASTER_DEVICE") MASTER_DEVICE("MASTER_DEVICE");
     }
 
 }
