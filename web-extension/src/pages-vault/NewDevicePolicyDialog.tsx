@@ -1,24 +1,9 @@
 import { useEffect, useRef, useState } from 'react'
-import { FiShield, FiShieldOff } from 'react-icons/fi'
+import { FiShield } from 'react-icons/fi'
+import { NewDeviceApprovalChoices } from '@shared/NewDeviceApprovalChoices'
+import type { NewDeviceApprovalPolicy } from '@shared/newDeviceApproval'
 import { UserNewDevicePolicy } from '@shared/generated/graphqlBaseTypes'
 import { Button } from '@src/components/ui/button'
-
-const policies = [
-  {
-    value: UserNewDevicePolicy.REQUIRE_ANY_DEVICE_APPROVAL,
-    title: 'Require approval from another device',
-    description:
-      'Approve each new device from a device already signed in to your account.',
-    Icon: FiShield
-  },
-  {
-    value: UserNewDevicePolicy.ALLOW,
-    title: 'Allow any new device',
-    description:
-      'New devices can sign in with your password. You’ll be notified when they do.',
-    Icon: FiShieldOff
-  }
-]
 
 type Props = {
   onSave: (policy: UserNewDevicePolicy) => Promise<void>
@@ -29,7 +14,7 @@ type Props = {
 export function NewDevicePolicyDialog({ onSave, saving, error }: Props) {
   const dialogRef = useRef<HTMLDialogElement>(null)
   const [selectedPolicy, setSelectedPolicy] =
-    useState<UserNewDevicePolicy | null>(null)
+    useState<NewDeviceApprovalPolicy | null>(null)
 
   // The native modal supplies focus trapping and makes the vault behind it inert.
   useEffect(() => {
@@ -51,7 +36,8 @@ export function NewDevicePolicyDialog({ onSave, saving, error }: Props) {
         aria-busy={saving}
         onSubmit={(event) => {
           event.preventDefault()
-          if (selectedPolicy && !saving) void onSave(selectedPolicy)
+          if (selectedPolicy && !saving)
+            void onSave(UserNewDevicePolicy[selectedPolicy])
         }}
       >
         <div className="mb-5 flex size-12 items-center justify-center rounded-2xl bg-[color:var(--color-accent)] text-[color:var(--color-primary)]">
@@ -61,51 +47,22 @@ export function NewDevicePolicyDialog({ onSave, saving, error }: Props) {
           id="device-policy-title"
           className="text-2xl font-bold tracking-tight"
         >
-          New device policy
+          New device approval
         </h1>
         <p
           id="device-policy-description"
           className="mt-3 text-sm leading-6 text-[color:var(--color-muted)]"
         >
-          Choose how new devices can access your vault. You can change this
-          later in Settings.
+          Choose how you will approve new devices. Enable one method or both.
+          You can change this later in Security settings.
         </p>
-        <fieldset disabled={saving} className="mt-6 space-y-3">
-          <legend className="mb-3 text-sm font-semibold">
-            When a new device signs in
-          </legend>
-          {policies.map(({ value, title, description, Icon }) => (
-            <label
-              key={value}
-              className="flex cursor-pointer items-start gap-3 rounded-2xl border border-[color:var(--color-border)] p-4 transition hover:bg-[color:var(--color-accent)] has-[:checked]:border-[color:var(--color-primary)] has-[:checked]:bg-[color:var(--color-accent)] has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-[color:var(--color-ring)]"
-            >
-              <input
-                type="radio"
-                name="newDevicePolicy"
-                value={value}
-                checked={selectedPolicy === value}
-                onChange={() => setSelectedPolicy(value)}
-                aria-describedby={`policy-description-${value}`}
-                className="mt-1 size-4 shrink-0 accent-[color:var(--color-primary)]"
-              />
-              <span className="min-w-0 flex-1">
-                <span className="block text-sm font-semibold leading-6">
-                  {title}
-                </span>
-                <span
-                  id={`policy-description-${value}`}
-                  className="mt-1 block text-sm leading-6 text-[color:var(--color-muted)]"
-                >
-                  {description}
-                </span>
-              </span>
-              <Icon
-                className="mt-1 hidden size-5 shrink-0 text-[color:var(--color-muted)] sm:block"
-                aria-hidden="true"
-              />
-            </label>
-          ))}
-        </fieldset>
+        <div className="mt-6">
+          <NewDeviceApprovalChoices
+            value={selectedPolicy}
+            onChange={setSelectedPolicy}
+            disabled={saving}
+          />
+        </div>
         {error && (
           <p
             role="alert"
@@ -120,7 +77,7 @@ export function NewDevicePolicyDialog({ onSave, saving, error }: Props) {
             type="submit"
             disabled={!selectedPolicy || saving}
           >
-            {saving ? 'Saving…' : 'Save policy'}
+            {saving ? 'Saving…' : 'Save approval methods'}
           </Button>
         </div>
       </form>

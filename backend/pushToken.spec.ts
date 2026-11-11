@@ -1,3 +1,5 @@
+import { sentEmails } from './utils/email'
+import { confirmNewDeviceEmailApproval } from './lib/newDeviceEmailApproval'
 import { beforeAll, expect, it, vi } from 'vitest'
 import { createHash } from 'node:crypto'
 import { sign } from 'jsonwebtoken'
@@ -35,7 +37,7 @@ beforeAll(async () => {
     loginCredentialsLimit: 100,
     TOTPlimit: 100,
     deviceRecoveryCooldownMinutes: 960,
-    newDevicePolicy: 'REQUIRE_ANY_DEVICE_APPROVAL'
+    newDevicePolicy: 'OTHER_DEVICE'
   })
   await db.insert(schema.device).values(
     [phoneId, masterId].map((id) => ({
@@ -117,11 +119,11 @@ it('requires authentication and rejects empty tokens', async () => {
   ).toBe(400)
 })
 
-it('notifies the phone after a successful new login when approval is not required', async () => {
+it('notifies the phone after a successful email-approved new login', async () => {
   sendNotification.mockClear()
   await db
     .update(schema.user)
-    .set({ newDevicePolicy: 'ALLOW' })
+    .set({ newDevicePolicy: 'EMAIL' })
     .where(eq(schema.user.id, userId))
   const response = await request('auth/requestDeviceChallenge', {
     email: `${userId}@test.com`,
@@ -132,7 +134,12 @@ it('notifies the phone after a successful new login when approval is not require
     }
   })
   const challenge = await response.json()
-  expect(challenge.status).toBe('approved')
+  expect(challenge.status).toBe('pending')
+  const token = sentEmails
+    .at(-1)
+    ?.Messages[0]?.TextPart.match(/token=([a-f0-9]{64})/)?.[1]
+  if (!token) throw new Error('Missing email approval token')
+  expect(await confirmNewDeviceEmailApproval(db, token)).toBe('approved')
   expect(sendNotification).not.toHaveBeenCalled()
   const login = {
     challengeId: challenge.challengeId,

@@ -249,12 +249,20 @@ export class UserQuery extends UserBase {
 
   @Field(() => [DecryptionChallengeForApproval])
   async decryptionChallengesWaiting(@Ctx() ctx: IContextAuthenticated) {
-    return ctx.db.query.decryptionChallenge.findMany({
+    const user = await ctx.db.query.user.findFirst({
+      where: { id: ctx.jwtPayload.userId },
+      columns: { newDevicePolicy: true }
+    })
+    const challenges = await ctx.db.query.decryptionChallenge.findMany({
       where: {
         userId: ctx.jwtPayload.userId,
         approvedAt: { isNull: true },
         rejectedAt: { isNull: true }
       }
     })
+    return challenges.map((challenge) => ({
+      ...challenge,
+      approvalPolicy: user?.newDevicePolicy ?? 'EMAIL'
+    }))
   }
 }

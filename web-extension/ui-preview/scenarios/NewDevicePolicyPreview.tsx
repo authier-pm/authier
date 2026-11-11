@@ -6,7 +6,9 @@ import {
 } from '@apollo/client'
 import { ApolloProvider } from '@apollo/client/react'
 import { useState } from 'react'
+import { NewDeviceApprovalStatus } from '@shared/NewDeviceApprovalStatus'
 import { UserNewDevicePolicy } from '@shared/generated/graphqlBaseTypes'
+import { NewDeviceApprovalSettings } from '@src/pages-vault/NewDeviceApprovalSettings'
 import { NewDevicePolicyOnboarding } from '@src/pages-vault/NewDevicePolicyOnboarding'
 import { useGetUserNewDevicePolicyQuery } from '@src/pages-vault/NewDevicePolicyOnboarding.codegen'
 
@@ -23,9 +25,12 @@ function PolicyStatus() {
 function createPreviewClient() {
   const params = new URLSearchParams(location.search)
   let policy: UserNewDevicePolicy | null = params.has('configured')
-    ? UserNewDevicePolicy.ALLOW
+    ? UserNewDevicePolicy.EMAIL
     : null
   let failNextSave = params.has('error')
+  const masterDeviceId = params.has('nonmaster')
+    ? 'preview-other-device'
+    : 'preview-current-device'
   return new ApolloClient({
     cache: new InMemoryCache(),
     link: new ApolloLink(
@@ -42,8 +47,11 @@ function createPreviewClient() {
               }
               const selected = operation.variables.newDevicePolicy
               if (
-                selected !== UserNewDevicePolicy.ALLOW &&
-                selected !== UserNewDevicePolicy.REQUIRE_ANY_DEVICE_APPROVAL
+                selected !== UserNewDevicePolicy.EMAIL &&
+                selected !== UserNewDevicePolicy.OTHER_DEVICE &&
+                selected !== UserNewDevicePolicy.EMAIL_OR_OTHER_DEVICE &&
+                selected !== UserNewDevicePolicy.EMAIL_AND_OTHER_DEVICE &&
+                selected !== UserNewDevicePolicy.MASTER_DEVICE
               ) {
                 observer.error(new Error('Unexpected device policy'))
                 return
@@ -56,6 +64,7 @@ function createPreviewClient() {
                     setNewDevicePolicy: {
                       __typename: 'UserGQL',
                       id: 'preview-user',
+                      masterDeviceId,
                       newDevicePolicy: policy
                     }
                   }
@@ -67,6 +76,7 @@ function createPreviewClient() {
                   me: {
                     __typename: 'UserQuery',
                     id: 'preview-user',
+                    masterDeviceId,
                     newDevicePolicy: policy
                   }
                 }
@@ -82,6 +92,25 @@ function createPreviewClient() {
 
 export function NewDevicePolicyPreview() {
   const [client] = useState(createPreviewClient)
+  const params = new URLSearchParams(location.search)
+  if (params.has('pending'))
+    return (
+      <main className="flex min-h-screen items-center justify-center p-6">
+        <section className="w-full max-w-xl space-y-5 rounded-3xl border border-[color:var(--color-border)] bg-[color:var(--color-card)] p-6">
+          <h1 className="text-2xl font-bold">Approve this browser</h1>
+          <NewDeviceApprovalStatus
+            policy={
+              params.has('master') ? 'MASTER_DEVICE' : 'EMAIL_AND_OTHER_DEVICE'
+            }
+            email="alex@example.com"
+            emailApprovalSentAt="2026-11-11T12:00:00Z"
+            emailApprovedAt={
+              params.has('emailApproved') ? '2026-11-11T12:01:00Z' : null
+            }
+          />
+        </section>
+      </main>
+    )
   return (
     <ApolloProvider client={client}>
       <main className="min-h-screen p-6 sm:p-10" data-ui-preview>
@@ -115,6 +144,11 @@ export function NewDevicePolicyPreview() {
           ))}
         </div>
       </main>
+      {new URLSearchParams(location.search).has('settings') && (
+        <div className="mx-auto mb-10 max-w-xl px-6">
+          <NewDeviceApprovalSettings />
+        </div>
+      )}
       <NewDevicePolicyOnboarding />
       <PolicyStatus />
     </ApolloProvider>

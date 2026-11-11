@@ -25,6 +25,7 @@ import {
 } from '../../shared/masterDeviceResetConfig'
 import type { CachedPasswordFormClassification } from '../../shared/passwordFormClassification'
 import type { MobileSecretRecord } from '../../shared/orpc/schemas'
+import { newDeviceApprovalPolicies } from '../../shared/newDeviceApproval'
 
 export const tokenType = pgEnum('TokenType', ['EMAIL', 'API'])
 export const encryptedSecretType = pgEnum('EncryptedSecretType', [
@@ -47,11 +48,10 @@ export const emailVerificationType = pgEnum('EmailVerificationType', [
   'PRIMARY',
   'CONTACT'
 ])
-export const userNewDevicePolicy = pgEnum('UserNewDevicePolicy', [
-  'ALLOW',
-  'REQUIRE_ANY_DEVICE_APPROVAL',
-  'REQUIRE_MASTER_DEVICE_APPROVAL'
-])
+export const userNewDevicePolicy = pgEnum(
+  'UserNewDevicePolicy',
+  newDeviceApprovalPolicies
+)
 
 export const prismaMigrations = pgTable('_prisma_migrations', {
   id: varchar({ length: 36 }).primaryKey(),
@@ -72,6 +72,11 @@ export const decryptionChallenge = pgTable(
     id: serial().primaryKey(),
     ipAddress: inet().notNull(),
     approvedAt: timestamp({ precision: 3 }),
+    emailApprovalTokenHash: text(),
+    emailApprovalExpiresAt: timestamp({ precision: 3 }),
+    emailApprovalSentAt: timestamp({ precision: 3 }),
+    emailApprovedAt: timestamp({ precision: 3 }),
+    deviceApprovedAt: timestamp({ precision: 3 }),
     userId: uuid()
       .notNull()
       .references((): AnyPgColumn => user.id, {

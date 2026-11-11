@@ -3,6 +3,7 @@ import {
   isResetConfirmationExpired
 } from '../../../shared/MasterDeviceResetProgress'
 import { useEffect, useState } from 'react'
+import { NewDeviceApprovalStatus } from '@shared/NewDeviceApprovalStatus'
 import { Navigate, useNavigate } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import {
@@ -60,9 +61,7 @@ export function AwaitingApprovalPage() {
           <div className="inline-flex w-fit rounded-full border border-white/10 bg-white/5 px-4 py-2 text-[11px] font-medium tracking-[0.24em] text-[color:var(--color-muted)] uppercase">
             Waiting for approval
           </div>
-          <CardTitle className="pt-3 text-2xl">
-            Approve this browser from a trusted device
-          </CardTitle>
+          <CardTitle className="pt-3 text-2xl">Approve this browser</CardTitle>
           <CardDescription>
             {pendingLogin.email} is trying to access the vault from this
             browser.
@@ -70,29 +69,13 @@ export function AwaitingApprovalPage() {
         </CardHeader>
 
         <CardContent className="space-y-4">
-          <p className="text-sm text-[color:var(--color-muted)]">
-            As soon as one of your approved devices confirms this login, the web
-            vault will finish the sign-in automatically.
-          </p>
-
-          <div className="grid gap-4 md:grid-cols-2">
-            <div className="rounded-[var(--radius-lg)] border border-[color:var(--color-border)] bg-[color:var(--color-surface-muted)] p-4">
-              <p className="text-[11px] font-medium tracking-[0.22em] text-[color:var(--color-muted)] uppercase">
-                Push notifications sent
-              </p>
-              <p className="mt-2 text-3xl font-semibold">
-                {pendingLogin.lastResult.pushNotificationsSentCount}
-              </p>
-            </div>
-            <div className="rounded-[var(--radius-lg)] border border-[color:var(--color-border)] bg-[color:var(--color-surface-muted)] p-4">
-              <p className="text-[11px] font-medium tracking-[0.22em] text-[color:var(--color-muted)] uppercase">
-                Push notifications failed
-              </p>
-              <p className="mt-2 text-3xl font-semibold">
-                {pendingLogin.lastResult.pushNotificationsFailedCount}
-              </p>
-            </div>
-          </div>
+          <NewDeviceApprovalStatus
+            policy={pendingLogin.lastResult.approvalPolicy}
+            email={pendingLogin.email}
+            emailApprovalSentAt={pendingLogin.lastResult.emailApprovalSentAt}
+            emailApprovedAt={pendingLogin.lastResult.emailApprovedAt}
+            deviceApprovedAt={pendingLogin.lastResult.deviceApprovedAt}
+          />
 
           <MasterDeviceResetProgress
             status={pendingLogin.lastResult.resetStatus}

@@ -76,9 +76,11 @@ The javascript `Date` as string. Type represents date and time as the ISO Date s
 scalar DateTime
 
 enum UserNewDevicePolicy {
-  ALLOW
-  REQUIRE_ANY_DEVICE_APPROVAL
-  REQUIRE_MASTER_DEVICE_APPROVAL
+  EMAIL
+  OTHER_DEVICE
+  EMAIL_OR_OTHER_DEVICE
+  EMAIL_AND_OTHER_DEVICE
+  MASTER_DEVICE
 }
 
 type TokenGQL {
@@ -390,6 +392,10 @@ type DecryptionChallengeForApproval {
   pushNotificationsSentCount: Int!
   pushNotificationsFailedCount: Int!
   resetStatus: MasterDeviceResetStatus
+  approvalPolicy: UserNewDevicePolicy!
+  emailApprovalSentAt: DateTime
+  emailApprovedAt: DateTime
+  deviceApprovedAt: DateTime
   masterDeviceResetRequestedAt: DateTime
   masterDeviceResetProcessAt: DateTime
   masterDeviceResetConfirmedAt: DateTime

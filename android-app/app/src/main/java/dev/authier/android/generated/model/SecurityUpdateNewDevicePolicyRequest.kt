@@ -45,13 +45,15 @@ data class SecurityUpdateNewDevicePolicyRequest (
     /**
      *
      *
-     * Values: ALLOW,REQUIRE_ANY_DEVICE_APPROVAL,REQUIRE_MASTER_DEVICE_APPROVAL
+     * Values: EMAIL,OTHER_DEVICE,EMAIL_OR_OTHER_DEVICE,EMAIL_AND_OTHER_DEVICE,MASTER_DEVICE
      */
     @Serializable
     enum class NewDevicePolicy(val value: kotlin.String) {
-        @SerialName(value = "ALLOW") ALLOW("ALLOW"),
-        @SerialName(value = "REQUIRE_ANY_DEVICE_APPROVAL") REQUIRE_ANY_DEVICE_APPROVAL("REQUIRE_ANY_DEVICE_APPROVAL"),
-        @SerialName(value = "REQUIRE_MASTER_DEVICE_APPROVAL") REQUIRE_MASTER_DEVICE_APPROVAL("REQUIRE_MASTER_DEVICE_APPROVAL");
+        @SerialName(value = "EMAIL") EMAIL("EMAIL"),
+        @SerialName(value = "OTHER_DEVICE") OTHER_DEVICE("OTHER_DEVICE"),
+        @SerialName(value = "EMAIL_OR_OTHER_DEVICE") EMAIL_OR_OTHER_DEVICE("EMAIL_OR_OTHER_DEVICE"),
+        @SerialName(value = "EMAIL_AND_OTHER_DEVICE") EMAIL_AND_OTHER_DEVICE("EMAIL_AND_OTHER_DEVICE"),
+        @SerialName(value = "MASTER_DEVICE") MASTER_DEVICE("MASTER_DEVICE");
     }
 
 }

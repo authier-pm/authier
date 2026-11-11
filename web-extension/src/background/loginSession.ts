@@ -1,4 +1,7 @@
-import { resetStatusSchema } from '@shared/orpc/schemas'
+import {
+  deviceApprovalProgressSchema,
+  resetStatusSchema
+} from '@shared/orpc/schemas'
 import { CombinedGraphQLErrors } from '@apollo/client/errors'
 import browser from 'webextension-polyfill'
 import { z } from 'zod'
@@ -44,7 +47,7 @@ import {
 
 const LOGIN_SESSION_STORAGE_KEY = 'login-session'
 
-const loginApprovalChallengeSchema = z.object({
+const loginApprovalChallengeSchema = deviceApprovalProgressSchema.extend({
   type: z.literal('awaiting-approval'),
   id: z.number(),
   pushNotificationsSentCount: z.number(),
@@ -492,6 +495,10 @@ const requestChallenge: LoginSessionOperations['requestChallenge'] = (input) =>
         return {
           type: 'awaiting-approval' as const,
           id: challenge.id,
+          approvalPolicy: challenge.approvalPolicy,
+          emailApprovalSentAt: challenge.emailApprovalSentAt ?? null,
+          emailApprovedAt: challenge.emailApprovedAt ?? null,
+          deviceApprovedAt: challenge.deviceApprovedAt ?? null,
           pushNotificationsSentCount: challenge.pushNotificationsSentCount,
           pushNotificationsFailedCount: challenge.pushNotificationsFailedCount,
           resetStatus: challenge.resetStatus,

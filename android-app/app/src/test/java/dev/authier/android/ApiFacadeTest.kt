@@ -62,10 +62,14 @@ class ApiFacadeTest {
     }
 
     @Test fun `decodes both generated challenge variants`() = runTest {
-        respond("""{"status":"pending","challengeId":12,"pushNotificationsSentCount":0,"pushNotificationsFailedCount":0,"masterDeviceResetRequestedAt":null,"masterDeviceResetProcessAt":null,"masterDeviceResetConfirmedAt":null,"masterDeviceResetRejectedAt":null}""")
+        respond("""{"status":"pending","challengeId":12,"approvalPolicy":"EMAIL_AND_OTHER_DEVICE","emailApprovalSentAt":"2026-11-11T10:00:00Z","emailApprovedAt":"2026-11-11T10:01:00Z","deviceApprovedAt":null,"pushNotificationsSentCount":0,"pushNotificationsFailedCount":0,"masterDeviceResetRequestedAt":null,"masterDeviceResetProcessAt":null,"masterDeviceResetConfirmedAt":null,"masterDeviceResetRejectedAt":null}""")
         val pending = api.challenge("test@example.com", "device", "Pixel")
         assertEquals("pending", pending.status)
         assertNull(pending.encryptionSalt)
+        assertEquals(NewDeviceApprovalPolicy.EMAIL_AND_OTHER_DEVICE, pending.approvalProgress?.policy)
+        assertEquals("2026-11-11T10:01:00Z", pending.approvalProgress?.emailApprovedAt)
+        assertNull(pending.approvalProgress?.deviceApprovedAt)
+        assertTrue(pending.approvalProgress!!.instructions.startsWith("Email approved."))
         val request = server.takeRequest()
         assertEquals("/api/v1/auth/requestDeviceChallenge", request.path)
         assertEquals("android", Json.parseToJsonElement(request.body.readUtf8()).jsonObject["deviceInput"]!!.jsonObject["platform"]!!.jsonPrimitive.content)
@@ -79,9 +83,9 @@ class ApiFacadeTest {
 
     @Test fun `sends empty JSON input and bearer auth without a JS serializer`() = runTest {
         api.accessToken = "test-token"
-        respond("""{"security":{"masterDeviceResetConfig":{"requiredApprovals":1,"waitMinutes":2880,"notificationEmails":[]},"newDevicePolicy":"ALLOW","deviceRecoveryCooldownMinutes":60,"masterDeviceId":null,"vaultLockTimeoutSeconds":300}}""")
+        respond("""{"security":{"masterDeviceResetConfig":{"requiredApprovals":1,"waitMinutes":2880,"notificationEmails":[]},"newDevicePolicy":"EMAIL","deviceRecoveryCooldownMinutes":60,"masterDeviceId":null,"vaultLockTimeoutSeconds":300}}""")
         val security = api.security()
-        assertEquals("ALLOW", security.newDevicePolicy)
+        assertEquals(NewDeviceApprovalPolicy.EMAIL, security.newDevicePolicy)
         assertNull(security.masterDeviceId)
         val request = server.takeRequest()
         assertEquals("/api/v1/security/get", request.path)
@@ -101,8 +105,22 @@ class ApiFacadeTest {
         assertEquals("Bearer master-session", request.getHeader("Authorization"))
         assertEquals("""{"newMasterDeviceId":"next-master"}""", request.body.readUtf8())
 
-        respond("""{"security":{"masterDeviceResetConfig":{"requiredApprovals":1,"waitMinutes":2880,"notificationEmails":[]},"newDevicePolicy":"REQUIRE_MASTER_DEVICE_APPROVAL","deviceRecoveryCooldownMinutes":60,"masterDeviceId":"next-master","vaultLockTimeoutSeconds":300}}""")
+        respond("""{"security":{"masterDeviceResetConfig":{"requiredApprovals":1,"waitMinutes":2880,"notificationEmails":[]},"newDevicePolicy":"OTHER_DEVICE","deviceRecoveryCooldownMinutes":60,"masterDeviceId":"next-master","vaultLockTimeoutSeconds":300}}""")
         assertEquals("next-master", api.security().masterDeviceId)
+    }
+
+    @Test fun `saves both approval rules through generated API and preserves an unchosen policy`() = runTest {
+        api.accessToken = "master-session"
+        for (policy in listOf(NewDeviceApprovalPolicy.EMAIL_OR_OTHER_DEVICE, NewDeviceApprovalPolicy.EMAIL_AND_OTHER_DEVICE)) {
+            respond("""{"security":{"masterDeviceResetConfig":{"requiredApprovals":1,"waitMinutes":2880,"notificationEmails":[]},"newDevicePolicy":"${policy.name}","deviceRecoveryCooldownMinutes":60,"masterDeviceId":"current-device","vaultLockTimeoutSeconds":300}}""")
+            assertEquals(policy, api.updatePolicy(policy).newDevicePolicy)
+            val request = server.takeRequest()
+            assertEquals("/api/v1/security/updateNewDevicePolicy", request.path)
+            assertEquals("Bearer master-session", request.getHeader("Authorization"))
+            assertEquals("""{"newDevicePolicy":"${policy.name}"}""", request.body.readUtf8())
+        }
+        respond("""{"security":{"masterDeviceResetConfig":{"requiredApprovals":1,"waitMinutes":2880,"notificationEmails":[]},"newDevicePolicy":null,"deviceRecoveryCooldownMinutes":60,"masterDeviceId":"current-device","vaultLockTimeoutSeconds":300}}""")
+        assertNull(api.security().newDevicePolicy)
     }
 
     @Test fun `preserves device history and signed out status from the generated client`() = runTest {

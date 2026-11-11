@@ -360,10 +360,26 @@ render the updated gallery.
 The `new-device-policy` scenario renders the production existing-account onboarding
 with an in-memory Apollo transport and synthetic vault background. Add `&error=1`
 for a failed save followed by a successful retry, or `&configured=1` for an account
-that has already chosen a policy. Run `pnpm playwright:ui-preview newDevicePolicy.spec.ts`
-to check radio selection, saving, keyboard focus, dark/light themes, and scrolling
-on small screens. Captures: `docs/screenshots/new-device-policy-dark.png`,
-`new-device-policy-light.png`, and `new-device-policy-mobile.png`.
+that has already chosen a policy. Add `&configured=1&settings=1` to edit an existing
+choice. Master-device-only selection replaces the email and any-device methods and captures `docs/screenshots/new-device-policy-master.png`. Add `&pending=1&master=1` to inspect master-only login instructions, or `&pending=1&emailApproved=1` to show a login waiting for the second
+required approval. Run `pnpm playwright:ui-preview newDevicePolicy.spec.ts` to check
+mandatory method selection, email/device options, either/both approval modes,
+settings changes, retry behavior, keyboard focus, dark/light themes, and mobile
+scrolling. Captures: `docs/screenshots/new-device-policy-dark.png`,
+`new-device-policy-light.png`, `new-device-policy-mobile.png`, and
+`new-device-approval-pending.png`. The native `NewDeviceApprovalSelectionTest` also captures `docs/screenshots/new-device-approval-master-android.png` from the production Compose setup screen.
+
+The node-side `scenarios/newDeviceEmailApproval.ts` fixture renders the production
+email approval and rejection page with synthetic tokens and device details. It
+runs outside the Vite registry so the real response headers, CSP and form scripts
+remain intact without importing backend modules into the browser bundle. All
+network requests are intercepted; the scenario never sends email or accesses a
+real account. Run `pnpm playwright:security emailApproval.spec.ts` from
+`web-extension` to check email-only and both-required approval, explicit rejection
+from either email link, expired links, and token removal from browser URLs.
+Captures: `docs/screenshots/new-device-email-approval.png`,
+`new-device-email-approval-both.png`, `new-device-email-rejection.png`, and
+`new-device-email-rejection-link.png`.
 
 The `totp-labels` scenario decodes a rendered synthetic Microsoft QR code through
 the production scanner and builds an account-first label. The `source` query

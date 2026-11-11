@@ -65,6 +65,10 @@ mutation deviceDecryptionChallenge(
     }
     ... on DecryptionChallengeForApproval {
       id
+      approvalPolicy
+      emailApprovalSentAt
+      emailApprovedAt
+      deviceApprovedAt
       pushNotificationsSentCount
       pushNotificationsFailedCount
       resetStatus { requiredApprovals approvalCount processAt expiresAt confirmedAt completedAt rejectedAt }

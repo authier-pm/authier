@@ -138,8 +138,7 @@ describe('RootResolver', () => {
   describe('deviceDecryptionChallenge', () => {
     /**
      * A user who requires approval for new devices and owns exactly one device.
-     * The master device must exist, otherwise the resolver auto-approves and
-     * returns addDeviceSecretEncrypted.
+     * Its already-enrolled master may bootstrap its first login challenge.
      */
     const insertApprovalRequiringUser = async () => {
       const userId = crypto.randomUUID()
@@ -150,7 +149,7 @@ describe('RootResolver', () => {
         email: fakeData.email,
         addDeviceSecret: await hashDeviceSecret(fakeData.addDeviceSecret),
         addDeviceSecretEncrypted: fakeData.addDeviceSecretEncrypted,
-        newDevicePolicy: 'REQUIRE_MASTER_DEVICE_APPROVAL',
+        newDevicePolicy: 'OTHER_DEVICE',
         encryptionSalt: fakeData.encryptionSalt,
         ...userSecurityProps
       })
@@ -202,24 +201,22 @@ describe('RootResolver', () => {
       expect(data).toBeInstanceOf(DecryptionChallengeApproved)
     })
 
-    it('does not approve a device registered to another account', async () => {
+    it('rejects a device registered to another account before creating a challenge', async () => {
       const victim = await insertApprovalRequiringUser()
       // Anyone can sign up, so an attacker always knows one valid device id.
       const attacker = await insertApprovalRequiringUser()
 
-      const data = await resolver.deviceDecryptionChallenge(
-        victim.email,
-        { id: attacker.masterDeviceId, name: 'chrome', platform: 'macOS' },
-        makeFakeCtx({ userId: attacker.userId })
-      )
-
-      expect(data).toBeInstanceOf(DecryptionChallengeForApproval)
-      expect(data).not.toHaveProperty('addDeviceSecretEncrypted')
-      expect(data).not.toHaveProperty('encryptionSalt')
+      await expect(
+        resolver.deviceDecryptionChallenge(
+          victim.email,
+          { id: attacker.masterDeviceId, name: 'chrome', platform: 'macOS' },
+          makeFakeCtx({ userId: attacker.userId })
+        )
+      ).rejects.toThrow('Login failed')
       const challenge = await db.query.decryptionChallenge.findFirst({
         where: { userId: victim.userId, deviceId: attacker.masterDeviceId }
       })
-      expect(challenge?.approvedAt).toBeNull()
+      expect(challenge).toBeUndefined()
     })
 
     it("should show 'Too many decryption challenges, wait for cooldown'", async () => {

@@ -18,7 +18,15 @@ import {
   masterDeviceResetConfigSchema
 } from '../../shared/masterDeviceResetConfig'
 import { RootResolver } from '../schemas/RootResolver'
-import { DecryptionChallengeMutation } from '../models/DecryptionChallenge'
+import {
+  DecryptionChallengeApproved,
+  DecryptionChallengeForApproval,
+  DecryptionChallengeMutation
+} from '../models/DecryptionChallenge'
+
+vi.mock('./getGeoIpLocation', () => ({
+  getGeoIpLocation: { memoized: async () => null }
+}))
 
 const fixture = async (requiredApprovals = 1, waitMinutes = 2880) => {
   const userId = crypto.randomUUID()
@@ -204,6 +212,10 @@ describe('master device recovery', () => {
 
   it('requires confirmation, a full wait from confirmation, and a distinct other device approval', async () => {
     const f = fixtures[0]!
+    await db
+      .update(schema.user)
+      .set({ newDevicePolicy: 'OTHER_DEVICE' })
+      .where(eq(schema.user.id, f.user.id))
     const { token, request } = await start(f)
     await actOnReset(f.ctx, f.challenge.id, 'approve')
     await actOnReset(f.ctx, f.challenge.id, 'approve')
@@ -225,6 +237,29 @@ describe('master device recovery', () => {
     expect((await processDueResets(db, due)).completedCount).toBe(1)
     expect((await current(f))?.masterDeviceId).toBeNull()
     expect((await processDueResets(db, due)).completedCount).toBe(0)
+    const recovered = await new RootResolver().deviceDecryptionChallenge(
+      f.user.email!,
+      { id: f.challenge.deviceId, name: 'Recovered device', platform: 'test' },
+      f.ctx
+    )
+    expect(recovered).toBeInstanceOf(DecryptionChallengeApproved)
+    expect(recovered).toMatchObject({
+      approvedByRecovery: true,
+      encryptionSalt: 'salt',
+      addDeviceSecretEncrypted: 'encrypted'
+    })
+    const unrelated = await new RootResolver().deviceDecryptionChallenge(
+      f.user.email!,
+      {
+        id: crypto.randomUUID(),
+        name: 'Unrelated new device',
+        platform: 'test'
+      },
+      f.ctx
+    )
+    expect(unrelated).toBeInstanceOf(DecryptionChallengeForApproval)
+    expect(unrelated).not.toHaveProperty('encryptionSalt')
+    expect(unrelated).not.toHaveProperty('addDeviceSecretEncrypted')
     expect(
       await db.query.device.findFirst({ where: { id: f.devices[0]!.id } })
     ).toBeUndefined()

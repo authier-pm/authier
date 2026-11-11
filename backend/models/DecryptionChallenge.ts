@@ -1,3 +1,11 @@
+import { hasCurrentDeviceApproval } from '../lib/newDeviceEmailApproval'
+import {
+  allowsDeviceApproval,
+  canDeviceApproveNewLogin,
+  allowsEmailApproval,
+  isNewDeviceApprovalComplete
+} from '../../shared/newDeviceApproval'
+import { UserNewDevicePolicyGQL } from './types/UserNewDevicePolicy'
 import { sendNewDeviceLoginPushNotifications } from '../lib/deviceLoginNotifications'
 import { actOnReset, getResetStatus } from '../lib/masterDeviceReset'
 import { hashDeviceSecret, verifyDeviceSecret } from '../utils/deviceSecretHash'
@@ -97,6 +105,18 @@ export class DecryptionChallengeForApproval {
     return getResetStatus(ctx.db, this.id)
   }
 
+  @Field(() => UserNewDevicePolicyGQL)
+  approvalPolicy: UserNewDevicePolicyGQL
+
+  @Field(() => GraphQLISODateTime, { nullable: true })
+  emailApprovalSentAt: Date | null
+
+  @Field(() => GraphQLISODateTime, { nullable: true })
+  emailApprovedAt: Date | null
+
+  @Field(() => GraphQLISODateTime, { nullable: true })
+  deviceApprovedAt: Date | null
+
   @Field(() => GraphQLISODateTime, { nullable: true })
   masterDeviceResetRequestedAt: Date | null
 
@@ -162,6 +182,9 @@ export class DecryptionChallengeApproved extends DecryptionChallengeGQL {
 
       if (!userData) {
         throw new GraphqlError('User not found')
+      }
+      if (!(await hasCurrentDeviceApproval(tx, challenge, userData))) {
+        throw new GraphqlError('Login failed')
       }
 
       if (
@@ -260,9 +283,9 @@ export class DecryptionChallengeApproved extends DecryptionChallengeGQL {
     })
     const { userData, deviceRec, isNewDevice } = result
 
-    // ALLOW skips the approval-request push. Notify existing devices only after
-    // the new device has proved the master password and enrollment has committed.
-    if (isNewDevice && userData.newDevicePolicy === 'ALLOW') {
+    // Email approval does not send a device approval request. Notify enrolled
+    // devices after the new device proves the master password and commits.
+    if (isNewDevice && allowsEmailApproval(userData.newDevicePolicy)) {
       const recipients = await ctx.db.query.device.findMany({
         where: {
           userId,
@@ -304,42 +327,90 @@ export class MasterDeviceResetRequestResult {
 export class DecryptionChallengeMutation extends DecryptionChallengeGQL {
   @Field(() => DecryptionChallengeGQL)
   async approve(@Ctx() ctx: IContextAuthenticated) {
-    const reset = await getResetStatus(ctx.db, this.id)
-    if (reset && !reset.completedAt && !reset.rejectedAt)
-      throw new GraphqlError(
-        'Use the explicit master device reset approval action'
-      )
-
-    const userData = await ctx.db.query.user.findFirst({
-      where: { id: ctx.jwtPayload.userId },
-      columns: {
-        newDevicePolicy: true,
-        masterDeviceId: true
-      }
-    })
-
-    if (!userData) throw new Error('User not found')
-
-    if (
-      userData.newDevicePolicy === 'REQUIRE_MASTER_DEVICE_APPROVAL' &&
-      userData.masterDeviceId !== ctx.device.id
-    ) {
-      throw new GraphqlError(
-        'Only the master device can approve a decryption challenge'
-      )
-    }
-
-    const res = await ctx.db
-      .update(decryptionChallenge)
-      .set({
-        approvedAt: new Date(),
-        approvedFromDeviceId: ctx.device.id,
-        rejectedAt: null,
-        blockIp: this.blockIp ? false : null
+    return ctx.db.transaction(async (tx) => {
+      const [userData] = await tx
+        .select()
+        .from(user)
+        .where(eq(user.id, ctx.jwtPayload.userId))
+        .for('update')
+      if (!userData) throw new GraphqlError('User not found')
+      const reset = await tx.query.masterDeviceResetRequest.findFirst({
+        where: {
+          decryptionChallengeId: this.id,
+          userId: userData.id,
+          completedAt: { isNull: true },
+          rejectedAt: { isNull: true }
+        },
+        columns: { id: true }
       })
-      .where(eq(decryptionChallenge.id, this.id))
-      .returning()
-    return res[0]!
+      if (reset)
+        throw new GraphqlError(
+          'Use the explicit master device reset approval action'
+        )
+      if (!allowsDeviceApproval(userData.newDevicePolicy)) {
+        throw new GraphqlError('Approval from another device is not enabled')
+      }
+      if (
+        !canDeviceApproveNewLogin(
+          userData.newDevicePolicy,
+          ctx.device.id,
+          userData.masterDeviceId
+        )
+      ) {
+        throw new GraphqlError('Only the master device can approve this login')
+      }
+      const approvingDevice = await tx.query.device.findFirst({
+        where: {
+          id: ctx.device.id,
+          userId: userData.id,
+          deletedAt: { isNull: true },
+          logoutAt: { isNull: true }
+        }
+      })
+      if (!approvingDevice) throw new GraphqlError('Device is not active')
+      const [challenge] = await tx
+        .select()
+        .from(decryptionChallenge)
+        .where(
+          and(
+            eq(decryptionChallenge.id, this.id),
+            eq(decryptionChallenge.userId, userData.id)
+          )
+        )
+        .for('update')
+      if (
+        !challenge ||
+        challenge.rejectedAt ||
+        challenge.blockIp ||
+        challenge.deviceId === approvingDevice.id
+      ) {
+        throw new GraphqlError('Login approval is unavailable')
+      }
+      const requestedDevice = await tx.query.device.findFirst({
+        where: { id: challenge.deviceId }
+      })
+      if (requestedDevice && requestedDevice.userId !== userData.id) {
+        throw new GraphqlError('Login approval is unavailable')
+      }
+      const now = new Date()
+      const complete = isNewDeviceApprovalComplete(userData.newDevicePolicy, {
+        emailApproved: Boolean(challenge.emailApprovedAt),
+        deviceApproved: true
+      })
+      const [approved] = await tx
+        .update(decryptionChallenge)
+        .set({
+          deviceApprovedAt: challenge.deviceApprovedAt ?? now,
+          approvedAt: complete ? (challenge.approvedAt ?? now) : null,
+          approvedFromDeviceId: approvingDevice.id,
+          ...(complete
+            ? { emailApprovalTokenHash: null, emailApprovalExpiresAt: null }
+            : {})
+        })
+        .where(eq(decryptionChallenge.id, challenge.id))
+        .returning()
+      return approved
+    })
   }
 
   @Field(() => DecryptionChallengeGQL)
@@ -366,7 +437,11 @@ export class DecryptionChallengeMutation extends DecryptionChallengeGQL {
       .set({
         rejectedAt: new Date(),
         blockIp: true,
-        approvedAt: null
+        approvedAt: null,
+        emailApprovalTokenHash: null,
+        emailApprovalExpiresAt: null,
+        emailApprovedAt: null,
+        deviceApprovedAt: null
       })
       .where(eq(decryptionChallenge.id, this.id))
       .returning()

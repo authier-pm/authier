@@ -113,6 +113,11 @@ describe('security boundaries', () => {
       'https://trusted-api.example.com/confirm-master-device-reset?token='
     )
     expect(message?.HTMLPart).not.toContain('evil-attacker.test')
+    await db
+      .delete(schema.masterDeviceResetRequest)
+      .where(
+        eq(schema.masterDeviceResetRequest.decryptionChallengeId, challenge.id)
+      )
     vi.unstubAllEnvs()
   })
 
