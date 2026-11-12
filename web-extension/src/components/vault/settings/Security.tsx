@@ -20,6 +20,8 @@ import { serializeAutofillForbiddenUrlPatterns } from '@shared/autofillForbidden
 import { toBackendSettings } from '@src/util/securitySettings'
 import { PasskeyCreationSettings } from './PasskeyCreationSettings'
 import { NewDeviceApprovalSettings } from '@src/pages-vault/NewDeviceApprovalSettings'
+import { DeviceUnlockSettings } from '@shared/DeviceUnlockSettings'
+import { enableDeviceUnlock } from '@shared/deviceUnlock'
 
 interface Values {
   vaultLockTimeoutSeconds: number
@@ -33,7 +35,8 @@ interface Values {
 }
 
 export default function Security() {
-  const { setSecuritySettings, deviceState } = useContext(DeviceStateContext)
+  const { setSecuritySettings, deviceState, device } =
+    useContext(DeviceStateContext)
   const options = useVaultLockTimeoutOptions()
 
   const [updateSettings] = useUpdateSettingsMutation({
@@ -55,6 +58,20 @@ export default function Security() {
       </CardHeader>
 
       <CardContent className="space-y-6">
+        <DeviceUnlockSettings
+          accountId={deviceState.userId}
+          onEnable={async () => {
+            const state = device.state
+            if (!state) throw new Error('Unlock your vault first')
+            const masterKey = state.masterEncryptionKey
+            await enableDeviceUnlock(
+              { accountId: state.userId, email: state.email, masterKey },
+              () =>
+                device.state === state &&
+                state.masterEncryptionKey === masterKey
+            )
+          }}
+        />
         <NewDeviceApprovalSettings />
         <PasskeyCreationSettings />
         <Formik

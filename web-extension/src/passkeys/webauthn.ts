@@ -139,10 +139,17 @@ export const getUnsupportedPasskeyReason = (
     if (extensions[key] !== undefined && extensions[key] !== false)
       return `The ${key} extension requires another authenticator`
   }
-  // Registration can succeed without PRF support. Assertions asking for PRF
-  // still need a provider that can evaluate it (for example, for encryption).
+  // Other sites may request optional PRF during registration without requiring
+  // it. Authier's own vault-unlock credential must live outside this vault.
+  const isVaultUnlock =
+    kind === 'create' &&
+    'rp' in options &&
+    ['authier.pm', 'vault.authier.pm'].includes(options.rp.id ?? '') &&
+    typeof prf === 'object' &&
+    prf !== null &&
+    'eval' in prf
   if (
-    kind === 'get' &&
+    (kind === 'get' || isVaultUnlock) &&
     extensions.prf !== undefined &&
     extensions.prf !== false
   )

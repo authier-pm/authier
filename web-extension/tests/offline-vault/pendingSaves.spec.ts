@@ -157,12 +157,21 @@ test('durable local save survives browser restart and a lost server acknowledgem
     })
 
     // Close the entire browser, not only the vault tab. Local storage and the
-    // encrypted remembered vault survive; session storage and live keys do not.
+    // password-encrypted snapshots survive; session storage and live keys do not.
     await context.close()
     context = await start()
     worker = await getWorker(context)
     page = await context.newPage()
     await page.goto(vaultUrl)
+    await expect(
+      page.getByRole('button', { name: 'Unlock vault', exact: true })
+    ).toBeVisible()
+    await page
+      .locator('input[type="password"]')
+      .fill('offline-preview-password')
+    await page
+      .getByRole('button', { name: 'Unlock vault', exact: true })
+      .click()
     await expect(
       page.getByText('New locally saved login', { exact: true })
     ).toBeVisible()

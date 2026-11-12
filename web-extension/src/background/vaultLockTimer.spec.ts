@@ -1,10 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import browser from 'webextension-polyfill'
-import {
-  forgetRememberedVault,
-  readRememberedVault,
-  rememberVault
-} from '@shared/rememberedVault'
+import { cancelDeviceUnlock } from '@shared/deviceUnlock'
 import { device, VAULT_LOCK_ALARM } from './ExtensionDevice'
 import type { IBackgroundStateSerializable } from './backgroundPage'
 import { mockPersistentVaultStorage } from '../../tests/vaultStorage'
@@ -88,7 +84,6 @@ beforeEach(async () => {
   device.state?.destroy()
   device.state = null
   device.lockedState = null
-  vi.mocked(readRememberedVault).mockResolvedValue(null)
 })
 
 afterEach(async () => {
@@ -120,7 +115,7 @@ describe('vault lock deadline enforcement', () => {
     expect(storage.session.lockedState).not.toHaveProperty(
       'masterEncryptionKey'
     )
-    expect(forgetRememberedVault).toHaveBeenCalled()
+    expect(cancelDeviceUnlock).toHaveBeenCalled()
   })
 
   it('keeps the original deadline across worker restarts and opening extension pages', async () => {
@@ -149,17 +144,16 @@ describe('vault lock deadline enforcement', () => {
       vaultLockTimeoutSeconds: 1_700_000_000_000
     }
   ])(
-    'rejects expired or invalid remembered deadlines before reopening the vault: %j',
+    'rejects expired or invalid session deadlines before reopening the vault: %j',
     async (values) => {
-      vi.mocked(readRememberedVault).mockResolvedValue({
-        ...snapshot(),
-        ...values
-      })
+      storage.session.backgroundState = { ...snapshot(), ...values }
       await device.initialize()
       expect(device.state).toBeNull()
       expect(storage.session.backgroundState).toBeNull()
       expect(device.lockedState?.authSecretEncrypted).toBe('ciphertext')
-      expect(rememberVault).not.toHaveBeenCalled()
+      expect(storage.session.lockedState).not.toHaveProperty(
+        'masterEncryptionKey'
+      )
     }
   )
 
@@ -207,7 +201,7 @@ describe('vault lock deadline enforcement', () => {
     await device.save(snapshot())
     const state = device.state!
     let finishPersistence!: () => void
-    vi.mocked(forgetRememberedVault).mockReturnValueOnce(
+    vi.mocked(cancelDeviceUnlock).mockReturnValueOnce(
       new Promise<void>((resolve) => {
         finishPersistence = resolve
       })

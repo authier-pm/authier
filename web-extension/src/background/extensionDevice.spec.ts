@@ -1,4 +1,5 @@
-import { readRememberedVault } from '@shared/rememberedVault'
+import { cleanupLegacyVault } from './legacyVaultCleanup'
+import { lockedVaultSnapshotSchema } from './lockedVaultStorage'
 import { DeviceState, device } from './ExtensionDevice'
 import type { IBackgroundStateSerializable } from './backgroundPage'
 import browser from 'webextension-polyfill'
@@ -74,7 +75,6 @@ describe('ExtensionDevice', () => {
   beforeEach(() => {
     location.href = 'chrome-extension://mock-extension-id/'
     vi.clearAllMocks()
-    vi.mocked(readRememberedVault).mockResolvedValue(null)
 
     // Reset device properties for each test
     device.id = null
@@ -125,7 +125,7 @@ describe('ExtensionDevice', () => {
   })
 
   describe('initialize', () => {
-    it('restores encrypted remembered state after browser session storage is cleared', async () => {
+    it('requires unlock after browser session storage is cleared', async () => {
       const remembered = {
         deviceName: 'Remembered browser',
         email: 'test@example.com',
@@ -147,11 +147,17 @@ describe('ExtensionDevice', () => {
         notificationOnWrongPasswordAttempts: 3
       }
       device.startLockInterval = vi.fn().mockResolvedValue(undefined)
-      vi.mocked(readRememberedVault).mockResolvedValue(remembered)
+      vi.mocked(browser.storage.local.get)
+        .mockResolvedValueOnce({ deviceId: 'test-device' })
+        .mockResolvedValueOnce({
+          lockedState: lockedVaultSnapshotSchema.parse(remembered)
+        })
       vi.mocked(browser.storage.session.get).mockResolvedValue({})
       await device.initialize()
-      expect(device.state?.masterEncryptionKey).toBe('remembered-key')
-      expect(device.lockedState).toBeNull()
+      expect(device.state).toBeNull()
+      expect(device.lockedState?.email).toBe(remembered.email)
+      expect(cleanupLegacyVault).toHaveBeenCalled()
+      expect(device.lockedState).not.toHaveProperty('masterEncryptionKey')
       expect(browser.storage.local.set).not.toHaveBeenCalledWith(
         expect.objectContaining({ backgroundState: expect.anything() })
       )
@@ -227,7 +233,7 @@ describe('ExtensionDevice', () => {
     })
   })
 
-  describe('commitPasswordRotation', () => {
+  describe('session transitions and password rotation', () => {
     const previousSnapshot: IBackgroundStateSerializable = {
       deviceName: 'browser',
       email: 'test@example.com',
@@ -258,6 +264,69 @@ describe('ExtensionDevice', () => {
         Object.create(DeviceState.prototype) as DeviceState,
         previousSnapshot
       )
+
+    it('restores a session created while startup device-ID I/O is pending', async () => {
+      let finish!: (id: string) => void
+      const getId = vi.spyOn(device, 'getDeviceId').mockImplementation(
+        () =>
+          new Promise<string>((resolve) => {
+            finish = resolve
+          })
+      )
+      const sessionGet = vi.mocked(browser.storage.session.get)
+      sessionGet.mockResolvedValue({})
+      const initializing = device.initialize()
+      await vi.waitFor(() => expect(getId).toHaveBeenCalled())
+      sessionGet.mockResolvedValue({
+        backgroundState: { ...previousSnapshot, vaultLockTimeoutSeconds: 0 },
+        lockedState: null
+      })
+      finish('startup-device')
+      await initializing
+      expect(device.state?.masterEncryptionKey).toBe('old-key')
+      device.state?.destroy()
+      getId.mockRestore()
+    })
+
+    it('unlocks the current snapshot with resolved keys', async () => {
+      device.lockedState = lockedVaultSnapshotSchema.parse(previousSnapshot)
+      await device.unlock(async () => ({
+        masterEncryptionKey: previousSnapshot.masterEncryptionKey,
+        authSecret: previousSnapshot.authSecret
+      }))
+      expect(device.state?.masterEncryptionKey).toBe('old-key')
+      expect(device.lockedState).toBeNull()
+      expect(browser.storage.session.set).toHaveBeenCalledWith({
+        backgroundState: expect.objectContaining({
+          masterEncryptionKey: 'old-key'
+        }),
+        lockedState: null
+      })
+      device.state?.destroy()
+    })
+
+    it('does not install keys from an unlock that finishes after logout', async () => {
+      device.lockedState = lockedVaultSnapshotSchema.parse(previousSnapshot)
+      const keys = {
+        masterEncryptionKey: previousSnapshot.masterEncryptionKey,
+        authSecret: previousSnapshot.authSecret
+      }
+      let finish!: (value: typeof keys) => void
+      const resolveKeys = vi.fn(
+        () =>
+          new Promise<typeof keys>((resolve) => {
+            finish = resolve
+          })
+      )
+      const unlocking = device.unlock(resolveKeys)
+      await vi.waitFor(() => expect(resolveKeys).toHaveBeenCalled())
+      await device.clearLocalStorage()
+      finish(keys)
+      await expect(unlocking).rejects.toThrow('Vault session changed')
+      expect(device.state).toBeNull()
+      expect(device.lockedState).toBeNull()
+      expect(browser.storage.session.set).not.toHaveBeenCalled()
+    })
 
     it('awaits installing the new key and ciphertext together for the same unlocked session', async () => {
       const previous = previousState()
