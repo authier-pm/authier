@@ -84,9 +84,13 @@
 
 html,
 body,
-#popup,
-#vault {
+#popup {
   min-height: 100vh;
+}
+
+#vault {
+  height: 100vh;
+  overflow: hidden;
 }
 
 body {
