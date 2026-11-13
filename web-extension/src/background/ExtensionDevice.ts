@@ -1,8 +1,9 @@
 import {
-  forgetRememberedVault,
-  readRememberedVault,
-  rememberVault
-} from '@shared/rememberedVault'
+  cancelDeviceUnlock,
+  discardOutdatedDeviceUnlock,
+  forgetDeviceUnlock
+} from '@shared/deviceUnlock'
+import { cleanupLegacyVault } from './legacyVaultCleanup'
 import { backgroundStateSerializableLockedSchema } from './backgroundSchemas'
 import { isSupportedSecretKind } from '@shared/secretKinds'
 import {
@@ -94,9 +95,9 @@ export const log = debug('au:Device')
 // The plaintext `decryptedSecrets` cache is derived on demand via
 // `getAllSecretsDecrypted()` and must never hit disk: strip it from every
 // `storage.session` write. Restored states recompute it in `initialize()`.
-// (Raw `masterEncryptionKey`/`authSecret` still persist in session storage so
-// the service worker can survive restarts; moving those to OS-keystore-held
-// non-extractable keys is tracked follow-up work.)
+// Raw keys stay only in this in-memory browser session, which survives worker
+// restarts but is cleared when the browser exits. Passkey unlock stores only a
+// wrapped master key; its wrapping key comes from an external authenticator.
 export const toPersistedBackgroundState = (
   state: object | null | undefined
 ) => {
@@ -409,6 +410,7 @@ export class DeviceState implements IBackgroundStateSerializable {
   }
 
   async save() {
+    await cleanupLegacyVault()
     //TODO: Fix perf
     await this.restorePendingSecrets()
     const decryptedSecrets = await this.getAllSecretsDecrypted()
@@ -422,7 +424,7 @@ export class DeviceState implements IBackgroundStateSerializable {
       }),
       setAutofillCredentialsEnabled(this.autofillCredentialsEnabled),
       saveLockedVaultSnapshot(this),
-      rememberVault(backgroundStateSerializableLockedSchema.parse(this))
+      discardOutdatedDeviceUnlock(this.userId, this.masterEncryptionKey)
     ])
     if (isRunningInBgServiceWorker) {
       const icon = browser.runtime.getURL('icon-48.png')
@@ -806,30 +808,22 @@ class ExtensionDevice {
     this.isInitialized = false
     this.state?.destroy()
     this.state = null
-    const [id, storage, persistedLockedState, rememberedSnapshot] =
-      await Promise.all([
-        this.getDeviceId(),
-        browser.storage.session.get() as Promise<{
-          backgroundState: IBackgroundStateSerializable | null
-          lockedState: IBackgroundStateSerializableLocked | null
-        }>,
-        readLockedVaultSnapshot(),
-        readRememberedVault()
-      ])
+    await cleanupLegacyVault()
+    const [id, persistedLockedState] = await Promise.all([
+      this.getDeviceId(),
+      readLockedVaultSnapshot()
+    ])
+    // Read the live session last, immediately before installing its listener.
+    // A login while migration/device-ID I/O runs must not be replaced with an
+    // earlier empty snapshot whose storage-change event was already delivered.
+    const storage = (await browser.storage.session.get()) as {
+      backgroundState: IBackgroundStateSerializable | null
+      lockedState: IBackgroundStateSerializableLocked | null
+    }
     this.lockedState = storage.lockedState ?? persistedLockedState
     this.id = id
-    const remembered =
-      backgroundStateSerializableLockedSchema.safeParse(rememberedSnapshot)
-    let storedState: IBackgroundStateSerializable | null = remembered.success
-      ? remembered.data
-      : null
-
-    if (storage.backgroundState) {
-      storedState = storage.backgroundState
-    } else if (storage.lockedState) {
-      this.lockedState = storage.lockedState
-      storedState = null
-    }
+    let storedState = storage.backgroundState ?? null
+    if (storage.lockedState) storedState = null
 
     // Never decrypt or re-persist a timed-out snapshot, including legacy
     // snapshots which cannot establish when the vault was last unlocked.
@@ -841,7 +835,6 @@ class ExtensionDevice {
         )
       })
       storedState = null
-      await forgetRememberedVault()
       await saveLockedVaultSnapshot(this.lockedState)
     }
 
@@ -905,6 +898,7 @@ class ExtensionDevice {
   async clearLocalStorage() {
     const state = this.state
     this.state = null
+    this.lockedState = null
     state?.destroy()
     if (state) {
       state.masterEncryptionKey = ''
@@ -916,7 +910,7 @@ class ExtensionDevice {
       this.getDeviceId(),
       getAutofillCredentialsEnabled()
     ])
-    await forgetRememberedVault()
+    await forgetDeviceUnlock()
     await browser.storage.session.clear()
     await browser.storage.local.remove('lockedState')
     this.state = null
@@ -1033,7 +1027,7 @@ class ExtensionDevice {
     // Invalidate the live session before any asynchronous persistence. An
     // in-flight save or request must observe that the vault is already locked.
     await this.clearLockInterval()
-    await forgetRememberedVault()
+    await cancelDeviceUnlock()
     await saveLockedVaultSnapshot(this.lockedState)
     await browser.storage.session.set({
       lockedState: this.lockedState,
@@ -1131,6 +1125,24 @@ class ExtensionDevice {
     await this.state.save()
   }
 
+  async unlock(
+    resolveKeys: (
+      snapshot: IBackgroundStateSerializableLocked
+    ) => Promise<
+      Pick<IBackgroundStateSerializable, 'masterEncryptionKey' | 'authSecret'>
+    >
+  ) {
+    const snapshot = this.lockedState
+    if (!snapshot || this.state) throw new Error('Vault session changed')
+    await cleanupLegacyVault()
+    const keys = await resolveKeys(snapshot)
+    // A prompt/derivation can finish after logout or another window changes
+    // the account. Check immediately before installing the unlocked session.
+    if (this.lockedState !== snapshot || this.state)
+      throw new Error('Vault session changed. Try unlocking again.')
+    await this.save({ ...snapshot, ...keys })
+  }
+
   async commitPasswordRotation(
     previousState: DeviceState,
     nextState: IBackgroundStateSerializable
@@ -1151,6 +1163,8 @@ class ExtensionDevice {
     }
     // Completing the server request must not undo an automatic/manual lock.
     // Keep its ciphertext and verifier current so the new password unlocks it.
+    await forgetDeviceUnlock()
+    if (this.state || this.lockedState !== lockedState) return
     const nextLockedState = lockedVaultSnapshotSchema.parse(nextState)
     this.lockedState = nextLockedState
     await saveLockedVaultSnapshot(nextLockedState)

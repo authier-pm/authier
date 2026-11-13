@@ -1,7 +1,13 @@
-vi.mock('@shared/rememberedVault', () => ({
-  rememberVault: vi.fn().mockResolvedValue(undefined),
-  readRememberedVault: vi.fn().mockResolvedValue(null),
-  forgetRememberedVault: vi.fn().mockResolvedValue(undefined)
+vi.mock('@shared/deviceUnlock', () => ({
+  cancelDeviceUnlock: vi.fn().mockResolvedValue(undefined),
+  discardOutdatedDeviceUnlock: vi.fn().mockResolvedValue(undefined),
+  forgetDeviceUnlock: vi.fn().mockResolvedValue(undefined),
+  enableDeviceUnlock: vi.fn().mockResolvedValue(undefined),
+  hasDeviceUnlock: vi.fn().mockResolvedValue(false),
+  unlockWithDevice: vi.fn()
+}))
+vi.mock('@src/background/legacyVaultCleanup', () => ({
+  cleanupLegacyVault: vi.fn().mockResolvedValue(undefined)
 }))
 import { mockDate, unmockDate } from 'proxy-date'
 import { beforeAll, afterAll, vi } from 'vitest'

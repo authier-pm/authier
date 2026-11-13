@@ -426,6 +426,19 @@ describe('software authenticator', () => {
     }
   )
 
+  it('delegates PRF encryption setup to an external authenticator', () => {
+    expect(
+      getUnsupportedPasskeyReason(
+        {
+          ...creationOptions(),
+          rp: { id: 'authier.pm', name: 'Authier' },
+          extensions: { prf: { eval: { first: 'c2FsdA' } } }
+        },
+        'create'
+      )
+    ).toContain('another authenticator')
+  })
+
   it('does not accept authentication-only PRF parameters during creation', () => {
     expect(
       getUnsupportedPasskeyReason(

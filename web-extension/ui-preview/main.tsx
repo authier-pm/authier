@@ -3,7 +3,7 @@ import {
   MasterDeviceRecoveryPreview,
   MasterDeviceResetProgressPreview
 } from './scenarios/MasterDeviceRecoveryPreview'
-import { RememberedSessionPreview } from './scenarios/RememberedSessionPreview'
+import { PasskeyUnlockPreview } from './scenarios/PasskeyUnlockPreview'
 import { type ComponentType } from 'react'
 import ReactDOM from 'react-dom/client'
 import '@src/index.css'
@@ -48,7 +48,7 @@ const scenarios: Record<string, ComponentType> = {
   'new-device-policy': NewDevicePolicyPreview,
   'master-device-recovery': MasterDeviceRecoveryPreview,
   'master-device-reset-progress': MasterDeviceResetProgressPreview,
-  'remembered-session': RememberedSessionPreview,
+  'passkey-unlock': PasskeyUnlockPreview,
   'passkey-vault': PasskeyVaultPreview,
   'passkey-sidebar': PasskeySidebarPreview,
   'passkey-popup': PasskeyPopupPreview,
@@ -87,6 +87,7 @@ document.body.classList.toggle(
   'extension-popup',
   !requestedScenario.startsWith('master-device-') &&
     requestedScenario !== 'new-device-policy' &&
+    requestedScenario !== 'passkey-unlock' &&
     requestedScenario !== 'add-item' &&
     requestedScenario !== 'credential-edit' &&
     !requestedScenario.startsWith('android-') &&

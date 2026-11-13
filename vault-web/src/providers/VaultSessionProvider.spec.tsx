@@ -1,5 +1,6 @@
+import { useState } from 'react'
 import { getVaultSecretMetadata } from '@/lib/vaultSecrets'
-import { readRememberedVault, rememberVault } from '@shared/rememberedVault'
+import * as deviceUnlock from '@shared/deviceUnlock'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { vi, describe, expect, it, beforeEach } from 'vitest'
@@ -147,6 +148,7 @@ const createSyncPage = (
 })
 
 function VaultSessionHarness() {
+  const [passkeyFinished, setPasskeyFinished] = useState(false)
   const {
     createLoginSecret,
     lockVault,
@@ -157,12 +159,14 @@ function VaultSessionHarness() {
     status,
     syncVault,
     unlockVault,
+    unlockVaultWithPasskey,
     updateLoginSecret
   } = useVaultSession()
 
   return (
     <div>
       <p data-testid="status">{status}</p>
+      <p data-testid="passkey-finished">{String(passkeyFinished)}</p>
       <p data-testid="sync-state">{isSyncingVault ? 'syncing' : 'idle'}</p>
       <p data-testid="last-sync">
         {session?.currentDevice.lastSyncAt ?? 'never'}
@@ -175,6 +179,14 @@ function VaultSessionHarness() {
       </button>
       <button onClick={lockVault} type="button">
         Lock
+      </button>
+      <button
+        onClick={() =>
+          void unlockVaultWithPasskey().finally(() => setPasskeyFinished(true))
+        }
+        type="button"
+      >
+        Passkey unlock
       </button>
       <button onClick={() => void syncVault()} type="button">
         Sync
@@ -261,6 +273,62 @@ describe('VaultSessionProvider', () => {
     })
     orpcMocks.sync.mockResolvedValue(createSyncPage([]))
   })
+
+  it.each([false, true])(
+    'requires the authenticator key and does not let late authentication undo a lock (lock while pending: %s)',
+    async (lockWhilePending) => {
+      const salt = crypto.getRandomValues(new Uint8Array(16))
+      const masterKey = await generateEncryptionKey(
+        'super secure password',
+        salt
+      )
+      const secrets = await initLocalDeviceAuthSecret(masterKey, salt)
+      storeLockedState({
+        encryptionSalt: bufferToBase64(salt),
+        authSecretEncrypted: secrets.addDeviceSecretEncrypted
+      })
+      const unlocked = vi
+        .spyOn(deviceUnlock, 'unlockWithDevice')
+        .mockResolvedValue(await cryptoKeyToString(masterKey))
+      const authentication =
+        createDeferred<VaultApiOutputs['auth']['refresh']>()
+      orpcMocks.completeDeviceLogin.mockReturnValueOnce(authentication.promise)
+      const view = render(
+        <VaultSessionProvider>
+          <VaultSessionHarness />
+        </VaultSessionProvider>
+      )
+      expect(screen.getByTestId('status')).toHaveTextContent('locked')
+      expect(orpcMocks.completeDeviceLogin).not.toHaveBeenCalled()
+      await userEvent.click(
+        screen.getByRole('button', { name: /^Passkey unlock$/ })
+      )
+      await waitFor(() =>
+        expect(orpcMocks.completeDeviceLogin).toHaveBeenCalledOnce()
+      )
+      expect(unlocked).toHaveBeenCalledWith('user-1')
+      if (lockWhilePending)
+        await userEvent.click(screen.getByRole('button', { name: /^Lock$/ }))
+      authentication.resolve({
+        accessToken: 'test-access',
+        refreshToken: 'test-refresh',
+        session: createSession({ secrets: [] })
+      })
+      await waitFor(() =>
+        expect(screen.getByTestId('status')).toHaveTextContent(
+          lockWhilePending ? 'locked' : 'authenticated'
+        )
+      )
+      await waitFor(() =>
+        expect(screen.getByTestId('passkey-finished')).toHaveTextContent('true')
+      )
+      expect(screen.getByTestId('status')).toHaveTextContent(
+        lockWhilePending ? 'locked' : 'authenticated'
+      )
+      view.unmount()
+      unlocked.mockRestore()
+    }
+  )
 
   it('unlocks local vault state and keeps secret CRUD encrypted client-side', async () => {
     const password = 'super secure password'
@@ -491,50 +559,6 @@ describe('VaultSessionProvider', () => {
     ]) {
       expect(window.localStorage.getItem(key)).toBeNull()
     }
-  })
-
-  it('restores remembered unlock after restart without a password or live cookie, and forgets it on lock', async () => {
-    const salt = crypto.getRandomValues(new Uint8Array(16))
-    const masterKey = await generateEncryptionKey('super secure password', salt)
-    const deviceSecrets = await initLocalDeviceAuthSecret(masterKey, salt)
-    const session = createSession({
-      secrets: [],
-      lastSyncAt: new Date().toISOString()
-    })
-    session.user.id = crypto.randomUUID()
-    storeLockedState({
-      userId: session.user.id,
-      authSecretEncrypted: deviceSecrets.addDeviceSecretEncrypted,
-      encryptionSalt: bufferToBase64(salt)
-    })
-    orpcMocks.refresh.mockResolvedValue({
-      accessToken: 'resumed-access',
-      refreshToken: 'resumed-refresh',
-      session
-    })
-    await rememberVault({
-      session,
-      masterKey: await cryptoKeyToString(masterKey)
-    })
-    const view = render(
-      <VaultSessionProvider>
-        <VaultSessionHarness />
-      </VaultSessionProvider>
-    )
-    await waitFor(() =>
-      expect(screen.getByTestId('status')).toHaveTextContent('authenticated')
-    )
-    expect(orpcMocks.requestDeviceChallenge).toHaveBeenCalledOnce()
-    expect(orpcMocks.completeDeviceLogin).toHaveBeenCalledOnce()
-    await userEvent.click(screen.getByRole('button', { name: /^Lock$/ }))
-    await waitFor(async () => expect(await readRememberedVault()).toBeNull())
-    view.unmount()
-    render(
-      <VaultSessionProvider>
-        <VaultSessionHarness />
-      </VaultSessionProvider>
-    )
-    expect(screen.getByTestId('status')).toHaveTextContent('locked')
   })
 
   it('purges legacy credentials and requires unlock after a remount', async () => {

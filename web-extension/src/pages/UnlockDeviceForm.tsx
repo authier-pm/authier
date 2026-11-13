@@ -8,9 +8,14 @@ import { DeviceStateContext } from '@src/providers/DeviceStateProvider'
 import { Input } from '@src/components/ui/input'
 import { toast } from '@src/ExtensionProviders'
 import {
+  abToCryptoKey,
+  base64ToBuffer,
   cryptoKeyToString,
   decryptDeviceSecretWithPassword
 } from '@util/generateEncryptionKey'
+import { decryptString } from '@shared/cryptoUtils'
+import { DeviceUnlockButton } from '@shared/DeviceUnlockButton'
+import { unlockWithDevice } from '@shared/deviceUnlock'
 
 interface FormValues {
   password: string
@@ -31,7 +36,7 @@ export function UnlockDeviceForm({ onUnlocked }: { onUnlocked: () => void }) {
   })
 
   const password = watch('password')
-  const { setDeviceState, lockedState, device } = useContext(DeviceStateContext)
+  const { lockedState, device } = useContext(DeviceStateContext)
 
   useEffect(() => {
     if (lockedState === null) {
@@ -47,22 +52,15 @@ export function UnlockDeviceForm({ onUnlocked }: { onUnlocked: () => void }) {
     setIsSubmitting(true)
 
     try {
-      const { addDeviceSecret, masterEncryptionKey } =
-        await decryptDeviceSecretWithPassword(values.password, lockedState)
-
-      if (!addDeviceSecret) {
-        throw new Error(t`Incorrect password`)
-      }
-
-      setDeviceState({
-        masterEncryptionKey: await cryptoKeyToString(masterEncryptionKey),
-        ...lockedState,
-        authSecret: addDeviceSecret
+      await device.unlock(async (snapshot) => {
+        const { addDeviceSecret, masterEncryptionKey } =
+          await decryptDeviceSecretWithPassword(values.password, snapshot)
+        if (!addDeviceSecret) throw new Error(t`Incorrect password`)
+        return {
+          masterEncryptionKey: await cryptoKeyToString(masterEncryptionKey),
+          authSecret: addDeviceSecret
+        }
       })
-
-      if (lockedState.vaultLockTimeoutSeconds) {
-        device.startLockInterval(lockedState.vaultLockTimeoutSeconds)
-      }
 
       onUnlocked()
     } catch (err) {
@@ -90,6 +88,28 @@ export function UnlockDeviceForm({ onUnlocked }: { onUnlocked: () => void }) {
         <div className="flex size-16 items-center justify-center rounded-full border border-[color:var(--color-border)] bg-[color:var(--color-accent)]/30">
           <IoLockClosed className="size-8 text-[color:var(--color-primary)]" />
         </div>
+      </div>
+
+      <div className="mb-4">
+        <DeviceUnlockButton
+          accountId={lockedState.userId}
+          onUnlock={async () => {
+            await device.unlock(async (snapshot) => {
+              const masterEncryptionKey = await unlockWithDevice(
+                snapshot.userId
+              )
+              const key = await abToCryptoKey(
+                base64ToBuffer(masterEncryptionKey)
+              )
+              const authSecret = await decryptString(
+                key,
+                snapshot.authSecretEncrypted
+              )
+              return { masterEncryptionKey, authSecret }
+            })
+            onUnlocked()
+          }}
+        />
       </div>
 
       <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>

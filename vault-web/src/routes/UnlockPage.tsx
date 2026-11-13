@@ -13,6 +13,7 @@ import {
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useVaultSession } from '@/providers/VaultSessionProvider'
+import { DeviceUnlockButton } from '@shared/DeviceUnlockButton'
 
 const unlockSchema = z.object({
   password: z.string().min(1)
@@ -20,7 +21,14 @@ const unlockSchema = z.object({
 
 export function UnlockPage() {
   const navigate = useNavigate()
-  const { isBusy, lockedState, status, unlockVault, logout } = useVaultSession()
+  const {
+    isBusy,
+    lockedState,
+    status,
+    unlockVault,
+    unlockVaultWithPasskey,
+    logout
+  } = useVaultSession()
   const form = useForm<z.infer<typeof unlockSchema>>({
     resolver: zodResolver(unlockSchema),
     defaultValues: {
@@ -57,7 +65,7 @@ export function UnlockPage() {
           </div>
           <CardTitle className="pt-3 text-2xl">Unlock vault</CardTitle>
           <CardDescription>
-            Re-enter your master password to decrypt this local session.
+            Use your passkey or master password to unlock this browser.
           </CardDescription>
         </CardHeader>
 
@@ -72,6 +80,13 @@ export function UnlockPage() {
             </p>
           </div>
 
+          <DeviceUnlockButton
+            accountId={lockedState.userId}
+            onUnlock={async () => {
+              await unlockVaultWithPasskey()
+              navigate('/vault', { replace: true })
+            }}
+          />
           <form className="space-y-4" onSubmit={handleSubmit}>
             <div className="space-y-2">
               <Label htmlFor="password">Master password</Label>

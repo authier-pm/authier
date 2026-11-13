@@ -23,7 +23,7 @@ extension with a synthetic mixed vault, including an unsupported future item.
 Build with `API_URL=https://api.authier.test/graphql pnpm prodBuild`, then run `pnpm exec playwright test --config
 playwrightOfflineVault.config.ts pendingSaves.spec.ts` from `web-extension`.
 It saves a new login offline, checks encrypted local persistence, restarts the
-entire browser, and retries a lost server acknowledgement without a duplicate.
+entire browser, unlocks with the master password, and retries a lost server acknowledgement without a duplicate.
 The production pending-sync and upgrade notices are captured in
 `docs/screenshots/vaultPendingSync.png`.
 
@@ -221,7 +221,11 @@ handler. Its deliberately broad saved username selector also matches the OTP
 boxes. The browser test verifies that the picker disappears on the second step,
 checks every filled digit, and captures `docs/screenshots/bitfinex-totp.png`.
 
-The `remembered-session` scenario renders the unlocked popup using the shared encrypted IndexedDB snapshot store. Reloading restores it without a password prompt. Its Playwright test captures `docs/screenshots/remembered-session-restart.png`.
+The `passkey-unlock` scenario renders the shared production passkey setup and unlock controls. Run `pnpm exec playwright test --config playwrightUiPreview.config.ts passkeyUnlock.spec.ts`. The test uses a WebAuthn PRF virtual authenticator, unlocks after reload, copies the profile while unlocked, and verifies that the copy cannot unlock without that authenticator. It captures `docs/screenshots/passkeyUnlock.png`.
+
+The built-extension regression `tests/security/vaultKeyPersistence.spec.ts` reproduces the legacy LevelDB key remnant, runs the real upgrade cleanup, exercises passkey setup and unlock, and scans the closed profile for synthetic key bytes. Build with `API_URL=https://api.authier.pm/graphql pnpm prodBuild`, then run `pnpm exec playwright test --config playwrightSecurity.config.ts vaultKeyPersistence.spec.ts`. All account traffic is mocked.
+
+For the web vault's real Worker cleanup, build `vault-web`, then run `pnpm exec playwright test --config playwrightVaultWeb.config.ts` from `web-extension`. This verifies same-origin clearing of historical IndexedDB key files and preservation of the public device identity. Browser tests use disposable profiles and synthetic keys; they do not test physical disk recovery or a real hardware authenticator.
 
 The `passkey-vault` scenario renders the production passkey table and label editor,
 including the website and account without exposing key material. Its Playwright

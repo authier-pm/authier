@@ -184,7 +184,7 @@ export function useDeviceState() {
 
   const saveDeviceState = useCallback(
     async (state: IBackgroundStateSerializable) => {
-      device.save(state)
+      await device.save(state)
     },
     []
   )

@@ -3,12 +3,13 @@ import {
   type MasterDeviceResetConfig
 } from '../../../shared/masterDeviceResetConfig'
 import {
-  forgetRememberedVault,
-  readRememberedVault,
-  rememberVault
-} from '@shared/rememberedVault'
-import { sessionBootstrapSchema } from '@shared/orpc/schemas'
-import { z } from 'zod'
+  cancelDeviceUnlock,
+  discardOutdatedDeviceUnlock,
+  enableDeviceUnlock,
+  forgetDeviceUnlock,
+  unlockWithDevice
+} from '@shared/deviceUnlock'
+import { cleanupLegacyVault } from '@/lib/legacyVaultCleanup'
 import {
   abToCryptoKey,
   cryptoKeyToString,
@@ -103,6 +104,8 @@ type VaultSessionContextValue = {
     config?: MasterDeviceResetConfig
   ) => Promise<void>
   unlockVault: (password: string) => Promise<void>
+  unlockVaultWithPasskey: () => Promise<void>
+  enablePasskeyUnlock: () => Promise<void>
   syncVault: () => Promise<void>
   lockVault: () => void
   logout: () => Promise<void>
@@ -181,7 +184,7 @@ export function VaultSessionProvider({ children }: { children: ReactNode }) {
     sessionEpochRef.current += 1
     syncCursorRef.current = undefined
     deletedVersionsRef.current.clear()
-    void forgetRememberedVault()
+    void cancelDeviceUnlock()
     setAccessToken(null)
     setSession(null)
     setMasterKey(null)
@@ -195,12 +198,14 @@ export function VaultSessionProvider({ children }: { children: ReactNode }) {
     clearUnlockedSession()
     setRefreshToken(null)
     setLockedState(null)
+    void forgetDeviceUnlock()
   }
 
   useEffect(() => {
     const unsubscribe = onUnauthorizedSession(clearVaultSession)
     return () => {
       unsubscribe()
+      sessionEpochRef.current += 1
       setAccessToken(null)
     }
   }, [])
@@ -289,8 +294,15 @@ export function VaultSessionProvider({ children }: { children: ReactNode }) {
 
   const completeAuthenticatedSession = async (
     authenticatedSession: AuthenticatedSession,
-    options: SessionAuthOptions
+    options: SessionAuthOptions,
+    shouldComplete = () => true
   ) => {
+    await cleanupLegacyVault()
+    await discardOutdatedDeviceUnlock(
+      authenticatedSession.session.user.id,
+      await cryptoKeyToString(options.masterEncryptionKey)
+    )
+    if (!shouldComplete()) return
     sessionEpochRef.current += 1
     syncCursorRef.current = undefined
     deletedVersionsRef.current.clear()
@@ -342,62 +354,6 @@ export function VaultSessionProvider({ children }: { children: ReactNode }) {
   }
 
   useEffect(() => {
-    let cancelled = false
-    const epoch = sessionEpochRef.current
-    void readRememberedVault()
-      .then(async (stored) => {
-        const snapshot = z
-          .object({ session: sessionBootstrapSchema, masterKey: z.string() })
-          .safeParse(stored)
-        if (!snapshot.success || cancelled || epoch !== sessionEpochRef.current)
-          return
-        const restoredKey = await abToCryptoKey(
-          base64ToBuffer(snapshot.data.masterKey)
-        )
-        if (cancelled || epoch !== sessionEpochRef.current) return
-        const email = snapshot.data.session.user.email
-        if (!email) return
-        const challenge = await orpcClient.auth.requestDeviceChallenge({
-          email,
-          deviceInput: deviceIdentity
-        })
-        if (cancelled || epoch !== sessionEpochRef.current) return
-        if (challenge.status !== 'approved') {
-          clearVaultSession()
-          throw new Error(
-            'This device needs approval before its session can resume'
-          )
-        }
-        // Prove possession of the remembered key, even if the refresh cookie
-        // expired while the browser was closed. Server approval still applies.
-        await completeApprovedLogin(
-          challenge,
-          email,
-          '',
-          restoredKey,
-          () => !cancelled && epoch === sessionEpochRef.current
-        )
-      })
-      .catch((error: unknown) =>
-        console.warn('Unable to restore remembered vault session', error)
-      )
-    return () => {
-      cancelled = true
-    }
-  }, [])
-
-  useEffect(() => {
-    if (!session || !masterKey) return
-    let cancelled = false
-    void cryptoKeyToString(masterKey).then(async (serializedKey) => {
-      if (!cancelled) await rememberVault({ session, masterKey: serializedKey })
-    })
-    return () => {
-      cancelled = true
-    }
-  }, [session, masterKey])
-
-  useEffect(() => {
     if (status !== 'authenticated' || !refreshToken || !lockedState) {
       return
     }
@@ -437,11 +393,11 @@ export function VaultSessionProvider({ children }: { children: ReactNode }) {
     challenge: ApprovedChallenge,
     email: string,
     password: string,
-    rememberedKey?: CryptoKey,
+    unlockedKey?: CryptoKey,
     shouldComplete = () => true
   ) => {
     const masterEncryptionKey =
-      rememberedKey ??
+      unlockedKey ??
       (await generateEncryptionKey(
         password,
         base64ToBuffer(challenge.encryptionSalt)
@@ -475,15 +431,20 @@ export function VaultSessionProvider({ children }: { children: ReactNode }) {
     })
 
     if (!shouldComplete()) return
-    await completeAuthenticatedSession(authenticatedSession, {
-      email,
-      encryptionSalt: challenge.encryptionSalt,
-      authSecretEncrypted: nextDeviceSecrets.addDeviceSecretEncrypted,
-      masterEncryptionKey
-    })
+    await completeAuthenticatedSession(
+      authenticatedSession,
+      {
+        email,
+        encryptionSalt: challenge.encryptionSalt,
+        authSecretEncrypted: nextDeviceSecrets.addDeviceSecretEncrypted,
+        masterEncryptionKey
+      },
+      shouldComplete
+    )
   }
 
   const submitLogin = async (email: string, password: string) => {
+    await cleanupLegacyVault()
     setIsBusy(true)
 
     try {
@@ -551,14 +512,20 @@ export function VaultSessionProvider({ children }: { children: ReactNode }) {
   const reauthenticateLockedDevice = async (
     email: string,
     password: string,
-    rememberedKey?: CryptoKey
+    unlockedKey?: CryptoKey
   ) => {
+    const epoch = sessionEpochRef.current
     const result = await orpcClient.auth.requestDeviceChallenge({
       email,
       deviceInput: deviceIdentity
     })
 
+    if (epoch !== sessionEpochRef.current) return
     if (result.status !== 'approved') {
+      if (!password)
+        throw new Error(
+          'This device needs approval. Sign in with your master password.'
+        )
       setPendingLogin({
         email,
         password,
@@ -567,7 +534,13 @@ export function VaultSessionProvider({ children }: { children: ReactNode }) {
       throw new Error('Session expired. Log in again to approve this device')
     }
 
-    await completeApprovedLogin(result, email, password, rememberedKey)
+    await completeApprovedLogin(
+      result,
+      email,
+      password,
+      unlockedKey,
+      () => epoch === sessionEpochRef.current
+    )
   }
 
   const register = async (
@@ -575,6 +548,7 @@ export function VaultSessionProvider({ children }: { children: ReactNode }) {
     password: string,
     config = defaultMasterDeviceResetConfig
   ) => {
+    await cleanupLegacyVault()
     setIsBusy(true)
 
     try {
@@ -612,6 +586,7 @@ export function VaultSessionProvider({ children }: { children: ReactNode }) {
   }
 
   const unlockVault = async (password: string) => {
+    await cleanupLegacyVault()
     if (!lockedState) {
       throw new Error('No locked vault available')
     }
@@ -654,6 +629,32 @@ export function VaultSessionProvider({ children }: { children: ReactNode }) {
     } finally {
       setIsBusy(false)
     }
+  }
+
+  const enablePasskeyUnlock = async () => {
+    if (!session || !masterKey || !session.user.email)
+      throw new Error('Unlock your vault first')
+    const epoch = sessionEpochRef.current
+    await enableDeviceUnlock(
+      {
+        accountId: session.user.id,
+        email: session.user.email,
+        masterKey: await cryptoKeyToString(masterKey)
+      },
+      () => epoch === sessionEpochRef.current
+    )
+  }
+
+  const unlockVaultWithPasskey = async () => {
+    if (!lockedState) throw new Error('No locked vault available')
+    const epoch = sessionEpochRef.current
+    await cleanupLegacyVault()
+    const key = await abToCryptoKey(
+      base64ToBuffer(await unlockWithDevice(lockedState.userId))
+    )
+    if (epoch !== sessionEpochRef.current)
+      throw new Error('Vault session changed')
+    await reauthenticateLockedDevice(lockedState.email, '', key)
   }
 
   const syncVault = async () => {
@@ -878,6 +879,8 @@ export function VaultSessionProvider({ children }: { children: ReactNode }) {
         requestMasterDeviceReset,
         register,
         unlockVault,
+        unlockVaultWithPasskey,
+        enablePasskeyUnlock,
         syncVault,
         lockVault,
         logout,

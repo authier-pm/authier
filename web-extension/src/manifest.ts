@@ -161,6 +161,7 @@ export async function getManifest(options: ManifestOptions = {}) {
     permissions: [
       'activeTab',
       'storage',
+      'browsingData',
       'alarms',
       'tabs',
       'clipboardRead',

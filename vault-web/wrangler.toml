@@ -1,7 +1,10 @@
 name = "authier-vault-web"
+main = "src/worker.ts"
 compatibility_date = "2025-06-01"
 compatibility_flags = ["nodejs_compat"]
 
 [assets]
+binding = "ASSETS"
+run_worker_first = ["/clear-legacy-vault"]
 directory = "./dist"
 not_found_handling = "single-page-application"
