@@ -5,6 +5,7 @@ import type {
 } from '../src/background/ExtensionDevice'
 import type { ISecret, IPasskeySecret } from '../src/util/useDeviceState'
 import { passkeySchema } from '@shared/passkeySchema'
+import { initLocalDeviceAuthSecret } from '@shared/cryptoUtils'
 
 export const pathNameToTypes = {
   '/credentials': [EncryptedSecretType.LOGIN_CREDENTIALS],
@@ -38,6 +39,12 @@ export const decodePreviewPasskey = (encrypted: string) =>
 
 export const device = {
   id: 'preview-current-device',
+  name: 'Preview browser',
+  platform: 'Linux',
+  getDeviceId: async () => '00000000-0000-4000-8000-000000000001',
+  generateDeviceName: () => 'Preview browser',
+  initLocalDeviceAuthSecret,
+  save: async () => undefined,
   state: {
     email: 'alex@example.com',
     secrets: [] as ISecret[],

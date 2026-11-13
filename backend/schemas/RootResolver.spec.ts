@@ -15,9 +15,11 @@ import { WebInputTypeGQL } from '../models/types/WebInputType'
 import { fakeUserAndContext } from './__test__/fakeUserAndContext'
 import { makeRegisterAccountInput } from './__test__/makeRegisterAccountInput'
 import { defaultDeviceSettingSystemValues } from '../models/defaultDeviceSettingSystemValues'
-import type { GraphQLResolveInfo } from 'graphql'
+import { graphql, type GraphQLResolveInfo } from 'graphql'
+import { readFileSync } from 'node:fs'
 import * as schema from '../drizzle/schema'
 import { eq } from 'drizzle-orm'
+import { gqlSchema } from './gqlSchema'
 
 const userSecurityProps = {
   deviceRecoveryCooldownMinutes: 960,
@@ -59,25 +61,48 @@ describe('RootResolver', () => {
   describe('registerNewUser', () => {
     const userId = crypto.randomUUID()
 
-    it('should add new user', async () => {
-      const input: RegisterNewAccountInput = makeRegisterAccountInput()
+    it('returns the new master device through the extension signup mutation', async () => {
+      const signupUserId = crypto.randomUUID()
+      const deviceId = crypto.randomUUID()
+      const input: RegisterNewAccountInput = {
+        email: `${signupUserId}@example.com`,
+        deviceId,
+        deviceName: 'Test browser',
+        devicePlatform: 'Linux',
+        firebaseToken: null,
+        addDeviceSecret: 'test-device-secret',
+        addDeviceSecretEncrypted: 'test-encrypted-device-secret',
+        encryptionSalt: 'test-salt'
+      }
+      const result = await graphql({
+        schema: gqlSchema,
+        source: readFileSync(
+          new URL('../../shared/graphql/registerNewUser.gql', import.meta.url),
+          'utf8'
+        ),
+        variableValues: { input, userId: signupUserId },
+        contextValue: makeFakeCtx({ userId: signupUserId, deviceId })
+      })
 
-      const data = await resolver.registerNewUser(
-        input,
-        userId,
-        makeFakeCtx({ userId })
-      )
-
-      expect({
-        accessToken: data.accessToken,
-        email: data.user.email
-      }).toMatchObject({ accessToken: expect.any(String), email: input.email })
-
-      await db.delete(schema.device).where(eq(schema.device.userId, userId))
-      await db
-        .delete(schema.decryptionChallenge)
-        .where(eq(schema.decryptionChallenge.userId, userId))
-      await db.delete(schema.user).where(eq(schema.user.id, userId))
+      expect(result.errors).toBeUndefined()
+      expect(result.data).toEqual({
+        registerNewUser: {
+          accessToken: expect.any(String),
+          user: {
+            id: signupUserId,
+            sendEmailVerification: 1,
+            notificationOnVaultUnlock: false,
+            notificationOnWrongPasswordAttempts: 3,
+            Devices: [{ id: deviceId, name: input.deviceName }]
+          }
+        }
+      })
+      expect(
+        await db.query.user.findFirst({
+          where: { id: signupUserId },
+          columns: { masterDeviceId: true }
+        })
+      ).toEqual({ masterDeviceId: deviceId })
     })
 
     it('should throw User with such email already exists', async () => {
@@ -98,8 +123,9 @@ describe('RootResolver', () => {
       ).rejects.toThrow('User with such email already exists.')
     })
 
-    it("should show 'Device already exists. You cannot register this device for multiple accounts.'", async () => {
+    it('rejects a device already in use and rolls back the new account', async () => {
       const userId = crypto.randomUUID()
+      const signupUserId = crypto.randomUUID()
 
       const input: RegisterNewAccountInput = makeRegisterAccountInput()
       await db.insert(schema.user).values({
@@ -126,12 +152,15 @@ describe('RootResolver', () => {
         async () =>
           await resolver.registerNewUser(
             input,
-            crypto.randomUUID(),
-            makeFakeCtx({ userId })
+            signupUserId,
+            makeFakeCtx({ userId: signupUserId })
           )
       ).rejects.toThrow(
         `Device ${input.deviceId} already exists. You cannot use a device with multiple accounts.`
       )
+      expect(
+        await db.query.user.findFirst({ where: { id: signupUserId } })
+      ).toBeUndefined()
     })
   })
 

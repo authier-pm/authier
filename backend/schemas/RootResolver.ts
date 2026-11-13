@@ -177,17 +177,14 @@ export class RootResolver {
     const resetConfig = masterDeviceResetConfigSchema.parse(
       input.masterDeviceResetConfig ?? defaultMasterDeviceResetConfig
     )
-    let user: any
-    let devices: any[]
+    const addDeviceSecretHash = await hashDeviceSecret(addDeviceSecret)
 
     try {
-      // Insert user
-      const [insertedUser] = await ctx.db
-        .insert(schema.user)
-        .values({
+      const { user, device } = await ctx.db.transaction(async (tx) => {
+        await tx.insert(schema.user).values({
           id: userId,
-          email: email,
-          addDeviceSecret: await hashDeviceSecret(addDeviceSecret),
+          email,
+          addDeviceSecret: addDeviceSecretHash,
           addDeviceSecretEncrypted,
           encryptionSalt,
           deviceRecoveryCooldownMinutes: resetConfig.waitMinutes,
@@ -195,40 +192,56 @@ export class RootResolver {
           loginCredentialsLimit: defaultAccountLimits.loginCredentialsLimit,
           TOTPlimit: defaultAccountLimits.TOTPlimit
         })
-        .returning()
 
-      // Insert device
-      const [insertedDevice] = await ctx.db
-        .insert(schema.device)
-        .values({
-          platform: input.devicePlatform,
-          id: deviceId,
-          firstIpAddress: ipAddress,
-          lastIpAddress: ipAddress,
-          firebaseToken: firebaseToken,
-          name: deviceName,
-          vaultLockTimeoutSeconds: 28800,
-          syncTOTP: true,
-          autofillTOTPEnabled: true,
-          userId: userId
-        })
-        .returning()
+        const [device] = await tx
+          .insert(schema.device)
+          .values({
+            platform: input.devicePlatform,
+            id: deviceId,
+            firstIpAddress: ipAddress,
+            lastIpAddress: ipAddress,
+            firebaseToken,
+            name: deviceName,
+            vaultLockTimeoutSeconds: 28800,
+            syncTOTP: true,
+            autofillTOTPEnabled: true,
+            userId
+          })
+          .returning()
 
-      user = insertedUser
-      devices = [insertedDevice]
+        const [user] = await tx
+          .update(schema.user)
+          .set({ masterDeviceId: device.id })
+          .where(eq(schema.user.id, userId))
+          .returning()
+
+        return { user, device }
+      })
+
+      return new UserMutation({
+        ...user,
+        devicesUserId: [device]
+      }).setCookiesAndConstructLoginResponse(device, ctx)
     } catch (err: unknown) {
       // Drizzle wraps PG errors in DrizzleQueryError with the original error in .cause
-      const pgError = (err as { cause?: { code?: string; detail?: string } })
-        .cause
+      const pgError = (
+        err as {
+          cause?: {
+            code?: string
+            constraint?: string
+            constraint_name?: string
+          }
+        }
+      ).cause
 
       // Handle unique constraint violations
       if (pgError?.code === '23505') {
-        const detail = pgError.detail || ''
-        if (detail.includes('email')) {
+        const constraint = pgError.constraint_name ?? pgError.constraint
+        if (constraint === 'User_email_key') {
           log('email', email)
           throw new GraphqlError(`User with such email already exists.`)
         }
-        if (detail.includes('id')) {
+        if (constraint === 'Device_pkey') {
           log('deviceId', deviceId)
           if (process.env.NODE_ENV === 'development') {
             console.warn(
@@ -247,22 +260,6 @@ export class RootResolver {
       }
       throw err
     }
-
-    const device = devices[0]
-    // Update user with masterDeviceId
-    const [updatedUser] = await ctx.db
-      .update(schema.user)
-      .set({
-        masterDeviceId: device.id
-      })
-      .where(eq(schema.user.id, user.id))
-      .returning()
-    user = updatedUser
-
-    return new UserMutation(user).setCookiesAndConstructLoginResponse(
-      device,
-      ctx
-    )
   }
 
   // TODO rate limit this per IP

@@ -37,8 +37,6 @@ browser.tabs.query({ active: true, currentWindow: true }).then(async () => {
   const div = document.getElementById('vault') as HTMLElement
   vaultRoot = ReactDOM.createRoot(div)
 
-  div.style.overflow = 'hidden' // needed to prevent extra scrollbar on the right
-  div.style.height = '100vh'
   document.documentElement.dataset.theme =
     chakraRawTheme.config?.initialColorMode ?? 'dark'
   await persistCache({

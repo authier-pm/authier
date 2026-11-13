@@ -350,6 +350,11 @@ zero-approval recovery, multiple email addresses and mobile overflow, and captur
 `docs/screenshots/master-device-recovery.png`, `master-device-recovery-mobile.png`
 and `master-device-reset-progress.png`.
 
+The `signup` scenario renders the extension's signup route and recovery step with
+a mock registration response. Run `pnpm playwright:ui-preview signup.spec.ts`
+to verify wheel and keyboard scrolling to the submit button and capture
+`docs/screenshots/signupRecoveryScroll.png`.
+
 The Android gallery also includes `android-recovery-setup.png` and
 `android-recovery-emails.png`, captured from the debug-only
 `RecoverySetupPreviewActivity`. It renders the production native signup step

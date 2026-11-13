@@ -13,6 +13,7 @@ import { VaultSettings } from './VaultSettings'
 import { DevicesPage } from './DevicesPage'
 import { VaultImportExport } from './VaultImportExport'
 import Register from './Register'
+import { VaultAuthLayout } from './VaultAuthLayout'
 import { AddItem } from './AddItem'
 import { DeviceStateContext } from '@src/providers/DeviceStateProvider'
 import { UnlockDeviceForm } from '@src/pages/UnlockDeviceForm'
@@ -60,7 +61,7 @@ export function VaultRouter() {
   if (deviceState === null) {
     return (
       <ApolloProvider client={apolloClientWithoutTokenRefresh}>
-        <div className="flex min-h-screen items-center justify-center px-4">
+        <VaultAuthLayout>
           <Routes>
             <Route element={<Login />} path="/" />
             <Route element={<Register />} path="/signup" />
@@ -75,7 +76,7 @@ export function VaultRouter() {
               path="/verify"
             />
           </Routes>
-        </div>
+        </VaultAuthLayout>
       </ApolloProvider>
     )
   }
