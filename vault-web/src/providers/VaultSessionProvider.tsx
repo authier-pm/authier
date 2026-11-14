@@ -345,26 +345,24 @@ export function VaultSessionProvider({ children }: { children: ReactNode }) {
     email,
     encryptionSalt,
     currentAddDeviceSecret,
+    authSecretEncrypted,
     masterEncryptionKey,
     shouldComplete = () => true
   }: {
     email: string
     encryptionSalt: string
     currentAddDeviceSecret: string
+    authSecretEncrypted: string
     masterEncryptionKey: CryptoKey
     shouldComplete?: () => boolean
   }) => {
-    const nextDeviceSecrets = await initLocalDeviceAuthSecret(
-      masterEncryptionKey,
-      base64ToBuffer(encryptionSalt)
-    )
-
     const authenticatedSession = await orpcClient.auth.resumeDevice({
       email,
       deviceInput: deviceIdentity,
       currentAddDeviceSecret,
       input: {
-        ...nextDeviceSecrets,
+        addDeviceSecret: currentAddDeviceSecret,
+        addDeviceSecretEncrypted: authSecretEncrypted,
         encryptionSalt,
         firebaseToken: null,
         devicePlatform: deviceIdentity.platform
@@ -375,7 +373,7 @@ export function VaultSessionProvider({ children }: { children: ReactNode }) {
     await completeAuthenticatedSession(authenticatedSession, {
       email,
       encryptionSalt,
-      authSecretEncrypted: nextDeviceSecrets.addDeviceSecretEncrypted,
+      authSecretEncrypted,
       masterEncryptionKey
     })
   }
@@ -414,11 +412,16 @@ export function VaultSessionProvider({ children }: { children: ReactNode }) {
             email,
             encryptionSalt: storedLockedState.encryptionSalt,
             currentAddDeviceSecret,
+            authSecretEncrypted: storedLockedState.authSecretEncrypted,
             masterEncryptionKey: restoredKey,
-            shouldComplete: () => !cancelled && epoch === sessionEpochRef.current
+            shouldComplete: () =>
+              !cancelled && epoch === sessionEpochRef.current
           })
         } catch (error) {
-          clearVaultSession()
+          if (cancelled || epoch !== sessionEpochRef.current) return
+          if (error instanceof ORPCError && error.status === 401) {
+            clearVaultSession()
+          }
           throw error
         }
       })
@@ -678,6 +681,7 @@ export function VaultSessionProvider({ children }: { children: ReactNode }) {
             email: lockedState.email,
             encryptionSalt: lockedState.encryptionSalt,
             currentAddDeviceSecret: decryptResult.addDeviceSecret,
+            authSecretEncrypted: lockedState.authSecretEncrypted,
             masterEncryptionKey: decryptResult.masterEncryptionKey
           })
         } catch {
@@ -712,6 +716,7 @@ export function VaultSessionProvider({ children }: { children: ReactNode }) {
             email: lockedState.email,
             encryptionSalt: lockedState.encryptionSalt,
             currentAddDeviceSecret: decryptResult.addDeviceSecret,
+            authSecretEncrypted: lockedState.authSecretEncrypted,
             masterEncryptionKey: decryptResult.masterEncryptionKey
           })
         } catch {

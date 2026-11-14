@@ -143,6 +143,8 @@ export const device = pgTable(
     firstIpAddress: inet().notNull(),
     lastIpAddress: inet().notNull(),
     firebaseToken: text(),
+    resumeSecretHash: text(),
+    resumeTokenVersion: integer().default(0).notNull(),
     name: text().notNull(),
     ipAddressLock: boolean().default(false).notNull(),
     vaultLockTimeoutSeconds: integer().notNull(),

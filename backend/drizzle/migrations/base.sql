@@ -49,6 +49,8 @@ CREATE TABLE "Device" (
 	"firstIpAddress" inet NOT NULL,
 	"lastIpAddress" inet NOT NULL,
 	"firebaseToken" text,
+	"resumeSecretHash" text,
+	"resumeTokenVersion" integer DEFAULT 0 NOT NULL,
 	"name" text NOT NULL,
 	"ipAddressLock" boolean DEFAULT false NOT NULL,
 	"vaultLockTimeoutSeconds" integer NOT NULL,

@@ -68,9 +68,10 @@ export const hasCurrentDeviceApproval = async (
   })
   if (existingDevice && existingDevice.userId !== user.id) return false
   if (
-    challenge.masterPasswordVerifiedAt &&
     existingDevice &&
-    (existingDevice.logoutAt || existingDevice.deletedAt)
+    (existingDevice.deletedAt ||
+      (existingDevice.logoutAt &&
+        existingDevice.logoutAt >= challenge.createdAt))
   ) {
     return false
   }
@@ -236,7 +237,9 @@ const findEmailApproval = async (db: Pick<DbType, 'query'>, token: string) => {
   })
   if (
     (device &&
-      (device.userId !== user.id || device.deletedAt || device.logoutAt)) ||
+      (device.userId !== user.id ||
+        device.deletedAt ||
+        (device.logoutAt && device.logoutAt >= challenge.createdAt))) ||
     (await hasPendingReset(db, challenge.id))
   )
     return null

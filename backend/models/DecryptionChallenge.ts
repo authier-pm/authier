@@ -196,10 +196,11 @@ export class DecryptionChallengeApproved extends DecryptionChallengeGQL {
         throw new GraphqlError('Wrong master password used')
       }
 
+      const resumeSecretHash = await hashDeviceSecret(input.addDeviceSecret)
       await tx
         .update(user)
         .set({
-          addDeviceSecret: await hashDeviceSecret(input.addDeviceSecret),
+          addDeviceSecret: resumeSecretHash,
           addDeviceSecretEncrypted: input.addDeviceSecretEncrypted
         })
         .where(eq(user.id, userData.id))
@@ -243,6 +244,8 @@ export class DecryptionChallengeApproved extends DecryptionChallengeGQL {
           .update(device)
           .set({
             logoutAt: null,
+            resumeSecretHash,
+            resumeTokenVersion: userData.tokenVersion,
             firebaseToken
           })
           .where(eq(device.id, deviceRec.id))
@@ -253,6 +256,8 @@ export class DecryptionChallengeApproved extends DecryptionChallengeGQL {
           .insert(device)
           .values({
             id: deviceId,
+            resumeSecretHash,
+            resumeTokenVersion: userData.tokenVersion,
             firstIpAddress: ipAddress,
             lastIpAddress: ipAddress,
             firebaseToken: firebaseToken,

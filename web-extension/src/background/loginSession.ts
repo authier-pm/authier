@@ -683,10 +683,10 @@ export const resumeRememberedDevice = async () => {
     platform: device.platform
   }
   const key = await abToCryptoKey(base64ToBuffer(state.masterEncryptionKey))
-  const newDeviceSecretsPair = await device.initLocalDeviceAuthSecret(
-    key,
-    base64ToBuffer(state.encryptionSalt)
-  )
+  const newDeviceSecretsPair = {
+    addDeviceSecret: state.authSecret,
+    addDeviceSecretEncrypted: state.authSecretEncrypted
+  }
   const fireToken = device.fireToken || `web-ext-${crypto.randomUUID()}`
   const response = await apolloClientWithoutTokenRefresh
     .mutate<ResumeDeviceSessionMutation, ResumeDeviceSessionMutationVariables>({
