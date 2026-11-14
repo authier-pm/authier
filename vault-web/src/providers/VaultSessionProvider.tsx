@@ -341,6 +341,45 @@ export function VaultSessionProvider({ children }: { children: ReactNode }) {
     await completeAuthenticatedSession(authenticatedSession, options)
   }
 
+  const resumeEnrolledDevice = async ({
+    email,
+    encryptionSalt,
+    currentAddDeviceSecret,
+    masterEncryptionKey,
+    shouldComplete = () => true
+  }: {
+    email: string
+    encryptionSalt: string
+    currentAddDeviceSecret: string
+    masterEncryptionKey: CryptoKey
+    shouldComplete?: () => boolean
+  }) => {
+    const nextDeviceSecrets = await initLocalDeviceAuthSecret(
+      masterEncryptionKey,
+      base64ToBuffer(encryptionSalt)
+    )
+
+    const authenticatedSession = await orpcClient.auth.resumeDevice({
+      email,
+      deviceInput: deviceIdentity,
+      currentAddDeviceSecret,
+      input: {
+        ...nextDeviceSecrets,
+        encryptionSalt,
+        firebaseToken: null,
+        devicePlatform: deviceIdentity.platform
+      }
+    })
+
+    if (!shouldComplete()) return
+    await completeAuthenticatedSession(authenticatedSession, {
+      email,
+      encryptionSalt,
+      authSecretEncrypted: nextDeviceSecrets.addDeviceSecretEncrypted,
+      masterEncryptionKey
+    })
+  }
+
   useEffect(() => {
     let cancelled = false
     const epoch = sessionEpochRef.current
@@ -356,27 +395,32 @@ export function VaultSessionProvider({ children }: { children: ReactNode }) {
         )
         if (cancelled || epoch !== sessionEpochRef.current) return
         const email = snapshot.data.session.user.email
-        if (!email) return
-        const challenge = await orpcClient.auth.requestDeviceChallenge({
-          email,
-          deviceInput: deviceIdentity
-        })
-        if (cancelled || epoch !== sessionEpochRef.current) return
-        if (challenge.status !== 'approved') {
-          clearVaultSession()
-          throw new Error(
-            'This device needs approval before its session can resume'
-          )
-        }
-        // Prove possession of the remembered key, even if the refresh cookie
-        // expired while the browser was closed. Server approval still applies.
-        await completeApprovedLogin(
-          challenge,
-          email,
-          '',
-          restoredKey,
-          () => !cancelled && epoch === sessionEpochRef.current
+        const storedLockedState = readStoredJson<LockedVaultState>(
+          LOCKED_STATE_STORAGE_KEY
         )
+        if (!email || !storedLockedState) return
+        let currentAddDeviceSecret: string
+        try {
+          currentAddDeviceSecret = await decryptString(
+            restoredKey,
+            storedLockedState.authSecretEncrypted
+          )
+        } catch {
+          clearVaultSession()
+          throw new Error('Unable to verify remembered device secret')
+        }
+        try {
+          await resumeEnrolledDevice({
+            email,
+            encryptionSalt: storedLockedState.encryptionSalt,
+            currentAddDeviceSecret,
+            masterEncryptionKey: restoredKey,
+            shouldComplete: () => !cancelled && epoch === sessionEpochRef.current
+          })
+        } catch (error) {
+          clearVaultSession()
+          throw error
+        }
       })
       .catch((error: unknown) =>
         console.warn('Unable to restore remembered vault session', error)
@@ -629,11 +673,29 @@ export function VaultSessionProvider({ children }: { children: ReactNode }) {
       }
 
       if (!refreshToken) {
-        await reauthenticateLockedDevice(
-          lockedState.email,
-          password,
-          decryptResult.masterEncryptionKey
-        )
+        try {
+          await resumeEnrolledDevice({
+            email: lockedState.email,
+            encryptionSalt: lockedState.encryptionSalt,
+            currentAddDeviceSecret: decryptResult.addDeviceSecret,
+            masterEncryptionKey: decryptResult.masterEncryptionKey
+          })
+        } catch {
+          try {
+            await refreshAuthenticatedSession({
+              email: lockedState.email,
+              encryptionSalt: lockedState.encryptionSalt,
+              authSecretEncrypted: lockedState.authSecretEncrypted,
+              masterEncryptionKey: decryptResult.masterEncryptionKey
+            })
+          } catch {
+            await reauthenticateLockedDevice(
+              lockedState.email,
+              password,
+              decryptResult.masterEncryptionKey
+            )
+          }
+        }
         return
       }
 
@@ -645,11 +707,20 @@ export function VaultSessionProvider({ children }: { children: ReactNode }) {
           masterEncryptionKey: decryptResult.masterEncryptionKey
         })
       } catch {
-        await reauthenticateLockedDevice(
-          lockedState.email,
-          password,
-          decryptResult.masterEncryptionKey
-        )
+        try {
+          await resumeEnrolledDevice({
+            email: lockedState.email,
+            encryptionSalt: lockedState.encryptionSalt,
+            currentAddDeviceSecret: decryptResult.addDeviceSecret,
+            masterEncryptionKey: decryptResult.masterEncryptionKey
+          })
+        } catch {
+          await reauthenticateLockedDevice(
+            lockedState.email,
+            password,
+            decryptResult.masterEncryptionKey
+          )
+        }
       }
     } finally {
       setIsBusy(false)

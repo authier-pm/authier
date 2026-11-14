@@ -1,4 +1,5 @@
 import { hashDeviceSecret } from '../utils/deviceSecretHash'
+import { sign } from 'jsonwebtoken'
 import { db } from '../prisma/prismaClient'
 import { RootResolver } from './RootResolver'
 import type { IContextAuthenticated } from '../models/types/ContextTypes'
@@ -7,10 +8,7 @@ import type { RegisterNewAccountInput } from '../models/AuthInputs'
 import { describe, expect, it } from 'vitest'
 
 import { makeFakeCtx } from '../tests/makeFakeCtx'
-import {
-  DecryptionChallengeApproved,
-  DecryptionChallengeForApproval
-} from '../models/DecryptionChallenge'
+import { DecryptionChallengeForApproval } from '../models/DecryptionChallenge'
 import { WebInputTypeGQL } from '../models/types/WebInputType'
 import { fakeUserAndContext } from './__test__/fakeUserAndContext'
 import { makeRegisterAccountInput } from './__test__/makeRegisterAccountInput'
@@ -217,7 +215,7 @@ describe('RootResolver', () => {
       expect(data).not.toHaveProperty('addDeviceSecretEncrypted')
     })
 
-    it("approves a returning login on the account's only device", async () => {
+    it('withholds approval and verifier material from an unauthenticated request using the master device ID', async () => {
       const { userId, masterDeviceId, email } =
         await insertApprovalRequiringUser()
 
@@ -227,7 +225,42 @@ describe('RootResolver', () => {
         makeFakeCtx({ userId })
       )
 
-      expect(data).toBeInstanceOf(DecryptionChallengeApproved)
+      expect(data).toBeInstanceOf(DecryptionChallengeForApproval)
+      expect(data).not.toHaveProperty('addDeviceSecretEncrypted')
+      expect(data).not.toHaveProperty('encryptionSalt')
+    })
+
+    it('lets an authenticated master device create a password-change challenge without exposing verifier material unauthenticated', async () => {
+      const { userId, masterDeviceId, email } =
+        await insertApprovalRequiringUser()
+      const token = sign(
+        { userId, deviceId: masterDeviceId, tokenVersion: 0 },
+        process.env.ACCESS_TOKEN_SECRET!
+      )
+      const authCtx = {
+        ...makeFakeCtx({ userId, deviceId: masterDeviceId }),
+        request: {
+          headers: { authorization: `Bearer ${token}` },
+          cookies: {}
+        }
+      }
+      const authChallenge = await resolver.deviceDecryptionChallenge(
+        email,
+        { id: masterDeviceId, name: 'master device', platform: 'iOS' },
+        authCtx
+      )
+      expect(authChallenge).toBeInstanceOf(DecryptionChallengeForApproval)
+      expect(authChallenge).not.toHaveProperty('addDeviceSecretEncrypted')
+
+      // An unauthenticated caller cannot reuse that challenge to obtain verifier material.
+      const unauthResult = await resolver.deviceDecryptionChallenge(
+        email,
+        { id: masterDeviceId, name: 'master device', platform: 'iOS' },
+        makeFakeCtx({ userId })
+      )
+      expect(unauthResult).toBeInstanceOf(DecryptionChallengeForApproval)
+      expect(unauthResult).not.toHaveProperty('addDeviceSecretEncrypted')
+      expect(unauthResult).not.toHaveProperty('encryptionSalt')
     })
 
     it('rejects a device registered to another account before creating a challenge', async () => {

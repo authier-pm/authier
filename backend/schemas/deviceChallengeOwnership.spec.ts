@@ -4,10 +4,7 @@ import { db } from '../prisma/prismaClient'
 import * as schema from '../drizzle/schema'
 import { makeFakeCtx } from '../tests/makeFakeCtx'
 import { defaultDeviceSettingSystemValues } from '../models/defaultDeviceSettingSystemValues'
-import {
-  DecryptionChallengeApproved,
-  DecryptionChallengeForApproval
-} from '../models/DecryptionChallenge'
+import { DecryptionChallengeForApproval } from '../models/DecryptionChallenge'
 import { RootResolver } from './RootResolver'
 
 vi.mock('../lib/getGeoIpLocation', () => ({
@@ -97,19 +94,15 @@ describe.each(policies)('device challenge ownership with %s', (policy) => {
     ).toEqual(challenge)
   })
 
-  it('preserves the original master device login before its first challenge', async () => {
+  it('withholds salt and ciphertext from an unauthenticated caller claiming the master device ID', async () => {
     const result = await resolver.deviceDecryptionChallenge(
       email,
       { id: masterDeviceId, name: 'Original master', platform: 'test' },
       ctx
     )
-    expect(result).toBeInstanceOf(DecryptionChallengeApproved)
-    expect(result).toMatchObject({
-      userId: victimId,
-      deviceId: masterDeviceId,
-      addDeviceSecretEncrypted: 'private-enrollment-ciphertext',
-      encryptionSalt: 'private-test-salt'
-    })
+    expect(result).toBeInstanceOf(DecryptionChallengeForApproval)
+    expect(result).not.toHaveProperty('encryptionSalt')
+    expect(result).not.toHaveProperty('addDeviceSecretEncrypted')
   })
 
   it('withholds salt and ciphertext from a new device until approval', async () => {

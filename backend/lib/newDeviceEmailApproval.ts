@@ -67,9 +67,13 @@ export const hasCurrentDeviceApproval = async (
     where: { id: challenge.deviceId }
   })
   if (existingDevice && existingDevice.userId !== user.id) return false
-  // A previously enrolled device already passed approval. Login still requires
-  // its current master-password-encrypted enrollment secret.
-  if (existingDevice && !existingDevice.deletedAt) return true
+  if (
+    challenge.masterPasswordVerifiedAt &&
+    existingDevice &&
+    (existingDevice.logoutAt || existingDevice.deletedAt)
+  ) {
+    return false
+  }
   let deviceApproved = Boolean(challenge.deviceApprovedAt)
   if (deviceApproved && user.newDevicePolicy === 'MASTER_DEVICE') {
     deviceApproved = Boolean(

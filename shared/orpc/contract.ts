@@ -43,6 +43,7 @@ import {
   updateVaultLockTimeoutInputSchema,
   initiateMasterDeviceResetInputSchema,
   completeDeviceLoginInputSchema,
+  resumeDeviceInputSchema,
   relayVerificationCodeInputSchema
 } from './schemas'
 
@@ -85,6 +86,15 @@ export const vaultApiContract = {
         tags: ['auth']
       })
       .input(completeDeviceLoginInputSchema)
+      .output(authenticatedSessionSchema),
+    resumeDevice: oc
+      .route({
+        method: 'POST',
+        path: '/auth/resumeDevice',
+        operationId: 'authResumeDevice',
+        tags: ['auth']
+      })
+      .input(resumeDeviceInputSchema)
       .output(authenticatedSessionSchema),
     initiateMasterDeviceReset: oc
       .route({

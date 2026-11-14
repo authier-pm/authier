@@ -28,6 +28,7 @@ const orpcMocks = vi.hoisted(() => ({
   register: vi.fn(),
   requestDeviceChallenge: vi.fn(),
   completeDeviceLogin: vi.fn(),
+  resumeDevice: vi.fn(),
   initiateMasterDeviceReset: vi.fn(),
   logout: vi.fn(),
   createSecret: vi.fn(),
@@ -43,6 +44,7 @@ vi.mock('@/lib/orpc', () => ({
       register: orpcMocks.register,
       requestDeviceChallenge: orpcMocks.requestDeviceChallenge,
       completeDeviceLogin: orpcMocks.completeDeviceLogin,
+      resumeDevice: orpcMocks.resumeDevice,
       initiateMasterDeviceReset: orpcMocks.initiateMasterDeviceReset,
       logout: orpcMocks.logout
     },
@@ -239,6 +241,7 @@ describe('VaultSessionProvider', () => {
     orpcMocks.register.mockReset()
     orpcMocks.requestDeviceChallenge.mockReset()
     orpcMocks.completeDeviceLogin.mockReset()
+    orpcMocks.resumeDevice.mockReset()
     orpcMocks.initiateMasterDeviceReset.mockReset()
     orpcMocks.requestDeviceChallenge.mockImplementation(async () => {
       const locked: { encryptionSalt: string; authSecretEncrypted: string } =
@@ -251,6 +254,7 @@ describe('VaultSessionProvider', () => {
       }
     })
     orpcMocks.completeDeviceLogin.mockImplementation(() => orpcMocks.refresh())
+    orpcMocks.resumeDevice.mockImplementation(() => orpcMocks.refresh())
     orpcMocks.logout.mockReset()
     orpcMocks.createSecret.mockReset()
     orpcMocks.updateSecret.mockReset()
@@ -524,8 +528,9 @@ describe('VaultSessionProvider', () => {
     await waitFor(() =>
       expect(screen.getByTestId('status')).toHaveTextContent('authenticated')
     )
-    expect(orpcMocks.requestDeviceChallenge).toHaveBeenCalledOnce()
-    expect(orpcMocks.completeDeviceLogin).toHaveBeenCalledOnce()
+    expect(orpcMocks.resumeDevice).toHaveBeenCalledOnce()
+    expect(orpcMocks.requestDeviceChallenge).not.toHaveBeenCalled()
+    expect(orpcMocks.completeDeviceLogin).not.toHaveBeenCalled()
     await userEvent.click(screen.getByRole('button', { name: /^Lock$/ }))
     await waitFor(async () => expect(await readRememberedVault()).toBeNull())
     view.unmount()
@@ -731,17 +736,7 @@ describe('VaultSessionProvider', () => {
       })
     )
 
-    orpcMocks.requestDeviceChallenge.mockResolvedValue({
-      status: 'approved',
-      challengeId: 42,
-      userId: '11111111-1111-1111-1111-111111111111',
-      deviceId: 'device-1',
-      deviceName: 'Primary browser',
-      approvedAt: new Date('2026-03-25T10:00:00.000Z').toISOString(),
-      addDeviceSecretEncrypted: deviceSecrets.addDeviceSecretEncrypted,
-      encryptionSalt
-    })
-    orpcMocks.completeDeviceLogin.mockResolvedValue({
+    orpcMocks.resumeDevice.mockResolvedValue({
       accessToken: 'access-token-2',
       refreshToken: 'refresh-token-2',
       session: {
@@ -793,15 +788,22 @@ describe('VaultSessionProvider', () => {
     })
     expect(await screen.findByText('GitHub')).toBeInTheDocument()
     expect(orpcMocks.refresh).not.toHaveBeenCalled()
-    expect(orpcMocks.requestDeviceChallenge).toHaveBeenCalledWith({
+    expect(orpcMocks.resumeDevice).toHaveBeenCalledWith({
       email: 'capaj@test.com',
       deviceInput: expect.objectContaining({
         id: expect.any(String),
         name: expect.any(String),
         platform: expect.any(String)
+      }),
+      currentAddDeviceSecret: deviceSecrets.addDeviceSecret,
+      input: expect.objectContaining({
+        encryptionSalt,
+        devicePlatform: expect.any(String),
+        firebaseToken: null
       })
     })
-    expect(orpcMocks.completeDeviceLogin).toHaveBeenCalledOnce()
+    expect(orpcMocks.requestDeviceChallenge).not.toHaveBeenCalled()
+    expect(orpcMocks.completeDeviceLogin).not.toHaveBeenCalled()
   })
 
   it('syncs the vault manually and updates its local timestamp only after applying changes', async () => {

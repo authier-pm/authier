@@ -49,6 +49,17 @@ export type AddNewDeviceForUserMutation = { deviceDecryptionChallenge:
     | { __typename: 'DecryptionChallengeForApproval' }
    | null };
 
+export type ResumeDeviceSessionMutationVariables = Exact<{
+  email: string;
+  deviceInput: Types.DeviceInput;
+  currentAddDeviceSecret: string;
+  input: Types.AddNewDeviceInput;
+  deviceId: string;
+}>;
+
+
+export type ResumeDeviceSessionMutation = { resumeDeviceSession: { accessToken: string, user: { id: string, uiLanguage: string, notificationOnVaultUnlock: boolean, notificationOnWrongPasswordAttempts: number, autofillForbiddenUrlPatterns: string, EncryptedSecrets: Array<{ id: string, encrypted: string, kind: Types.EncryptedSecretType, createdAt: string, updatedAt: string | null, version: number }>, device: { id: string, syncTOTP: boolean, vaultLockTimeoutSeconds: number, autofillTOTPEnabled: boolean, passkeyCreationVerificationRequired: boolean }, defaultDeviceSettings: { id: number, autofillTOTPEnabled: boolean, theme: string, syncTOTP: boolean, vaultLockTimeoutSeconds: number } } } };
+
 export type DeviceDecryptionChallengeMutationVariables = Exact<{
   email: string;
   deviceInput: Types.DeviceInput;
@@ -143,6 +154,75 @@ export function useAddNewDeviceForUserMutation(baseOptions?: ApolloReactHooks.Mu
       }
 export type AddNewDeviceForUserMutationHookResult = ReturnType<typeof useAddNewDeviceForUserMutation>;
 export type AddNewDeviceForUserMutationResult = ApolloReactCommon.MutationResult<AddNewDeviceForUserMutation>;
+export const ResumeDeviceSessionDocument = gql`
+    mutation resumeDeviceSession($email: EmailAddress!, $deviceInput: DeviceInput!, $currentAddDeviceSecret: NonEmptyString!, $input: AddNewDeviceInput!, $deviceId: String!) {
+  resumeDeviceSession(
+    email: $email
+    deviceInput: $deviceInput
+    currentAddDeviceSecret: $currentAddDeviceSecret
+    input: $input
+  ) {
+    accessToken
+    user {
+      id
+      uiLanguage
+      EncryptedSecrets {
+        id
+        encrypted
+        kind
+        createdAt
+        updatedAt
+        version
+      }
+      notificationOnVaultUnlock
+      notificationOnWrongPasswordAttempts
+      autofillForbiddenUrlPatterns
+      device(id: $deviceId) {
+        id
+        syncTOTP
+        vaultLockTimeoutSeconds
+        autofillTOTPEnabled
+        passkeyCreationVerificationRequired
+      }
+      defaultDeviceSettings {
+        id
+        autofillTOTPEnabled
+        theme
+        syncTOTP
+        vaultLockTimeoutSeconds
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useResumeDeviceSessionMutation__
+ *
+ * To run a mutation, you first call `useResumeDeviceSessionMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useResumeDeviceSessionMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [resumeDeviceSessionMutation, { data, loading, error }] = useResumeDeviceSessionMutation({
+ *   variables: {
+ *      email: // value for 'email'
+ *      deviceInput: // value for 'deviceInput'
+ *      currentAddDeviceSecret: // value for 'currentAddDeviceSecret'
+ *      input: // value for 'input'
+ *      deviceId: // value for 'deviceId'
+ *   },
+ * });
+ */
+export function useResumeDeviceSessionMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<ResumeDeviceSessionMutation, ResumeDeviceSessionMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return ApolloReactHooks.useMutation<ResumeDeviceSessionMutation, ResumeDeviceSessionMutationVariables>(ResumeDeviceSessionDocument, options);
+      }
+export type ResumeDeviceSessionMutationHookResult = ReturnType<typeof useResumeDeviceSessionMutation>;
+export type ResumeDeviceSessionMutationResult = ApolloReactCommon.MutationResult<ResumeDeviceSessionMutation>;
 export const DeviceDecryptionChallengeDocument = gql`
     mutation deviceDecryptionChallenge($email: EmailAddress!, $deviceInput: DeviceInput!) {
   deviceDecryptionChallenge(email: $email, deviceInput: $deviceInput) {
