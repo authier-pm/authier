@@ -9,6 +9,7 @@ import kotlinx.serialization.Serializable
 
 import dev.authier.android.generated.model.AuthInitiateMasterDeviceReset200Response
 import dev.authier.android.generated.model.AuthInitiateMasterDeviceResetRequest
+import dev.authier.android.generated.model.AuthResumeDeviceRequest
 import dev.authier.android.generated.model.AuthenticatedSession
 import dev.authier.android.generated.model.CompleteDeviceLoginInput
 import dev.authier.android.generated.model.DeviceChallenge
@@ -109,5 +110,18 @@ interface AuthApi {
      */
     @POST("auth/requestDeviceChallenge")
     suspend fun authRequestDeviceChallenge(@Body requestDeviceChallengeInput: RequestDeviceChallengeInput): DeviceChallenge
+
+    /**
+     * POST auth/resumeDevice
+     *
+     *
+     * Responses:
+     *  - 200: OK
+     *
+     * @param authResumeDeviceRequest
+     * @return [AuthenticatedSession]
+     */
+    @POST("auth/resumeDevice")
+    suspend fun authResumeDevice(@Body authResumeDeviceRequest: AuthResumeDeviceRequest): AuthenticatedSession
 
 }

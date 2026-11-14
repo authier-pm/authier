@@ -15,8 +15,7 @@ import {
   AndroidBlogPreview,
   AndroidUpdatesPreview,
   SeptemberReleaseBlogPreview,
-  OctoberReleaseBlogPreview,
-  HackingPrizeBlogPreview
+  OctoberReleaseBlogPreview
 } from './scenarios/AndroidUpdatesPreview'
 import { BitfinexTotpPreview } from './scenarios/BitfinexTotpPreview'
 import { KostkohratkyPasswordPreview } from './scenarios/KostkohratkyPasswordPreview'
@@ -67,7 +66,6 @@ const scenarios: Record<string, ComponentType> = {
   'android-blog': AndroidBlogPreview,
   'september-release-blog': SeptemberReleaseBlogPreview,
   'october-release-blog': OctoberReleaseBlogPreview,
-  'hacking-prize-blog': HackingPrizeBlogPreview,
   'android-landing': AndroidLandingPreview,
   'bitfinex-totp': BitfinexTotpPreview,
   'totp-labels': TotpLabelsPreview,

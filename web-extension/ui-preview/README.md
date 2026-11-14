@@ -27,21 +27,6 @@ entire browser, and retries a lost server acknowledgement without a duplicate.
 The production pending-sync and upgrade notices are captured in
 `docs/screenshots/vaultPendingSync.png`.
 
-The `hacking-prize-blog` scenario embeds the production 84 LTC security challenge
-announcement. Start the Astro server on port 4321 alongside the preview, then
-open `/?scenario=hacking-prize-blog`. Check the 84 LTC headline and reward card,
-full-decryption criteria, and the network attack requirement without assuming
-access to the vault owner's machine or email account. Verify the requirement to
-reproduce on the latest `main` commit when reporting, the tested commit SHA, fresh
-demo account recommendation, required Litecoin receiving address, and submission
-links on desktop and mobile.
-Captures live in `docs/screenshots/hacking-prize-blog-desktop.jpg` and
-`docs/screenshots/hacking-prize-blog-mobile.jpg`.
-The account recommendation and Litecoin address requirement are captured in
-`docs/screenshots/hacking-prize-submission-requirements.jpg`.
-Set `VITE_WEBSITE_PREVIEW_ORIGIN` when Astro uses a different port, for example
-`VITE_WEBSITE_PREVIEW_ORIGIN=http://127.0.0.1:4323 pnpm preview:ui --port 4175`.
-
 The `clock-skew` scenario renders the production warning above the real popup
 TOTP list with a synthetic server clock sample. Controls simulate clocks ahead
 and behind, a corrected sync, and closing/reopening the popup. Add `&offset=10000`
@@ -60,6 +45,9 @@ run `pnpm exec playwright test --config playwrightAndroidUpdates.config.ts` from
 `web-extension`. This starts both servers, verifies the Obtainium link and mobile
 layout, and captures `docs/screenshots/android-updates.png` and
 `android-updates-mobile.png`.
+
+Set `VITE_WEBSITE_PREVIEW_ORIGIN` when Astro uses a different port, for example
+`VITE_WEBSITE_PREVIEW_ORIGIN=http://127.0.0.1:4323 pnpm preview:ui --port 4175`.
 
 The same suite covers `android-landing`, which embeds the real homepage and verifies
 the configured Obtainium links in its hero, platform list, and closing call to action.
