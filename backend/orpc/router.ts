@@ -1,4 +1,5 @@
 import { updateResetConfig, getResetStatus } from '../lib/masterDeviceReset'
+import { resumeDeviceSession } from '../lib/resumeDeviceSession'
 import type { MasterDeviceResetConfig } from '../../shared/masterDeviceResetConfig'
 import type { NewDeviceApprovalPolicy } from '../../shared/newDeviceApproval'
 import { implement, ORPCError } from '@orpc/server'
@@ -551,6 +552,20 @@ export const vaultOrpcRouter = os.router({
         }
       }
     ),
+    resumeDevice: os.auth.resumeDevice.handler(async ({ input, context }) => {
+      try {
+        const { user, device } = await resumeDeviceSession(context.legacyCtx, {
+          email: input.email,
+          deviceId: input.deviceInput.id,
+          currentAddDeviceSecret: input.currentAddDeviceSecret,
+          input: input.input
+        })
+
+        return getAuthenticatedSession(context.legacyCtx, user.id, device.id)
+      } catch (error) {
+        return raiseAsOrpcError(error)
+      }
+    }),
     initiateMasterDeviceReset: os.auth.initiateMasterDeviceReset.handler(
       async ({ input, context }) => {
         try {

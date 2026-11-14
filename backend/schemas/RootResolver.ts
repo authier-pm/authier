@@ -13,7 +13,8 @@ import {
 } from '../../shared/masterDeviceResetConfig'
 import { initiateReset, hashResetToken } from '../lib/masterDeviceReset'
 import { hashDeviceSecret } from '../utils/deviceSecretHash'
-import { throwIfNotAuthenticated } from '../lib/authMiddleware'
+import { throwIfNotAuthenticated, readVerifiedAccessToken } from '../lib/authMiddleware'
+import { resumeDeviceSession as resumeEnrolledDeviceSession } from '../lib/resumeDeviceSession'
 import {
   Query,
   Resolver,
@@ -35,6 +36,7 @@ import { GraphqlError } from '../lib/GraphqlError'
 import { WebInputElement } from '../models/WebInputElement'
 import {
   GraphQLEmailAddress,
+  GraphQLNonEmptyString,
   GraphQLPositiveInt,
   GraphQLUUID
 } from 'graphql-scalars'
@@ -42,7 +44,7 @@ import { GraphQLJSON } from 'graphql-scalars'
 import { classifyAndCachePasswordForm } from '../lib/classifyPasswordForm'
 
 import debug from 'debug'
-import { RegisterNewAccountInput } from '../models/AuthInputs'
+import { AddNewDeviceInput, RegisterNewAccountInput } from '../models/AuthInputs'
 
 import {
   WebInputGQL,
@@ -70,7 +72,7 @@ import type {
   IContext,
   IContextAuthenticated
 } from '../models/types/ContextTypes'
-import { eq, and, or, like, sql, gte, count } from 'drizzle-orm'
+import { eq, and, or, like, sql, gte, count, isNotNull } from 'drizzle-orm'
 import * as schema from '../drizzle/schema'
 import { defaultAccountLimits } from '../models/accountLimits'
 
@@ -283,7 +285,8 @@ export class RootResolver {
         addDeviceSecretEncrypted: true,
         encryptionSalt: true,
         newDevicePolicy: true,
-        masterDeviceId: true
+        masterDeviceId: true,
+        tokenVersion: true
       }
     })
 
@@ -336,36 +339,82 @@ export class RootResolver {
       throw new GraphqlError('Login failed')
     }
 
-    let challenge = await ctx.db.query.decryptionChallenge.findFirst({
-      where: {
-        deviceId: deviceInput.id,
-        userId: user.id
-      }
-    })
+    const [blockedOrRejectedChallenge] = await ctx.db
+      .select({ id: schema.decryptionChallenge.id })
+      .from(schema.decryptionChallenge)
+      .where(
+        and(
+          eq(schema.decryptionChallenge.deviceId, deviceInput.id),
+          eq(schema.decryptionChallenge.userId, user.id),
+          or(
+            isNotNull(schema.decryptionChallenge.rejectedAt),
+            eq(schema.decryptionChallenge.blockIp, true)
+          )
+        )
+      )
+      .limit(1)
 
-    // Registration enrolls the original master before it has a login challenge.
-    // Only that existing active device may bootstrap its first challenge.
-    if (
-      !challenge &&
-      device?.id === user.masterDeviceId &&
-      !device.logoutAt &&
-      !device.deletedAt
-    ) {
-      const [created] = await ctx.db
-        .insert(schema.decryptionChallenge)
-        .values({
-          deviceId: device.id,
-          deviceName: device.name,
-          userId: user.id,
-          ipAddress,
-          approvedAt: device.createdAt
-        })
-        .returning()
-      challenge = created
+    if (blockedOrRejectedChallenge) {
+      throw new GraphqlError('Login failed')
     }
 
-    if (challenge?.rejectedAt || challenge?.blockIp) {
-      throw new GraphqlError('Login failed')
+    const authPayload = readVerifiedAccessToken(ctx)
+    const isAuthenticatedMasterDevice = Boolean(
+      authPayload &&
+        authPayload.userId === user.id &&
+        authPayload.deviceId === deviceInput.id &&
+        authPayload.tokenVersion === user.tokenVersion &&
+        device &&
+        device.id === user.masterDeviceId &&
+        !device.logoutAt &&
+        !device.deletedAt
+    )
+
+    let challenge:
+      | typeof schema.decryptionChallenge.$inferSelect
+      | undefined
+
+    if (isAuthenticatedMasterDevice && device) {
+      const existingAuthChallenge =
+        await ctx.db.query.decryptionChallenge.findFirst({
+          where: {
+            deviceId: device.id,
+            userId: user.id,
+            masterPasswordVerifiedAt: { isNull: true },
+            approvedAt: { isNotNull: true }
+          },
+          orderBy: (c, { desc }) => [desc(c.id)]
+        })
+      challenge = existingAuthChallenge
+      if (!challenge) {
+        const [created] = await ctx.db
+          .insert(schema.decryptionChallenge)
+          .values({
+            deviceId: device.id,
+            deviceName: device.name,
+            userId: user.id,
+            ipAddress,
+            approvedAt: new Date()
+          })
+          .returning()
+        challenge = created
+      }
+    } else {
+      const openChallenge = await ctx.db.query.decryptionChallenge.findFirst({
+        where: {
+          deviceId: deviceInput.id,
+          userId: user.id,
+          masterPasswordVerifiedAt: { isNull: true }
+        },
+        orderBy: (c, { desc }) => [desc(c.id)]
+      })
+      const isAuthenticatedOnlyChallenge = Boolean(
+        openChallenge?.approvedAt &&
+          !openChallenge.emailApprovedAt &&
+          !openChallenge.deviceApprovedAt &&
+          !openChallenge.approvedByRecovery
+      )
+      challenge = isAuthenticatedOnlyChallenge ? undefined : openChallenge
     }
 
     if (!challenge) {
@@ -494,6 +543,7 @@ export class RootResolver {
         .limit(1)
 
       if (
+        currentChallenge.masterPasswordVerifiedAt ||
         !(await hasCurrentDeviceApproval(tx, currentChallenge, currentUser))
       ) {
         return plainToClass(DecryptionChallengeForApproval, {
@@ -530,6 +580,31 @@ export class RootResolver {
         encryptionSalt: currentUser.encryptionSalt
       })
     })
+  }
+
+  @Mutation(() => LoginResponse, {
+    description:
+      'resumes a remembered session on an already-enrolled active device by verifying its current enrollment secret'
+  })
+  async resumeDeviceSession(
+    @Arg('email', () => GraphQLEmailAddress) email: string,
+    @Arg('deviceInput', () => DeviceInput) deviceInput: DeviceInput,
+    @Arg('currentAddDeviceSecret', () => GraphQLNonEmptyString)
+    currentAddDeviceSecret: string,
+    @Arg('input', () => AddNewDeviceInput) input: AddNewDeviceInput,
+    @Ctx() ctx: IContext
+  ) {
+    const { user, device } = await resumeEnrolledDeviceSession(ctx, {
+      email,
+      deviceId: deviceInput.id,
+      currentAddDeviceSecret,
+      input
+    })
+
+    return new UserMutation({
+      ...user,
+      devicesUserId: [device]
+    }).setCookiesAndConstructLoginResponse(device, ctx)
   }
 
   @Mutation(() => MasterDeviceResetRequestResult, {

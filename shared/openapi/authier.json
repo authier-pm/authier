@@ -1282,6 +1282,59 @@
         "security": []
       }
     },
+    "/auth/resumeDevice": {
+      "post": {
+        "operationId": "authResumeDevice",
+        "tags": [
+          "auth"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email"
+                  },
+                  "deviceInput": {
+                    "$ref": "#/components/schemas/DeviceIdentity"
+                  },
+                  "currentAddDeviceSecret": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "input": {
+                    "$ref": "#/components/schemas/AddNewDeviceInput"
+                  }
+                },
+                "required": [
+                  "email",
+                  "deviceInput",
+                  "currentAddDeviceSecret",
+                  "input"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthenticatedSession"
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      }
+    },
     "/auth/initiateMasterDeviceReset": {
       "post": {
         "operationId": "authInitiateMasterDeviceReset",

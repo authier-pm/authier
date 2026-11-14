@@ -1,6 +1,7 @@
 import type { MiddlewareFn } from 'type-graphql'
 import { verify } from 'jsonwebtoken'
 import type {
+  IContext,
   IContextAuthenticated,
   IJWTPayload
 } from '../models/types/ContextTypes'
@@ -76,6 +77,22 @@ export const throwIfNotAuthenticated: MiddlewareFn<
   context.masterDeviceId = user.masterDeviceId
 
   return next()
+}
+
+export const readVerifiedAccessToken = (ctx: IContext): IJWTPayload | null => {
+  const token =
+    ctx.request.cookies?.['access-token'] ??
+    ctx.request.headers['authorization']?.split(' ')[1]
+
+  if (!token) {
+    return null
+  }
+
+  try {
+    return verify(token, process.env.ACCESS_TOKEN_SECRET!) as IJWTPayload
+  } catch {
+    return null
+  }
 }
 
 export const authenticateFromToken: MiddlewareFn<IContextAuthenticated> = (

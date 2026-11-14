@@ -48,6 +48,52 @@ mutation addNewDeviceForUser(
   }
 }
 
+mutation resumeDeviceSession(
+  $email: EmailAddress!
+  $deviceInput: DeviceInput!
+  $currentAddDeviceSecret: NonEmptyString!
+  $input: AddNewDeviceInput!
+  $deviceId: String!
+) {
+  resumeDeviceSession(
+    email: $email
+    deviceInput: $deviceInput
+    currentAddDeviceSecret: $currentAddDeviceSecret
+    input: $input
+  ) {
+    accessToken
+    user {
+      id
+      uiLanguage
+      EncryptedSecrets {
+        id
+        encrypted
+        kind
+        createdAt
+        updatedAt
+        version
+      }
+      notificationOnVaultUnlock
+      notificationOnWrongPasswordAttempts
+      autofillForbiddenUrlPatterns
+      device(id: $deviceId) {
+        id
+        syncTOTP
+        vaultLockTimeoutSeconds
+        autofillTOTPEnabled
+        passkeyCreationVerificationRequired
+      }
+      defaultDeviceSettings {
+        id
+        autofillTOTPEnabled
+        theme
+        syncTOTP
+        vaultLockTimeoutSeconds
+      }
+    }
+  }
+}
+
 mutation deviceDecryptionChallenge(
   $email: EmailAddress!
   $deviceInput: DeviceInput!

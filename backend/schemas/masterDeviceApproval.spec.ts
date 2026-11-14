@@ -275,4 +275,71 @@ describe('master-only new device approval', () => {
       expect.objectContaining({ token: `push-token-${fixture.otherId}` })
     )
   })
+
+  it('never leaks verifier material for masterDeviceId or previously enrolled devices without fresh approval', async () => {
+    const fixture = fixtures.other
+    // Master device has no prior challenge: unauthenticated request stays pending.
+    const masterPending = await pendingFor({
+      ...fixture,
+      newId: fixture.masterId
+    })
+    expect((await enroll(fixture, masterPending.challengeId)).status).toBe(401)
+
+    // Secondary device goes through normal approval and completes login.
+    const secondaryFixture = { ...fixture, newId: crypto.randomUUID() }
+    const secondary = await pendingFor(secondaryFixture)
+    expect(
+      (await approve(secondaryFixture, secondary.challengeId, fixture.masterId))
+        .status
+    ).toBe(200)
+    expect((await enroll(secondaryFixture, secondary.challengeId)).status).toBe(
+      200
+    )
+
+    // Replaying requestDeviceChallenge unauthenticated with the enrolled deviceId
+    // must create a new pending challenge instead of leaking salt/ciphertext.
+    const replay = await pendingFor(secondaryFixture)
+    expect(replay.challengeId).not.toBe(secondary.challengeId)
+    expect((await enroll(secondaryFixture, replay.challengeId)).status).toBe(
+      401
+    )
+  })
+
+  it('resumes an active enrolled device via resumeDevice with its current enrollment secret only', async () => {
+    const fixture = fixtures.other
+    // The preceding test rotated fixtures.other's secret to 'next-secret'.
+    const resume = (secret: string, deviceId = fixture.masterId) =>
+      request(
+        'auth/resumeDevice',
+        {
+          email: `${fixture.userId}@test.com`,
+          deviceInput: { id: deviceId, name: 'Master', platform: 'test' },
+          currentAddDeviceSecret: secret,
+          input: {
+            firebaseToken: null,
+            devicePlatform: 'test',
+            encryptionSalt: 'secret-salt',
+            addDeviceSecret: 'resumed-secret',
+            addDeviceSecretEncrypted: 'resumed-encrypted'
+          }
+        },
+        fixture
+      )
+
+    expect((await resume('wrong-secret')).status).toBe(401)
+    const ok = await resume('next-secret')
+    expect(ok.status, await ok.clone().text()).toBe(200)
+    const body = (await ok.json()) as Record<string, unknown>
+    expect(body).not.toHaveProperty('encryptionSalt')
+    expect(body).not.toHaveProperty('addDeviceSecretEncrypted')
+    expect((await resume('next-secret')).status).toBe(401)
+
+    // Logged-out and deleted devices cannot resume even with the current secret.
+    expect((await resume('resumed-secret', fixture.otherId)).status).toBe(200)
+    await db
+      .update(schema.device)
+      .set({ logoutAt: new Date() })
+      .where(eq(schema.device.id, fixture.otherId))
+    expect((await resume('resumed-secret', fixture.otherId)).status).toBe(401)
+  })
 })
