@@ -43,7 +43,7 @@ import { setNewAccessTokenIntoCookie, setNewRefreshToken } from '../userAuth'
 import { DefaultDeviceSettingsMutation } from './DefaultDeviceSettings'
 import { defaultDeviceSettingSystemValues } from './defaultDeviceSettingSystemValues'
 import { UserNewDevicePolicyGQL } from './types/UserNewDevicePolicy'
-import { eq, and, sql, isNull } from 'drizzle-orm'
+import { eq, and, sql, isNull, desc } from 'drizzle-orm'
 import {
   device as deviceSchema,
   secretUsageEvent as secretUsageEventSchema,
@@ -151,9 +151,12 @@ export class UserMutation extends UserBase {
         .where(
           and(
             eq(decryptionChallengeSchema.userId, user.id),
-            eq(decryptionChallengeSchema.deviceId, deviceParams.id)
+            eq(decryptionChallengeSchema.deviceId, deviceParams.id),
+            isNull(decryptionChallengeSchema.masterPasswordVerifiedAt)
           )
         )
+        .orderBy(desc(decryptionChallengeSchema.id))
+        .limit(1)
         .for('update')
       if (
         !challenge ||

@@ -63,10 +63,10 @@ stateDiagram-v2
 2. Check if is user blocked
 3. Check decryption challenge count
 4. Get current device with challenge
-5. Reject device IDs owned by another account. The original already-enrolled, active master device can bootstrap its own first challenge; an unknown device never inherits that approval.
+5. Reject device IDs owned by another account. Unauthenticated requests never auto-approve the master device or reuse previously completed challenges, and never receive `addDeviceSecretEncrypted` or `encryptionSalt` before approval. Remembered/locked enrolled devices resume sessions via `resumeDevice` / `resumeDeviceSession` by proving possession of their current 256-bit `authSecret`.
 6. Reject cancelled or blocked challenges.
 7. Create a pending challenge and send the configured email and/or device notifications. An unconfigured account requires email approval until its owner saves a policy.
-8. Return `addDeviceSecretEncrypted` and `encryptionSalt` only after the required approvals. With both approvals required, the first approval remains pending. Master-password verification is still required to finish login.
+8. Return `addDeviceSecretEncrypted` and `encryptionSalt` only after the required approvals for an unverified challenge. With both approvals required, the first approval remains pending. Master-password verification is still required to finish login.
 
 ## Approval methods
 

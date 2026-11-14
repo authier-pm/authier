@@ -113,6 +113,13 @@ export const completeDeviceLoginInputSchema = z.object({
   input: addNewDeviceInputSchema
 })
 
+export const resumeDeviceInputSchema = z.object({
+  email: z.string().email(),
+  deviceInput: deviceIdentitySchema,
+  currentAddDeviceSecret: z.string().min(1),
+  input: addNewDeviceInputSchema
+})
+
 export const tokenPairSchema = z.object({
   accessToken: z.string().min(1),
   refreshToken: z.string().min(1)

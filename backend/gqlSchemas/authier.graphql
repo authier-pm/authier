@@ -450,6 +450,16 @@ type Mutation {
   ): DecryptionChallenge
 
   """
+  resumes a remembered session on an already-enrolled active device by verifying its current enrollment secret
+  """
+  resumeDeviceSession(
+    input: AddNewDeviceInput!
+    currentAddDeviceSecret: NonEmptyString!
+    deviceInput: DeviceInput!
+    email: EmailAddress!
+  ): LoginResponse!
+
+  """
   initiates a delayed reset of the master device when the user cannot approve from an existing device
   """
   initiateMasterDeviceReset(

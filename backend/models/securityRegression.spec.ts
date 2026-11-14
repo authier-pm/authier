@@ -89,7 +89,8 @@ describe('security boundaries', () => {
         deviceId,
         deviceName: 'master',
         ipAddress: '127.0.0.1',
-        approvedAt: new Date()
+        approvedAt: new Date(),
+        emailApprovedAt: new Date()
       })
       .returning()
     challenge = plainToInstance(DecryptionChallengeApproved, row)

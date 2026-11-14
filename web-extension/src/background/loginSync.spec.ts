@@ -322,6 +322,20 @@ it('keeps locally saved items when session renewal returns no items and sync fai
   const { result } = renderHook(useDeviceState)
   await waitFor(() => expect(result.current.loginCredentials).toHaveLength(1))
 
+  loginMutation.mockReset().mockResolvedValueOnce({
+    data: {
+      resumeDeviceSession: {
+        accessToken: `e30.${btoa(JSON.stringify({ userId: snapshot.userId }))}.signature`,
+        user: {
+          ...snapshot,
+          EncryptedSecrets: [],
+          device: snapshot,
+          defaultDeviceSettings: { theme: 'dark' }
+        }
+      }
+    }
+  })
+
   await act(async () => {
     await resumeRememberedDevice()
   })
@@ -389,12 +403,14 @@ it('does not restore a remembered session that was locked while renewal was in f
     await pending
     return {
       data: {
-        deviceDecryptionChallenge: {
-          __typename: 'DecryptionChallengeApproved',
-          id: 42,
-          addDeviceSecretEncrypted: enrollmentCiphertext,
-          encryptionSalt: snapshot.encryptionSalt,
-          userId: snapshot.userId
+        resumeDeviceSession: {
+          accessToken: `e30.${btoa(JSON.stringify({ userId: snapshot.userId }))}.signature`,
+          user: {
+            ...snapshot,
+            EncryptedSecrets: [],
+            device: snapshot,
+            defaultDeviceSettings: { theme: 'dark' }
+          }
         }
       }
     }
