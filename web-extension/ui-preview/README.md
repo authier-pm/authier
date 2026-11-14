@@ -27,18 +27,12 @@ entire browser, and retries a lost server acknowledgement without a duplicate.
 The production pending-sync and upgrade notices are captured in
 `docs/screenshots/vaultPendingSync.png`.
 
-The `hacking-prize-blog` scenario embeds the production 84 LTC security challenge
-announcement. Start the Astro server on port 4321 alongside the preview, then
-open `/?scenario=hacking-prize-blog`. Check the 84 LTC headline and reward card,
-full-decryption criteria, and the network attack requirement without assuming
-access to the vault owner's machine or email account. Verify the requirement to
-reproduce on the latest `main` commit when reporting, the tested commit SHA, fresh
-demo account recommendation, required Litecoin receiving address, and submission
-links on desktop and mobile.
-Captures live in `docs/screenshots/hacking-prize-blog-desktop.jpg` and
-`docs/screenshots/hacking-prize-blog-mobile.jpg`.
-The account recommendation and Litecoin address requirement are captured in
-`docs/screenshots/hacking-prize-submission-requirements.jpg`.
+The `hacking-prize-blog` scenario embeds the withdrawal notice at the original
+challenge URL. Start the Astro server on port 4321 alongside the preview, then
+open `/?scenario=hacking-prize-blog`. Check the dated notice in English and Czech,
+the contact for prior claims, and the collapsed archive on desktop and mobile.
+Open the archive with the keyboard to verify that the previous terms remain
+readable. See `docs/screenshots/hacking-prize-blog-desktop.jpg`.
 Set `VITE_WEBSITE_PREVIEW_ORIGIN` when Astro uses a different port, for example
 `VITE_WEBSITE_PREVIEW_ORIGIN=http://127.0.0.1:4323 pnpm preview:ui --port 4175`.
 
