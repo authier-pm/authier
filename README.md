@@ -83,9 +83,10 @@ self-hosted `authier` PostgreSQL database on `192.168.50.200`. Authier has its o
 `authier_app` role and Hyperdrive configuration. It shares the existing private
 TCP VPC service and Cloudflare Tunnel with Moot. The service verifies the origin
 certificate and hostname (`postgres.moot.fyi`); PostgreSQL needs no public port.
-Hyperdrive query caching is disabled. The role accepts TLS connections only
-from loopback, has a 20-connection limit and a 30-second statement timeout;
-Hyperdrive's origin pool limit is 10. Runtime queries continue to use the
+Hyperdrive query caching is disabled. The role accepts TLS connections from
+loopback and LAN workstations explicitly allowed in `pg_hba.conf`. It has a
+20-connection limit and a 30-second statement timeout. Hyperdrive's origin pool
+limit is 10. Runtime queries continue to use the
 existing Postgres.js/Drizzle driver, with one connection per Worker invocation,
 including cron jobs and legacy model helpers. Connections close after work ends.
 
@@ -113,6 +114,10 @@ For local development, override
 PostgreSQL URL. Direct local migrations use `pnpm db:migrate` and `DATABASE_URL`
 from the environment or ignored `backend/.env`. Automated tests use PGlite.
 Production database credentials belong in Hyperdrive, not Git or Worker vars.
+
+An allowed LAN workstation can connect directly to the production database with
+`DATABASE_URL=postgresql://authier_app:<password>@192.168.50.200:5432/authier?sslmode=require`.
+Keep the password in an ignored environment file.
 
 The Neon cutover pauses source writes, saves a consistent database export, and
 compares every restored table's row count and content checksum, sequence values
