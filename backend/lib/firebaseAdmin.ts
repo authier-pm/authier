@@ -301,9 +301,9 @@ export async function firebaseSendNotification(msg: Message) {
 
       if (user.email) {
         await sendEmail(user.email, {
-          Subject: 'Master device change required',
-          TextPart: 'Your device has been deleted',
-          HTMLPart: `<p>Your device ${device.name} is no longer reachable via firebase cloud messaging. 
+          subject: 'Master device change required',
+          text: 'Your device has been deleted',
+          html: `<p>Your device ${device.name} is no longer reachable via firebase cloud messaging.
           You need to make another device your master device. To confirm making your latest device your master device, please click <a href="${process.env.FRONTEND_URL}/confirm-master-device?token=${device.id}">here</a></p>`
         })
       }

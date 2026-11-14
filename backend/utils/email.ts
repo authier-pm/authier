@@ -1,114 +1,64 @@
+import { AsyncLocalStorage } from 'node:async_hooks'
 import debug from 'debug'
 
 const log = debug('au:email')
 
-type MailjetRequestMessage = {
-  From: {
-    Email: string
-    Name: string
-  }
-  To: Array<{
-    Email: string
-  }>
-  Subject: string
-  TextPart: string
-  HTMLPart?: string
+type EmailContent = {
+  subject: string
+  text: string
+  html?: string
 }
 
-type MailjetSendPayload = {
-  Messages: MailjetRequestMessage[]
+type EmailMessage = EmailContent & {
+  from: {
+    email: string
+    name: string
+  }
+  to: string
 }
 
-type MailjetSendResponse = {
-  response: {
-    status: number
-    body?: string
-  } & Record<string, unknown>
-}
-
-export const sentEmails: MailjetSendPayload[] = []
-
-const shouldDisableSending =
-  process.env.NODE_ENV === 'test' ||
-  process.env.DISABLE_EMAIL_SENDING !== 'false'
-
-const sendMailjetRequest = async (
-  payload: MailjetSendPayload
-): Promise<MailjetSendResponse> => {
-  const apiKey = process.env.MJ_APIKEY_PUBLIC
-  const apiSecret = process.env.MJ_APIKEY_PRIVATE
-
-  if (!apiKey || !apiSecret) {
-    throw new Error('Missing Mailjet credentials')
-  }
-
-  const response = await fetch('https://api.mailjet.com/v3.1/send', {
-    method: 'POST',
-    headers: {
-      Authorization: `Basic ${btoa(`${apiKey}:${apiSecret}`)}`,
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(payload)
-  })
-
-  const body = await response.text()
-
-  if (!response.ok) {
-    throw new Error(`Mailjet send failed (${response.status}): ${body}`)
-  }
-
-  return {
-    response: {
-      status: response.status,
-      body
-    }
+export type EmailBindings = {
+  EMAIL?: {
+    send(message: EmailMessage): Promise<{ messageId: string }>
   }
 }
+
+const emailBindings = new AsyncLocalStorage<EmailBindings>()
+
+export const sentEmails: EmailMessage[] = []
+
+export const withEmailSending = <T>(bindings: EmailBindings, work: () => T) =>
+  emailBindings.run(bindings, work)
 
 export const sendEmail = async (
   emailAddress: string,
-  props: {
-    Subject: string
-    TextPart: string
-    HTMLPart?: string
-  },
+  content: EmailContent,
   options: { requireDelivery?: boolean } = {}
-) => {
-  const payload: MailjetSendPayload = {
-    Messages: [
-      {
-        From: {
-          Email: 'no-reply@authier.pm',
-          Name: 'Authier password manager'
-        },
-        To: [
-          {
-            Email: emailAddress
-          }
-        ],
-        ...props
-      }
-    ]
+): Promise<void> => {
+  const message: EmailMessage = {
+    from: {
+      email: 'no-reply@authier.pm',
+      name: 'Authier password manager'
+    },
+    to: emailAddress,
+    ...content
   }
 
-  if (shouldDisableSending) {
-    if (options.requireDelivery && process.env.NODE_ENV !== 'test') {
+  const isTest = process.env.NODE_ENV === 'test'
+  if (isTest || process.env.DISABLE_EMAIL_SENDING !== 'false') {
+    if (options.requireDelivery && !isTest) {
       throw new Error('Email approval delivery is disabled')
     }
-    console.log(
-      `would have sent emails to ${payload.Messages.map((message) => message.To[0]?.Email).join(', ')}`
-    )
-    sentEmails.push(payload)
-
-    return {
-      response: {
-        status: 200
-      }
-    }
+    log(`would have sent email to ${emailAddress}`)
+    sentEmails.push(message)
+    return
   }
 
-  const res = await sendMailjetRequest(payload)
+  const sender = emailBindings.getStore()?.EMAIL
+  if (!sender) {
+    throw new Error('Cloudflare EMAIL binding is not configured')
+  }
 
-  log(`sent email to ${emailAddress}`)
-  return res
+  const result = await sender.send(message)
+  log(`sent email ${result.messageId} to ${emailAddress}`)
 }

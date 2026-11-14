@@ -109,11 +109,11 @@ describe('security boundaries', () => {
       challenge.id,
       ctx
     )
-    const message = sentEmails.at(-1)?.Messages[0]
-    expect(message?.TextPart).toContain(
+    const message = sentEmails.at(-1)
+    expect(message?.text).toContain(
       'https://trusted-api.example.com/confirm-master-device-reset?token='
     )
-    expect(message?.HTMLPart).not.toContain('evil-attacker.test')
+    expect(message?.html).not.toContain('evil-attacker.test')
     await db
       .delete(schema.masterDeviceResetRequest)
       .where(

@@ -6,7 +6,7 @@ import { plainToInstance } from 'class-transformer'
 import { buildApp } from '../app'
 import { db } from '../prisma/prismaClient'
 import * as schema from '../drizzle/schema'
-import { sentEmails } from '../utils/email'
+import { sentEmails, withEmailSending } from '../utils/email'
 import { makeFakeCtx } from '../tests/makeFakeCtx'
 import { defaultDeviceSettingSystemValues } from '../models/defaultDeviceSettingSystemValues'
 import {
@@ -143,13 +143,13 @@ const assertPending = (
   return result
 }
 
+const latestEmail = (fixture: Fixture) =>
+  sentEmails.findLast((mail) => mail.to === `${fixture.userId}@test.com`)
+
 const latestToken = (fixture: Fixture) => {
-  const message = sentEmails
-    .flatMap((mail) => mail.Messages)
-    .filter((mail) => mail.To[0]?.Email === `${fixture.userId}@test.com`)
-    .at(-1)
-  expect(message?.HTMLPart).not.toContain('<img src=x')
-  const token = message?.TextPart.match(
+  const message = latestEmail(fixture)
+  expect(message?.html).not.toContain('<img src=x')
+  const token = message?.text.match(
     /approve-new-device#token=([a-f0-9]{64})/
   )?.[1]
   if (!token) throw new Error('Missing approval email token')
@@ -478,7 +478,7 @@ describe('new device email approval', () => {
     ).toBeNull()
   })
 
-  it('fails closed instead of silently suppressing required production email delivery', async () => {
+  it('does not issue an approval token when email delivery is disabled or fails', async () => {
     const fixture = fixtures.delivery
     const [challenge] = await db
       .insert(schema.decryptionChallenge)
@@ -491,9 +491,21 @@ describe('new device email approval', () => {
       .returning()
     const before = sentEmails.length
     vi.stubEnv('NODE_ENV', 'production')
+    vi.stubEnv('DISABLE_EMAIL_SENDING', 'true')
     await expect(sendNewDeviceApprovalEmail(db, challenge.id)).rejects.toThrow(
       'Email approval delivery is disabled'
     )
+
+    vi.stubEnv('DISABLE_EMAIL_SENDING', 'false')
+    const failure = new Error('Cloudflare email delivery failed')
+    const send = vi.fn().mockRejectedValueOnce(failure)
+    await expect(
+      withEmailSending({ EMAIL: { send } }, () =>
+        sendNewDeviceApprovalEmail(db, challenge.id)
+      )
+    ).rejects.toBe(failure)
+    expect(send).toHaveBeenCalledOnce()
+
     expect(sentEmails).toHaveLength(before)
     const stored = await db.query.decryptionChallenge.findFirst({
       where: { id: challenge.id }
@@ -611,14 +623,11 @@ describe('new device email approval', () => {
       const fixture = fixtures[name]
       const pending = assertPending(await requestChallenge(fixture))
       const token = latestToken(fixture)
-      const message = sentEmails
-        .flatMap((mail) => mail.Messages)
-        .filter((mail) => mail.To[0]?.Email === `${fixture.userId}@test.com`)
-        .at(-1)
-      expect(message?.TextPart).toContain(
+      const message = latestEmail(fixture)
+      expect(message?.text).toContain(
         `/approve-new-device#token=${token}&action=reject`
       )
-      expect(message?.HTMLPart).toContain('reject this device</a>')
+      expect(message?.html).toContain('reject this device</a>')
       if (name === 'andReject')
         await approveFromDevice(fixture, pending.challengeId)
       const [unrelated] = await db

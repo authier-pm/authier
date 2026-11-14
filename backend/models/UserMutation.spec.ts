@@ -13,6 +13,7 @@ import { defaultDeviceSettingSystemValues } from './defaultDeviceSettingSystemVa
 import { graphql } from 'graphql'
 import { sign } from 'jsonwebtoken'
 import { gqlSchema } from '../schemas/gqlSchema'
+import { sentEmails } from '../utils/email'
 
 type User = InferSelectModel<typeof schema.user>
 
@@ -81,7 +82,27 @@ describe('UserMutation', () => {
       )
 
       expect(res.email).toBe(newEmail)
-      // expect(sentEmails.length).toBe(1) // TODO figure out why this is not working
+      expect(sentEmails.at(-1)).toMatchObject({
+        to: user.email,
+        subject: 'Your login email has been changed',
+        text: expect.stringContaining(newEmail)
+      })
+    })
+  })
+
+  it('reports accepted verification emails as sent', async () => {
+    const user = plainToClass(UserMutation, userRaw)
+    const result = await user.sendEmailVerification(
+      makeFakeCtx({ userId: user.id }),
+      false
+    )
+
+    expect(result).toBe(1)
+    expect(sentEmails.at(-1)).toMatchObject({
+      to: user.email,
+      subject: 'Verify your email',
+      text: expect.stringContaining('To verify your email'),
+      html: expect.stringContaining('Please verify your email.')
     })
   })
 
