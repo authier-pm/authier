@@ -405,6 +405,14 @@ describe('security boundaries', () => {
     ).toBe(1)
     const updated = await db.query.user.findFirst({ where: { id: attackerId } })
     expect(updated?.tokenVersion).toBe(1)
+    const resumedDevice = await db.query.device.findFirst({
+      where: { id: deviceId }
+    })
+    expect(resumedDevice?.resumeTokenVersion).toBe(updated?.tokenVersion)
+    expect(
+      await verifyDeviceSecret(nextSecret, resumedDevice!.resumeSecretHash!)
+    ).toBe(true)
+
     expect(await verifyDeviceSecret(nextSecret, updated!.addDeviceSecret)).toBe(
       true
     )

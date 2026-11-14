@@ -50,7 +50,8 @@ export const resumeDeviceSession = async (
       !deviceRec ||
       deviceRec.userId !== foundUser.id ||
       deviceRec.logoutAt ||
-      deviceRec.deletedAt
+      deviceRec.deletedAt ||
+      deviceRec.resumeTokenVersion !== foundUser.tokenVersion
     ) {
       throw new GraphqlErrorUnauthorized(
         'This device needs approval before its session can resume'
@@ -60,7 +61,7 @@ export const resumeDeviceSession = async (
     if (
       !(await verifyDeviceSecret(
         params.currentAddDeviceSecret,
-        foundUser.addDeviceSecret
+        deviceRec.resumeSecretHash ?? foundUser.addDeviceSecret
       ))
     ) {
       throw new GraphqlErrorUnauthorized(
@@ -68,18 +69,14 @@ export const resumeDeviceSession = async (
       )
     }
 
-    const [updatedUser] = await tx
-      .update(schema.user)
-      .set({
-        addDeviceSecret: await hashDeviceSecret(params.input.addDeviceSecret),
-        addDeviceSecretEncrypted: params.input.addDeviceSecretEncrypted
-      })
-      .where(eq(schema.user.id, foundUser.id))
-      .returning()
+    const resumeSecretHash = await hashDeviceSecret(
+      params.input.addDeviceSecret
+    )
 
     const [updatedDevice] = await tx
       .update(schema.device)
       .set({
+        resumeSecretHash,
         lastIpAddress: ipAddress,
         firebaseToken: params.input.firebaseToken ?? deviceRec.firebaseToken
       })
@@ -87,7 +84,7 @@ export const resumeDeviceSession = async (
       .returning()
 
     return {
-      user: updatedUser,
+      user: foundUser,
       device: updatedDevice
     }
   })

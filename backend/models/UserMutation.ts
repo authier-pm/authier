@@ -453,10 +453,11 @@ export class UserMutation extends UserBase {
             'Vault changed; synchronize before changing the master password'
           )
         }
+        const resumeSecretHash = await hashDeviceSecret(input.addDeviceSecret)
         const userRes = await tx
           .update(userSchema)
           .set({
-            addDeviceSecret: await hashDeviceSecret(input.addDeviceSecret),
+            addDeviceSecret: resumeSecretHash,
             addDeviceSecretEncrypted: input.addDeviceSecretEncrypted,
             tokenVersion: sql`${userSchema.tokenVersion} + 1`
           })
@@ -475,6 +476,14 @@ export class UserMutation extends UserBase {
               eq(decryptionChallengeSchema.userId, ctx.jwtPayload.userId)
             )
           )
+
+        await tx
+          .update(deviceSchema)
+          .set({
+            resumeSecretHash,
+            resumeTokenVersion: userRes[0].tokenVersion
+          })
+          .where(eq(deviceSchema.id, ctx.device.id))
 
         await invalidateNewDeviceApprovals(tx, this.id)
 
