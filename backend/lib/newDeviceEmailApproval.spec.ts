@@ -9,7 +9,10 @@ import * as schema from '../drizzle/schema'
 import { sentEmails } from '../utils/email'
 import { makeFakeCtx } from '../tests/makeFakeCtx'
 import { defaultDeviceSettingSystemValues } from '../models/defaultDeviceSettingSystemValues'
-import { DecryptionChallengeMutation } from '../models/DecryptionChallenge'
+import {
+  DecryptionChallengeApproved,
+  DecryptionChallengeMutation
+} from '../models/DecryptionChallenge'
 import { UserMutation } from '../models/UserMutation'
 import { UserNewDevicePolicyGQL } from '../models/types/UserNewDevicePolicy'
 import { requestDeviceChallengeResultSchema } from '../../shared/orpc/schemas'
@@ -29,6 +32,7 @@ afterEach(() => vi.unstubAllEnvs())
 const app = buildApp()
 const cases = {
   email: 'EMAIL',
+  returning: 'EMAIL',
   unconfigured: null,
   noMaster: 'EMAIL',
   andEmailFirst: 'EMAIL_AND_OTHER_DEVICE',
@@ -372,12 +376,64 @@ describe('new device email approval', () => {
     expect((await requestChallenge(fixture)).status).toBe('approved')
   })
 
+  it('requires a fresh email approval after logout and completes re-enrollment', async () => {
+    const fixture = fixtures.returning
+    const old = assertPending(await requestChallenge(fixture))
+    await db
+      .update(schema.decryptionChallenge)
+      .set({ createdAt: new Date(Date.now() - 2000) })
+      .where(eq(schema.decryptionChallenge.id, old.challengeId))
+    await db.insert(schema.device).values({
+      id: fixture.deviceId,
+      userId: fixture.userId,
+      name: 'Returning browser',
+      platform: 'test',
+      firstIpAddress: '127.0.0.1',
+      lastIpAddress: '127.0.0.1',
+      logoutAt: new Date(Date.now() - 1000),
+      ...defaultDeviceSettingSystemValues
+    })
+    expect((await confirm(latestToken(fixture))).status).toBe(400)
+    const fresh = assertPending(await requestChallenge(fixture))
+    expect(fresh.challengeId).not.toBe(old.challengeId)
+    expect((await confirm(latestToken(fixture))).status).toBe(200)
+    expect((await requestChallenge(fixture)).status).toBe('approved')
+    const challenge = await db.query.decryptionChallenge.findFirst({
+      where: { id: fresh.challengeId }
+    })
+    const login = await plainToInstance(
+      DecryptionChallengeApproved,
+      challenge
+    ).addNewDeviceForUser(
+      {
+        addDeviceSecret: 'returning-secret',
+        addDeviceSecretEncrypted: 'returning-encrypted',
+        encryptionSalt: 'salt',
+        devicePlatform: 'test',
+        firebaseToken: null
+      },
+      'synthetic-enrollment-secret',
+      makeFakeCtx({ userId: fixture.userId })
+    )
+    expect(login.accessToken).toBeTruthy()
+    expect(
+      await db.query.device.findFirst({ where: { id: fixture.deviceId } })
+    ).toMatchObject({
+      logoutAt: null,
+      resumeSecretHash: expect.any(String)
+    })
+  })
+
   it.each(['revoked', 'foreign'])(
     'rejects an email token after its requested device becomes %s',
     async (name) => {
       const fixture = fixtures[name]
       const pending = assertPending(await requestChallenge(fixture))
       const token = latestToken(fixture)
+      const requested = await db.query.decryptionChallenge.findFirst({
+        where: { id: pending.challengeId }
+      })
+      if (!requested) throw new Error('Missing challenge')
       await db.insert(schema.device).values({
         id: fixture.deviceId,
         userId: name === 'foreign' ? fixtures.email.userId : fixture.userId,
@@ -385,7 +441,10 @@ describe('new device email approval', () => {
         platform: 'test',
         firstIpAddress: '127.0.0.1',
         lastIpAddress: '127.0.0.1',
-        logoutAt: name === 'revoked' ? new Date() : null,
+        logoutAt:
+          name === 'revoked'
+            ? new Date(requested.createdAt.getTime() + 1)
+            : null,
         ...defaultDeviceSettingSystemValues
       })
       expect((await confirm(token)).status).toBe(400)

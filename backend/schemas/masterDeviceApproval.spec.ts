@@ -335,7 +335,7 @@ describe('master-only new device approval', () => {
     expect((await resume('next-secret')).status).toBe(401)
 
     // Logged-out and deleted devices cannot resume even with the current secret.
-    expect((await resume('resumed-secret', fixture.otherId)).status).toBe(200)
+    expect((await resume('next-secret', fixture.otherId)).status).toBe(200)
     await db
       .update(schema.device)
       .set({ logoutAt: new Date() })

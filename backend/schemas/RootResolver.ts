@@ -13,7 +13,10 @@ import {
 } from '../../shared/masterDeviceResetConfig'
 import { initiateReset, hashResetToken } from '../lib/masterDeviceReset'
 import { hashDeviceSecret } from '../utils/deviceSecretHash'
-import { throwIfNotAuthenticated, readVerifiedAccessToken } from '../lib/authMiddleware'
+import {
+  throwIfNotAuthenticated,
+  readVerifiedAccessToken
+} from '../lib/authMiddleware'
 import { resumeDeviceSession as resumeEnrolledDeviceSession } from '../lib/resumeDeviceSession'
 import {
   Query,
@@ -44,7 +47,10 @@ import { GraphQLJSON } from 'graphql-scalars'
 import { classifyAndCachePasswordForm } from '../lib/classifyPasswordForm'
 
 import debug from 'debug'
-import { AddNewDeviceInput, RegisterNewAccountInput } from '../models/AuthInputs'
+import {
+  AddNewDeviceInput,
+  RegisterNewAccountInput
+} from '../models/AuthInputs'
 
 import {
   WebInputGQL,
@@ -203,6 +209,7 @@ export class RootResolver {
             firstIpAddress: ipAddress,
             lastIpAddress: ipAddress,
             firebaseToken,
+            resumeSecretHash: addDeviceSecretHash,
             name: deviceName,
             vaultLockTimeoutSeconds: 28800,
             syncTOTP: true,
@@ -361,18 +368,16 @@ export class RootResolver {
     const authPayload = readVerifiedAccessToken(ctx)
     const isAuthenticatedMasterDevice = Boolean(
       authPayload &&
-        authPayload.userId === user.id &&
-        authPayload.deviceId === deviceInput.id &&
-        authPayload.tokenVersion === user.tokenVersion &&
-        device &&
-        device.id === user.masterDeviceId &&
-        !device.logoutAt &&
-        !device.deletedAt
+      authPayload.userId === user.id &&
+      authPayload.deviceId === deviceInput.id &&
+      authPayload.tokenVersion === user.tokenVersion &&
+      device &&
+      device.id === user.masterDeviceId &&
+      !device.logoutAt &&
+      !device.deletedAt
     )
 
-    let challenge:
-      | typeof schema.decryptionChallenge.$inferSelect
-      | undefined
+    let challenge: typeof schema.decryptionChallenge.$inferSelect | undefined
 
     if (isAuthenticatedMasterDevice && device) {
       const existingAuthChallenge =
@@ -404,15 +409,16 @@ export class RootResolver {
         where: {
           deviceId: deviceInput.id,
           userId: user.id,
-          masterPasswordVerifiedAt: { isNull: true }
+          masterPasswordVerifiedAt: { isNull: true },
+          createdAt: device?.logoutAt ? { gt: device.logoutAt } : undefined
         },
         orderBy: (c, { desc }) => [desc(c.id)]
       })
       const isAuthenticatedOnlyChallenge = Boolean(
         openChallenge?.approvedAt &&
-          !openChallenge.emailApprovedAt &&
-          !openChallenge.deviceApprovedAt &&
-          !openChallenge.approvedByRecovery
+        !openChallenge.emailApprovedAt &&
+        !openChallenge.deviceApprovedAt &&
+        !openChallenge.approvedByRecovery
       )
       challenge = isAuthenticatedOnlyChallenge ? undefined : openChallenge
     }

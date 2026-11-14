@@ -1,3 +1,4 @@
+import { ORPCError } from '@orpc/client'
 import { getVaultSecretMetadata } from '@/lib/vaultSecrets'
 import { readRememberedVault, rememberVault } from '@shared/rememberedVault'
 import { render, screen, waitFor } from '@testing-library/react'
@@ -495,6 +496,102 @@ describe('VaultSessionProvider', () => {
     ]) {
       expect(window.localStorage.getItem(key)).toBeNull()
     }
+  })
+
+  it.each([
+    new TypeError('Failed to fetch'),
+    new ORPCError('INTERNAL_SERVER_ERROR'),
+    new ORPCError('TOO_MANY_REQUESTS')
+  ])(
+    'retains remembered credentials after a transient resume failure: %s',
+    async (error) => {
+      const salt = crypto.getRandomValues(new Uint8Array(16))
+      const masterKey = await generateEncryptionKey(
+        'super secure password',
+        salt
+      )
+      const deviceSecrets = await initLocalDeviceAuthSecret(masterKey, salt)
+      const session = createSession({
+        secrets: [],
+        lastSyncAt: new Date().toISOString()
+      })
+      session.user.id = crypto.randomUUID()
+      storeLockedState({
+        userId: session.user.id,
+        authSecretEncrypted: deviceSecrets.addDeviceSecretEncrypted,
+        encryptionSalt: bufferToBase64(salt)
+      })
+      const savedLockedState = window.localStorage.getItem(
+        'authier-vault-locked-state'
+      )
+      await rememberVault({
+        session,
+        masterKey: await cryptoKeyToString(masterKey)
+      })
+      orpcMocks.resumeDevice.mockRejectedValueOnce(error)
+      const view = render(
+        <VaultSessionProvider>
+          <VaultSessionHarness />
+        </VaultSessionProvider>
+      )
+      await waitFor(() => expect(orpcMocks.resumeDevice).toHaveBeenCalledOnce())
+      await waitFor(() =>
+        expect(screen.getByTestId('status')).toHaveTextContent('locked')
+      )
+      view.unmount()
+      expect(await readRememberedVault()).not.toBeNull()
+      expect(window.localStorage.getItem('authier-vault-locked-state')).toBe(
+        savedLockedState
+      )
+      orpcMocks.resumeDevice.mockResolvedValue({
+        accessToken: 'retry-access',
+        refreshToken: 'retry-refresh',
+        session
+      })
+      render(
+        <VaultSessionProvider>
+          <VaultSessionHarness />
+        </VaultSessionProvider>
+      )
+      await waitFor(() =>
+        expect(screen.getByTestId('status')).toHaveTextContent('authenticated')
+      )
+      expect(orpcMocks.resumeDevice).toHaveBeenLastCalledWith(
+        expect.objectContaining({
+          currentAddDeviceSecret: deviceSecrets.addDeviceSecret,
+          input: expect.objectContaining({
+            addDeviceSecret: deviceSecrets.addDeviceSecret,
+            addDeviceSecretEncrypted: deviceSecrets.addDeviceSecretEncrypted
+          })
+        })
+      )
+    }
+  )
+
+  it('forgets remembered credentials after a definitive resume rejection', async () => {
+    const salt = crypto.getRandomValues(new Uint8Array(16))
+    const masterKey = await generateEncryptionKey('super secure password', salt)
+    const deviceSecrets = await initLocalDeviceAuthSecret(masterKey, salt)
+    const session = createSession({ secrets: [] })
+    session.user.id = crypto.randomUUID()
+    storeLockedState({
+      userId: session.user.id,
+      authSecretEncrypted: deviceSecrets.addDeviceSecretEncrypted,
+      encryptionSalt: bufferToBase64(salt)
+    })
+    await rememberVault({
+      session,
+      masterKey: await cryptoKeyToString(masterKey)
+    })
+    orpcMocks.resumeDevice.mockRejectedValueOnce(new ORPCError('UNAUTHORIZED'))
+    render(
+      <VaultSessionProvider>
+        <VaultSessionHarness />
+      </VaultSessionProvider>
+    )
+    await waitFor(() => expect(orpcMocks.resumeDevice).toHaveBeenCalledOnce())
+    await waitFor(async () => expect(await readRememberedVault()).toBeNull())
+    expect(window.localStorage.getItem('authier-vault-locked-state')).toBeNull()
   })
 
   it('restores remembered unlock after restart without a password or live cookie, and forgets it on lock', async () => {
