@@ -68,6 +68,16 @@ stateDiagram-v2
 7. Create a pending challenge and send the configured email and/or device notifications. An unconfigured account requires email approval until its owner saves a policy.
 8. Return `addDeviceSecretEncrypted` and `encryptionSalt` only after the required approvals for an unverified challenge. With both approvals required, the first approval remains pending. Master-password verification is still required to finish login.
 
+### Remembered device renewal
+
+Registration and approved enrollment save a hashed renewal credential on each device. Renewal checks device ownership, logout/deletion status and the account token version before verifying that credential. It never rotates the account-wide enrollment secret. Password changes update the master device's renewal credential and token version; older credentials on other devices cannot resume after the version changes.
+
+The extension and web vault retain their saved credential during routine renewal. A dropped response or a lock while renewal is in flight can therefore be retried without losing access. The web vault keeps remembered and locked state after network errors, rate limits and server failures, and clears it on a confirmed unauthorized response.
+
+An email login after logout requires a new challenge created after that logout. Older approval links cannot reactivate the device.
+
+Apply migration `20261114041132_smooth_slapstick` before deploying this renewal change. It adds device credential fields and initializes existing devices' token versions. A legacy device with no saved verifier can initialize one using the current account enrollment secret. A legacy device whose local secret is already stale must complete fresh approval once; subsequent device enrollments no longer invalidate its renewal credential.
+
 ## Approval methods
 
 `EMAIL` requires an email confirmation. `OTHER_DEVICE` requires approval from an already signed-in Authier device and is the recommended choice. `EMAIL_OR_OTHER_DEVICE` allows either method; `EMAIL_AND_OTHER_DEVICE` requires both. `MASTER_DEVICE` permits approval only from the current active master device and sends the approval push only to that device. It has no email or other-device fallback. Transferring the master role clears pending grants so the new master must approve them. Email is the most convenient and least secure standalone option, since access to the mailbox allows approval. Policy changes remain restricted to the master device after the initial choice.
