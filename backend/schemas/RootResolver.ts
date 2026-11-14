@@ -409,7 +409,8 @@ export class RootResolver {
         where: {
           deviceId: deviceInput.id,
           userId: user.id,
-          masterPasswordVerifiedAt: { isNull: true }
+          masterPasswordVerifiedAt: { isNull: true },
+          createdAt: device?.logoutAt ? { gt: device.logoutAt } : undefined
         },
         orderBy: (c, { desc }) => [desc(c.id)]
       })
