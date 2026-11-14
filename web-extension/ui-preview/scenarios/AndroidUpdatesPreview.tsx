@@ -26,7 +26,3 @@ export const SeptemberReleaseBlogPreview = () => (
 export const OctoberReleaseBlogPreview = () => (
   <WebsitePreview path="/blog/sms-codes-and-device-recovery" />
 )
-
-export const HackingPrizeBlogPreview = () => (
-  <WebsitePreview path="/blog/hack-authier-10-ltc" />
-)

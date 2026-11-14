@@ -2,19 +2,7 @@ import type { ContentEntry } from './content'
 
 export type BlogPost = ContentEntry
 
-export const hackingPrizePost = {
-  title: 'Hack Authier. Earn 84 LTC.',
-  description:
-    'Fully decrypt an Authier vault, demonstrate the attack programmatically, and receive an 84 LTC reward. Submit your proof to security@authier.pm.',
-  href: '/blog/hack-authier-10-ltc',
-  publishedAt: '2026-10-25',
-  updatedAt: '2026-11-11',
-  readingTime: '3 min read',
-  category: 'Security challenge'
-} as const satisfies BlogPost
-
 export const blogPosts = [
-  hackingPrizePost,
   {
     title: 'SMS codes, device recovery, and a steadier vault',
     description:
