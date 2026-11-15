@@ -86,7 +86,7 @@ const start = async (f: Fixture) => {
     f.challenge.deviceId,
     f.challenge.id
   )
-  const message = email.sentEmails.at(-1)!.Messages[0]!.TextPart
+  const message = email.sentEmails.at(-1)!.text
   const token = message.match(/token=([^\s]+)/)![1]!
   const [request] = await db
     .select()
@@ -264,12 +264,12 @@ describe('master device recovery', () => {
       await db.query.device.findFirst({ where: { id: f.devices[0]!.id } })
     ).toBeUndefined()
     const completed = email.sentEmails.filter(
-      (payload) =>
-        payload.Messages[0]?.Subject === 'Master device reset completed'
+      (message) => message.subject === 'Master device reset completed'
     )
-    expect(
-      completed.map((payload) => payload.Messages[0]!.To[0]!.Email)
-    ).toEqual([f.user.email, 'backup@example.com'])
+    expect(completed.map((message) => message.to)).toEqual([
+      f.user.email,
+      'backup@example.com'
+    ])
   })
 
   it('does not count repeated approvals toward a quorum of two', async () => {
@@ -359,8 +359,7 @@ describe('master device recovery', () => {
     expect((await current(f))?.masterDeviceId).toBe(f.devices[0]!.id)
     expect(
       email.sentEmails.some(
-        (payload) =>
-          payload.Messages[0]?.Subject === 'Master device reset cancelled'
+        (message) => message.subject === 'Master device reset cancelled'
       )
     ).toBe(true)
   })
@@ -461,9 +460,9 @@ describe('master device recovery', () => {
     expect((await current(f))?.masterDeviceId).toBeNull()
     await processDueResets(db, request.processAt)
     const completed = email.sentEmails.filter(
-      (payload) =>
-        payload.Messages[0]?.Subject === 'Master device reset completed' &&
-        payload.Messages[0]?.To[0]?.Email === f.user.email
+      (message) =>
+        message.subject === 'Master device reset completed' &&
+        message.to === f.user.email
     )
     expect(completed).toHaveLength(1)
   })

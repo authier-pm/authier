@@ -135,9 +135,7 @@ it('notifies the phone after a successful email-approved new login', async () =>
   })
   const challenge = await response.json()
   expect(challenge.status).toBe('pending')
-  const token = sentEmails
-    .at(-1)
-    ?.Messages[0]?.TextPart.match(/token=([a-f0-9]{64})/)?.[1]
+  const token = sentEmails.at(-1)?.text.match(/token=([a-f0-9]{64})/)?.[1]
   if (!token) throw new Error('Missing email approval token')
   expect(await confirmNewDeviceEmailApproval(db, token)).toBe('approved')
   expect(sendNotification).not.toHaveBeenCalled()

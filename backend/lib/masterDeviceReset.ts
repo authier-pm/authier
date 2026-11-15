@@ -38,7 +38,6 @@ export const queueResetEmail = async (
 
 export const flushResetEmails = async (db: DbType) => {
   // Lock each row through delivery so overlapping cron invocations cannot send it twice.
-  // Delivery is at-least-once if the process dies after Mailjet accepts the message.
   const pending = await db
     .select({ id: schema.masterDeviceResetEmail.id })
     .from(schema.masterDeviceResetEmail)
@@ -60,8 +59,8 @@ export const flushResetEmails = async (db: DbType) => {
           .for('update', { skipLocked: true })
         if (!email) return
         await sendEmail(email.recipient, {
-          Subject: email.subject,
-          TextPart: email.message
+          subject: email.subject,
+          text: email.message
         })
         await tx
           .update(schema.masterDeviceResetEmail)
@@ -176,9 +175,9 @@ export const initiateReset = async (
     )
     // Keep the token out of persistent storage. A send failure rolls back the request so it can be retried.
     await sendEmail(user.email, {
-      Subject: 'Confirm master device reset',
-      TextPart: `${message}\nConfirm within 24 hours: ${getBackendOrigin()}/confirm-master-device-reset?token=${token}`,
-      HTMLPart: `<p>Confirm your master device reset within 24 hours. Your configured waiting period and device approvals are required.</p><p><a href="${getBackendOrigin()}/confirm-master-device-reset?token=${token}">Confirm master device reset</a></p>`
+      subject: 'Confirm master device reset',
+      text: `${message}\nConfirm within 24 hours: ${getBackendOrigin()}/confirm-master-device-reset?token=${token}`,
+      html: `<p>Confirm your master device reset within 24 hours. Your configured waiting period and device approvals are required.</p><p><a href="${getBackendOrigin()}/confirm-master-device-reset?token=${token}">Confirm master device reset</a></p>`
     })
     return { requestedAt: now, processAt, alreadyPending: false }
   })

@@ -160,9 +160,7 @@ describe('master-only new device approval', () => {
       expect.objectContaining({ token: `push-token-${fixture.masterId}` })
     )
     expect(
-      sentEmails
-        .flatMap((mail) => mail.Messages)
-        .some((mail) => mail.To[0]?.Email === `${fixture.userId}@test.com`)
+      sentEmails.some((mail) => mail.to === `${fixture.userId}@test.com`)
     ).toBe(false)
     expect(
       (await approve(fixture, pending.challengeId, fixture.otherId)).status

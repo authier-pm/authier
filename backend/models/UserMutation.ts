@@ -341,13 +341,13 @@ export class UserMutation extends UserBase {
         ? 'Verified email can be used to recover in case you lose your master device.'
         : 'It will be used as your primary notification channel until you install the mobile app. If you prefer mobile notifications, install our mobile app.'
 
-      const res = await sendEmail(
+      await sendEmail(
         this.email,
 
         {
-          Subject: 'Verify your email',
-          TextPart: `To verify your email, please go here: ${link} \n ${notifMessage}`,
-          HTMLPart: `<!DOCTYPE html>
+          subject: 'Verify your email',
+          text: `To verify your email, please go here: ${link} \n ${notifMessage}`,
+          html: `<!DOCTYPE html>
           <html>
           <body>
           <a href="${link}" rel="notrack">Please verify your email.</a> ${notifMessage}
@@ -355,7 +355,7 @@ export class UserMutation extends UserBase {
           </html>`
         }
       )
-      return res.response.status === 200 ? 1 : 0
+      return 1
     }
   }
 
@@ -528,8 +528,8 @@ export class UserMutation extends UserBase {
         await invalidateNewDeviceApprovals(trx, updatedUser.id)
 
       await sendEmail(oldEmail!, {
-        Subject: 'Your login email has been changed',
-        TextPart: `Your login email has been changed from ${oldEmail} to ${email}. 
+        subject: 'Your login email has been changed',
+        text: `Your login email has been changed from ${oldEmail} to ${email}.
         If you did not do this you should consider your master device compromised.
         Request was made from ip: ${ctx.getIpAddress()}
         `

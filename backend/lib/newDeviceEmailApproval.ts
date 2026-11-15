@@ -196,9 +196,9 @@ export const sendNewDeviceApprovalEmail = async (
     await sendEmail(
       user.email,
       {
-        Subject: 'Approve a new Authier device',
-        TextPart: `A new device, ${challenge.deviceName}, requested access to your Authier account from ${challenge.ipAddress}.\n\nIf you started this login, review and approve it within 15 minutes:\n${url}\n\n${instructions}\n\nIf this was not you, review and reject this device:\n${rejectUrl}`,
-        HTMLPart: `<p>A new device requested access to your Authier account.</p><p><strong>${escapeHtml(challenge.deviceName)}</strong><br>IP address: ${escapeHtml(challenge.ipAddress)}</p><p>If you started this login, <a href="${url}">review and approve this device</a> within 15 minutes.</p><p>${instructions}</p><p>If this was not you, <a href="${escapeHtml(rejectUrl)}">reject this device</a>.</p>`
+        subject: 'Approve a new Authier device',
+        text: `A new device, ${challenge.deviceName}, requested access to your Authier account from ${challenge.ipAddress}.\n\nIf you started this login, review and approve it within 15 minutes:\n${url}\n\n${instructions}\n\nIf this was not you, review and reject this device:\n${rejectUrl}`,
+        html: `<p>A new device requested access to your Authier account.</p><p><strong>${escapeHtml(challenge.deviceName)}</strong><br>IP address: ${escapeHtml(challenge.ipAddress)}</p><p>If you started this login, <a href="${url}">review and approve this device</a> within 15 minutes.</p><p>${instructions}</p><p>If this was not you, <a href="${escapeHtml(rejectUrl)}">reject this device</a>.</p>`
       },
       { requireDelivery: true }
     )
