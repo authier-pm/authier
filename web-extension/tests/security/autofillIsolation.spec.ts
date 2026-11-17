@@ -19,6 +19,7 @@ const foreignOrigin = 'https://unrelated.example.net'
 const plainHttpOrigin = 'http://mail.example.com'
 const intranetOrigin = 'http://intranet.example.org'
 const localOrigin = 'http://localhost:4173'
+const savedUsername = 'alex@example.com'
 const savedPassword = 'mail-preview-password'
 
 type Login = {
@@ -45,13 +46,12 @@ const localLogin: Login = {
   url: 'localhost',
   iconUrl: null
 }
-const loginForm = `
-  <form action="/login" onsubmit="event.preventDefault()">
-    <h1>Sign in</h1>
-    <label>Email <input name="username" autocomplete="username"></label>
-    <label>Password <input name="password" type="password" autocomplete="current-password"></label>
-    <button type="submit">Sign in</button>
-  </form>`
+const loginFormFields = `
+  <h1>Sign in</h1>
+  <label>Email <input name="username" autocomplete="username"></label>
+  <label>Password <input name="password" type="password" autocomplete="current-password"></label>
+  <button type="submit">Sign in</button>`
+const loginForm = `<form action="/login" onsubmit="event.preventDefault()">${loginFormFields}</form>`
 
 const html = (body: string) => `<!doctype html><html><head>
   <title>Security regression fixture</title>
@@ -129,9 +129,11 @@ const test = base.extend<{ vaultLogins: Login[]; vaultBrowser: VaultBrowser }>({
         json: { errors: [{ message: 'Offline security test' }] }
       })
     })
+    const isAuthierWorker = (worker: Worker) =>
+      new URL(worker.url()).pathname === '/js/backgroundPage.js'
     const worker =
-      context.serviceWorkers()[0] ??
-      (await context.waitForEvent('serviceworker'))
+      context.serviceWorkers().find(isAuthierWorker) ??
+      (await context.waitForEvent('serviceworker', isAuthierWorker))
     const extensionId = new URL(worker.url()).hostname
     await expect
       .poll(() =>
@@ -157,6 +159,23 @@ const test = base.extend<{ vaultLogins: Login[]; vaultBrowser: VaultBrowser }>({
   }
 })
 
+async function lockVault({ context, worker, extensionId }: VaultBrowser) {
+  const vault = await context.newPage()
+  await vault.goto(`chrome-extension://${extensionId}/js/vault.html#/`, {
+    waitUntil: 'domcontentloaded'
+  })
+  await vault.getByRole('button', { name: 'Lock', exact: true }).click()
+  await expect
+    .poll(() =>
+      worker.evaluate(async () => {
+        const state = await chrome.storage.session.get('backgroundState')
+        return state.backgroundState === null
+      })
+    )
+    .toBe(true)
+  await vault.close()
+}
+
 test('autofills a same-origin frame without disclosing credentials to a foreign frame', async ({
   vaultBrowser
 }) => {
@@ -178,7 +197,7 @@ test('autofills a same-origin frame without disclosing credentials to a foreign 
 test('manual lock stops cached autofill until a fresh unlock', async ({
   vaultBrowser
 }) => {
-  const { context, worker, extensionId } = vaultBrowser
+  const { context, worker } = vaultBrowser
   const page = await context.newPage()
   await page.goto(`${trustedOrigin}/login`)
   await expect(page.locator('input[type="password"]')).toHaveValue(
@@ -190,19 +209,7 @@ test('manual lock stops cached autofill until a fresh unlock', async ({
   )
   const picker = page.locator('.authier-dropdown-content a')
 
-  const vault = await context.newPage()
-  await vault.goto(`chrome-extension://${extensionId}/js/vault.html#/`, {
-    waitUntil: 'domcontentloaded'
-  })
-  await vault.getByRole('button', { name: 'Lock', exact: true }).click()
-  await expect
-    .poll(() =>
-      worker.evaluate(async () => {
-        const state = await chrome.storage.session.get('backgroundState')
-        return state.backgroundState === null
-      })
-    )
-    .toBe(true)
+  await lockVault(vaultBrowser)
   await expect(picker).toHaveCount(0)
 
   await page.evaluate((markup) => {
@@ -224,6 +231,75 @@ test('manual lock stops cached autofill until a fresh unlock', async ({
   await expect(page.locator('input[type="password"]')).toHaveValue(
     savedPassword
   )
+})
+
+test('a new Chrome tab can use a website session after Authier autofill and lock', async ({
+  vaultBrowser
+}) => {
+  const { context } = vaultBrowser
+  const loginUrl = `${trustedOrigin}/login`
+  const inboxUrl = `${trustedOrigin}/inbox`
+  const sessionCookie = '__Host-example-mail=fixture-session'
+
+  await context.route(loginUrl, async (route) => {
+    const request = route.request()
+    if (request.method() === 'GET') {
+      return route.fulfill({
+        contentType: 'text/html',
+        body: html(
+          `<form method="post" action="/login">${loginFormFields}</form>`
+        )
+      })
+    }
+
+    const fields = new URLSearchParams(request.postData() ?? '')
+    if (
+      request.method() !== 'POST' ||
+      fields.get('username') !== savedUsername ||
+      fields.get('password') !== savedPassword
+    ) {
+      return route.fulfill({ status: 401, body: 'Invalid login' })
+    }
+    return route.fulfill({
+      headers: {
+        'set-cookie': `${sessionCookie}; Path=/; Secure; HttpOnly; SameSite=Lax`
+      },
+      contentType: 'text/html',
+      body: html('<h1>Signed in</h1>')
+    })
+  })
+  await context.route(inboxUrl, async (route) => {
+    const cookies = await route.request().headerValue('cookie')
+    const signedIn = cookies?.split(/;\s*/).includes(sessionCookie)
+    return route.fulfill({
+      status: signedIn ? 200 : 401,
+      contentType: 'text/html',
+      body: html(
+        signedIn ? '<h1>Example Mail inbox</h1>' : '<h1>Sign in required</h1>'
+      )
+    })
+  })
+
+  const signInPage = await context.newPage()
+  await signInPage.goto(inboxUrl)
+  await expect(
+    signInPage.getByRole('heading', { name: 'Sign in required' })
+  ).toBeVisible()
+  await signInPage.goto(loginUrl)
+  await expect(
+    signInPage.getByRole('heading', { name: 'Signed in' })
+  ).toBeVisible()
+  await signInPage.close()
+  await lockVault(vaultBrowser)
+
+  // Model Muse opening its own tab in the same Chrome profile.
+  const taskPage = await context.newPage()
+  await taskPage.goto(inboxUrl)
+  await expect(
+    taskPage.getByRole('heading', { name: 'Example Mail inbox' })
+  ).toBeVisible()
+  await expect(taskPage.locator('input[type="password"]')).toHaveCount(0)
+  expect(await taskPage.evaluate(() => document.cookie)).toBe('')
 })
 
 test('the extension RPC honors a timeout in seconds and locks existing page scripts', async ({

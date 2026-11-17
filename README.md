@@ -20,6 +20,11 @@ receive updates directly from signed GitHub Releases. See [Android installation]
 Save website passkeys in Authier and sync them between Brave, Firefox and Edge.
 See [passkey setup, compatibility and rollout](docs/passkeys.md).
 
+## Muse in Chrome
+
+Use Authier to sign in before Muse opens the site in the same Chrome profile.
+See [setup and verification](docs/museChrome.md).
+
 ## Running the extension build on Ubuntu
 
 To build the browser extension follow these commands with a current LTS node version:
