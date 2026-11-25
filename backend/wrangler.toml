@@ -12,6 +12,10 @@ id = "24e2d3e4fa10434c8143060a11dace64"
 # CLOUDFLARE_HYPERDRIVE_LOCAL_CONNECTION_STRING_HYPERDRIVE.
 localConnectionString = "postgresql://authier:auth133r@127.0.0.1:5432/authier"
 
+[[send_email]]
+name = "EMAIL"
+allowed_sender_addresses = ["no-reply@authier.pm"]
+
 [vars]
 NODE_ENV = "production"
 DISABLE_EMAIL_SENDING = "false"
