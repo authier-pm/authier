@@ -172,19 +172,10 @@ function LoginSecret({ secretProps }: { secretProps: ILoginSecret }) {
             >
               <TextField label="URL" name="url" />
               <TextField label="Label" name="label" />
-              <TextField label="Username" name="username" />
 
-              <div className="space-y-2">
+              <div className="grid gap-5 md:col-span-2 md:grid-cols-2 md:gap-y-2">
+                <TextField label="Username" name="username" />
                 <PasswordField
-                  actions={
-                    canShowPositions && (
-                      <PasswordPositionsButton
-                        expanded={showPositions}
-                        onClick={() => setShowPositions((current) => !current)}
-                        panelId={positionsId}
-                      />
-                    )
-                  }
                   copyLabel={t`Copy password`}
                   label="Password"
                   name="password"
@@ -195,18 +186,35 @@ function LoginSecret({ secretProps }: { secretProps: ILoginSecret }) {
                       status: 'success'
                     })
                   }}
-                  onToggleGenerator={() => {
-                    setIsGeneratorOpen((currentValue) => !currentValue)
-                  }}
                   onToggleVisibility={() => {
                     setShowPositions(false)
                     setShowPassword((currentValue) => !currentValue)
                   }}
                   showValue={showPassword}
-                  toggleGeneratorLabel={
-                    isGeneratorOpen ? 'Hide generator' : 'Show generator'
-                  }
                 />
+                <div className="flex flex-wrap items-center gap-2">
+                  <Button
+                    aria-expanded={isGeneratorOpen}
+                    onClick={() => setIsGeneratorOpen((current) => !current)}
+                    size="sm"
+                    type="button"
+                    variant="outline"
+                  >
+                    {isGeneratorOpen ? (
+                      <FiChevronUp className="size-4" />
+                    ) : (
+                      <FiChevronDown className="size-4" />
+                    )}
+                    {isGeneratorOpen ? 'Hide generator' : 'Show generator'}
+                  </Button>
+                  {canShowPositions && (
+                    <PasswordPositionsButton
+                      expanded={showPositions}
+                      onClick={() => setShowPositions((current) => !current)}
+                      panelId={positionsId}
+                    />
+                  )}
+                </div>
                 <PasswordStrengthBar
                   color={levelOfPassword.color ?? 'red'}
                   label={levelOfPassword.value}
@@ -352,7 +360,6 @@ function TotpSecret({ secretProps }: { secretProps: ITOTPSecret }) {
                   setShowSecret((currentValue) => !currentValue)
                 }}
                 showValue={showSecret}
-                toggleGeneratorLabel={null}
               />
             </div>
             <NumberField label="Digits" name="digits" />
@@ -653,25 +660,19 @@ function NumberField({ label, name }: { label: string; name: string }) {
 }
 
 function PasswordField({
-  actions,
   copyLabel,
   label,
   name,
   onCopy,
-  onToggleGenerator,
   onToggleVisibility,
-  showValue,
-  toggleGeneratorLabel
+  showValue
 }: {
-  actions?: ReactNode
   copyLabel: string
   label: string
   name: string
   onCopy: (value: string) => void
-  onToggleGenerator?: () => void
   onToggleVisibility: () => void
   showValue: boolean
-  toggleGeneratorLabel: string | null
 }) {
   const [field, meta] = useField<string>(name)
   const inputId = useId()
@@ -724,25 +725,6 @@ function PasswordField({
             )}
           </Button>
         </div>
-      </div>
-
-      <div className="flex flex-wrap items-center gap-2">
-        {toggleGeneratorLabel && onToggleGenerator ? (
-          <Button
-            onClick={onToggleGenerator}
-            size="sm"
-            type="button"
-            variant="outline"
-          >
-            {toggleGeneratorLabel.includes('Hide') ? (
-              <FiChevronUp className="size-4" />
-            ) : (
-              <FiChevronDown className="size-4" />
-            )}
-            {toggleGeneratorLabel}
-          </Button>
-        ) : null}
-        {actions}
       </div>
 
       {meta.touched && meta.error ? (

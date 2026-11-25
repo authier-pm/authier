@@ -8,7 +8,8 @@ valid credentials, while Formik still validates required credential fields. It
 captures `docs/screenshots/credential-edit-generator-validation.png`.
 
 In `credential-edit`, reveal the password and select “Show password positions”
-to see its numbered characters across the full form width. Run
+below Username, where the generator toggle also appears on desktop. The
+numbered characters use the full form width. Run
 `pnpm playwright:ui-preview passwordPositions.spec.ts` from `web-extension`
 to verify the layout, numbering, live edits, and masking. It captures
 `docs/screenshots/password-positions.png`.

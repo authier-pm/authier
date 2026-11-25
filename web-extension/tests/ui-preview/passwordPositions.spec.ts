@@ -37,6 +37,28 @@ test('shows numbered characters on the vault credential detail page while reveal
     page.getByRole('button', { name: 'Hide password positions' })
   ).toHaveAttribute('aria-expanded', 'true')
 
+  const usernameColumn = await page
+    .getByRole('textbox', { name: 'Username', exact: true })
+    .evaluate((input) => {
+      const { left, right, bottom } = input.getBoundingClientRect()
+      return { left, right, bottom }
+    })
+  const toggles = page.getByRole('button', {
+    name: /^(Show generator|Hide password positions)$/
+  })
+  await expect(toggles).toHaveCount(2)
+  const toggleBounds = await toggles.evaluateAll((buttons) =>
+    buttons.map((button) => {
+      const { left, right, top } = button.getBoundingClientRect()
+      return { left, right, top }
+    })
+  )
+  for (const { left, right, top } of toggleBounds) {
+    expect(left).toBeGreaterThanOrEqual(usernameColumn.left)
+    expect(right).toBeLessThanOrEqual(usernameColumn.right)
+    expect(top).toBeGreaterThanOrEqual(usernameColumn.bottom)
+  }
+
   const formWidth = await password.evaluate(
     (input) => input.closest('form')?.getBoundingClientRect().width
   )
