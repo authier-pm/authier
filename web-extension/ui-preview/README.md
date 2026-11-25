@@ -7,10 +7,9 @@ the form. Run `pnpm playwright:ui-preview credentialEdit.spec.ts` from
 valid credentials, while Formik still validates required credential fields. It
 captures `docs/screenshots/credential-edit-generator-validation.png`.
 
-The `password-positions` scenario renders the production popup with synthetic
-logins. Open “Show password positions” beside Copy password to see the numbered
-characters. Run `pnpm playwright:ui-preview passwordPositions.spec.ts` from
-`web-extension` to verify the popup and vault editor and capture
+In `credential-edit`, reveal the password and select “Show password positions”
+to see its numbered characters. Run `pnpm playwright:ui-preview passwordPositions.spec.ts`
+from `web-extension` to verify numbering, live edits, and masking. It captures
 `docs/screenshots/password-positions.png`.
 
 The `add-item` scenario renders the production add-item page in the vault shell.

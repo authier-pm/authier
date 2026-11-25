@@ -22,10 +22,10 @@ export function CredentialEditPreview() {
   const [saved, setSaved] = useState<ILoginSecret['loginCredentials']>()
   const [secret] = useState<ILoginSecret>(() => {
     const loginCredentials = {
-      label: '',
+      label: 'Example Bank',
       url: 'https://accounts.example.com',
       username: 'alex@example.com',
-      password: 'synthetic-preview-password',
+      password: 'V7!sp9#Qct2@x',
       iconUrl: null
     }
     return {

@@ -7,6 +7,9 @@ test('lists site passkeys below TOTP codes and passwords', async ({ page }) => {
   await expect(items).toHaveCount(4)
   await expect(items.nth(0)).toContainText('GitHub 2FA')
   await expect(items.nth(1)).toContainText('GitHub password')
+  await expect(
+    items.nth(1).getByRole('button', { name: 'Show password positions' })
+  ).toHaveCount(0)
   await expect(items.nth(2)).toContainText('Passkey')
   await expect(items.nth(2)).toContainText('alex@example.com')
   await expect(items.nth(3)).toContainText('alex@work.example')

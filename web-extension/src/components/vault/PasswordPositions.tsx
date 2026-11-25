@@ -1,44 +1,33 @@
 import { t } from '@lingui/core/macro'
 import { TbListNumbers } from 'react-icons/tb'
 import { Button } from '@src/components/ui/button'
-import { Tooltip } from '@src/components/ui/tooltip'
 
 export function PasswordPositionsButton({
   expanded,
   panelId,
-  onClick,
-  withLabel = false
+  onClick
 }: {
   expanded: boolean
   panelId: string
   onClick: () => void
-  withLabel?: boolean
 }) {
   const label = expanded
     ? t`Hide password positions`
     : t`Show password positions`
-  const button = (
+
+  return (
     <Button
       aria-controls={expanded ? panelId : undefined}
       aria-expanded={expanded}
-      aria-label={label}
       className="aria-expanded:border-primary aria-expanded:text-primary"
       onClick={onClick}
-      size={withLabel ? 'sm' : 'icon'}
+      size="sm"
       type="button"
       variant="outline"
     >
       <TbListNumbers aria-hidden="true" className="size-4" />
-      {withLabel ? label : null}
+      {label}
     </Button>
-  )
-
-  if (withLabel) return button
-
-  return (
-    <Tooltip className="left-auto right-0 translate-x-0" content={label}>
-      {button}
-    </Tooltip>
   )
 }
 

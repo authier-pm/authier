@@ -736,7 +736,6 @@ function PasswordField({
             expanded={showPositions}
             onClick={() => setShowPositions((current) => !current)}
             panelId={positionsId}
-            withLabel
           />
         )}
       </div>

@@ -39,7 +39,6 @@ import { VaultScrollingPreview } from './scenarios/VaultScrollingPreview'
 import { ClockSkewPreview } from './scenarios/ClockSkewPreview'
 import { AddItemPreview } from './scenarios/AddItemPreview'
 import { CredentialEditPreview } from './scenarios/CredentialEditPreview'
-import { PasswordPositionsPreview } from './scenarios/PasswordPositionsPreview'
 import { SignupPreview } from './scenarios/SignupPreview'
 
 const DEFAULT_SCENARIO = 'autofill-controls'
@@ -47,7 +46,6 @@ const scenarios: Record<string, ComponentType> = {
   [DEFAULT_SCENARIO]: AutofillControlsPreview,
   'add-item': AddItemPreview,
   'credential-edit': CredentialEditPreview,
-  'password-positions': PasswordPositionsPreview,
   signup: SignupPreview,
   'new-device-policy': NewDevicePolicyPreview,
   'master-device-recovery': MasterDeviceRecoveryPreview,
