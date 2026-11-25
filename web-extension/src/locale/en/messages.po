@@ -356,6 +356,10 @@ msgstr "Hide"
 msgid "Hide all secrets"
 msgstr "Hide all secrets"
 
+#: src/components/vault/PasswordPositions.tsx
+msgid "Hide password positions"
+msgstr "Hide password positions"
+
 #: src/components/vault/TableList.tsx
 #: src/components/vault/VirtualizedList.tsx
 msgid "Hide secret"
@@ -518,6 +522,10 @@ msgstr "Password changed, all your other devices will be logged out and you will
 msgid "Password generation history"
 msgstr "Password generation history"
 
+#: src/components/vault/PasswordPositions.tsx
+msgid "Password positions"
+msgstr "Password positions"
+
 #: src/components/vault/settings/Account.tsx
 msgid "Passwords do not match"
 msgstr "Passwords do not match"
@@ -611,6 +619,10 @@ msgstr "Show all secrets"
 msgid "Show card view"
 msgstr "Show card view"
 
+#: src/components/vault/PasswordPositions.tsx
+msgid "Show password positions"
+msgstr "Show password positions"
+
 #: src/components/vault/TableList.tsx
 #: src/components/vault/VirtualizedList.tsx
 msgid "Show secret"
@@ -623,6 +635,10 @@ msgstr "Show secrets"
 #: src/pages-vault/VaultList.tsx
 msgid "Show table view"
 msgstr "Show table view"
+
+#: src/components/vault/PasswordPositions.tsx
+msgid "Space"
+msgstr "Space"
 
 #: src/components/auth/Login.tsx
 #: src/components/vault/settings/Account.tsx

@@ -356,6 +356,10 @@ msgstr ""
 msgid "Hide all secrets"
 msgstr ""
 
+#: src/components/vault/PasswordPositions.tsx
+msgid "Hide password positions"
+msgstr "Skrýt pozice znaků hesla"
+
 #: src/components/vault/TableList.tsx
 #: src/components/vault/VirtualizedList.tsx
 msgid "Hide secret"
@@ -530,6 +534,10 @@ msgstr "Heslo bylo změněno, všechna vaše další zařízení budou odhláše
 msgid "Password generation history"
 msgstr ""
 
+#: src/components/vault/PasswordPositions.tsx
+msgid "Password positions"
+msgstr "Pozice znaků hesla"
+
 #: src/components/vault/settings/Account.tsx
 msgid "Passwords do not match"
 msgstr "Hesla se neshodují"
@@ -675,6 +683,10 @@ msgstr ""
 msgid "Show card view"
 msgstr ""
 
+#: src/components/vault/PasswordPositions.tsx
+msgid "Show password positions"
+msgstr "Zobrazit pozice znaků hesla"
+
 #: src/components/pages/AuthsList.tsx
 #~ msgid "Show full OTP secret"
 #~ msgstr "Zobrazit celý OTP tajný kód"
@@ -691,6 +703,10 @@ msgstr ""
 #: src/pages-vault/VaultList.tsx
 msgid "Show table view"
 msgstr ""
+
+#: src/components/vault/PasswordPositions.tsx
+msgid "Space"
+msgstr "Mezera"
 
 #: src/components/auth/Login.tsx
 #: src/components/vault/settings/Account.tsx

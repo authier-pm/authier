@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from 'react'
+import { useContext, useEffect, useId, useState } from 'react'
 import { t } from '@lingui/core/macro'
 import browser from 'webextension-polyfill'
 import debug from 'debug'
@@ -12,6 +12,10 @@ import type {
 } from '@src/util/useDeviceState'
 import { Button } from '@src/components/ui/button'
 import { Tooltip } from '@src/components/ui/tooltip'
+import {
+  PasswordPositions,
+  PasswordPositionsButton
+} from '@src/components/vault/PasswordPositions'
 import { copyTextToClipboard } from '@src/lib/clipboard'
 import { cn } from '@src/lib/cn'
 import { SecretItemIcon } from '../SecretItemIcon'
@@ -145,9 +149,12 @@ const LoginCredentialsListItem = ({
   loginSecret: ILoginSecret
 }) => {
   const { loginCredentials } = loginSecret
+  const positionsId = useId()
+  const [showPositions, setShowPositions] = useState(false)
+  const copyPasswordLabel = t`Copy password`
 
   return (
-    <div className={cardClassName}>
+    <div className={cn(cardClassName, 'space-y-3')}>
       <div className="flex items-center justify-between gap-3">
         <div className="flex flex-col">
           <SecretItemIcon {...loginCredentials} />
@@ -162,21 +169,37 @@ const LoginCredentialsListItem = ({
           </div>
         </div>
 
-        <Tooltip
-          className="left-auto right-0 translate-x-0"
-          content={t`Copy password`}
-        >
-          <Button
-            size="icon"
-            variant="outline"
-            onClick={() => {
-              void copyTextToClipboard(loginCredentials.password)
-            }}
+        <div className="flex shrink-0 items-center gap-1">
+          {loginCredentials.password && (
+            <PasswordPositionsButton
+              expanded={showPositions}
+              onClick={() => setShowPositions((current) => !current)}
+              panelId={positionsId}
+            />
+          )}
+          <Tooltip
+            className="left-auto right-0 translate-x-0"
+            content={copyPasswordLabel}
           >
-            <IoCopyOutline className="size-4" />
-          </Button>
-        </Tooltip>
+            <Button
+              aria-label={copyPasswordLabel}
+              size="icon"
+              variant="outline"
+              onClick={() => {
+                void copyTextToClipboard(loginCredentials.password)
+              }}
+            >
+              <IoCopyOutline aria-hidden="true" className="size-4" />
+            </Button>
+          </Tooltip>
+        </div>
       </div>
+      {showPositions && loginCredentials.password && (
+        <PasswordPositions
+          id={positionsId}
+          password={loginCredentials.password}
+        />
+      )}
     </div>
   )
 }
