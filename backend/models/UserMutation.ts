@@ -1,45 +1,49 @@
-import { updateResetConfig } from "../lib/masterDeviceReset";
-import type { MasterDeviceResetConfig } from "../../shared/masterDeviceResetConfig";
-import { runVaultTransaction } from "../vault/vaultWrites";
-import { hashDeviceSecret } from "../utils/deviceSecretHash";
-import { assertValidVaultLockTimeoutSeconds } from "../userAuth";
-import { Arg, Ctx, Field, ID, Info, Int, ObjectType } from "type-graphql";
-import type { IContext, IContextAuthenticated } from "./types/ContextTypes";
+import {
+  hasCurrentDeviceApproval,
+  invalidateNewDeviceApprovals
+} from '../lib/newDeviceEmailApproval'
+import { updateResetConfig } from '../lib/masterDeviceReset'
+import type { MasterDeviceResetConfig } from '../../shared/masterDeviceResetConfig'
+import { runVaultTransaction } from '../vault/vaultWrites'
+import { hashDeviceSecret } from '../utils/deviceSecretHash'
+import { assertValidVaultLockTimeoutSeconds } from '../userAuth'
+import { Arg, Ctx, Field, ID, Info, Int, ObjectType } from 'type-graphql'
+import type { IContext, IContextAuthenticated } from './types/ContextTypes'
 import {
   EncryptedSecretMutation,
-  EncryptedSecretQuery,
-} from "./EncryptedSecret";
-import { EncryptedSecretInput, SettingsInput } from "./models";
-import { UserGQL } from "./generated/UserGQL";
+  EncryptedSecretQuery
+} from './EncryptedSecret'
+import { EncryptedSecretInput, SettingsInput } from './models'
+import { UserGQL } from './generated/UserGQL'
 
-import { DeviceGQL } from "./generated/DeviceGQL";
-import { UserBase, UserQuery } from "./UserQuery";
-import { GraphQLInt } from "graphql";
-import type { GraphQLResolveInfo } from "graphql";
-import { ChangeMasterPasswordInput } from "./AuthInputs";
+import { DeviceGQL } from './generated/DeviceGQL'
+import { UserBase, UserQuery } from './UserQuery'
+import { GraphQLInt } from 'graphql'
+import type { GraphQLResolveInfo } from 'graphql'
+import { ChangeMasterPasswordInput } from './AuthInputs'
 import {
   GraphQLJSON,
   GraphQLEmailAddress,
   GraphQLNonNegativeInt,
-  GraphQLUUID,
-} from "graphql-scalars";
-import { sendEmail } from "../utils/email";
-import { v4 as uuidv4 } from "uuid";
+  GraphQLUUID
+} from 'graphql-scalars'
+import { sendEmail } from '../utils/email'
+import { v4 as uuidv4 } from 'uuid'
 
-import { DecryptionChallengeMutation } from "./DecryptionChallenge";
+import { DecryptionChallengeMutation } from './DecryptionChallenge'
 
-import { DeviceInput } from "./Device";
-import { DeviceMutation } from "./Device";
-import { SecretUsageEventInput } from "./types/SecretUsageEventInput";
-import { SecretUsageEventGQLScalars } from "./generated/SecretUsageEventGQL";
-import { MasterDeviceChangeGQL } from "./generated/MasterDeviceChangeGQL";
-import { GraphqlError } from "../lib/GraphqlError";
-import debug from "debug";
-import { setNewAccessTokenIntoCookie, setNewRefreshToken } from "../userAuth";
-import { DefaultDeviceSettingsMutation } from "./DefaultDeviceSettings";
-import { defaultDeviceSettingSystemValues } from "./defaultDeviceSettingSystemValues";
-import { UserNewDevicePolicyGQL } from "./types/UserNewDevicePolicy";
-import { eq, and, sql, isNull } from "drizzle-orm";
+import { DeviceInput } from './Device'
+import { DeviceMutation } from './Device'
+import { SecretUsageEventInput } from './types/SecretUsageEventInput'
+import { SecretUsageEventGQLScalars } from './generated/SecretUsageEventGQL'
+import { MasterDeviceChangeGQL } from './generated/MasterDeviceChangeGQL'
+import { GraphqlError } from '../lib/GraphqlError'
+import debug from 'debug'
+import { setNewAccessTokenIntoCookie, setNewRefreshToken } from '../userAuth'
+import { DefaultDeviceSettingsMutation } from './DefaultDeviceSettings'
+import { defaultDeviceSettingSystemValues } from './defaultDeviceSettingSystemValues'
+import { UserNewDevicePolicyGQL } from './types/UserNewDevicePolicy'
+import { eq, and, sql, isNull, desc } from 'drizzle-orm'
 import {
   device as deviceSchema,
   secretUsageEvent as secretUsageEventSchema,
@@ -47,144 +51,174 @@ import {
   emailVerification as emailVerificationSchema,
   decryptionChallenge as decryptionChallengeSchema,
   masterDeviceChange as masterDeviceChangeSchema,
-  masterDeviceResetRequest as masterDeviceResetRequestSchema,
-} from "../drizzle/schema";
+  masterDeviceResetRequest as masterDeviceResetRequestSchema
+} from '../drizzle/schema'
 
-const log = debug("au:userMutation");
+const log = debug('au:userMutation')
 
-const STRIPE_ENV = (process.env.STRIPE_ENV as "test" | "live") ?? "live";
+const STRIPE_ENV = (process.env.STRIPE_ENV as 'test' | 'live') ?? 'live'
 
 // Only these products may be purchased through createCheckoutSession.
 // Accepting an arbitrary `product` ID would let a caller force the victim
 // into buying any price from the same Stripe account.
 const allowedCheckoutProducts: ReadonlySet<string> = new Set(
-  STRIPE_ENV === "test"
-    ? ["prod_LquWXgjk6kl5sM", "prod_LquVrkwfsXjTAL", "prod_Lp3NU9UcNWduBm"]
-    : ["prod_O70NGKoIusmxwE", "prod_O70Pl3a3CW9XNz", "prod_O7KTrrFYqhOrJR"],
-);
+  STRIPE_ENV === 'test'
+    ? ['prod_LquWXgjk6kl5sM', 'prod_LquVrkwfsXjTAL', 'prod_Lp3NU9UcNWduBm']
+    : ['prod_O70NGKoIusmxwE', 'prod_O70Pl3a3CW9XNz', 'prod_O7KTrrFYqhOrJR']
+)
 
 // `Referer` is attacker-controlled. Only redirect back to first-party
 // billing origins; fall back to FRONTEND_URL otherwise (open-redirect fix).
 const getSafeBillingReturnBase = (referer: unknown): string => {
-  const fallback = process.env.FRONTEND_URL ?? "https://vault.authier.pm";
+  const fallback = process.env.FRONTEND_URL ?? 'https://vault.authier.pm'
   const allowedOrigins = new Set(
     [
-      "https://vault.authier.pm",
+      'https://vault.authier.pm',
       process.env.FRONTEND_URL,
-      "http://localhost:5173",
-      "http://127.0.0.1:5173",
+      'http://localhost:5173',
+      'http://127.0.0.1:5173'
     ]
       .filter((origin): origin is string => Boolean(origin))
       .map((origin) => {
         try {
-          return new URL(origin).origin;
+          return new URL(origin).origin
         } catch {
-          return null;
+          return null
         }
       })
-      .filter((origin): origin is string => Boolean(origin)),
-  );
-  if (typeof referer !== "string" || referer.length === 0) return fallback;
+      .filter((origin): origin is string => Boolean(origin))
+  )
+  if (typeof referer !== 'string' || referer.length === 0) return fallback
   try {
-    const origin = new URL(referer).origin;
-    if (allowedOrigins.has(origin)) return origin;
+    const origin = new URL(referer).origin
+    if (allowedOrigins.has(origin)) return origin
   } catch {
     // fall through to fallback
   }
-  return fallback;
-};
+  return fallback
+}
 
 @ObjectType()
 export class UserMutation extends UserBase {
   @Field(() => String)
   async addCookie(@Ctx() ctx: IContext) {
-    if (process.env.NODE_ENV !== "development") {
-      throw new Error("This is only for development");
+    if (process.env.NODE_ENV !== 'development') {
+      throw new Error('This is only for development')
     }
 
-    const firstDev = await ctx.db.query.device.findFirst();
+    const firstDev = await ctx.db.query.device.findFirst()
     if (firstDev) {
       const { accessToken } = await this.setCookiesAndConstructLoginResponse(
         firstDev as any,
-        ctx,
-      );
-      return accessToken;
+        ctx
+      )
+      return accessToken
     }
   }
 
   @Field(() => DeviceMutation)
-  async device(@Ctx() ctx: IContext, @Arg("id", () => String) id: string) {
+  async device(@Ctx() ctx: IContext, @Arg('id', () => String) id: string) {
     return ctx.db.query.device.findFirst({
-      where: { userId: this.id, id: id },
-    });
+      where: { userId: this.id, id: id }
+    })
   }
 
   @Field(() => DefaultDeviceSettingsMutation)
   async defaultDeviceSettings(@Ctx() ctx: IContext) {
-    return super.defaultDeviceSettings(ctx);
+    return super.defaultDeviceSettings(ctx)
   }
 
   @Field(() => DeviceGQL)
   async addDevice(
-    @Arg("device", () => DeviceInput) deviceParams: DeviceInput,
-    @Arg("firebaseToken", () => String, {
+    @Arg('device', () => DeviceInput) deviceParams: DeviceInput,
+    @Arg('firebaseToken', () => String, {
       nullable: true,
-      description: "Firebase token is only used for mobile app",
+      description: 'Firebase token is only used for mobile app'
     })
     firebaseToken: string | null,
-    @Ctx() ctx: IContext,
+    @Ctx() ctx: IContextAuthenticated
   ) {
-    const ipAddress: string = ctx.getIpAddress();
+    return ctx.db.transaction(async (tx) => {
+      const [user] = await tx
+        .select()
+        .from(userSchema)
+        .where(eq(userSchema.id, ctx.jwtPayload.userId))
+        .for('update')
+      if (!user || user.id !== this.id) throw new GraphqlError('User not found')
+      const [challenge] = await tx
+        .select()
+        .from(decryptionChallengeSchema)
+        .where(
+          and(
+            eq(decryptionChallengeSchema.userId, user.id),
+            eq(decryptionChallengeSchema.deviceId, deviceParams.id),
+            isNull(decryptionChallengeSchema.masterPasswordVerifiedAt)
+          )
+        )
+        .orderBy(desc(decryptionChallengeSchema.id))
+        .limit(1)
+        .for('update')
+      if (
+        !challenge ||
+        !(await hasCurrentDeviceApproval(tx, challenge, user))
+      ) {
+        throw new GraphqlError(
+          'Complete the configured new-device approvals first'
+        )
+      }
+      const ipAddress: string = ctx.getIpAddress()
 
-    const deviceDefaultSettings =
-      (await ctx.db.query.defaultSettings.findFirst({
-        where: { userId: this.id },
-      })) ?? defaultDeviceSettingSystemValues;
+      const deviceDefaultSettings =
+        (await tx.query.defaultSettings.findFirst({
+          where: { userId: this.id }
+        })) ?? defaultDeviceSettingSystemValues
 
-    const res = await ctx.db
-      .insert(deviceSchema)
-      .values({
-        platform: deviceParams.platform,
-        name: deviceParams.name,
-        id: deviceParams.id,
-        firebaseToken: firebaseToken,
-        firstIpAddress: ipAddress,
-        userId: this.id,
-        lastIpAddress: ipAddress,
-        vaultLockTimeoutSeconds: deviceDefaultSettings.vaultLockTimeoutSeconds,
-        autofillTOTPEnabled: deviceDefaultSettings.autofillTOTPEnabled,
-        passkeyCreationVerificationRequired:
-          deviceDefaultSettings.passkeyCreationVerificationRequired,
-        syncTOTP: deviceDefaultSettings.syncTOTP,
-      })
-      .returning();
-    return res[0];
+      const res = await tx
+        .insert(deviceSchema)
+        .values({
+          platform: deviceParams.platform,
+          name: deviceParams.name,
+          id: deviceParams.id,
+          firebaseToken: firebaseToken,
+          firstIpAddress: ipAddress,
+          userId: this.id,
+          lastIpAddress: ipAddress,
+          vaultLockTimeoutSeconds:
+            deviceDefaultSettings.vaultLockTimeoutSeconds,
+          autofillTOTPEnabled: deviceDefaultSettings.autofillTOTPEnabled,
+          passkeyCreationVerificationRequired:
+            deviceDefaultSettings.passkeyCreationVerificationRequired,
+          syncTOTP: deviceDefaultSettings.syncTOTP
+        })
+        .returning()
+      return res[0]
+    })
   }
 
   @Field(() => EncryptedSecretMutation)
   async encryptedSecret(
-    @Arg("id", () => ID) id: string,
+    @Arg('id', () => ID) id: string,
     @Ctx() ctx: IContextAuthenticated,
-    @Info() _info: GraphQLResolveInfo,
+    @Info() _info: GraphQLResolveInfo
   ) {
     // Note: getPrismaRelationsFromGQLInfo won't work with Drizzle out of the box.
     // Drizzle relations are nested via nested objects instead of Prisma `include`.
     // Returning basic data here and it may limit deep inclusions.
     return ctx.db.query.encryptedSecret.findFirst({
-      where: { id, userId: ctx.jwtPayload.userId },
-    });
+      where: { id, userId: ctx.jwtPayload.userId }
+    })
   }
 
   @Field(() => SecretUsageEventGQLScalars)
   async createSecretUsageEvent(
-    @Arg("event", () => SecretUsageEventInput)
+    @Arg('event', () => SecretUsageEventInput)
     event: SecretUsageEventInput,
-    @Ctx() ctx: IContextAuthenticated,
+    @Ctx() ctx: IContextAuthenticated
   ) {
     const secret = await ctx.db.query.encryptedSecret.findFirst({
-      where: { id: event.secretId, userId: ctx.jwtPayload.userId },
-    });
-    if (!secret) throw new GraphqlError("Secret not found");
+      where: { id: event.secretId, userId: ctx.jwtPayload.userId }
+    })
+    if (!secret) throw new GraphqlError('Secret not found')
 
     const res = await ctx.db
       .insert(secretUsageEventSchema)
@@ -194,69 +228,69 @@ export class UserMutation extends UserBase {
         deviceId: ctx.device.id,
         userId: this.id,
         ipAddress: ctx.getIpAddress(),
-        secretId: event.secretId,
+        secretId: event.secretId
       })
-      .returning();
-    return res[0];
+      .returning()
+    return res[0]
   }
 
   @Field(() => [EncryptedSecretMutation])
   async removeEncryptedSecrets(
     // GraphQLUUID validates each ID; class-validator expects class instances.
-    @Arg("secrets", () => [GraphQLUUID], { validate: false })
+    @Arg('secrets', () => [GraphQLUUID], { validate: false })
     secrets: string[],
-    @Ctx() ctx: IContextAuthenticated,
+    @Ctx() ctx: IContextAuthenticated
   ) {
     return runVaultTransaction(ctx.db, ctx.jwtPayload, (writer) =>
-      writer.update(secrets, { deletedAt: new Date() }),
-    );
+      writer.update(secrets, { deletedAt: new Date() })
+    )
   }
 
   @Field(() => [EncryptedSecretQuery])
   async addEncryptedSecrets(
-    @Arg("secrets", () => [EncryptedSecretInput])
+    @Arg('secrets', () => [EncryptedSecretInput])
     secrets: EncryptedSecretInput[],
-    @Ctx() ctx: IContextAuthenticated,
+    @Ctx() ctx: IContextAuthenticated
   ) {
     return runVaultTransaction(ctx.db, ctx.jwtPayload, (writer) =>
       writer.create(
-        secrets.map((secret) => ({ ...secret, id: crypto.randomUUID() })),
-      ),
-    );
+        secrets.map((secret) => ({ ...secret, id: crypto.randomUUID() }))
+      )
+    )
   }
 
   @Field(() => DeviceGQL)
   async updateFireToken(
-    @Arg("firebaseToken", () => String) firebaseToken: string,
-    @Ctx() ctx: IContext,
+    @Arg('firebaseToken', () => String) firebaseToken: string,
+    @Ctx() ctx: IContext
   ) {
     if (!this.masterDeviceId) {
-      throw new Error("Must have masterDeviceId");
+      throw new Error('Must have masterDeviceId')
     }
     const res = await ctx.db
       .update(deviceSchema)
       .set({
-        firebaseToken: firebaseToken,
+        firebaseToken: firebaseToken
       })
       .where(eq(deviceSchema.id, this.masterDeviceId))
-      .returning();
-    return res[0];
+      .returning()
+    return res[0]
   }
 
   @Field(() => UserGQL)
   async updateSettings(
-    @Arg("config", () => SettingsInput) config: SettingsInput,
-    @Ctx() ctx: IContextAuthenticated,
+    @Arg('config', () => SettingsInput) config: SettingsInput,
+    @Ctx() ctx: IContextAuthenticated
   ) {
-    assertValidVaultLockTimeoutSeconds(config.vaultLockTimeoutSeconds);
+    assertValidVaultLockTimeoutSeconds(config.vaultLockTimeoutSeconds)
     await ctx.db
       .update(deviceSchema)
       .set({
         syncTOTP: config.syncTOTP,
         vaultLockTimeoutSeconds: config.vaultLockTimeoutSeconds,
-        autofillTOTPEnabled: config.autofillTOTPEnabled,
+        autofillTOTPEnabled: config.autofillTOTPEnabled
       })
-      .where(eq(deviceSchema.id, ctx.device.id));
+      .where(eq(deviceSchema.id, ctx.device.id))
 
     const res = await ctx.db
       .update(userSchema)
@@ -267,26 +301,26 @@ export class UserMutation extends UserBase {
           config.autofillForbiddenUrlPatterns ??
           this.autofillForbiddenUrlPatterns,
         notificationOnWrongPasswordAttempts:
-          config.notificationOnWrongPasswordAttempts,
+          config.notificationOnWrongPasswordAttempts
       })
       .where(eq(userSchema.id, this.id))
-      .returning();
+      .returning()
 
-    return res[0];
+    return res[0]
   }
 
   @Field(() => GraphQLNonNegativeInt)
   async sendEmailVerification(
     @Ctx() ctx: IContext,
-    @Arg("isMobile", () => Boolean, {
-      nullable: true,
+    @Arg('isMobile', () => Boolean, {
+      nullable: true
     })
-    isMobile: boolean | null,
+    isMobile: boolean | null
   ) {
     if (this.email) {
       let verification = await ctx.db.query.emailVerification.findFirst({
-        where: { address: this.email! },
-      });
+        where: { address: this.email! }
+      })
 
       if (!verification) {
         const res = await ctx.db
@@ -295,33 +329,33 @@ export class UserMutation extends UserBase {
             token: uuidv4(),
             address: this.email,
             userId: this.id,
-            kind: "PRIMARY",
+            kind: 'PRIMARY'
           })
-          .returning();
-        verification = res[0];
+          .returning()
+        verification = res[0]
       }
 
-      const link = `${process.env.FRONTEND_URL}/verify-email?token=${verification.token}`;
+      const link = `${process.env.FRONTEND_URL}/verify-email?token=${verification.token}`
 
       const notifMessage = isMobile
-        ? "Verified email can be used to recover in case you lose your master device."
-        : "It will be used as your primary notification channel until you install the mobile app. If you prefer mobile notifications, install our mobile app.";
+        ? 'Verified email can be used to recover in case you lose your master device.'
+        : 'It will be used as your primary notification channel until you install the mobile app. If you prefer mobile notifications, install our mobile app.'
 
       await sendEmail(
         this.email,
 
         {
-          subject: "Verify your email",
+          subject: 'Verify your email',
           text: `To verify your email, please go here: ${link} \n ${notifMessage}`,
           html: `<!DOCTYPE html>
           <html>
           <body>
           <a href="${link}" rel="notrack">Please verify your email.</a> ${notifMessage}
           </body>
-          </html>`,
-        },
-      );
-      return 1;
+          </html>`
+        }
+      )
+      return 1
     }
   }
 
@@ -331,21 +365,21 @@ export class UserMutation extends UserBase {
     const res = await ctx.db
       .update(userSchema)
       .set({
-        tokenVersion: sql`${userSchema.tokenVersion} + 1`,
+        tokenVersion: sql`${userSchema.tokenVersion} + 1`
       })
       .where(eq(userSchema.id, this.id))
-      .returning();
-    return res[0];
+      .returning()
+    return res[0]
   }
 
   @Field(() => GraphQLInt)
   async changeMasterPassword(
-    @Arg("input", () => ChangeMasterPasswordInput)
+    @Arg('input', () => ChangeMasterPasswordInput)
     input: ChangeMasterPasswordInput,
-    @Ctx() ctx: IContextAuthenticated,
+    @Ctx() ctx: IContextAuthenticated
   ) {
     if (ctx.device.id !== this.masterDeviceId) {
-      throw new Error("You can only change password on a master device");
+      throw new Error('You can only change password on a master device')
     }
 
     const targetUser = await runVaultTransaction(
@@ -359,10 +393,10 @@ export class UserMutation extends UserBase {
             and(
               eq(decryptionChallengeSchema.id, input.decryptionChallengeId),
               eq(decryptionChallengeSchema.deviceId, ctx.device.id),
-              eq(decryptionChallengeSchema.userId, ctx.jwtPayload.userId),
-            ),
+              eq(decryptionChallengeSchema.userId, ctx.jwtPayload.userId)
+            )
           )
-          .for("update");
+          .for('update')
         if (
           this.id !== ctx.jwtPayload.userId ||
           !challenge ||
@@ -370,212 +404,255 @@ export class UserMutation extends UserBase {
           challenge.rejectedAt ||
           challenge.blockIp
         ) {
-          throw new GraphqlError("Invalid password change challenge");
+          throw new GraphqlError('Invalid password change challenge')
         }
         const persistedUser = await tx.query.user.findFirst({
           where: { id: ctx.jwtPayload.userId },
-          columns: { masterDeviceId: true },
-        });
+          columns: { masterDeviceId: true }
+        })
         if (persistedUser?.masterDeviceId !== ctx.device.id)
           throw new GraphqlError(
-            "You can only change password on a master device",
-          );
-        const ids = new Set(input.secrets.map((secret) => secret.id));
+            'You can only change password on a master device'
+          )
+        const ids = new Set(input.secrets.map((secret) => secret.id))
         const ownedSecrets = await tx.query.encryptedSecret.findMany({
           where: { userId: ctx.jwtPayload.userId },
-          columns: { id: true, version: true, deletedAt: true },
-        });
-        const ownedIds = new Set(ownedSecrets.map((secret) => secret.id));
+          columns: { id: true, version: true, deletedAt: true }
+        })
+        const ownedIds = new Set(ownedSecrets.map((secret) => secret.id))
         if (
           ids.size !== input.secrets.length ||
           input.secrets.some((secret) => !ownedIds.has(secret.id))
         )
-          throw new GraphqlError("Secret not found");
-        const activeSecrets = ownedSecrets.filter(
-          (secret) => !secret.deletedAt,
-        );
+          throw new GraphqlError('Secret not found')
+        const activeSecrets = ownedSecrets.filter((secret) => !secret.deletedAt)
         if (
           activeSecrets.length !== ids.size ||
           activeSecrets.some((secret) => !ids.has(secret.id))
         ) {
           throw new GraphqlError(
-            "Vault changed; synchronize the complete vault before changing the master password",
-          );
+            'Vault changed; synchronize the complete vault before changing the master password'
+          )
         }
         const versions = new Map(
-          activeSecrets.map((secret) => [secret.id, secret.version]),
-        );
+          activeSecrets.map((secret) => [secret.id, secret.version])
+        )
         if (
           input.secrets.some((secret) => secret.expectedVersion === undefined)
         ) {
           throw new GraphqlError(
-            "Update your Authier app and synchronize before changing the master password",
-          );
+            'Update your Authier app and synchronize before changing the master password'
+          )
         }
         if (
           input.secrets.some(
-            (secret) => secret.expectedVersion !== versions.get(secret.id),
+            (secret) => secret.expectedVersion !== versions.get(secret.id)
           )
         ) {
           throw new GraphqlError(
-            "Vault changed; synchronize before changing the master password",
-          );
+            'Vault changed; synchronize before changing the master password'
+          )
         }
+        const resumeSecretHash = await hashDeviceSecret(input.addDeviceSecret)
         const userRes = await tx
           .update(userSchema)
           .set({
-            addDeviceSecret: await hashDeviceSecret(input.addDeviceSecret),
+            addDeviceSecret: resumeSecretHash,
             addDeviceSecretEncrypted: input.addDeviceSecretEncrypted,
-            tokenVersion: sql`${userSchema.tokenVersion} + 1`,
+            tokenVersion: sql`${userSchema.tokenVersion} + 1`
           })
           .where(eq(userSchema.id, this.id))
-          .returning();
+          .returning()
 
         await tx
           .update(decryptionChallengeSchema)
           .set({
-            masterPasswordVerifiedAt: new Date(),
+            masterPasswordVerifiedAt: new Date()
           })
           .where(
             and(
               eq(decryptionChallengeSchema.id, input.decryptionChallengeId),
               eq(decryptionChallengeSchema.deviceId, ctx.device.id),
-              eq(decryptionChallengeSchema.userId, ctx.jwtPayload.userId),
-            ),
-          );
+              eq(decryptionChallengeSchema.userId, ctx.jwtPayload.userId)
+            )
+          )
+
+        await tx
+          .update(deviceSchema)
+          .set({
+            resumeSecretHash,
+            resumeTokenVersion: userRes[0].tokenVersion
+          })
+          .where(eq(deviceSchema.id, ctx.device.id))
+
+        await invalidateNewDeviceApprovals(tx, this.id)
 
         for (const { id, expectedVersion, ...patch } of input.secrets) {
-          await writer.update([id], patch, { expectedVersion });
+          await writer.update([id], patch, { expectedVersion })
         }
-        return userRes[0];
-      },
-    );
+        return userRes[0]
+      }
+    )
 
     // Bumping tokenVersion above invalidates every access token already in
     // flight (forcing other devices to re-login on next request). Re-issue
     // both tokens for THIS device so the originating client doesn't 401 on
     // its very next request.
-    setNewRefreshToken(targetUser, ctx.device, ctx);
-    setNewAccessTokenIntoCookie(targetUser, ctx.device, ctx);
-    return input.secrets.length;
+    setNewRefreshToken(targetUser, ctx.device, ctx)
+    setNewAccessTokenIntoCookie(targetUser, ctx.device, ctx)
+    return input.secrets.length
   }
 
   @Field(() => UserQuery)
   async changeEmail(
-    @Arg("email", () => GraphQLEmailAddress)
+    @Arg('email', () => GraphQLEmailAddress)
     email: string,
-    @Ctx() ctx: IContextAuthenticated,
+    @Ctx() ctx: IContextAuthenticated
   ) {
     if (ctx.device.id !== this.masterDeviceId) {
-      console.log(`${ctx.device.id} vs ${this.masterDeviceId}`);
+      console.log(`${ctx.device.id} vs ${this.masterDeviceId}`)
       throw new GraphqlError(
-        "You can only change login email from master device",
-      );
+        'You can only change login email from master device'
+      )
     }
 
     return ctx.db.transaction(async (trx) => {
-      const oldEmail = this.email;
+      const oldEmail = this.email
       const res = await trx
         .update(userSchema)
         .set({ email })
         .where(eq(userSchema.id, this.id))
-        .returning();
-      const updatedUser = res[0];
+        .returning()
+      const updatedUser = res[0]
+      if (updatedUser.email !== oldEmail)
+        await invalidateNewDeviceApprovals(trx, updatedUser.id)
 
       await sendEmail(oldEmail!, {
-        subject: "Your login email has been changed",
+        subject: 'Your login email has been changed',
         text: `Your login email has been changed from ${oldEmail} to ${email}.
         If you did not do this you should consider your master device compromised.
         Request was made from ip: ${ctx.getIpAddress()}
-        `,
-      });
+        `
+      })
 
-      return updatedUser;
-    });
+      return updatedUser
+    })
   }
 
   @Field(() => DecryptionChallengeMutation)
   async decryptionChallenge(
     @Ctx() ctx: IContextAuthenticated,
-    @Arg("id", () => Int) id: number,
+    @Arg('id', () => Int) id: number
   ) {
     return ctx.db.query.decryptionChallenge.findFirst({
       where: {
         id: id,
-        userId: ctx.jwtPayload.userId,
-      },
-    });
+        userId: ctx.jwtPayload.userId
+      }
+    })
   }
 
   @Field(() => UserGQL)
   async setNewDevicePolicy(
-    @Arg("newDevicePolicy", () => UserNewDevicePolicyGQL)
+    @Arg('newDevicePolicy', () => UserNewDevicePolicyGQL)
     newDevicePolicy: UserNewDevicePolicyGQL,
-    @Ctx() ctx: IContextAuthenticated,
+    @Ctx() ctx: IContextAuthenticated
   ) {
-    if (
-      this.newDevicePolicy !== null &&
-      ctx.device.id !== this.masterDeviceId
-    ) {
-      throw new GraphqlError(
-        "newDevicePolicy can be set only from master device",
-      );
-    }
-
-    const res = await ctx.db
-      .update(userSchema)
-      .set({
-        newDevicePolicy: newDevicePolicy as any,
-      })
-      .where(eq(userSchema.id, this.id))
-      .returning();
-    return res[0];
+    return ctx.db.transaction(async (tx) => {
+      const [currentUser] = await tx
+        .select()
+        .from(userSchema)
+        .where(eq(userSchema.id, ctx.jwtPayload.userId))
+        .for('update')
+      if (!currentUser || currentUser.id !== this.id) {
+        throw new GraphqlError('User not found')
+      }
+      if (
+        currentUser.newDevicePolicy !== null &&
+        ctx.device.id !== currentUser.masterDeviceId
+      ) {
+        throw new GraphqlError(
+          'newDevicePolicy can be set only from master device'
+        )
+      }
+      const [updated] = await tx
+        .update(userSchema)
+        .set({ newDevicePolicy })
+        .where(eq(userSchema.id, currentUser.id))
+        .returning()
+      if (currentUser.newDevicePolicy !== newDevicePolicy) {
+        // A previous method must not authorize a new device after the user
+        // changes their choices, including partially completed AND approvals.
+        await invalidateNewDeviceApprovals(tx, currentUser.id)
+      }
+      return updated
+    })
   }
 
   @Field(() => UserGQL)
   async setDeviceRecoveryCooldownMinutes(
-    @Arg("deviceRecoveryCooldownMinutes", () => GraphQLNonNegativeInt)
+    @Arg('deviceRecoveryCooldownMinutes', () => GraphQLNonNegativeInt)
     deviceRecoveryCooldownMinutes: number,
-    @Ctx() ctx: IContextAuthenticated,
+    @Ctx() ctx: IContextAuthenticated
   ) {
     const user = await ctx.db.query.user.findFirst({
-      where: { id: ctx.jwtPayload.userId },
-    });
-    if (!user) throw new GraphqlError("User not found");
+      where: { id: ctx.jwtPayload.userId }
+    })
+    if (!user) throw new GraphqlError('User not found')
     return updateResetConfig(ctx, {
       ...user.masterDeviceResetConfig,
-      waitMinutes: deviceRecoveryCooldownMinutes,
-    });
+      waitMinutes: deviceRecoveryCooldownMinutes
+    })
   }
 
   @Field(() => UserQuery)
   async setMasterDeviceResetConfig(
-    @Arg("config", () => GraphQLJSON) config: MasterDeviceResetConfig,
-    @Ctx() ctx: IContextAuthenticated,
+    @Arg('config', () => GraphQLJSON) config: MasterDeviceResetConfig,
+    @Ctx() ctx: IContextAuthenticated
   ) {
-    return updateResetConfig(ctx, config);
+    return updateResetConfig(ctx, config)
   }
 
   @Field(() => MasterDeviceChangeGQL)
   async setMasterDevice(
     @Ctx() ctx: IContextAuthenticated,
-    @Arg("newMasterDeviceId", () => String) newMasterDeviceId: string,
+    @Arg('newMasterDeviceId', () => String) newMasterDeviceId: string
   ) {
-    if (ctx.device.id !== ctx.masterDeviceId) {
-      throw new GraphqlError("This can be done only from master device");
-    }
-
-    let updatedUser: any;
-
-    await ctx.db.transaction(async (tx) => {
+    return ctx.db.transaction(async (tx) => {
+      const [currentUser] = await tx
+        .select()
+        .from(userSchema)
+        .where(eq(userSchema.id, ctx.jwtPayload.userId))
+        .for('update')
+      if (!currentUser || ctx.device.id !== currentUser.masterDeviceId) {
+        throw new GraphqlError('This can be done only from master device')
+      }
+      const nextMaster = await tx.query.device.findFirst({
+        where: {
+          id: newMasterDeviceId,
+          userId: currentUser.id,
+          deletedAt: { isNull: true },
+          logoutAt: { isNull: true }
+        }
+      })
+      if (!nextMaster)
+        throw new GraphqlError(
+          'Master device must be an active device on this account'
+        )
       const res = await tx
         .update(userSchema)
         .set({
-          masterDeviceId: newMasterDeviceId,
+          masterDeviceId: newMasterDeviceId
         })
         .where(eq(userSchema.id, ctx.jwtPayload.userId))
-        .returning();
-      updatedUser = res[0];
+        .returning()
+      const updatedUser = res[0]
+      if (
+        currentUser.newDevicePolicy === 'MASTER_DEVICE' &&
+        currentUser.masterDeviceId !== newMasterDeviceId
+      ) {
+        await invalidateNewDeviceApprovals(tx, currentUser.id)
+      }
 
       await tx
         .delete(masterDeviceResetRequestSchema)
@@ -584,122 +661,121 @@ export class UserMutation extends UserBase {
             eq(masterDeviceResetRequestSchema.userId, ctx.jwtPayload.userId),
             eq(
               masterDeviceResetRequestSchema.targetMasterDeviceId,
-              ctx.masterDeviceId!,
+              currentUser.masterDeviceId
             ),
             isNull(masterDeviceResetRequestSchema.completedAt),
-            isNull(masterDeviceResetRequestSchema.rejectedAt),
-          ),
-        );
+            isNull(masterDeviceResetRequestSchema.rejectedAt)
+          )
+        )
 
       await tx.insert(masterDeviceChangeSchema).values({
         id: uuidv4(),
-        oldDeviceId: ctx.masterDeviceId!,
+        oldDeviceId: currentUser.masterDeviceId,
         newDeviceId: newMasterDeviceId,
         processAt: new Date(),
-        userId: ctx.jwtPayload.userId,
-      });
-    });
-
-    return updatedUser;
+        userId: ctx.jwtPayload.userId
+      })
+      return updatedUser
+    })
   }
 
   @Field(() => String)
   async createPortalSession(@Ctx() ctx: IContextAuthenticated) {
-    const stripeClient = ctx.getStripeClient();
+    const stripeClient = ctx.getStripeClient()
     const product = await ctx.db.query.userPaidProducts.findFirst({
       where: { userId: ctx.jwtPayload.userId },
-      orderBy: (upp, { desc }) => [desc(upp.createdAt)],
-    });
+      orderBy: (upp, { desc }) => [desc(upp.createdAt)]
+    })
 
     if (!product) {
-      throw new GraphqlError("You don't have a paid subscription");
+      throw new GraphqlError("You don't have a paid subscription")
     }
 
     const checkoutSession = await stripeClient.checkout.sessions.retrieve(
-      product?.checkoutSessionId as string,
-    );
+      product?.checkoutSessionId as string
+    )
 
     // This is the url to which the customer will be redirected when they are done
     // managing their billing with the portal.
-    const returnUrl = `${process.env.FRONTEND_URL}/pricing`;
+    const returnUrl = `${process.env.FRONTEND_URL}/pricing`
 
     const portalSession = await stripeClient.billingPortal.sessions.create({
       customer: checkoutSession.customer as string,
-      return_url: returnUrl,
-    });
+      return_url: returnUrl
+    })
 
-    return portalSession.url;
+    return portalSession.url
   }
 
   @Field(() => String)
   async createCheckoutSession(
     @Ctx() ctx: IContextAuthenticated,
-    @Arg("product", () => String) product: string,
+    @Arg('product', () => String) product: string
   ) {
     if (!allowedCheckoutProducts.has(product)) {
-      throw new GraphqlError("Unknown product");
+      throw new GraphqlError('Unknown product')
     }
-    const stripeClient = ctx.getStripeClient();
+    const stripeClient = ctx.getStripeClient()
     const userPaidProduct = await ctx.db.query.userPaidProducts.findFirst({
-      where: { userId: ctx.jwtPayload.userId },
-    });
+      where: { userId: ctx.jwtPayload.userId }
+    })
 
-    const productItem = await stripeClient.products.retrieve(product);
-    const defaultPrice = productItem["default_price"] as string | null;
+    const productItem = await stripeClient.products.retrieve(product)
+    const defaultPrice = productItem['default_price'] as string | null
     if (!defaultPrice) {
-      throw new GraphqlError("Product is not purchasable");
+      throw new GraphqlError('Product is not purchasable')
     }
 
-    const returnBase = getSafeBillingReturnBase(ctx.request.headers.referer);
+    const returnBase = getSafeBillingReturnBase(ctx.request.headers.referer)
 
     if (userPaidProduct) {
       const checkoutSession = await stripeClient.checkout.sessions.retrieve(
-        userPaidProduct?.checkoutSessionId as string,
-      );
+        userPaidProduct?.checkoutSessionId as string
+      )
 
       const session = await stripeClient.checkout.sessions.create({
-        billing_address_collection: "auto",
+        billing_address_collection: 'auto',
         line_items: [
           {
             price: defaultPrice,
             //For metered billing, do not pass quantity
-            quantity: 1,
-          },
+            quantity: 1
+          }
         ],
         metadata: {
-          productId: productItem.id,
+          productId: productItem.id
         },
         customer: checkoutSession.customer as string,
-        mode: "subscription",
+        mode: 'subscription',
         success_url: `${returnBase}/?success=true&session_id={CHECKOUT_SESSION_ID}`,
-        cancel_url: `${returnBase}?canceled=true`,
-      });
+        cancel_url: `${returnBase}?canceled=true`
+      })
 
-      return session.id;
+      return session.id
     } else {
       const newCustomer = await ctx.db.query.user.findFirst({
-        where: { id: ctx.jwtPayload.userId },
-      });
+        where: { id: ctx.jwtPayload.userId }
+      })
 
       const session = await stripeClient.checkout.sessions.create({
-        billing_address_collection: "auto",
+        billing_address_collection: 'auto',
         customer_email: newCustomer?.email as string,
         line_items: [
           {
             price: defaultPrice,
             //For metered billing, do not pass quantity
-            quantity: 1,
-          },
+            quantity: 1
+          }
         ],
         metadata: {
-          productId: productItem.id,
+          productId: productItem.id
         },
-        mode: "subscription",
+        mode: 'subscription',
         success_url: `${returnBase}/?success=true&session_id={CHECKOUT_SESSION_ID}`,
-        cancel_url: `${returnBase}?canceled=true`,
-      });
+        cancel_url: `${returnBase}?canceled=true`
+      })
 
-      return session.id;
+      return session.id
     }
   }
 
@@ -708,11 +784,11 @@ export class UserMutation extends UserBase {
     const res = await ctx.db
       .delete(userSchema)
       .where(eq(userSchema.id, this.id))
-      .returning();
+      .returning()
 
-    log("deleted user", res[0]?.email);
-    ctx.reply.clearCookie("refresh-token");
-    ctx.reply.clearCookie("access-token");
-    return res[0];
+    log('deleted user', res[0]?.email)
+    ctx.reply.clearCookie('refresh-token')
+    ctx.reply.clearCookie('access-token')
+    return res[0]
   }
 }

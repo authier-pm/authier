@@ -3,6 +3,7 @@ mutation UpdateNewDevicePolicy($newDevicePolicy: UserNewDevicePolicy!) {
     setNewDevicePolicy(newDevicePolicy: $newDevicePolicy) {
       id
       newDevicePolicy
+      masterDeviceId
     }
   }
 }
@@ -11,5 +12,6 @@ query GetUserNewDevicePolicy {
   me {
     id
     newDevicePolicy
+    masterDeviceId
   }
 }

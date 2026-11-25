@@ -42,6 +42,8 @@ data class VaultSnapshot(
     val lastSyncAt: Long? = null,
     /** Per-phone opt-in to send SMS verification codes to the account's browsers. */
     val relaySmsCodes: Boolean = false,
+    /** Keep required account setup visible across process restarts and offline unlocks. */
+    val requiresApprovalSetup: Boolean = false,
 )
 
 @Serializable
@@ -84,8 +86,9 @@ data class DeviceInfo(
     val isCurrent: Boolean,
     val logoutAt: String? = null,
 )
-data class ApprovalInfo(val id: Int, val deviceName: String, val ipAddress: String, val createdAt: String)
-data class SecurityInfo(val newDevicePolicy: String = "REQUIRE_ANY_DEVICE_APPROVAL", val recoveryMinutes: Int = 1440, val masterDeviceId: String? = null)
+data class ApprovalInfo(val id: Int, val deviceName: String, val ipAddress: String, val createdAt: String,
+    val progress: LoginApprovalProgress? = null)
+data class SecurityInfo(val newDevicePolicy: NewDeviceApprovalPolicy? = null, val recoveryMinutes: Int = 1440, val masterDeviceId: String? = null)
 
 /** Apply a complete page and its cursor together. Pending local edits win until resolved. */
 fun applySyncPage(snapshot: VaultSnapshot, changes: List<SecretRecord>, nextCursor: String): VaultSnapshot {

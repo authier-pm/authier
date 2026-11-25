@@ -322,6 +322,20 @@ it('keeps locally saved items when session renewal returns no items and sync fai
   const { result } = renderHook(useDeviceState)
   await waitFor(() => expect(result.current.loginCredentials).toHaveLength(1))
 
+  loginMutation.mockReset().mockResolvedValueOnce({
+    data: {
+      resumeDeviceSession: {
+        accessToken: `e30.${btoa(JSON.stringify({ userId: snapshot.userId }))}.signature`,
+        user: {
+          ...snapshot,
+          EncryptedSecrets: [],
+          device: snapshot,
+          defaultDeviceSettings: { theme: 'dark' }
+        }
+      }
+    }
+  })
+
   await act(async () => {
     await resumeRememberedDevice()
   })
@@ -377,6 +391,41 @@ it('treats a database error during remembered-session renewal as retryable and r
   expect(device.state?.secrets).toEqual(snapshot.secrets)
 })
 
+it('retries a lost renewal response with the same saved credential', async () => {
+  await device.save(snapshot)
+  loginMutation
+    .mockReset()
+    .mockRejectedValueOnce(new TypeError('Failed to fetch'))
+    .mockResolvedValueOnce({
+      data: {
+        resumeDeviceSession: {
+          accessToken: `e30.${btoa(JSON.stringify({ userId: snapshot.userId }))}.signature`,
+          user: {
+            ...snapshot,
+            EncryptedSecrets: [],
+            device: snapshot,
+            defaultDeviceSettings: { theme: 'dark' }
+          }
+        }
+      }
+    })
+  await expect(resumeRememberedDevice()).rejects.toMatchObject({
+    retryable: true
+  })
+  await resumeRememberedDevice()
+  for (const [request] of loginMutation.mock.calls) {
+    expect(request.variables).toMatchObject({
+      currentAddDeviceSecret: snapshot.authSecret,
+      input: {
+        addDeviceSecret: snapshot.authSecret,
+        addDeviceSecretEncrypted: snapshot.authSecretEncrypted
+      }
+    })
+  }
+  expect(device.state?.authSecret).toBe(snapshot.authSecret)
+  expect(device.state?.authSecretEncrypted).toBe(snapshot.authSecretEncrypted)
+})
+
 it('does not restore a remembered session that was locked while renewal was in flight', async () => {
   await device.save(snapshot)
   const { result } = renderHook(useDeviceState)
@@ -389,12 +438,14 @@ it('does not restore a remembered session that was locked while renewal was in f
     await pending
     return {
       data: {
-        deviceDecryptionChallenge: {
-          __typename: 'DecryptionChallengeApproved',
-          id: 42,
-          addDeviceSecretEncrypted: enrollmentCiphertext,
-          encryptionSalt: snapshot.encryptionSalt,
-          userId: snapshot.userId
+        resumeDeviceSession: {
+          accessToken: `e30.${btoa(JSON.stringify({ userId: snapshot.userId }))}.signature`,
+          user: {
+            ...snapshot,
+            EncryptedSecrets: [],
+            device: snapshot,
+            defaultDeviceSettings: { theme: 'dark' }
+          }
         }
       }
     }

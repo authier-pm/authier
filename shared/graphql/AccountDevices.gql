@@ -25,6 +25,10 @@ query DevicesRequests {
     newDevicePolicy
     decryptionChallengesWaiting {
       id
+      approvalPolicy
+      emailApprovalSentAt
+      emailApprovedAt
+      deviceApprovedAt
       createdAt
       deviceName
       deviceId

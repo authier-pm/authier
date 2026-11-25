@@ -46,12 +46,11 @@ fun SettingsScreen(state: VaultUiState, model: VaultViewModel) {
         item { SmsRelaySettings(state, model) }
 
         item {
-            SettingSection("NEW DEVICE ACCESS", "Protect new sign-ins with approval from a trusted device.") {
-                listOf("REQUIRE_ANY_DEVICE_APPROVAL" to "Approval from any device", "REQUIRE_MASTER_DEVICE_APPROVAL" to "Approval from master device", "ALLOW" to "Allow with master password").forEach { (policy, label) ->
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        RadioButton(state.security.newDevicePolicy == policy, { model.changePolicy(policy) }, enabled = !state.busy && !state.demo)
-                        Text(label, style = MaterialTheme.typography.bodyMedium)
-                    }
+            SettingSection("NEW DEVICE ACCESS", "Choose how to approve each new device. Select one method or enable both.") {
+                val canChangePolicy = state.security.newDevicePolicy == null || state.isCurrentDeviceMaster
+                NewDeviceApprovalEditor(state.security.newDevicePolicy, state.busy, !state.demo && canChangePolicy, model::changePolicy)
+                if (!canChangePolicy) {
+                    Text("Open your master device to change approval settings.", color = Muted, style = MaterialTheme.typography.bodySmall)
                 }
             }
         }

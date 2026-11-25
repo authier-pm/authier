@@ -1,4 +1,5 @@
 import { hashDeviceSecret } from '../utils/deviceSecretHash'
+import { sign } from 'jsonwebtoken'
 import { db } from '../prisma/prismaClient'
 import { RootResolver } from './RootResolver'
 import type { IContextAuthenticated } from '../models/types/ContextTypes'
@@ -7,14 +8,16 @@ import type { RegisterNewAccountInput } from '../models/AuthInputs'
 import { describe, expect, it } from 'vitest'
 
 import { makeFakeCtx } from '../tests/makeFakeCtx'
-import type { DecryptionChallengeForApproval } from '../models/DecryptionChallenge'
+import { DecryptionChallengeForApproval } from '../models/DecryptionChallenge'
 import { WebInputTypeGQL } from '../models/types/WebInputType'
 import { fakeUserAndContext } from './__test__/fakeUserAndContext'
 import { makeRegisterAccountInput } from './__test__/makeRegisterAccountInput'
 import { defaultDeviceSettingSystemValues } from '../models/defaultDeviceSettingSystemValues'
-import type { GraphQLResolveInfo } from 'graphql'
+import { graphql, type GraphQLResolveInfo } from 'graphql'
+import { readFileSync } from 'node:fs'
 import * as schema from '../drizzle/schema'
 import { eq } from 'drizzle-orm'
+import { gqlSchema } from './gqlSchema'
 
 const userSecurityProps = {
   deviceRecoveryCooldownMinutes: 960,
@@ -56,25 +59,48 @@ describe('RootResolver', () => {
   describe('registerNewUser', () => {
     const userId = crypto.randomUUID()
 
-    it('should add new user', async () => {
-      const input: RegisterNewAccountInput = makeRegisterAccountInput()
+    it('returns the new master device through the extension signup mutation', async () => {
+      const signupUserId = crypto.randomUUID()
+      const deviceId = crypto.randomUUID()
+      const input: RegisterNewAccountInput = {
+        email: `${signupUserId}@example.com`,
+        deviceId,
+        deviceName: 'Test browser',
+        devicePlatform: 'Linux',
+        firebaseToken: null,
+        addDeviceSecret: 'test-device-secret',
+        addDeviceSecretEncrypted: 'test-encrypted-device-secret',
+        encryptionSalt: 'test-salt'
+      }
+      const result = await graphql({
+        schema: gqlSchema,
+        source: readFileSync(
+          new URL('../../shared/graphql/registerNewUser.gql', import.meta.url),
+          'utf8'
+        ),
+        variableValues: { input, userId: signupUserId },
+        contextValue: makeFakeCtx({ userId: signupUserId, deviceId })
+      })
 
-      const data = await resolver.registerNewUser(
-        input,
-        userId,
-        makeFakeCtx({ userId })
-      )
-
-      expect({
-        accessToken: data.accessToken,
-        email: data.user.email
-      }).toMatchObject({ accessToken: expect.any(String), email: input.email })
-
-      await db.delete(schema.device).where(eq(schema.device.userId, userId))
-      await db
-        .delete(schema.decryptionChallenge)
-        .where(eq(schema.decryptionChallenge.userId, userId))
-      await db.delete(schema.user).where(eq(schema.user.id, userId))
+      expect(result.errors).toBeUndefined()
+      expect(result.data).toEqual({
+        registerNewUser: {
+          accessToken: expect.any(String),
+          user: {
+            id: signupUserId,
+            sendEmailVerification: 1,
+            notificationOnVaultUnlock: false,
+            notificationOnWrongPasswordAttempts: 3,
+            Devices: [{ id: deviceId, name: input.deviceName }]
+          }
+        }
+      })
+      expect(
+        await db.query.user.findFirst({
+          where: { id: signupUserId },
+          columns: { masterDeviceId: true }
+        })
+      ).toEqual({ masterDeviceId: deviceId })
     })
 
     it('should throw User with such email already exists', async () => {
@@ -95,8 +121,9 @@ describe('RootResolver', () => {
       ).rejects.toThrow('User with such email already exists.')
     })
 
-    it("should show 'Device already exists. You cannot register this device for multiple accounts.'", async () => {
+    it('rejects a device already in use and rolls back the new account', async () => {
       const userId = crypto.randomUUID()
+      const signupUserId = crypto.randomUUID()
 
       const input: RegisterNewAccountInput = makeRegisterAccountInput()
       await db.insert(schema.user).values({
@@ -123,33 +150,36 @@ describe('RootResolver', () => {
         async () =>
           await resolver.registerNewUser(
             input,
-            crypto.randomUUID(),
-            makeFakeCtx({ userId })
+            signupUserId,
+            makeFakeCtx({ userId: signupUserId })
           )
       ).rejects.toThrow(
         `Device ${input.deviceId} already exists. You cannot use a device with multiple accounts.`
       )
+      expect(
+        await db.query.user.findFirst({ where: { id: signupUserId } })
+      ).toBeUndefined()
     })
   })
 
   describe('deviceDecryptionChallenge', () => {
-    it('should return a DecryptionChallengeForApproval', async () => {
+    /**
+     * A user who requires approval for new devices and owns exactly one device.
+     * Its already-enrolled master may bootstrap its first login challenge.
+     */
+    const insertApprovalRequiringUser = async () => {
       const userId = crypto.randomUUID()
+      const masterDeviceId = crypto.randomUUID()
       const fakeData: RegisterNewAccountInput = makeRegisterAccountInput()
       await db.insert(schema.user).values({
         id: userId,
         email: fakeData.email,
         addDeviceSecret: await hashDeviceSecret(fakeData.addDeviceSecret),
         addDeviceSecretEncrypted: fakeData.addDeviceSecretEncrypted,
-        newDevicePolicy: 'REQUIRE_MASTER_DEVICE_APPROVAL',
+        newDevicePolicy: 'OTHER_DEVICE',
         encryptionSalt: fakeData.encryptionSalt,
         ...userSecurityProps
       })
-
-      // Insert a master device and set masterDeviceId on user so
-      // userHasNoMasterDevice is false, otherwise the resolver
-      // auto-approves and returns addDeviceSecretEncrypted
-      const masterDeviceId = crypto.randomUUID()
       await db.insert(schema.device).values({
         id: masterDeviceId,
         platform: 'iOS',
@@ -165,20 +195,90 @@ describe('RootResolver', () => {
         .set({ masterDeviceId })
         .where(eq(schema.user.id, userId))
 
-      const data = (await resolver.deviceDecryptionChallenge(
-        fakeData.email,
+      return { userId, masterDeviceId, email: fakeData.email }
+    }
+
+    it('should return a DecryptionChallengeForApproval', async () => {
+      const { userId, email } = await insertApprovalRequiringUser()
+
+      const data = await resolver.deviceDecryptionChallenge(
+        email,
         {
           id: crypto.randomUUID(),
           name: 'chrome ',
           platform: 'macOS'
         },
         makeFakeCtx({ userId })
-      )) as DecryptionChallengeForApproval
+      )
 
-      expect(
-        (data as { addDeviceSecretEncrypted?: string })
-          ?.addDeviceSecretEncrypted
-      ).toBe(undefined)
+      expect(data).toBeInstanceOf(DecryptionChallengeForApproval)
+      expect(data).not.toHaveProperty('addDeviceSecretEncrypted')
+    })
+
+    it('withholds approval and verifier material from an unauthenticated request using the master device ID', async () => {
+      const { userId, masterDeviceId, email } =
+        await insertApprovalRequiringUser()
+
+      const data = await resolver.deviceDecryptionChallenge(
+        email,
+        { id: masterDeviceId, name: 'master device', platform: 'iOS' },
+        makeFakeCtx({ userId })
+      )
+
+      expect(data).toBeInstanceOf(DecryptionChallengeForApproval)
+      expect(data).not.toHaveProperty('addDeviceSecretEncrypted')
+      expect(data).not.toHaveProperty('encryptionSalt')
+    })
+
+    it('lets an authenticated master device create a password-change challenge without exposing verifier material unauthenticated', async () => {
+      const { userId, masterDeviceId, email } =
+        await insertApprovalRequiringUser()
+      const token = sign(
+        { userId, deviceId: masterDeviceId, tokenVersion: 0 },
+        process.env.ACCESS_TOKEN_SECRET!
+      )
+      const authCtx = {
+        ...makeFakeCtx({ userId, deviceId: masterDeviceId }),
+        request: {
+          headers: { authorization: `Bearer ${token}` },
+          cookies: {}
+        }
+      }
+      const authChallenge = await resolver.deviceDecryptionChallenge(
+        email,
+        { id: masterDeviceId, name: 'master device', platform: 'iOS' },
+        authCtx
+      )
+      expect(authChallenge).toBeInstanceOf(DecryptionChallengeForApproval)
+      expect(authChallenge).not.toHaveProperty('addDeviceSecretEncrypted')
+
+      // An unauthenticated caller cannot reuse that challenge to obtain verifier material.
+      const unauthResult = await resolver.deviceDecryptionChallenge(
+        email,
+        { id: masterDeviceId, name: 'master device', platform: 'iOS' },
+        makeFakeCtx({ userId })
+      )
+      expect(unauthResult).toBeInstanceOf(DecryptionChallengeForApproval)
+      expect(unauthResult).not.toHaveProperty('addDeviceSecretEncrypted')
+      expect(unauthResult).not.toHaveProperty('encryptionSalt')
+    })
+
+    it('rejects a device registered to another account before creating a challenge', async () => {
+      const victim = await insertApprovalRequiringUser()
+      // Anyone can sign up, so an attacker always knows one valid device id.
+      const attacker = await insertApprovalRequiringUser()
+
+      await expect(
+        resolver.deviceDecryptionChallenge(
+          victim.email,
+          { id: attacker.masterDeviceId, name: 'chrome', platform: 'macOS' },
+          makeFakeCtx({ userId: attacker.userId })
+        )
+      ).rejects.toThrow('Login failed')
+      const challenge = await db.query.decryptionChallenge.findFirst({
+        where: { userId: victim.userId, deviceId: attacker.masterDeviceId }
+      })
+      expect(challenge).toBeUndefined()
     })
 
     it("should show 'Too many decryption challenges, wait for cooldown'", async () => {

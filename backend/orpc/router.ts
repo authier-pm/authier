@@ -1,5 +1,7 @@
 import { updateResetConfig, getResetStatus } from '../lib/masterDeviceReset'
+import { resumeDeviceSession } from '../lib/resumeDeviceSession'
 import type { MasterDeviceResetConfig } from '../../shared/masterDeviceResetConfig'
+import type { NewDeviceApprovalPolicy } from '../../shared/newDeviceApproval'
 import { implement, ORPCError } from '@orpc/server'
 import { and, eq, sql } from 'drizzle-orm'
 import { verify } from 'jsonwebtoken'
@@ -116,11 +118,7 @@ const mapCurrentDevice = (device: {
 
 const mapSecurityState = (
   user: {
-    newDevicePolicy:
-      | 'ALLOW'
-      | 'REQUIRE_ANY_DEVICE_APPROVAL'
-      | 'REQUIRE_MASTER_DEVICE_APPROVAL'
-      | null
+    newDevicePolicy: NewDeviceApprovalPolicy | null
     masterDeviceResetConfig: MasterDeviceResetConfig
     deviceRecoveryCooldownMinutes: number
     masterDeviceId: string | null
@@ -154,6 +152,10 @@ const getPendingChallenges = async (
   ctx: OrpcContext['legacyCtx'],
   userId: string
 ) => {
+  const user = await ctx.db.query.user.findFirst({
+    where: { id: userId },
+    columns: { newDevicePolicy: true }
+  })
   const challenges = await ctx.db.query.decryptionChallenge.findMany({
     where: {
       userId,
@@ -168,6 +170,10 @@ const getPendingChallenges = async (
       const resetStatus = await getResetStatus(ctx.db, challenge.id)
 
       return {
+        approvalPolicy: user?.newDevicePolicy ?? 'EMAIL',
+        emailApprovalSentAt: asIsoString(challenge.emailApprovalSentAt),
+        emailApprovedAt: asIsoString(challenge.emailApprovedAt),
+        deviceApprovedAt: asIsoString(challenge.deviceApprovedAt),
         id: challenge.id,
         createdAt: challenge.createdAt.toISOString(),
         deviceName: challenge.deviceName,
@@ -461,6 +467,10 @@ export const vaultOrpcRouter = os.router({
 
           return {
             status: 'pending' as const,
+            approvalPolicy: result.approvalPolicy,
+            emailApprovalSentAt: asIsoString(result.emailApprovalSentAt),
+            emailApprovedAt: asIsoString(result.emailApprovedAt),
+            deviceApprovedAt: asIsoString(result.deviceApprovedAt),
             challengeId: result.id,
             pushNotificationsSentCount: result.pushNotificationsSentCount,
             pushNotificationsFailedCount: result.pushNotificationsFailedCount,
@@ -542,6 +552,20 @@ export const vaultOrpcRouter = os.router({
         }
       }
     ),
+    resumeDevice: os.auth.resumeDevice.handler(async ({ input, context }) => {
+      try {
+        const { user, device } = await resumeDeviceSession(context.legacyCtx, {
+          email: input.email,
+          deviceId: input.deviceInput.id,
+          currentAddDeviceSecret: input.currentAddDeviceSecret,
+          input: input.input
+        })
+
+        return getAuthenticatedSession(context.legacyCtx, user.id, device.id)
+      } catch (error) {
+        return raiseAsOrpcError(error)
+      }
+    }),
     initiateMasterDeviceReset: os.auth.initiateMasterDeviceReset.handler(
       async ({ input, context }) => {
         try {

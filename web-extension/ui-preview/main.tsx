@@ -39,12 +39,14 @@ import { VaultScrollingPreview } from './scenarios/VaultScrollingPreview'
 import { ClockSkewPreview } from './scenarios/ClockSkewPreview'
 import { AddItemPreview } from './scenarios/AddItemPreview'
 import { CredentialEditPreview } from './scenarios/CredentialEditPreview'
+import { SignupPreview } from './scenarios/SignupPreview'
 
 const DEFAULT_SCENARIO = 'autofill-controls'
 const scenarios: Record<string, ComponentType> = {
   [DEFAULT_SCENARIO]: AutofillControlsPreview,
   'add-item': AddItemPreview,
   'credential-edit': CredentialEditPreview,
+  signup: SignupPreview,
   'new-device-policy': NewDevicePolicyPreview,
   'master-device-recovery': MasterDeviceRecoveryPreview,
   'master-device-reset-progress': MasterDeviceResetProgressPreview,
@@ -89,6 +91,7 @@ document.body.classList.toggle(
     requestedScenario !== 'new-device-policy' &&
     requestedScenario !== 'add-item' &&
     requestedScenario !== 'credential-edit' &&
+    requestedScenario !== 'signup' &&
     !requestedScenario.startsWith('android-') &&
     requestedScenario !== 'bitfinex-totp' &&
     requestedScenario !== 'totp-labels' &&

@@ -18,14 +18,16 @@ interface VaultApi {
     suspend fun removeDevice(id: String)
     suspend fun setMasterDevice(id: String)
     suspend fun security(): SecurityInfo
-    suspend fun updatePolicy(policy: String): SecurityInfo
+    suspend fun updatePolicy(policy: NewDeviceApprovalPolicy): SecurityInfo
     suspend fun updateLockTimeout(seconds: Int)
 }
 
 data class DeviceSecretInput(val addDeviceSecret: String, val addDeviceSecretEncrypted: String, val encryptionSalt: String)
 data class AuthSession(val tokens: SessionTokens, val bootstrap: BootstrapInfo)
-data class BootstrapInfo(val email: String, val secrets: List<SecretRecord>, val lockTimeoutSeconds: Int, val approvals: List<ApprovalInfo>)
-data class LoginChallenge(val status: String, val challengeId: Int, val encryptionSalt: String? = null, val addDeviceSecretEncrypted: String? = null)
+data class BootstrapInfo(val email: String, val secrets: List<SecretRecord>, val lockTimeoutSeconds: Int, val approvals: List<ApprovalInfo>,
+    val newDevicePolicy: NewDeviceApprovalPolicy? = null, val masterDeviceId: String? = null)
+data class LoginChallenge(val status: String, val challengeId: Int, val encryptionSalt: String? = null, val addDeviceSecretEncrypted: String? = null,
+    val approvalProgress: LoginApprovalProgress? = null)
 data class SyncPage(val changes: List<SecretRecord>, val nextCursor: String, val hasMore: Boolean)
 
 class ApiFailure(val status: Int, message: String, val code: String? = null, cause: Throwable? = null, val details: ApiErrorDetails? = null) : Exception(message, cause)

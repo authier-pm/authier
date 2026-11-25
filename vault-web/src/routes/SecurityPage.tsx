@@ -10,7 +10,7 @@ import {
   CardHeader,
   CardTitle
 } from '@/components/ui/card'
-import { inputClassName } from '@/components/ui/input'
+import { NewDeviceApprovalSettings } from '@/components/NewDeviceApprovalSettings'
 import { orpc, orpcClient } from '@/lib/orpc'
 
 const lockTimeoutOptions = [300, 1800, 3600, 28800, 86400, 0]
@@ -30,36 +30,14 @@ export function SecurityPage() {
     <div className="grid gap-4 lg:grid-cols-3">
       <Card className="border-white/10 bg-[color:var(--color-surface)] backdrop-blur-[14px] lg:col-span-2">
         <CardHeader>
-          <CardTitle>Approval policy</CardTitle>
+          <CardTitle>New device approval</CardTitle>
           <CardDescription>
-            Decide which device can approve new browser sessions.
+            Choose how you approve new devices before they can access your
+            vault.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <select
-            className={`${inputClassName} h-10 px-3`}
-            defaultValue={security.newDevicePolicy ?? 'ALLOW'}
-            onChange={(event) => {
-              void orpcClient.security
-                .updateNewDevicePolicy({
-                  newDevicePolicy: event.target.value as
-                    | 'ALLOW'
-                    | 'REQUIRE_ANY_DEVICE_APPROVAL'
-                    | 'REQUIRE_MASTER_DEVICE_APPROVAL'
-                })
-                .then(() => {
-                  void securityQuery.refetch()
-                })
-            }}
-          >
-            <option value="ALLOW">Allow immediately</option>
-            <option value="REQUIRE_ANY_DEVICE_APPROVAL">
-              Require any approved device
-            </option>
-            <option value="REQUIRE_MASTER_DEVICE_APPROVAL">
-              Require master device approval
-            </option>
-          </select>
+          <NewDeviceApprovalSettings />
         </CardContent>
       </Card>
 

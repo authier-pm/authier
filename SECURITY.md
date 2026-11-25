@@ -4,22 +4,11 @@ notify us. We welcome working with you to resolve the issue promptly. Thanks in 
 
 Send security reports to **security@authier.pm**.
 
-## 84 LTC hacking prize
+## Hacking prize withdrawn
 
-Authier offers an **84 LTC (Litecoin)** reward for a verified attack that fully decrypts a user's
-stored vault secrets. Submissions must include a reproducible, programmatic proof of concept;
-access to ciphertext or metadata alone does not qualify. Use accounts you control and synthetic
-secrets, and demonstrate the attack without supplying the user's master password or legitimate
-decryption keys as inputs. The disclosure policy and scope below apply.
-
-Ideally, demonstrate the hack with a fresh Authier account created solely for the hack demo,
-populated with synthetic secrets.
-
-Your submission must include a Litecoin receiving address where we should send the 84 LTC reward
-if your attack qualifies.
-
-Read the announcement and submission requirements at
-https://www.authier.pm/blog/hack-authier-10-ltc and send your proof to **security@authier.pm**.
+Authier withdrew its public promise of a Litecoin reward for the vault decryption challenge on
+November 14, 2026. The [withdrawal notice and archived terms](https://www.authier.pm/blog/hack-authier-10-ltc)
+explain how to contact us about work already completed under the earlier offer.
 
 # Disclosure Policy
 

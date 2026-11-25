@@ -51,10 +51,36 @@ describe('passkey creation defaults for new devices', () => {
         deviceName: 'New browser',
         userId,
         ipAddress: '127.0.0.1',
-        approvedAt: new Date()
+        approvedAt: new Date(),
+        emailApprovedAt: new Date()
       })
       .returning()
     challenge = plainToInstance(DecryptionChallengeApproved, row)
+  })
+
+  const addApprovedDevice = async (name: string) => {
+    const id = crypto.randomUUID()
+    await db.insert(decryptionChallenge).values({
+      userId,
+      deviceId: id,
+      deviceName: name,
+      ipAddress: '127.0.0.1',
+      approvedAt: new Date(),
+      emailApprovedAt: new Date()
+    })
+    return actor.addDevice({ id, name, platform: 'test' }, null, context())
+  }
+
+  it('rejects legacy pairing without the configured approval', async () => {
+    const id = crypto.randomUUID()
+    await expect(
+      actor.addDevice(
+        { id, name: 'Unapproved pair', platform: 'test' },
+        null,
+        context()
+      )
+    ).rejects.toThrow('configured new-device approvals')
+    expect(await db.query.device.findFirst({ where: { id } })).toBeUndefined()
   })
 
   it('applies the saved default through both enrollment paths without changing existing devices', async () => {
@@ -81,11 +107,7 @@ describe('passkey creation defaults for new devices', () => {
     const legacy = await defaults.update(legacyConfig, context())
     expect(legacy.passkeyCreationVerificationRequired).toBe(false)
 
-    const added = await actor.addDevice(
-      { id: crypto.randomUUID(), name: 'Paired browser', platform: 'test' },
-      null,
-      context()
-    )
+    const added = await addApprovedDevice('Paired browser')
     expect(added.passkeyCreationVerificationRequired).toBe(false)
     await challenge.addNewDeviceForUser(input, input.addDeviceSecret, context())
     expect(
@@ -106,11 +128,7 @@ describe('passkey creation defaults for new devices', () => {
     ).toMatchObject({
       passkeyCreationVerificationRequired: false
     })
-    const later = await actor.addDevice(
-      { id: crypto.randomUUID(), name: 'Later browser', platform: 'test' },
-      null,
-      context()
-    )
+    const later = await addApprovedDevice('Later browser')
     expect(later.passkeyCreationVerificationRequired).toBe(true)
     expect(
       await db.query.device.findFirst({ where: { id: added.id } })

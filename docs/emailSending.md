@@ -1,6 +1,6 @@
 # Email sending
 
-Authier sends transactional emails through [Cloudflare Email Service](https://developers.cloudflare.com/email-service/get-started/send-emails/) using the Worker's native `EMAIL` binding. Verification, account-change, device and recovery notifications all use `backend/utils/email.ts`. The sender remains `Authier password manager <no-reply@authier.pm>`.
+Authier sends account verification, account change, device approval, device notification and recovery emails from `Authier password manager <no-reply@authier.pm>`. These flows share `backend/utils/email.ts` and use the Worker's native `EMAIL` binding. See [Cloudflare Email Service](https://developers.cloudflare.com/email-service/get-started/send-emails/).
 
 ## Production setup
 
@@ -10,7 +10,7 @@ The Cloudflare account must use Workers Paid to send to arbitrary recipients. In
 
 Deploy through `pnpm wrdeploy` from `backend` so pending migrations run first. Production Workers Builds must keep `pnpm run db:migrate && npx wrangler deploy`. Once the Cloudflare deployment is verified, the obsolete `MJ_APIKEY_PUBLIC` and `MJ_APIKEY_PRIVATE` secrets can be removed from the Worker, GitHub Actions and local environment files.
 
-Cloudflare send errors propagate to the caller. Failed reset confirmations roll back their database transaction; queued recovery notifications remain pending and are retried by the cron. A successful send means Cloudflare accepted the message, not that it reached the recipient's inbox. Delivery remains at-least-once if an invocation stops after Cloudflare accepts an email but before its database record is marked sent.
+The shared email interface propagates Cloudflare send errors to its callers. Cloudflare reports success when it accepts the message for delivery. New device approvals require a successful send outside tests. Failed reset confirmation sends roll back their database transaction. Queued recovery notifications remain pending and the cron retries them. It can send a duplicate if an invocation stops after Cloudflare accepts the email but before its database record is marked sent.
 
 ## Local development and tests
 

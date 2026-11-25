@@ -75,6 +75,7 @@
     "gbs": "cd backend && pnpm gbs",
     "schemas": "pnpm gbs && pnpm gfs",
     "preinstall": "npx only-allow pnpm",
+    "prepare": "husky",
     "release": "cd web-extension && pnpm run release",
     "fmt": "oxfmt",
     "fmt:check": "oxfmt --check",

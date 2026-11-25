@@ -11,7 +11,11 @@ import {
   useDevicesRequestsQuery,
   useRejectChallengeMutation
 } from '@shared/graphql/AccountDevices.codegen'
-import { UserNewDevicePolicy } from '@shared/generated/graphqlBaseTypes'
+import {
+  allowsDeviceApproval,
+  canDeviceApproveNewLogin
+} from '@shared/newDeviceApproval'
+import { NewDeviceApprovalProgress } from '@shared/NewDeviceApprovalStatus'
 import { LOGIN_DECRYPTION_CHALLENGE_REFETCH_INTERVAL } from '@src/background/loginSessionTypes'
 import { useDevicesListWithDataQuery } from './Devices.codegen'
 
@@ -26,10 +30,14 @@ export const NewDevicesApprovalStack = () => {
   const [approve] = useApproveChallengeMutation()
   const [approveReset] = useApproveMasterDeviceResetMutation()
 
-  const showMasterDevicePolicyHint =
-    device.id !== devicesRequests?.me.masterDeviceId &&
-    devicesRequests?.me.newDevicePolicy ===
-      UserNewDevicePolicy.REQUIRE_MASTER_DEVICE_APPROVAL
+  const deviceApprovalEnabled = allowsDeviceApproval(
+    devicesRequests?.me.newDevicePolicy ?? null
+  )
+  const canApprove = canDeviceApproveNewLogin(
+    devicesRequests?.me.newDevicePolicy ?? null,
+    device.id,
+    devicesRequests?.me.masterDeviceId
+  )
 
   return (
     <div className="mt-3 space-y-3">
@@ -48,6 +56,13 @@ export const NewDevicesApprovalStack = () => {
               <MasterDeviceResetProgress
                 status={challengeToApprove.resetStatus}
               />
+              {!challengeToApprove.resetStatus && (
+                <NewDeviceApprovalProgress
+                  policy={challengeToApprove.approvalPolicy}
+                  emailApprovedAt={challengeToApprove.emailApprovedAt}
+                  deviceApprovedAt={challengeToApprove.deviceApprovedAt}
+                />
+              )}
               <div className="flex flex-col gap-3 md:flex-row md:items-center">
                 <div className="text-sm text-[color:var(--color-foreground)]">
                   <Trans>
@@ -86,10 +101,12 @@ export const NewDevicesApprovalStack = () => {
                     <Trans>Reject</Trans>
                   </Button>
                   <Button
-                    disabled={Boolean(
-                      challengeToApprove.resetStatus &&
-                      device.id === devicesRequests?.me.masterDeviceId
-                    )}
+                    disabled={
+                      challengeToApprove.resetStatus
+                        ? device.id === devicesRequests?.me.masterDeviceId
+                        : !canApprove ||
+                          Boolean(challengeToApprove.deviceApprovedAt)
+                    }
                     onClick={async () => {
                       const action = challengeToApprove.resetStatus
                         ? approveReset
@@ -126,9 +143,9 @@ export const NewDevicesApprovalStack = () => {
           )
         }
       )}
-      {showMasterDevicePolicyHint ? (
+      {!deviceApprovalEnabled ? (
         <div className="text-center text-sm text-[color:var(--color-muted)]">
-          <Trans>Open device list on your master device to approve</Trans>
+          New device logins are approved through your account email.
         </div>
       ) : null}
     </div>

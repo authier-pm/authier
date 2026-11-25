@@ -19,6 +19,7 @@ import { useVaultLockTimeoutOptions } from '@src/util/useVaultLockTimeoutOptions
 import { serializeAutofillForbiddenUrlPatterns } from '@shared/autofillForbiddenUrlPatterns'
 import { toBackendSettings } from '@src/util/securitySettings'
 import { PasskeyCreationSettings } from './PasskeyCreationSettings'
+import { NewDeviceApprovalSettings } from '@src/pages-vault/NewDeviceApprovalSettings'
 
 interface Values {
   vaultLockTimeoutSeconds: number
@@ -54,6 +55,7 @@ export default function Security() {
       </CardHeader>
 
       <CardContent className="space-y-6">
+        <NewDeviceApprovalSettings />
         <PasskeyCreationSettings />
         <Formik
           initialValues={{

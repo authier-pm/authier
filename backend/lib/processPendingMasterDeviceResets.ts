@@ -42,7 +42,13 @@ export const processDueResets = async (db: DbType, now = new Date()) => {
       const challenge = await tx.query.decryptionChallenge.findFirst({
         where: { id: request.decryptionChallengeId }
       })
-      if (!challenge || challenge.rejectedAt || challenge.blockIp) return false
+      if (
+        !challenge ||
+        challenge.userId !== user.id ||
+        challenge.rejectedAt ||
+        challenge.blockIp
+      )
+        return false
       const devices = await tx
         .select()
         .from(schema.device)
@@ -69,6 +75,22 @@ export const processDueResets = async (db: DbType, now = new Date()) => {
           and(
             eq(schema.device.id, request.targetMasterDeviceId),
             eq(schema.device.userId, user.id)
+          )
+        )
+      // Completing the configured recovery authorizes only the device that
+      // requested this reset. Having no master device never approves other logins.
+      await tx
+        .update(schema.decryptionChallenge)
+        .set({
+          approvedAt: now,
+          approvedByRecovery: true,
+          emailApprovalTokenHash: null,
+          emailApprovalExpiresAt: null
+        })
+        .where(
+          and(
+            eq(schema.decryptionChallenge.id, request.decryptionChallengeId),
+            eq(schema.decryptionChallenge.userId, user.id)
           )
         )
       await tx

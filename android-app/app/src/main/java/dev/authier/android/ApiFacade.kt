@@ -88,7 +88,9 @@ class ApiFacade(serverUrl: String, private var currentDeviceId: String? = null) 
             is DeviceChallenge.ApprovedWrapper -> LoginChallenge(
                 "approved", result.value.challengeId, result.value.encryptionSalt, result.value.addDeviceSecretEncrypted
             )
-            is DeviceChallenge.PendingWrapper -> LoginChallenge("pending", result.value.challengeId)
+            is DeviceChallenge.PendingWrapper -> LoginChallenge("pending", result.value.challengeId,
+                approvalProgress = LoginApprovalProgress(NewDeviceApprovalPolicy.valueOf(result.value.approvalPolicy.value),
+                    result.value.emailApprovalSentAt, result.value.emailApprovedAt, result.value.deviceApprovedAt))
         }
     }
 
@@ -142,9 +144,9 @@ class ApiFacade(serverUrl: String, private var currentDeviceId: String? = null) 
     override suspend fun removeDevice(id: String) { request { device.devicesRemove(DevicesLogoutRequest(id)) } }
     override suspend fun setMasterDevice(id: String) { request { device.devicesSetMaster(DevicesSetMasterRequest(id)) } }
     override suspend fun security() = request { settings.securityGet(emptyInput).security.toDomain() }
-    override suspend fun updatePolicy(policy: String) = request {
+    override suspend fun updatePolicy(policy: NewDeviceApprovalPolicy) = request {
         settings.securityUpdateNewDevicePolicy(SecurityUpdateNewDevicePolicyRequest(
-            SecurityUpdateNewDevicePolicyRequest.NewDevicePolicy.valueOf(policy)
+            SecurityUpdateNewDevicePolicyRequest.NewDevicePolicy.valueOf(policy.name)
         )).security.toDomain()
     }
     override suspend fun updateLockTimeout(seconds: Int) {
@@ -155,12 +157,14 @@ class ApiFacade(serverUrl: String, private var currentDeviceId: String? = null) 
     private fun AuthenticatedSession.toDomain() = AuthSession(SessionTokens(accessToken, refreshToken), session.toDomain())
     private fun Session.toDomain(): BootstrapInfo {
         currentDeviceId = currentDevice.id
-        return BootstrapInfo(user.email.orEmpty(), secrets.map { it.toDomain() }, currentDevice.vaultLockTimeoutSeconds, pendingChallenges.map { it.toDomain() })
+        return BootstrapInfo(user.email.orEmpty(), secrets.map { it.toDomain() }, currentDevice.vaultLockTimeoutSeconds, pendingChallenges.map { it.toDomain() },
+            user.newDevicePolicy?.value?.let(NewDeviceApprovalPolicy::valueOf), user.masterDeviceId)
     }
     private fun ApiSecret.toDomain() = SecretRecord(id, encrypted, kind, version, createdAt, updatedAt)
     private fun SyncSecretRecord.toDomain() = SecretRecord(id, encrypted, kind, version, createdAt, updatedAt, deletedAt)
-    private fun PendingDeviceApproval.toDomain() = ApprovalInfo(id, deviceName, ipAddress, createdAt)
-    private fun SecurityState.toDomain() = SecurityInfo(newDevicePolicy?.value ?: "ALLOW", deviceRecoveryCooldownMinutes, masterDeviceId)
+    private fun PendingDeviceApproval.toDomain() = ApprovalInfo(id, deviceName, ipAddress, createdAt,
+        LoginApprovalProgress(NewDeviceApprovalPolicy.valueOf(approvalPolicy.value), emailApprovalSentAt, emailApprovedAt, deviceApprovedAt))
+    private fun SecurityState.toDomain() = SecurityInfo(newDevicePolicy?.value?.let(NewDeviceApprovalPolicy::valueOf), deviceRecoveryCooldownMinutes, masterDeviceId)
 
     private suspend fun <T> request(block: suspend () -> T): T {
         try {

@@ -62,7 +62,8 @@ describe('DecryptionChallenge', () => {
         deviceName: challenge.deviceName,
         userId,
         ipAddress: '127.0.0.1',
-        approvedAt: new Date()
+        approvedAt: new Date(),
+        emailApprovedAt: new Date()
       })
       .returning()
     Object.assign(challenge, row)
@@ -111,6 +112,7 @@ describe('DecryptionChallenge', () => {
 
       const input = makeAddNewDeviceInput()
       challenge.userId = userId
+      challenge.deviceId = crypto.randomUUID()
 
       await db.insert(schema.user).values({
         id: userId,
@@ -128,7 +130,8 @@ describe('DecryptionChallenge', () => {
           deviceName: challenge.deviceName,
           userId,
           ipAddress: '127.0.0.1',
-          approvedAt: new Date()
+          approvedAt: new Date(),
+          emailApprovedAt: new Date()
         })
         .returning()
       Object.assign(challenge, row)
@@ -160,7 +163,7 @@ describe('DecryptionChallenge', () => {
         addDeviceSecret: faker.string.sample(5),
         addDeviceSecretEncrypted: input.addDeviceSecretEncrypted,
         encryptionSalt: faker.string.sample(5),
-        newDevicePolicy: 'REQUIRE_MASTER_DEVICE_APPROVAL',
+        newDevicePolicy: 'OTHER_DEVICE',
         ...userSecurityProps
       })
 
@@ -216,7 +219,7 @@ describe('DecryptionChallenge', () => {
       await db.delete(schema.user).where(eq(schema.user.id, userId))
     })
 
-    it("should show 'Only the master device can approve a decryption challenge'", async () => {
+    it("should show 'Device is not active'", async () => {
       challengeMutation.id = faker.number.int({ min: 1, max: 1000 })
 
       const fakeCtx = {
@@ -233,9 +236,7 @@ describe('DecryptionChallenge', () => {
 
       await expect(
         async () => await challengeMutation.approve(fakeCtx)
-      ).rejects.toThrow(
-        'Only the master device can approve a decryption challenge'
-      )
+      ).rejects.toThrow('Device is not active')
 
       await db
         .delete(schema.decryptionChallenge)

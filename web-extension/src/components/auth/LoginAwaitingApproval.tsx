@@ -3,6 +3,7 @@ import {
   isResetConfirmationExpired
 } from '@shared/MasterDeviceResetProgress'
 import { useState } from 'react'
+import { NewDeviceApprovalStatus } from '@shared/NewDeviceApprovalStatus'
 import { t } from '@lingui/core/macro'
 import { Trans } from '@lingui/react/macro'
 import { IoWarningOutline } from 'react-icons/io5'
@@ -88,39 +89,13 @@ export const LoginAwaitingApproval = ({
       </div>
 
       <div className="mt-4 space-y-3 text-sm">
-        <p>
-          <Trans>
-            Approve this device in your device management in the vault on your
-            master device in order to proceed adding new device.
-          </Trans>
-        </p>
-        <p className="text-[color:var(--color-muted)]">
-          {compact ? (
-            <Trans>
-              After you approve it, the vault password will be checked and your
-              vault will open automatically in this popup.
-            </Trans>
-          ) : (
-            <Trans>
-              After you approve it, the vault password will be checked and your
-              vault will open automatically in this tab.
-            </Trans>
-          )}
-        </p>
-
-        <div className="rounded-[var(--radius-md)] border border-[color:var(--color-border)] bg-[color:var(--color-surface-muted)] px-3 py-2 text-xs text-[color:var(--color-muted)]">
-          <div>
-            <Trans>
-              Push notifications sent: {challenge.pushNotificationsSentCount}
-            </Trans>
-          </div>
-          <div>
-            <Trans>
-              Push notifications failed:{' '}
-              {challenge.pushNotificationsFailedCount}
-            </Trans>
-          </div>
-        </div>
+        <NewDeviceApprovalStatus
+          policy={challenge.approvalPolicy}
+          email={session.email}
+          emailApprovalSentAt={challenge.emailApprovalSentAt}
+          emailApprovedAt={challenge.emailApprovedAt}
+          deviceApprovedAt={challenge.deviceApprovedAt}
+        />
 
         {session.error ? (
           <div className="rounded-[var(--radius-md)] border border-amber-400/50 bg-amber-500/10 px-3 py-2 text-amber-200">

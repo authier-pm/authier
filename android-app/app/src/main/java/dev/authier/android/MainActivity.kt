@@ -82,7 +82,7 @@ fun AuthierApp(model: VaultViewModel, initialTab: Int = 0, notificationRequest: 
         }
     }
     Scaffold(containerColor = Canvas, bottomBar = {
-        if (state.unlocked) NavigationBar(containerColor = Canvas, tonalElevation = 0.dp) {
+        if (state.unlocked && !state.requiresApprovalSetup) NavigationBar(containerColor = Canvas, tonalElevation = 0.dp) {
             listOf("Vault" to Icons.Outlined.GridView, "Devices" to Icons.Outlined.Devices, "Settings" to Icons.Outlined.Tune).forEachIndexed { index, (label, icon) ->
                 NavigationBarItem(selected = tab == index, onClick = { tab = index; if (index > 0) model.loadDevices() }, icon = { Icon(icon, label) }, label = { Text(label) }, colors = NavigationBarItemDefaults.colors(indicatorColor = Mint.copy(alpha = .12f), selectedIconColor = Mint, selectedTextColor = Mint, unselectedIconColor = Muted, unselectedTextColor = Muted))
             }
@@ -92,6 +92,7 @@ fun AuthierApp(model: VaultViewModel, initialTab: Int = 0, notificationRequest: 
             if (state.busy) LinearProgressIndicator(Modifier.fillMaxWidth(), color = Mint, trackColor = Panel)
             if (state.error != null || state.notice != null) MessageBanner(state.error ?: state.notice.orEmpty(), state.error != null, model::clearMessage, state.errorDetails)
             if (!state.unlocked) key(state.lockGeneration) { AuthScreen(state, model) }
+            else if (state.requiresApprovalSetup) NewDeviceApprovalSetupScreen(state, model::changePolicy, model::lock)
             else when (tab) {
                 0 -> VaultScreen(state, model)
                 1 -> DevicesScreen(state, model)
