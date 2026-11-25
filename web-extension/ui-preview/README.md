@@ -8,8 +8,9 @@ valid credentials, while Formik still validates required credential fields. It
 captures `docs/screenshots/credential-edit-generator-validation.png`.
 
 In `credential-edit`, reveal the password and select “Show password positions”
-to see its numbered characters. Run `pnpm playwright:ui-preview passwordPositions.spec.ts`
-from `web-extension` to verify numbering, live edits, and masking. It captures
+to see its numbered characters across the full form width. Run
+`pnpm playwright:ui-preview passwordPositions.spec.ts` from `web-extension`
+to verify the layout, numbering, live edits, and masking. It captures
 `docs/screenshots/password-positions.png`.
 
 The `add-item` scenario renders the production add-item page in the vault shell.

@@ -37,6 +37,17 @@ test('shows numbered characters on the vault credential detail page while reveal
     page.getByRole('button', { name: 'Hide password positions' })
   ).toHaveAttribute('aria-expanded', 'true')
 
+  const formWidth = await password.evaluate(
+    (input) => input.closest('form')?.getBoundingClientRect().width
+  )
+  expect((await positions.boundingBox())?.width).toBe(formWidth)
+  expect(
+    await characters.evaluateAll(
+      (cells) =>
+        new Set(cells.map((cell) => cell.getBoundingClientRect().y)).size
+    )
+  ).toBe(1)
+
   await page.getByRole('heading', { name: 'Example Bank', exact: true }).click()
   await page.mouse.move(0, 0)
   await page.screenshot({

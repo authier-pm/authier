@@ -80,6 +80,8 @@ function LoginSecret({ secretProps }: { secretProps: ILoginSecret }) {
   const navigate = useNavigate()
   const toast = useAppToast()
   const [showPassword, setShowPassword] = useState(false)
+  const [showPositions, setShowPositions] = useState(false)
+  const positionsId = useId()
   const [isGeneratorOpen, setIsGeneratorOpen] = useState(false)
   const [updateSecret] = useUpdateEncryptedSecretMutation()
   const [removeWebInput] = useRemoveWebInputMutation()
@@ -157,6 +159,7 @@ function LoginSecret({ secretProps }: { secretProps: ILoginSecret }) {
       >
         {({ handleSubmit, setFieldValue, values }) => {
           const levelOfPassword = evaluatePasswordStrength(values.password)
+          const canShowPositions = showPassword && Boolean(values.password)
 
           return (
             <form
@@ -173,6 +176,15 @@ function LoginSecret({ secretProps }: { secretProps: ILoginSecret }) {
 
               <div className="space-y-2">
                 <PasswordField
+                  actions={
+                    canShowPositions && (
+                      <PasswordPositionsButton
+                        expanded={showPositions}
+                        onClick={() => setShowPositions((current) => !current)}
+                        panelId={positionsId}
+                      />
+                    )
+                  }
                   copyLabel={t`Copy password`}
                   label="Password"
                   name="password"
@@ -187,13 +199,13 @@ function LoginSecret({ secretProps }: { secretProps: ILoginSecret }) {
                     setIsGeneratorOpen((currentValue) => !currentValue)
                   }}
                   onToggleVisibility={() => {
+                    setShowPositions(false)
                     setShowPassword((currentValue) => !currentValue)
                   }}
                   showValue={showPassword}
                   toggleGeneratorLabel={
                     isGeneratorOpen ? 'Hide generator' : 'Show generator'
                   }
-                  withPasswordPositions
                 />
                 <PasswordStrengthBar
                   color={levelOfPassword.color ?? 'red'}
@@ -202,7 +214,13 @@ function LoginSecret({ secretProps }: { secretProps: ILoginSecret }) {
                 />
               </div>
 
-              <div className="md:col-span-2">
+              <div className="space-y-5 md:col-span-2">
+                {canShowPositions && showPositions && (
+                  <PasswordPositions
+                    id={positionsId}
+                    password={values.password}
+                  />
+                )}
                 <PasswordGenerator
                   isOpen={isGeneratorOpen}
                   onGenerate={(generatedPassword) => {
@@ -635,6 +653,7 @@ function NumberField({ label, name }: { label: string; name: string }) {
 }
 
 function PasswordField({
+  actions,
   copyLabel,
   label,
   name,
@@ -642,9 +661,9 @@ function PasswordField({
   onToggleGenerator,
   onToggleVisibility,
   showValue,
-  toggleGeneratorLabel,
-  withPasswordPositions = false
+  toggleGeneratorLabel
 }: {
+  actions?: ReactNode
   copyLabel: string
   label: string
   name: string
@@ -653,14 +672,9 @@ function PasswordField({
   onToggleVisibility: () => void
   showValue: boolean
   toggleGeneratorLabel: string | null
-  withPasswordPositions?: boolean
 }) {
   const [field, meta] = useField<string>(name)
   const inputId = useId()
-  const positionsId = `${inputId}-positions`
-  const [showPositions, setShowPositions] = useState(false)
-  const canShowPositions =
-    withPasswordPositions && showValue && Boolean(field.value)
 
   return (
     <div className="space-y-2">
@@ -698,10 +712,7 @@ function PasswordField({
           </Tooltip>
           <Button
             aria-label={showValue ? 'Hide value' : 'Show value'}
-            onClick={() => {
-              setShowPositions(false)
-              onToggleVisibility()
-            }}
+            onClick={onToggleVisibility}
             size="icon"
             type="button"
             variant="ghost"
@@ -731,18 +742,8 @@ function PasswordField({
             {toggleGeneratorLabel}
           </Button>
         ) : null}
-        {canShowPositions && (
-          <PasswordPositionsButton
-            expanded={showPositions}
-            onClick={() => setShowPositions((current) => !current)}
-            panelId={positionsId}
-          />
-        )}
+        {actions}
       </div>
-
-      {canShowPositions && showPositions && (
-        <PasswordPositions id={positionsId} password={field.value} />
-      )}
 
       {meta.touched && meta.error ? (
         <p className="text-xs text-[color:var(--color-danger)]">{meta.error}</p>
